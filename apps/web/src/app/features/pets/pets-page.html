@@ -1,0 +1,84 @@
+<div class="pm-page">
+  <h1 class="title">{{ 'PET.TITLE' | translate }}</h1>
+
+  <mat-card class="add-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="add()" class="form">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'PET.NAME' | translate }}</mat-label>
+          <input matInput formControlName="name" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'PET.SPECIES' | translate }}</mat-label>
+          <input matInput formControlName="kind" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'PET.BREED' | translate }}</mat-label>
+          <input matInput formControlName="breed" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'PET.STATUS' | translate }}</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="TOGETHER">{{ 'PET.TOGETHER' | translate }}</mat-option>
+            <mat-option value="PASSED_AWAY">{{ 'PET.PASSED_AWAY' | translate }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button class="pm-button-primary" type="submit" [disabled]="pendingAdd()">
+          {{ 'PET.ADD_NEW' | translate }}
+        </button>
+      </form>
+
+      @if (errorAdd(); as codeError) {
+        <p class="error" role="alert">{{ codeError | translate }}</p>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('EMPTY') {
+      <div class="center empty">
+        <p>{{ 'PET.EMPTY' | translate }}</p>
+      </div>
+    }
+    @case ('HAS_DATA') {
+      <div class="grid">
+        @for (pet of list(); track pet._id) {
+          <mat-card class="pet-card" [class.memorial]="pet.status === 'PASSED_AWAY'">
+            <mat-card-header>
+              <mat-card-title>{{ pet.name }}</mat-card-title>
+              <mat-card-subtitle>{{ pet.kind }} {{ pet.breed }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-chip-set>
+                <mat-chip>{{ keyStatus(pet) | translate }}</mat-chip>
+              </mat-chip-set>
+            </mat-card-content>
+            <mat-card-actions align="end">
+              <a class="pm-button-secondary" [routerLink]="['/pets', pet._id, 'photos']">
+                {{ 'PET.MANAGE_PHOTOS' | translate }}
+              </a>
+              <button class="pm-button-secondary small" type="button" (click)="hide(pet)">
+                {{ 'COMMON.REMOVE' | translate }}
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        }
+      </div>
+    }
+  }
+</div>

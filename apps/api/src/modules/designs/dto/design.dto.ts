@@ -1,0 +1,102 @@
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { PreviewAngle } from '../schemas/design.schema';
+
+/** Caps how many faces one mesh may carry, so a record cannot balloon. */
+export const COUNT_FACE_MAX = 20000;
+export const COUNT_MESH_MAX = 30;
+export const COUNT_DESIGN_MAX = 30;
+
+export class MeshPaintDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  mesh!: string;
+
+  /**
+   * The colour string for a whole mesh: every six hex characters is one face.
+   * Its length must divide by six, otherwise the data is corrupt.
+   */
+  @Matches(/^(?:[0-9a-f]{6})*$/, {
+    message: 'Chuoi mau phai gom cac nhom sau ky tu he muoi sau viet thuong',
+  })
+  @MaxLength(COUNT_FACE_MAX * 6)
+  color!: string;
+}
+
+export class EngravingDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  name?: string;
+
+  @IsOptional()
+  @IsDateString()
+  memorialDate?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  message?: string;
+}
+
+export class SaveDesignDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(100)
+  name!: string;
+
+  /**
+   * Base model code. Letters, digits, hyphen and underscore only, so nobody can
+   * smuggle a file path in here.
+   */
+  @Matches(/^[A-Za-z0-9_-]{1,60}$/, { message: 'Ma mo hinh khong hop le' })
+  modelCode!: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(COUNT_MESH_MAX)
+  @ValidateNested({ each: true })
+  @Type(() => MeshPaintDto)
+  paint?: MeshPaintDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(64)
+  @Matches(/^[A-Z0-9-]{1,20}$/, { each: true })
+  colorCodesUsed?: string[];
+
+  @IsOptional()
+  @Matches(/^[A-Za-z0-9-]{0,40}$/)
+  productTypeCode?: string;
+
+  @IsOptional()
+  @Matches(/^[A-Za-z0-9-]{0,40}$/)
+  sizeCode?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => EngravingDto)
+  engraving?: EngravingDto;
+
+  @IsOptional()
+  @IsMongoId()
+  pet?: string;
+}
+
+export class UploadPreviewDto {
+  @IsEnum(PreviewAngle)
+  angle!: PreviewAngle;
+}

@@ -1,0 +1,190 @@
+<div class="pm-page">
+  <a class="back-link" routerLink="/pets">← {{ 'PHOTO.BACK_TO_PETS' | translate }}</a>
+
+  <header class="page-header">
+    <h1 class="title">{{ 'PHOTO.TITLE' | translate }}</h1>
+    <p class="description">{{ 'PHOTO.DESCRIPTION' | translate }}</p>
+
+    <div class="progress" role="status">
+      <span class="angle-count" [class.raw]="facade.rawAngle()">
+        {{ facade.anglesFilled() }}/{{ facade.requiredAngleCount }}
+      </span>
+      <span>{{ (facade.rawAngle() ? 'PHOTO.RAW_ANGLE' : 'PHOTO.REMAINING_MISSING_ANGLE') | translate }}</span>
+    </div>
+  </header>
+
+  @if (facade.error(); as codeError) {
+    <p class="error" role="alert">{{ codeError | translate }}</p>
+  }
+
+  @switch (facade.status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="facade.reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('READY') {
+      <section class="operations-panel">
+        <h2>{{ 'PHOTO.SELECT_OPERATION' | translate }}</h2>
+        <p class="note">{{ 'PHOTO.NOTE_RESTORE' | translate }}</p>
+        <div class="checkbox-row">
+          @for (op of operations(); track op.code) {
+            <mat-checkbox [checked]="op.chosen" (change)="changeOperation(op.code, $event.checked)">
+              {{ op.key | translate }}
+            </mat-checkbox>
+          }
+        </div>
+      </section>
+
+      <div class="angle-grid">
+        @for (o of facade.tiles(); track o.angle) {
+          <section class="angle-slot" [class.missing]="o.required && !o.photo">
+            <h2 class="angle-name">
+              {{ o.keyAngle | translate }}
+              @if (o.required) {
+                <span class="asterisk" [attr.aria-label]="'PHOTO.REQUIRED' | translate">*</span>
+              }
+            </h2>
+
+            @if (o.photo; as photo) {
+              <div class="photo-frame">
+                @if (facade.sourcePhoto()[photo.raw._id]; as src) {
+                  <img [src]="src" [alt]="o.keyAngle | translate" />
+                } @else {
+                  <div class="photo-loading"><mat-spinner diameter="28" /></div>
+                }
+              </div>
+
+              <p class="label" [attr.data-label]="photo.raw.quality.label">
+                {{ photo.keyLabel | translate }}
+              </p>
+              <p class="spec">{{ photo.raw.quality.width }}×{{ photo.raw.quality.height }}</p>
+
+              @if (photo.warningKeys.length > 0) {
+                <ul class="warning">
+                  @for (key of photo.warningKeys; track key) {
+                    <li>{{ key | translate }}</li>
+                  }
+                </ul>
+              }
+
+              <div class="button-row">
+                @if (photo.shouldRestore && !o.versionRestore) {
+                  <button
+                    class="pm-button-primary"
+                    type="button"
+                    [disabled]="facade.pendingRestore() === photo.raw._id"
+                    (click)="startRestore(photo.raw._id)"
+                  >
+                    {{ 'PHOTO.RESTORE' | translate }}
+                  </button>
+                }
+                @if (o.versionRestore) {
+                  <button class="pm-button-secondary" type="button" (click)="facade.openCompare(photo.raw._id)">
+                    {{ 'PHOTO.VIEW_COMPARISON' | translate }}
+                  </button>
+                }
+                <button class="pm-button-secondary small" type="button" (click)="facade.remove(photo.raw)">
+                  {{ 'COMMON.REMOVE' | translate }}
+                </button>
+              </div>
+
+              @if (o.versionRestore?.raw?.confirmedByOwner) {
+                <p class="in-use">{{ 'PHOTO.PENDING_BUILD_VERSION_RESTORE' | translate }}</p>
+              }
+            } @else {
+              <label class="empty-slot" [attr.for]="o.slotId">
+                <span class="photo-frame empty" aria-hidden="true">＋</span>
+                <span class="choose-button">{{ 'PHOTO.SELECT_FILE' | translate }}</span>
+                <input
+                  class="visually-hidden"
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  [id]="o.slotId"
+                  [attr.aria-label]="o.keyAngle | translate"
+                  (change)="selectFile(o, $event)"
+                />
+              </label>
+              @if (facade.uploading() === o.angle) {
+                <div class="pm-center"><mat-spinner diameter="24" /></div>
+              }
+            }
+          </section>
+        }
+      </div>
+    }
+  }
+
+  @if (cellCompare(); as o) {
+    @if (o.photo && o.versionRestore) {
+      <div
+        class="overlay"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-label]="'PHOTO.COMPARE' | translate"
+        (keydown.escape)="facade.openCompare(null)"
+      >
+        <div class="compare-dialog" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+          <h2>{{ 'PHOTO.COMPARE' | translate }}</h2>
+
+          <div class="photo-pair">
+            <figure>
+              <figcaption>{{ 'PHOTO.VERSION_ANGLE' | translate }}</figcaption>
+              @if (facade.sourcePhoto()[o.photo.raw._id]; as src) {
+                <img [src]="src" [alt]="'PHOTO.VERSION_ANGLE' | translate" />
+              }
+              <p class="spec">
+                {{ o.photo.raw.quality.width }}×{{ o.photo.raw.quality.height }} ·
+                {{ o.photo.keyLabel | translate }}
+              </p>
+            </figure>
+            <figure>
+              <figcaption>{{ 'PHOTO.VERSION_RESTORE' | translate }}</figcaption>
+              @if (facade.sourcePhoto()[o.versionRestore.raw._id]; as src) {
+                <img [src]="src" [alt]="'PHOTO.VERSION_RESTORE' | translate" />
+              }
+              <p class="spec">
+                {{ o.versionRestore.raw.quality.width }}×{{ o.versionRestore.raw.quality.height }} ·
+                {{ o.versionRestore.keyLabel | translate }}
+              </p>
+              @if (o.versionRestore.raw.resemblance !== null) {
+                <p class="spec">
+                  {{
+                    'PHOTO.RESEMBLANCE'
+                      | translate: { percent: o.versionRestore.raw.resemblance }
+                  }}
+                </p>
+              }
+            </figure>
+          </div>
+
+          @if (o.versionRestore.resemblanceLow) {
+            <p class="resemblance-warning" role="alert">
+              {{ 'PHOTO.RESEMBLANCE_LOW' | translate }}
+            </p>
+          }
+
+          <p class="note">{{ 'PHOTO.NOTE_CONFIRM' | translate }}</p>
+
+          <div class="button-row">
+            <button class="pm-button-primary" type="button" (click)="facade.decide(o.versionRestore.raw, true)">
+              {{ 'PHOTO.USE_THIS_VERSION' | translate }}
+            </button>
+            <button class="pm-button-secondary" type="button" (click)="facade.decide(o.versionRestore.raw, false)">
+              {{ 'PHOTO.KEEP_VERSION_ANGLE' | translate }}
+            </button>
+            <button class="pm-button-secondary small" type="button" (click)="facade.openCompare(null)">
+              {{ 'COMMON.CLOSE' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

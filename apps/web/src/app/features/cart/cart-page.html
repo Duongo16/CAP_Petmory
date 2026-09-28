@@ -1,0 +1,65 @@
+<h1 class="pm-page-title">{{ 'CART.TITLE' | translate }}</h1>
+
+@switch (status()) {
+  @case ('LOADING') {
+    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+  }
+  @case ('ERROR') {
+    <div class="pm-center">
+      <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+      <button type="button" class="pm-button-secondary" (click)="reload()">{{ 'COMMON.RETRY' | translate }}</button>
+    </div>
+  }
+  @case ('READY') {
+    @if (cart().items.length === 0) {
+      <div class="pm-center">
+        <p class="pm-empty">{{ 'CART.EMPTY' | translate }}</p>
+        <a class="pm-button-primary" routerLink="/products">{{ 'CART.VIEW_PRODUCTS' | translate }}</a>
+      </div>
+    } @else {
+      <div class="layout">
+        <ul class="list">
+          @for (item of cart().items; track item.id) {
+            <li class="line-item pm-card">
+              <div class="text">
+                <h2 class="name">{{ item.displayName }}</h2>
+                @if (item.petName) {
+                  <p class="sub">{{ item.petName }}</p>
+                }
+                <p class="sub">{{ item.unitPrice | amount: item.currency }}</p>
+              </div>
+
+              <div class="stepper">
+                <button type="button" (click)="changeQuantity(item, -1)" [disabled]="item.quantity <= 1" aria-label="-">−</button>
+                <span class="number">{{ item.quantity }}</span>
+                <button type="button" (click)="changeQuantity(item, 1)" [disabled]="item.quantity >= 99" aria-label="+">+</button>
+              </div>
+
+              <button type="button" class="remove-button" (click)="remove(item)">
+                {{ 'COMMON.REMOVE' | translate }}
+              </button>
+            </li>
+          }
+        </ul>
+
+        <aside class="summary pm-card">
+          <h2 class="section-title">{{ 'CART.SUMMARY' | translate }}</h2>
+          <div class="line">
+            <span>{{ 'CART.COUNT_ITEM' | translate }}</span>
+            <strong>{{ cart().countItem }}</strong>
+          </div>
+          <div class="line">
+            <span>{{ 'CART.LEAD_TIME' | translate }}</span>
+            <strong>{{ 'PRODUCT.DAYS' | translate: { count: cart().productionDaysMax } }}</strong>
+          </div>
+          <div class="line total">
+            <span>{{ 'PRODUCT.TOTAL' | translate }}</span>
+            <strong class="amount">{{ cart().total | amount: cart().currency }}</strong>
+          </div>
+          <a class="pm-button-primary wide" routerLink="/checkout">{{ 'CART.CHECKOUT' | translate }}</a>
+          <p class="note">{{ 'CART.SHIPPING_FEE_NOTE' | translate }}</p>
+        </aside>
+      </div>
+    }
+  }
+}

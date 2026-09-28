@@ -1,0 +1,224 @@
+<div class="pm-page">
+  <a class="back-link" routerLink="/community">← {{ 'COMMUNITY.POST.BACK' | translate }}</a>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="36" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="pm-button-secondary" (click)="load()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @default {
+      @if (data(); as d) {
+        <div class="layout">
+          <article class="main-column pm-card">
+            <header class="post-head">
+              <a class="author" [routerLink]="['/community/users', d.post.author.id]">
+                <span class="avatar" aria-hidden="true">{{ d.post.author.initial }}</span>
+                <span class="author-text">
+                  <span class="author-name">{{ d.post.author.fullName }}</span>
+                  <span class="post-meta">
+                    {{ d.post.createdAt | date: 'dd/MM/yyyy HH:mm' }} ·
+                    {{ topicKey() | translate }}
+                  </span>
+                </span>
+              </a>
+            </header>
+
+            <h1 class="post-title">{{ d.post.title }}</h1>
+            <p class="post-text">{{ d.post.content }}</p>
+
+            @if (photoUrls().length > 0) {
+              <figure class="gallery">
+                <img
+                  [src]="currentPhoto()"
+                  [alt]="'COMMUNITY.POST.PHOTO_OF' | translate: { title: d.post.title }"
+                />
+                @if (photoUrls().length > 1) {
+                  <button type="button" class="nav prev" (click)="showPhoto(-1)">
+                    <span aria-hidden="true">‹</span>
+                    <span class="sr-only">{{ 'COMMON.BACK' | translate }}</span>
+                  </button>
+                  <button type="button" class="nav next" (click)="showPhoto(1)">
+                    <span aria-hidden="true">›</span>
+                    <span class="sr-only">{{ 'COMMON.RETRY' | translate }}</span>
+                  </button>
+                  <figcaption class="counter">
+                    {{ photoIndex() + 1 }} / {{ photoUrls().length }}
+                  </figcaption>
+                }
+              </figure>
+
+              @if (photoUrls().length > 1) {
+                <ul class="thumbs">
+                  @for (url of photoUrls(); track url; let i = $index) {
+                    <li>
+                      <button type="button" [class.is-on]="i === photoIndex()" (click)="pickPhoto(i)">
+                        <img
+                          [src]="url"
+                          [alt]="'COMMUNITY.POST.PHOTO_OF' | translate: { title: d.post.title }"
+                        />
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+            }
+
+            @if (d.post.tags.length > 0) {
+              <ul class="tag-list">
+                @for (tag of d.post.tags; track tag) {
+                  <li class="pm-status">#{{ tag }}</li>
+                }
+              </ul>
+            }
+
+            <footer class="post-foot">
+              <button
+                type="button"
+                class="react"
+                [class.is-on]="d.post.likedByMe"
+                [disabled]="!user()"
+                (click)="toggleLike()"
+              >
+                <pm-icon name="heart" [size]="17" [filled]="d.post.likedByMe" />
+                <span>{{ d.post.likeCount }}</span>
+              </button>
+              <span class="react">
+                <pm-icon name="comment" [size]="17" />
+                <span>{{ d.post.commentCount }}</span>
+              </span>
+              <button
+                type="button"
+                class="react"
+                [class.is-on]="d.post.savedByMe"
+                [disabled]="!user()"
+                (click)="toggleSave()"
+              >
+                <pm-icon name="bookmark" [size]="17" [filled]="d.post.savedByMe" />
+                <span>
+                  {{
+                    (d.post.savedByMe ? 'COMMUNITY.POST.SAVED' : 'COMMUNITY.POST.SAVE') | translate
+                  }}
+                </span>
+              </button>
+            </footer>
+
+            <section class="comments">
+              <h2 class="pm-section-title">
+                {{ 'COMMUNITY.DETAIL.COMMENTS' | translate: { count: comments().length } }}
+              </h2>
+
+              @if (user()) {
+                <form class="comment-form" (ngSubmit)="send()">
+                  <label class="sr-only" for="comment-input">
+                    {{ 'COMMUNITY.DETAIL.COMMENT_PLACEHOLDER' | translate }}
+                  </label>
+                  <input
+                    id="comment-input"
+                    name="comment"
+                    maxlength="2000"
+                    [placeholder]="'COMMUNITY.DETAIL.COMMENT_PLACEHOLDER' | translate"
+                    [(ngModel)]="draft"
+                  />
+                  <button type="submit" class="pm-button-primary" [disabled]="sending()">
+                    {{ 'COMMUNITY.DETAIL.SEND' | translate }}
+                  </button>
+                </form>
+              }
+
+              <ul class="comment-list">
+                @for (comment of comments(); track comment.id) {
+                  <li>
+                    <span class="avatar sm" aria-hidden="true">{{ comment.author.initial }}</span>
+                    <div>
+                      <p class="comment-head">
+                        <strong>{{ comment.author.fullName }}</strong>
+                        <span>{{ comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                      </p>
+                      <p class="comment-text">{{ comment.content }}</p>
+                    </div>
+                  </li>
+                }
+              </ul>
+            </section>
+          </article>
+
+          <aside class="side-column">
+            <section class="pm-card side-card">
+              <h2 class="pm-section-title">{{ 'COMMUNITY.DETAIL.INFO' | translate }}</h2>
+              <dl class="info-list">
+                <dt>{{ 'COMMUNITY.DETAIL.TOPIC' | translate }}</dt>
+                <dd>{{ topicKey() | translate }}</dd>
+                <dt>{{ 'COMMUNITY.DETAIL.TIME' | translate }}</dt>
+                <dd>{{ d.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+                <dt>{{ 'COMMUNITY.DETAIL.VIEWS' | translate }}</dt>
+                <dd>{{ d.post.viewCount }}</dd>
+              </dl>
+            </section>
+
+            @if (relatedCards().length > 0) {
+              <section class="pm-card side-card">
+                <h2 class="pm-section-title">{{ 'COMMUNITY.DETAIL.RELATED' | translate }}</h2>
+                <ul class="related-list">
+                  @for (card of relatedCards(); track card.raw.id) {
+                    <li>
+                      <a [routerLink]="['/community/posts', card.raw.id]">
+                        @if (card.cover) {
+                          <img [src]="card.cover" alt="" />
+                        } @else {
+                          <span class="thumb-blank"><pm-icon name="paw" [size]="20" /></span>
+                        }
+                        <span class="related-text">
+                          <strong>{{ card.raw.title }}</strong>
+                          <span>{{ card.raw.likeCount }} · {{ card.raw.commentCount }}</span>
+                        </span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+
+            <section class="pm-card side-card">
+              <h2 class="pm-section-title">{{ 'COMMUNITY.DETAIL.BY_AUTHOR' | translate }}</h2>
+              <a class="author" [routerLink]="['/community/users', d.post.author.id]">
+                <span class="avatar" aria-hidden="true">{{ d.post.author.initial }}</span>
+                <span class="author-text">
+                  <span class="author-name">{{ d.post.author.fullName }}</span>
+                  <span class="post-meta">
+                    {{ 'COMMUNITY.DETAIL.POST_COUNT' | translate: { count: d.author.postCount } }} ·
+                    {{
+                      'COMMUNITY.DETAIL.FOLLOWER_COUNT'
+                        | translate: { count: d.author.followerCount }
+                    }}
+                  </span>
+                </span>
+              </a>
+              @if (user() && !d.post.mine) {
+                <button
+                  type="button"
+                  class="pm-chip follow"
+                  [class.is-selected]="d.author.followedByMe"
+                  (click)="toggleFollow()"
+                >
+                  {{
+                    (d.author.followedByMe
+                      ? 'COMMUNITY.DETAIL.FOLLOWING'
+                      : 'COMMUNITY.DETAIL.FOLLOW'
+                    ) | translate
+                  }}
+                </button>
+              }
+            </section>
+          </aside>
+        </div>
+      }
+    }
+  }
+</div>

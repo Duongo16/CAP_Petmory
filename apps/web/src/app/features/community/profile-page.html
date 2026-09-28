@@ -1,0 +1,113 @@
+<div class="pm-page">
+  <a class="back-link" routerLink="/community">← {{ 'COMMUNITY.POST.BACK' | translate }}</a>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="36" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="pm-button-secondary" (click)="load()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @default {
+      @if (profile(); as p) {
+        <header class="cover pm-card">
+          <div class="cover-art"><pm-icon name="paw" [size]="40" /></div>
+          <div class="identity">
+            <span class="avatar" aria-hidden="true">{{ p.initial }}</span>
+            <div class="identity-text">
+              <h1>{{ p.fullName }}</h1>
+              <p class="handle">{{ p.handle }}</p>
+            </div>
+            @if (user() && !p.mine) {
+              <button
+                type="button"
+                class="pm-chip"
+                [class.is-selected]="p.followedByMe"
+                (click)="toggleFollow()"
+              >
+                {{
+                  (p.followedByMe ? 'COMMUNITY.DETAIL.FOLLOWING' : 'COMMUNITY.DETAIL.FOLLOW')
+                    | translate
+                }}
+              </button>
+            }
+          </div>
+
+          <dl class="stats">
+            <div>
+              <dt>{{ 'COMMUNITY.PROFILE.POSTS' | translate }}</dt>
+              <dd>{{ p.postCount }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'COMMUNITY.PROFILE.FOLLOWERS' | translate }}</dt>
+              <dd>{{ p.followerCount }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'COMMUNITY.PROFILE.FOLLOWING' | translate }}</dt>
+              <dd>{{ p.followingCount }}</dd>
+            </div>
+          </dl>
+        </header>
+
+        <div class="layout">
+          <section class="posts">
+            <h2 class="pm-section-title">{{ 'COMMUNITY.PROFILE.POSTS' | translate }}</h2>
+            @if (empty()) {
+              <p class="pm-empty">{{ 'COMMUNITY.PROFILE.NO_POST' | translate }}</p>
+            } @else {
+              <ul class="post-list">
+                @for (card of cards(); track card.raw.id) {
+                  <li class="pm-card pm-card-interactive">
+                    <a [routerLink]="['/community/posts', card.raw.id]">
+                      @if (card.cover) {
+                        <img [src]="card.cover" alt="" />
+                      }
+                      <div class="post-text">
+                        <span class="pm-status" data-tone="accent">
+                          {{ card.topicKey | translate }}
+                        </span>
+                        <strong>{{ card.raw.title }}</strong>
+                        <span class="post-meta">
+                          {{ card.raw.createdAt | date: 'dd/MM/yyyy' }} ·
+                          {{ card.raw.likeCount }} · {{ card.raw.commentCount }}
+                        </span>
+                      </div>
+                    </a>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+
+          <aside class="side-column">
+            <section class="pm-card side-card">
+              <h2 class="pm-section-title">
+                {{ 'COMMUNITY.PROFILE.PETS' | translate: { count: p.pets.length } }}
+              </h2>
+              @if (p.pets.length === 0) {
+                <p class="pm-empty">{{ 'COMMON.NO_DATA' | translate }}</p>
+              } @else {
+                <ul class="pet-list">
+                  @for (pet of p.pets; track pet.id) {
+                    <li>
+                      <span class="pet-avatar"><pm-icon name="paw" [size]="19" /></span>
+                      <span class="pet-text">
+                        <strong>{{ pet.name }}</strong>
+                        <span>{{ pet.kind }} {{ pet.breed }}</span>
+                      </span>
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+          </aside>
+        </div>
+      }
+    }
+  }
+</div>

@@ -1,0 +1,287 @@
+<div class="pm-page community">
+  <section class="banner">
+    <div class="banner-text">
+      <h1>{{ 'COMMUNITY.TITLE' | translate }}</h1>
+      <p>{{ 'COMMUNITY.SUBTITLE' | translate }}</p>
+    </div>
+    <span class="banner-art" aria-hidden="true"><pm-icon name="paw" [size]="42" /></span>
+  </section>
+
+  <div class="layout">
+    <div class="feed-column">
+      <div class="chips" role="group" [attr.aria-label]="'COMMUNITY.TOPIC.ALL' | translate">
+        @for (chip of facade.chips(); track chip.key) {
+          <button
+            type="button"
+            class="pm-chip"
+            [attr.aria-pressed]="facade.topic() === chip.topic"
+            (click)="facade.chooseTopic(chip.topic)"
+          >
+            {{ chip.key | translate }}
+            <span class="chip-count">{{ chip.count }}</span>
+          </button>
+        }
+      </div>
+
+      @if (user()) {
+        <section class="composer pm-card">
+          @if (!composing()) {
+            <div class="composer-row">
+              <span class="avatar" aria-hidden="true">{{ user()!.fullName.charAt(0) }}</span>
+              <button type="button" class="composer-prompt" (click)="openComposer('MOMENT')">
+                {{ 'COMMUNITY.COMPOSER.PROMPT' | translate }}
+              </button>
+            </div>
+            <div class="composer-actions">
+              <button type="button" class="pm-chip" (click)="openComposer('MOMENT')">
+                <pm-icon name="image" [size]="17" /> {{ 'COMMUNITY.COMPOSER.PHOTO' | translate }}
+              </button>
+              <button type="button" class="pm-chip" (click)="openComposer('MEMORIAL')">
+                <pm-icon name="candle" [size]="17" /> {{ 'COMMUNITY.COMPOSER.MEMORIAL' | translate }}
+              </button>
+              <button type="button" class="pm-chip" (click)="openComposer('EXPERIENCE')">
+                <pm-icon name="bulb" [size]="17" /> {{ 'COMMUNITY.COMPOSER.TEMPLATE' | translate }}
+              </button>
+            </div>
+          } @else {
+            <form class="composer-form" (ngSubmit)="submit()">
+              <div class="field">
+                <label for="draft-topic">{{ 'COMMUNITY.COMPOSER.TOPIC_LABEL' | translate }}</label>
+                <select id="draft-topic" name="topic" [(ngModel)]="draftTopic">
+                  @for (option of topicOptions(); track option.topic) {
+                    <option [value]="option.topic">{{ option.key | translate }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="draft-title">{{ 'COMMUNITY.COMPOSER.TITLE_LABEL' | translate }}</label>
+                <input id="draft-title" name="title" maxlength="200" [(ngModel)]="draftTitle" />
+              </div>
+
+              <div class="field">
+                <label for="draft-content">{{ 'COMMUNITY.COMPOSER.CONTENT_LABEL' | translate }}</label>
+                <textarea
+                  id="draft-content"
+                  name="content"
+                  rows="5"
+                  maxlength="5000"
+                  [(ngModel)]="draftContent"
+                ></textarea>
+                <button type="button" class="link-button" (click)="useTemplate()">
+                  {{ 'COMMUNITY.COMPOSER.TEMPLATE' | translate }}
+                </button>
+                <p class="hint">{{ 'COMMUNITY.COMPOSER.TEMPLATE_HINT' | translate }}</p>
+              </div>
+
+              <div class="field">
+                <label for="draft-tag">{{ 'COMMUNITY.COMPOSER.TAGS_LABEL' | translate }}</label>
+                <div class="tag-row">
+                  @for (tag of draftTags(); track tag) {
+                    <button type="button" class="pm-chip is-selected" (click)="removeTag(tag)">
+                      {{ tag }} <span aria-hidden="true">×</span>
+                    </button>
+                  }
+                  <input
+                    id="draft-tag"
+                    name="tag"
+                    [placeholder]="'COMMUNITY.COMPOSER.TAG_PLACEHOLDER' | translate"
+                    [(ngModel)]="tagInput"
+                    (keydown.enter)="$event.preventDefault(); addTag()"
+                  />
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="upload" for="draft-photo">
+                  <pm-icon name="image" [size]="19" />
+                  <span>{{ photoName() || ('COMMUNITY.COMPOSER.UPLOAD_HINT' | translate) }}</span>
+                </label>
+                <input
+                  id="draft-photo"
+                  class="sr-only"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  (change)="chooseFile($event)"
+                />
+              </div>
+
+              <div class="composer-footer">
+                <button type="button" class="pm-button-secondary" (click)="closeComposer()">
+                  {{ 'COMMUNITY.COMPOSER.CANCEL' | translate }}
+                </button>
+                <button type="submit" class="pm-button-primary" [disabled]="!canSubmit()">
+                  {{ 'COMMUNITY.COMPOSER.SUBMIT' | translate }}
+                </button>
+              </div>
+            </form>
+          }
+        </section>
+      } @else {
+        <p class="pm-empty sign-in-note">{{ 'COMMUNITY.SIGN_IN_TO_POST' | translate }}</p>
+      }
+
+      @switch (facade.status()) {
+        @case ('LOADING') {
+          <div class="pm-center"><mat-spinner diameter="36" /></div>
+        }
+        @case ('ERROR') {
+          <div class="pm-center">
+            <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+            <button type="button" class="pm-button-secondary" (click)="facade.load()">
+              {{ 'COMMON.RETRY' | translate }}
+            </button>
+          </div>
+        }
+        @default {
+          @if (facade.empty()) {
+            <p class="pm-empty pm-center">{{ 'COMMUNITY.EMPTY' | translate }}</p>
+          } @else {
+            <ul class="post-list">
+              @for (card of facade.cards(); track card.raw.id) {
+                <li class="post-card pm-card pm-card-interactive">
+                  <header class="post-head">
+                    <a class="author" [routerLink]="['/community/users', card.raw.author.id]">
+                      <span class="avatar" aria-hidden="true">{{ card.raw.author.initial }}</span>
+                      <span class="author-text">
+                        <span class="author-name">{{ card.raw.author.fullName }}</span>
+                        <span class="post-meta">
+                          {{ card.raw.createdAt | date: 'dd/MM/yyyy HH:mm' }} ·
+                          {{ card.topicKey | translate }}
+                        </span>
+                      </span>
+                    </a>
+                    @if (card.raw.mine) {
+                      <button type="button" class="pm-icon-button" (click)="confirmRemove(card.raw)">
+                        <pm-icon name="trash" [size]="17" />
+                        <span class="sr-only">{{ 'COMMUNITY.POST.DELETE' | translate }}</span>
+                      </button>
+                    }
+                  </header>
+
+                  <a class="post-body" [routerLink]="['/community/posts', card.raw.id]">
+                    <h2 class="post-title">{{ card.raw.title }}</h2>
+                    <p class="post-text">{{ card.raw.content }}</p>
+                  </a>
+
+                  @if (card.photoUrls.length > 0) {
+                    <a class="post-photos" [routerLink]="['/community/posts', card.raw.id]">
+                      @for (url of card.photoUrls; track url) {
+                        <img
+                          [src]="url"
+                          [alt]="'COMMUNITY.POST.PHOTO_OF' | translate: { title: card.raw.title }"
+                        />
+                      }
+                    </a>
+                  }
+
+                  @if (card.raw.tags.length > 0) {
+                    <ul class="tag-list">
+                      @for (tag of card.raw.tags; track tag) {
+                        <li class="pm-status">#{{ tag }}</li>
+                      }
+                    </ul>
+                  }
+
+                  <footer class="post-foot">
+                    <button
+                      type="button"
+                      class="react"
+                      [class.is-on]="card.raw.likedByMe"
+                      (click)="facade.toggleLike(card.raw)"
+                    >
+                      <pm-icon name="heart" [size]="17" [filled]="card.raw.likedByMe" />
+                      <span>{{ card.raw.likeCount }}</span>
+                      <span class="sr-only">{{ 'COMMUNITY.POST.LIKE' | translate }}</span>
+                    </button>
+
+                    <a class="react" [routerLink]="['/community/posts', card.raw.id]">
+                      <pm-icon name="comment" [size]="17" />
+                      <span>{{ card.raw.commentCount }}</span>
+                      <span class="sr-only">{{ 'COMMUNITY.POST.COMMENT' | translate }}</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      class="react"
+                      [class.is-on]="card.raw.savedByMe"
+                      (click)="facade.toggleSave(card.raw)"
+                    >
+                      <pm-icon name="bookmark" [size]="17" [filled]="card.raw.savedByMe" />
+                      <span>
+                        {{
+                          (card.raw.savedByMe ? 'COMMUNITY.POST.SAVED' : 'COMMUNITY.POST.SAVE')
+                            | translate
+                        }}
+                      </span>
+                    </button>
+                  </footer>
+                </li>
+              }
+            </ul>
+
+            @if (facade.pageCount() > 1) {
+              <div class="paging">
+                <button
+                  type="button"
+                  class="pm-button-secondary"
+                  [disabled]="facade.page() === 1"
+                  (click)="facade.changePage(facade.page() - 1)"
+                >
+                  ‹
+                </button>
+                <span>{{ facade.page() }} / {{ facade.pageCount() }}</span>
+                <button
+                  type="button"
+                  class="pm-button-secondary"
+                  [disabled]="facade.page() === facade.pageCount()"
+                  (click)="facade.changePage(facade.page() + 1)"
+                >
+                  ›
+                </button>
+              </div>
+            }
+          }
+        }
+      }
+    </div>
+
+    <aside class="side-column">
+      <section class="pm-card side-card">
+        <h2 class="pm-section-title">{{ 'COMMUNITY.DISCOVER.TITLE' | translate }}</h2>
+        <p class="hint">{{ 'COMMUNITY.DISCOVER.SUBTITLE' | translate }}</p>
+        <ul class="scope-list">
+          @for (chip of scopeChips(); track chip.scope) {
+            <li>
+              <button
+                type="button"
+                class="pm-chip"
+                [attr.aria-pressed]="facade.scope() === chip.scope"
+                (click)="facade.chooseScope(chip.scope)"
+              >
+                {{ chip.key | translate }}
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="pm-card side-card">
+        <h2 class="pm-section-title">{{ 'FOOTER.FOLLOW' | translate }}</h2>
+        <pm-social-links variant="full" />
+      </section>
+    </aside>
+  </div>
+
+  <ul class="value-strip">
+    @for (value of values; track value.titleKey) {
+      <li>
+        <span class="value-glyph"><pm-icon [name]="value.icon" [size]="18" /></span>
+        <span class="value-text">
+          <strong>{{ value.titleKey | translate }}</strong>
+          <span>{{ value.textKey | translate }}</span>
+        </span>
+      </li>
+    }
+  </ul>
+</div>

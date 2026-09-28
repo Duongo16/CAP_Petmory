@@ -1,0 +1,116 @@
+<div class="pm-page">
+  <header class="page-header">
+    <h1 class="title">{{ 'ADMIN.ORDER.TITLE' | translate }}</h1>
+    <p class="description">{{ 'ADMIN.ORDER.DESCRIPTION' | translate }}</p>
+  </header>
+
+  <section class="counter-board" [attr.aria-label]="'ADMIN.ORDER.COUNTER_BOARD' | translate">
+    @for (o of facade.tiles(); track o.code) {
+      <button
+        type="button"
+        class="counter-tile"
+        [attr.data-group]="o.groupColor"
+        [class.selected]="o.selected"
+        [attr.aria-pressed]="o.selected"
+        (click)="facade.selectStatus(o.code)"
+      >
+        <span class="number">{{ o.count }}</span>
+        <span class="tile-name">{{ o.key | translate }}</span>
+      </button>
+    }
+  </section>
+
+  <form class="search-row" (ngSubmit)="facade.search(searchInput.value)">
+    <label class="sr-only" for="search-order">{{ 'ADMIN.ORDER.SEARCH_INPUT' | translate }}</label>
+    <input
+      id="search-order"
+      #searchInput
+      type="search"
+      autocomplete="off"
+      [value]="facade.keyword()"
+      [placeholder]="'ADMIN.ORDER.SEARCH_INPUT' | translate"
+    />
+    <button class="pm-button-primary" type="submit">{{ 'ADMIN.FIND' | translate }}</button>
+    @if (facade.keyword() || facade.filterStatus()) {
+      <button class="pm-button-secondary" type="button" (click)="searchInput.value = ''; facade.removeFilter()">
+        {{ 'ADMIN.REMOVE_FILTER' | translate }}
+      </button>
+    }
+    <span class="result-count">{{ 'ADMIN.RESULT_COUNT' | translate: { count: facade.total() } }}</span>
+  </form>
+
+  @switch (facade.status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="facade.reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('READY') {
+      @if (facade.rows().length === 0) {
+        <div class="pm-center pm-empty"><p>{{ 'ADMIN.ORDER.EMPTY' | translate }}</p></div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'ADMIN.ORDER.CODE' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.ORDER.RECIPIENT' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.ORDER.ORDER_DATE' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.ORDER.TOTAL' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.ORDER.STATUS' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of facade.rows(); track d.raw._id) {
+                <tr>
+                  <td>
+                    <a class="order-code" [routerLink]="['/admin/orders', d.raw.orderCode]">
+                      {{ d.raw.orderCode }}
+                    </a>
+                  </td>
+                  <td>
+                    <span class="customer-name">{{ d.raw.delivery.fullName }}</span>
+                    <span class="sub">{{ d.raw.delivery.phone }}</span>
+                  </td>
+                  <td>{{ d.raw.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="right">{{ d.raw.total | amount: d.raw.currency }}</td>
+                  <td>
+                    <span class="status-chip" [attr.data-group]="d.groupColor">
+                      {{ d.keyStatus | translate }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <nav class="paging" [attr.aria-label]="'ADMIN.PAGING' | translate">
+          <button
+            class="pm-button-secondary"
+            type="button"
+            [disabled]="!facade.remainingPrevPage()"
+            (click)="facade.changePage(-1)"
+          >
+            {{ 'ADMIN.PREV_PAGE' | translate }}
+          </button>
+          <span>{{ facade.page() }} / {{ facade.pageCount() }}</span>
+          <button
+            class="pm-button-secondary"
+            type="button"
+            [disabled]="!facade.remainingNextPage()"
+            (click)="facade.changePage(1)"
+          >
+            {{ 'ADMIN.NEXT_PAGE' | translate }}
+          </button>
+        </nav>
+      }
+    }
+  }
+</div>

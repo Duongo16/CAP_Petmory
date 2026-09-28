@@ -1,0 +1,30 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--pm-gap);
+}
+
+.card {
+  width: min(420px, 100%);
+  border-radius: var(--pm-radius);
+  overflow: hidden;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: var(--pm-gap);
+}
+
+.error {
+  margin: 0 0 8px;
+  color: var(--pm-danger);
+  font-size: 0.875rem;
+}

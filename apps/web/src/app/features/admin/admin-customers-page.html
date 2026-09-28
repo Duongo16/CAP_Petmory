@@ -1,0 +1,92 @@
+<div class="pm-page">
+  <header class="page-header">
+    <h1 class="title">{{ 'ADMIN.RECIPIENT.TITLE' | translate }}</h1>
+    <p class="description">{{ 'ADMIN.RECIPIENT.DESCRIPTION' | translate }}</p>
+  </header>
+
+  <form class="search-row" (ngSubmit)="search(searchInput.value)">
+    <label class="sr-only" for="search-customer">{{ 'ADMIN.RECIPIENT.SEARCH_INPUT' | translate }}</label>
+    <input
+      id="search-customer"
+      #searchInput
+      type="search"
+      autocomplete="off"
+      [value]="keyword()"
+      [placeholder]="'ADMIN.RECIPIENT.SEARCH_INPUT' | translate"
+    />
+    <button class="pm-button-primary" type="submit">{{ 'ADMIN.FIND' | translate }}</button>
+    @if (keyword()) {
+      <button class="pm-button-secondary" type="button" (click)="searchInput.value = ''; search('')">
+        {{ 'ADMIN.REMOVE_FILTER' | translate }}
+      </button>
+    }
+    <span class="result-count">{{ 'ADMIN.RESULT_COUNT' | translate: { count: total() } }}</span>
+  </form>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('READY') {
+      @if (rows().length === 0) {
+        <div class="pm-center pm-empty"><p>{{ 'ADMIN.RECIPIENT.EMPTY' | translate }}</p></div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'ADMIN.RECIPIENT.FULL_NAME' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.RECIPIENT.EMAIL' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.RECIPIENT.COUNT_ORDER' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.RECIPIENT.CREATED_DATE' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.RECIPIENT.LOGIN_LAST' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (k of rows(); track k._id) {
+                <tr>
+                  <td>
+                    <a [routerLink]="['/admin/customers', k._id]">{{ k.fullName }}</a>
+                  </td>
+                  <td>{{ k.email }}</td>
+                  <td class="right">{{ k.countOrder }}</td>
+                  <td>{{ k.createdAt | date: 'dd/MM/yyyy' }}</td>
+                  <td>
+                    {{
+                      k.lastLoginAt
+                        ? (k.lastLoginAt | date: 'dd/MM/yyyy HH:mm')
+                        : ('ADMIN.NONE_YET' | translate)
+                    }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <nav class="paging" [attr.aria-label]="'ADMIN.PAGING' | translate">
+          <button class="pm-button-secondary" type="button" [disabled]="page() <= 1" (click)="changePage(-1)">
+            {{ 'ADMIN.PREV_PAGE' | translate }}
+          </button>
+          <span>{{ page() }} / {{ pageCount() }}</span>
+          <button
+            class="pm-button-secondary"
+            type="button"
+            [disabled]="page() >= pageCount()"
+            (click)="changePage(1)"
+          >
+            {{ 'ADMIN.NEXT_PAGE' | translate }}
+          </button>
+        </nav>
+      }
+    }
+  }
+</div>

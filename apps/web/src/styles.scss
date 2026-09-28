@@ -1,0 +1,365 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light dark;
+  @include mat.theme((
+    color: (
+      primary: mat.$orange-palette,
+      tertiary: mat.$yellow-palette,
+    ),
+    typography: 'Be Vietnam Pro',
+    density: 0,
+  ));
+}
+
+/**
+ * Shared interface tokens. A later restyle only needs changes here, not in
+ * every individual screen.
+ */
+:root {
+  /* Backgrounds and surfaces */
+  --pm-bg: #fffaf0;
+  --pm-bg-card: #ffffff;
+  --pm-bg-muted: #fdf4e4;
+  --pm-bg-sunken: #fcefd8;
+  --pm-bg-3d: #fdf3e2;
+
+  /* Brand colours */
+  --pm-accent: #f6a92b;
+  --pm-accent-dark: #e18f15;
+  --pm-accent-soft: #fdeed2;
+  --pm-accent-ring: #f6a92b40;
+  --pm-on-accent: #402c0b;
+  --pm-memorial: #8c6fa6;
+  --pm-memorial-soft: #f1ebf6;
+  --pm-danger: #c0392b;
+  --pm-danger-soft: #fbeae8;
+  --pm-success: #3e9b5f;
+  --pm-success-soft: #e8f5ec;
+  --pm-info: #3b7dd8;
+  --pm-info-soft: #e7f0fc;
+  --pm-star: #f5a623;
+
+  /* Text and borders */
+  --pm-text: #3a2f22;
+  --pm-text-muted: #8b7f6e;
+  --pm-border: #f0e3cd;
+  --pm-border-strong: #e3d1b2;
+
+  /* Shape */
+  --pm-radius-lg: 24px;
+  --pm-radius: 16px;
+  --pm-radius-sm: 10px;
+  --pm-gap: 20px;
+  --pm-shadow: 0 1px 2px rgba(122, 85, 24, 0.05), 0 10px 28px rgba(122, 85, 24, 0.07);
+  --pm-shadow-lifted: 0 2px 4px rgba(122, 85, 24, 0.06), 0 18px 40px rgba(122, 85, 24, 0.12);
+}
+
+@mixin pm-dark-tokens {
+  --pm-bg: #1b1713;
+  --pm-bg-card: #251f19;
+  --pm-bg-muted: #2d251d;
+  --pm-bg-sunken: #332a20;
+  --pm-bg-3d: #2a231b;
+
+  --pm-accent: #f2b45c;
+  --pm-accent-dark: #ffc978;
+  --pm-accent-soft: #3a2d1a;
+  --pm-accent-ring: #f2b45c40;
+  --pm-on-accent: #2a1c06;
+  --pm-memorial: #c0a8d4;
+  --pm-memorial-soft: #332a3c;
+  --pm-danger: #f0a49a;
+  --pm-danger-soft: #3d2622;
+  --pm-success: #7fc79a;
+  --pm-success-soft: #22332a;
+  --pm-info: #8fb8f0;
+  --pm-info-soft: #222c3a;
+  --pm-star: #f2b45c;
+
+  --pm-text: #f2e9dc;
+  --pm-text-muted: #a89a86;
+  --pm-border: #3b3128;
+  --pm-border-strong: #4b3f32;
+
+  --pm-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 10px 28px rgba(0, 0, 0, 0.3);
+  --pm-shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.42);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include pm-dark-tokens;
+  }
+}
+
+:root[data-theme='dark'] {
+  @include pm-dark-tokens;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Be Vietnam Pro', Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--pm-bg);
+  color: var(--pm-text);
+}
+
+/* ---- Utility classes shared by every screen ---- */
+
+.pm-card {
+  background: var(--pm-bg-card);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  box-shadow: var(--pm-shadow);
+}
+
+/** A card that reacts to the pointer, used for anything clickable in a grid. */
+.pm-card-interactive {
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+
+  &:hover,
+  &:focus-within {
+    transform: translate3d(0, -3px, 0);
+    box-shadow: var(--pm-shadow-lifted);
+    border-color: var(--pm-border-strong);
+  }
+}
+
+.pm-page-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+
+.pm-page-description {
+  margin: 0 0 var(--pm-gap);
+  color: var(--pm-text-muted);
+  font-size: 0.925rem;
+}
+
+/** Section heading with the small amber rule the design uses above a block. */
+.pm-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 var(--pm-gap);
+
+  &::before {
+    content: '';
+    width: 4px;
+    height: 1.1em;
+    border-radius: 999px;
+    background: var(--pm-accent);
+  }
+}
+
+/** Primary page button, solid amber. */
+.pm-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border: none;
+  border-radius: 999px;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(246, 169, 43, 0.28);
+  transition:
+    background 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background: var(--pm-accent-dark);
+    transform: translate3d(0, -1px, 0);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+/** Secondary button, amber outline on a transparent background. */
+.pm-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 26px;
+  border: 1px solid var(--pm-border-strong);
+  border-radius: 999px;
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease;
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background: var(--pm-accent-soft);
+    border-color: var(--pm-accent);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+/** A round icon-only button, used in the header and on top of images. */
+.pm-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pm-text);
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+}
+
+/** A selectable pill, used for filters, sizes and any short choice. */
+.pm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: 1px solid var(--pm-border-strong);
+  border-radius: 999px;
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--pm-accent);
+  }
+
+  &[aria-pressed='true'],
+  &.is-selected {
+    background: var(--pm-accent);
+    border-color: var(--pm-accent);
+    color: var(--pm-on-accent);
+    font-weight: 600;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/** A read-only status pill. The colour group comes from a data attribute. */
+.pm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--pm-bg-muted);
+  color: var(--pm-text-muted);
+
+  &[data-tone='accent'] {
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+
+  &[data-tone='success'] {
+    background: var(--pm-success-soft);
+    color: var(--pm-success);
+  }
+
+  &[data-tone='info'] {
+    background: var(--pm-info-soft);
+    color: var(--pm-info);
+  }
+
+  &[data-tone='danger'] {
+    background: var(--pm-danger-soft);
+    color: var(--pm-danger);
+  }
+
+  &[data-tone='memorial'] {
+    background: var(--pm-memorial-soft);
+    color: var(--pm-memorial);
+  }
+}
+
+/** The three states every screen that calls a service must handle. */
+.pm-center {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 56px 16px;
+  text-align: center;
+}
+
+.pm-empty {
+  color: var(--pm-text-muted);
+}
+
+/** Page shell: one consistent maximum width and side gutter. */
+.pm-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 16px 64px;
+  box-sizing: border-box;
+}
+
+/** Hidden from sight but still read out and still reachable by keyboard. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--pm-accent-ring);
+  outline-offset: 2px;
+}

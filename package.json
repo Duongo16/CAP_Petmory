@@ -1,0 +1,32 @@
+{
+  "name": "petmory",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PETMORY - luu giu ky niem thu cung bang san pham thu cong tuy bien",
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f mongo",
+    "api": "npm run start:dev --workspace apps/api",
+    "web": "npm run start --workspace apps/web",
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run api\" \"npm run web\"",
+    "seed": "npm run seed --workspace apps/api",
+    "build": "npm run build --workspace apps/api && npm run build --workspace apps/web",
+    "lint": "npm run lint --workspace apps/api",
+    "docs:contracts": "node docs/contracts/build-docx.js",
+    "test:integration": "node tools/integration/run-all.js",
+    "test:models": "node tools/check-models.js",
+    "db:check": "node tools/check-db.js",
+    "test:i18n": "node tools/check-i18n-keys.js",
+    "test:templates": "node tools/check-template-deps.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "docx": "^9.5.1",
+    "playwright": "^1.63.0"
+  }
+}

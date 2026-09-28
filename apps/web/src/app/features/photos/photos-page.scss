@@ -1,0 +1,266 @@
+:host {
+  display: block;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--pm-text-muted);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--pm-accent);
+  }
+}
+
+.page-header {
+  margin-bottom: var(--pm-gap);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-size: 1.6rem;
+}
+
+.description {
+  margin: 0 0 12px;
+  color: var(--pm-text-muted);
+}
+
+.progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 1px solid var(--pm-border);
+  border-radius: 999px;
+  background: var(--pm-bg-card);
+}
+
+.angle-count {
+  font-weight: 700;
+  color: var(--pm-text-muted);
+
+  &.raw {
+    color: var(--pm-accent);
+  }
+}
+
+.error {
+  padding: 10px 14px;
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-bg-card);
+  color: var(--pm-danger);
+}
+
+.angle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--pm-gap);
+}
+
+.angle-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+
+  &.missing {
+    border-style: dashed;
+  }
+}
+
+.angle-name {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.asterisk {
+  color: var(--pm-danger);
+}
+
+.photo-frame {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-bg-muted);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &.empty {
+    font-size: 2rem;
+    color: var(--pm-text-muted);
+  }
+}
+
+.label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+
+  &[data-label='GOOD'] {
+    color: var(--pm-accent);
+  }
+
+  &[data-label='SHOULD_RESTORE'],
+  &[data-label='UNUSABLE'] {
+    color: var(--pm-danger);
+  }
+}
+
+.spec {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--pm-text-muted);
+}
+
+.warning {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.82rem;
+  color: var(--pm-text-muted);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.in-use {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--pm-accent);
+}
+
+.empty-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.choose-button {
+  display: block;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Still reachable by keyboard, so a fully hidden attribute is not used. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.empty-slot:focus-within .choose-button {
+  outline: 3px solid var(--pm-accent-dark);
+  outline-offset: 2px;
+}
+
+.operations-panel {
+  margin-bottom: var(--pm-gap);
+  padding: 16px;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  background: var(--pm-bg-card);
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+  }
+}
+
+.note {
+  margin: 0 0 10px;
+  font-size: 0.88rem;
+  color: var(--pm-text-muted);
+}
+
+.checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 45%);
+}
+
+.compare-dialog {
+  width: min(880px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 20px;
+  border-radius: var(--pm-radius);
+  background: var(--pm-bg-card);
+
+  h2 {
+    margin: 0 0 12px;
+  }
+}
+
+.photo-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+
+  figure {
+    margin: 0;
+  }
+
+  figcaption {
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  img {
+    width: 100%;
+    border-radius: var(--pm-radius-sm);
+    background: var(--pm-bg-muted);
+  }
+}
+
+.compare-dialog .note {
+  margin-top: 14px;
+}
+
+/*
+ * Shown when a restored version no longer resembles the original closely
+ * enough. It warns but does not block: the customer still decides.
+ */
+.resemblance-warning {
+  margin: 0 0 12px;
+  padding: 11px 15px;
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-danger-soft);
+  color: var(--pm-danger);
+  font-size: 0.875rem;
+  font-weight: 600;
+}

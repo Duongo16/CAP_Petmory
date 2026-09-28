@@ -1,0 +1,29 @@
+<span class="rating" [attr.role]="interactive() ? 'group' : 'img'" [attr.aria-label]="label()">
+  @for (slot of slots(); track slot.index) {
+    @if (interactive()) {
+      <button
+        type="button"
+        class="star"
+        [attr.data-fill]="slot.fill"
+        [style.--star-size.px]="size()"
+        (click)="pick(slot.index)"
+      >
+        <span class="sr-only">{{ slot.index }}</span>
+      </button>
+    } @else {
+      <span
+        class="star"
+        [attr.data-fill]="slot.fill"
+        [style.--star-size.px]="size()"
+        aria-hidden="true"
+      ></span>
+    }
+  }
+
+  @if (count() !== null) {
+    <span class="figures">
+      <strong>{{ rounded() }}</strong>
+      <span class="count">({{ count() }})</span>
+    </span>
+  }
+</span>

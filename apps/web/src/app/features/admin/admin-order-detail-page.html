@@ -1,0 +1,163 @@
+<div class="pm-page">
+  <a class="back-link" routerLink="/admin/orders">← {{ 'ADMIN.BACK_TO_ORDERS' | translate }}</a>
+
+  @switch (facade.status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="facade.reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('READY') {
+      @if (facade.order(); as order) {
+        <header class="page-header">
+          <h1 class="title">{{ order.orderCode }}</h1>
+          <span class="status-chip large" [attr.data-group]="facade.groupColor()">
+            {{ facade.keyStatus() | translate }}
+          </span>
+          @if (isOperations()) {
+            <a class="pm-button-secondary" [routerLink]="['/admin/orders', order.orderCode, 'production-file']">
+              {{ 'ADMIN.PROFILE.OPEN' | translate }}
+            </a>
+          }
+        </header>
+
+        @if (facade.error(); as codeError) {
+          <p class="error" role="alert">{{ codeError | translate }}</p>
+        }
+
+        <div class="two-column-grid">
+          <section class="card">
+            <h2>{{ 'ADMIN.ORDER.CONTENT' | translate }}</h2>
+            <table class="table compact">
+              <thead>
+                <tr>
+                  <th scope="col">{{ 'ADMIN.ORDER.PRODUCT' | translate }}</th>
+                  <th scope="col">{{ 'ADMIN.ORDER.QUANTITY' | translate }}</th>
+                  <th scope="col">{{ 'ADMIN.ORDER.UNIT_PRICE' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of order.rows; track line.sizeCode) {
+                  <tr>
+                    <td>{{ line.displayName }}</td>
+                    <td class="right">{{ line.quantity }}</td>
+                    <td class="right">{{ line.unitPrice | amount: order.currency }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <p class="total-amount">
+              {{ 'ADMIN.ORDER.TOTAL' | translate }}:
+              <strong>{{ order.total | amount: order.currency }}</strong>
+            </p>
+            <dl class="info-pair">
+              <dt>{{ 'ADMIN.ORDER.ORDER_DATE' | translate }}</dt>
+              <dd>{{ order.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              <dt>{{ 'ADMIN.ORDER.DELIVERY_DATE' | translate }}</dt>
+              <dd>{{ order.estimatedDelivery | date: 'dd/MM/yyyy' }}</dd>
+              <dt>{{ 'ADMIN.ORDER.AT_RETURN_MONEY' | translate }}</dt>
+              <dd>
+                {{
+                  order.paidAt
+                    ? (order.paidAt | date: 'dd/MM/yyyy HH:mm')
+                    : ('ADMIN.NONE_YET' | translate)
+                }}
+              </dd>
+            </dl>
+          </section>
+
+          <section class="card">
+            <h2>{{ 'ADMIN.ORDER.DELIVERY_INFO' | translate }}</h2>
+            <dl class="info-pair">
+              <dt>{{ 'CHECKOUT.FULL_NAME' | translate }}</dt>
+              <dd>{{ order.delivery.fullName }}</dd>
+              <dt>{{ 'CHECKOUT.PHONE' | translate }}</dt>
+              <dd>{{ order.delivery.phone }}</dd>
+              <dt>{{ 'CHECKOUT.ADDRESS' | translate }}</dt>
+              <dd>{{ order.delivery.address }}, {{ order.delivery.province }}</dd>
+              @if (order.delivery.note) {
+                <dt>{{ 'CHECKOUT.NOTE' | translate }}</dt>
+                <dd>{{ order.delivery.note }}</dd>
+              }
+            </dl>
+
+            @if (facade.customer(); as k) {
+              <h2>{{ 'ADMIN.ORDER.ACCOUNT' | translate }}</h2>
+              <p>
+                <a [routerLink]="['/admin/customers', k._id]">{{ k.fullName }}</a>
+                <span class="sub">{{ k.email }}</span>
+              </p>
+            }
+          </section>
+        </div>
+
+        <section class="card">
+          <h2>{{ 'ADMIN.ORDER.TRANSITION_STATUS' | translate }}</h2>
+          @if (!isOperations()) {
+            <p class="note">{{ 'ADMIN.READ_ONLY' | translate }}</p>
+          } @else if (facade.buttons().length === 0) {
+            <p class="note">{{ 'ADMIN.ORDER.NONE_STEP' | translate }}</p>
+          } @else {
+            <label class="field-label" for="reason-input">{{ 'ADMIN.ORDER.REASON' | translate }}</label>
+            <input
+              id="reason-input"
+              type="text"
+              maxlength="300"
+              [ngModel]="facade.reason()"
+              (ngModelChange)="facade.reason.set($event)"
+              [placeholder]="'ADMIN.ORDER.REASON_SUGGESTION' | translate"
+            />
+            <div class="button-row">
+              @for (n of facade.buttons(); track n.code) {
+                <button
+                  class="pm-button-primary"
+                  type="button"
+                  [disabled]="facade.saving()"
+                  (click)="facade.transition(n.code)"
+                >
+                  {{ n.key | translate }}
+                </button>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="card">
+          <h2>{{ 'ADMIN.ORDER.HISTORY' | translate }}</h2>
+          @if (facade.history().length === 0) {
+            <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
+          } @else {
+            <ol class="timeline">
+              @for (b of facade.history(); track b.id) {
+                <li>
+                  <span class="timestamp">{{ b.at | date: 'dd/MM/yyyy HH:mm' }}</span>
+                  <span class="action">{{ b.keyAction | translate }}</span>
+                  @if (b.keyAfter) {
+                    <span class="summary">
+                      @if (b.keyBefore) {
+                        {{ b.keyBefore | translate }} →
+                      }
+                      {{ b.keyAfter | translate }}
+                    </span>
+                  }
+                  @if (b.actorName) {
+                    <span class="sub">{{ b.actorName }}</span>
+                  }
+                  @if (b.reason) {
+                    <span class="reason">{{ b.reason }}</span>
+                  }
+                </li>
+              }
+            </ol>
+          }
+        </section>
+      }
+    }
+  }
+</div>

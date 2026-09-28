@@ -1,0 +1,65 @@
+<div class="frame">
+  <div
+    #wrap
+    class="canvas-3d"
+    [class.hidden]="status() === 'UNSUPPORTED'"
+    [class.painting]="colorPendingPaint() !== null && canPaint()"
+    (pointerdown)="startPaint($event)"
+    (pointermove)="dragPaint($event)"
+    (pointerup)="endPaint($event)"
+    (pointercancel)="endPaint($event)"
+  ></div>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="overlay">
+        <mat-spinner diameter="40" />
+        <p>{{ 'VIEWER.LOADING' | translate }}</p>
+      </div>
+    }
+    @case ('ERROR') {
+      <div class="overlay">
+        <p>{{ 'VIEWER.ERROR_LOAD' | translate }}</p>
+      </div>
+    }
+    @case ('UNSUPPORTED') {
+      <div class="overlay">
+        <p>{{ 'VIEWER.UNSUPPORTED' | translate }}</p>
+      </div>
+    }
+  }
+</div>
+
+@if (status() === 'READY') {
+  <div class="toolbar">
+    <mat-button-toggle-group
+      [value]="angleSelected()"
+      (change)="changeAngle($event.value)"
+      [attr.aria-label]="'VIEWER.SELECT_ANGLE' | translate"
+    >
+      @for (angle of angles; track angle) {
+        <mat-button-toggle [value]="angle">{{ keyAngle(angle) | translate }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <span class="spacer"></span>
+
+    <button class="pm-button-secondary" type="button" (click)="toggleAutoRotate()">
+      {{ (autoRotate() ? 'VIEWER.STOP_ROTATE' : 'VIEWER.AUTO_ROTATE') | translate }}
+    </button>
+
+    @if (canPaint()) {
+      <button class="pm-button-secondary" type="button" (click)="undo()">
+        {{ 'VIEWER.UNDO' | translate }}
+      </button>
+    }
+
+    <button class="pm-button-secondary" type="button" (click)="captureSixAngles()">
+      {{ 'VIEWER.CAPTURE_AFTER_ANGLE' | translate }}
+    </button>
+  </div>
+
+  <p class="note">
+    {{ 'VIEWER.HINT' | translate }} · {{ 'VIEWER.COUNT_VERTEX' | translate: { count: countVertex() } }}
+  </p>
+}

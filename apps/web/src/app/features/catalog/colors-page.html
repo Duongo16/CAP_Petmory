@@ -1,0 +1,38 @@
+<div class="pm-page">
+  <h1 class="title">{{ 'PALETTE.TITLE' | translate }}</h1>
+  <p class="description">{{ 'PALETTE.DESCRIPTION' | translate }}</p>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="center"><p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+    }
+    @default {
+      @if (empty()) {
+        <div class="center empty"><p>{{ 'PALETTE.EMPTY' | translate }}</p></div>
+      } @else {
+        @for (group of groups(); track group.group) {
+          <section class="group">
+            <h2 class="group-name">{{ group.keyTitle | translate }}</h2>
+            <div class="grid">
+              @for (color of group.list; track color.code) {
+                <mat-card class="color-card">
+                  <div class="swatch" [style.background-color]="color.swatch" aria-hidden="true"></div>
+                  <div class="info">
+                    <span class="code">{{ color.code }}</span>
+                    <span class="name">{{ color.displayName }}</span>
+                    @if (color.note) {
+                      <span class="note">{{ color.note }}</span>
+                    }
+                  </div>
+                </mat-card>
+              }
+            </div>
+          </section>
+        }
+      }
+    }
+  }
+</div>

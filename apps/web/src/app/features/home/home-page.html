@@ -1,0 +1,86 @@
+<div class="pm-page">
+  <section class="hero">
+    <div class="hero-text">
+      <p class="label">{{ 'HOME.LABEL' | translate }}</p>
+      <h1 class="title">{{ 'HOME.TITLE' | translate }}</h1>
+      <p class="description">{{ 'HOME.DESCRIPTION' | translate }}</p>
+
+      <div class="buttons">
+        <a class="pm-button-primary" routerLink="/studio">
+          {{ 'HOME.CREATE_PET' | translate }}
+          <span aria-hidden="true">→</span>
+        </a>
+        <a class="pm-button-secondary" routerLink="/products">
+          {{ 'HOME.EXPLORE' | translate }}
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <span class="art-paw"><pm-icon name="paw" [size]="70" /></span>
+      <span class="art-heart"><pm-icon name="heart" [size]="26" /></span>
+      <span class="art-star"><pm-icon name="star" [size]="20" /></span>
+    </div>
+  </section>
+
+  <section class="points">
+    @for (point of points; track point.nameKey) {
+      <article class="point-item">
+        <span class="point-icon"><pm-icon [name]="point.icon" [size]="20" /></span>
+        <div class="text">
+          <h2 class="name">{{ point.nameKey | translate }}</h2>
+          <p class="sub">{{ point.textKey | translate }}</p>
+        </div>
+      </article>
+    }
+  </section>
+
+  @if (featured().length > 0) {
+    <section class="featured">
+      <header class="featured-head">
+        <h2 class="pm-section-title">{{ 'HOME.FEATURED' | translate }}</h2>
+        <a class="see-all" routerLink="/products">
+          {{ 'HOME.SEE_ALL' | translate }} <span aria-hidden="true">→</span>
+        </a>
+      </header>
+
+      <div class="grid">
+        @for (card of featured(); track card.raw.code) {
+          <a class="product-card pm-card pm-card-interactive" [routerLink]="['/products', card.raw.code]">
+            <div class="photo">
+              @if (card.raw.imageUrl) {
+                <img [src]="card.raw.imageUrl" [alt]="card.raw.name" />
+              } @else {
+                <span class="photo-blank"><pm-icon name="paw" [size]="30" /></span>
+              }
+            </div>
+            <div class="text">
+              <h3 class="name">{{ card.raw.name }}</h3>
+              <pm-rating
+                [value]="card.raw.rating.average"
+                [count]="card.raw.rating.count"
+                [label]="'PRODUCT.RATING' | translate"
+              />
+              @if (card.priceFrom; as price) {
+                <p class="price">{{ price | amount }}</p>
+              }
+            </div>
+          </a>
+        }
+      </div>
+    </section>
+  }
+
+  <section class="process">
+    <h2 class="pm-section-title">{{ 'HOME.PROCESS' | translate }}</h2>
+    <ol class="steps">
+      @for (step of steps; track step.number) {
+        <li class="step-item pm-card">
+          <span class="count">{{ step.number }}</span>
+          <h3 class="step-name">{{ step.nameKey | translate }}</h3>
+          <p class="sub">{{ step.textKey | translate }}</p>
+        </li>
+      }
+    </ol>
+  </section>
+</div>

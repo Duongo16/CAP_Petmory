@@ -1,0 +1,399 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 20;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:focus {
+    left: 16px;
+  }
+}
+
+/* ---- Top bar ---- */
+
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--pm-bg-card);
+  border-bottom: 1px solid var(--pm-border);
+}
+
+.bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: var(--pm-text);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: var(--pm-accent-soft);
+  font-size: 1.05rem;
+}
+
+.brand-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+/* Without an explicit min-width the nav is not allowed to shrink, so it pushes the
+   items on its right off the screen once there are many of them. */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  min-width: 0;
+
+  a {
+    padding: 8px 13px;
+    border-radius: 999px;
+    color: var(--pm-text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background 140ms ease,
+      color 140ms ease;
+
+    &:hover {
+      color: var(--pm-text);
+      background: var(--pm-bg-muted);
+    }
+
+    &.selected {
+      background: var(--pm-accent-soft);
+      color: var(--pm-accent-dark);
+      font-weight: 600;
+    }
+  }
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 200px;
+  min-width: 0;
+  max-width: 280px;
+
+  input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1px solid var(--pm-border-strong);
+    border-radius: 999px;
+    background: var(--pm-bg-muted);
+    color: var(--pm-text);
+    font: inherit;
+    font-size: 0.875rem;
+
+    &::placeholder {
+      color: var(--pm-text-muted);
+    }
+
+    &:focus {
+      background: var(--pm-bg-card);
+      border-color: var(--pm-accent);
+      outline: none;
+    }
+  }
+}
+
+.search-glyph {
+  position: absolute;
+  left: 13px;
+  color: var(--pm-text-muted);
+  font-size: 1.05rem;
+  pointer-events: none;
+}
+
+.bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cart-button {
+  position: relative;
+  text-decoration: none;
+  font-size: 1.05rem;
+
+  &.selected {
+    background: var(--pm-accent-soft);
+  }
+}
+
+.badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.account {
+  position: relative;
+}
+
+.account-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 5px;
+  border: 1px solid var(--pm-border-strong);
+  border-radius: 999px;
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--pm-accent);
+  }
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  min-width: 190px;
+  padding: 7px;
+
+  a,
+  .logout-item {
+    padding: 9px 13px;
+    border: none;
+    border-radius: var(--pm-radius-sm);
+    background: none;
+    color: var(--pm-text);
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--pm-bg-muted);
+    }
+
+    &.selected {
+      background: var(--pm-accent-soft);
+      color: var(--pm-accent-dark);
+      font-weight: 600;
+    }
+  }
+
+  .logout-item {
+    margin-top: 5px;
+    border-top: 1px solid var(--pm-border);
+    border-radius: 0 0 var(--pm-radius-sm) var(--pm-radius-sm);
+    color: var(--pm-danger);
+    font-weight: 600;
+  }
+}
+
+/* The internal staff strip, separated from the customer menu by its own band. */
+.staff-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  border-top: 1px solid var(--pm-border);
+}
+
+.staff-tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--pm-memorial-soft);
+  color: var(--pm-memorial);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.internal-link {
+  padding: 5px 12px;
+  border-radius: 999px;
+  color: var(--pm-text-muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--pm-bg-muted);
+    color: var(--pm-text);
+  }
+
+  &.selected {
+    background: var(--pm-memorial-soft);
+    color: var(--pm-memorial);
+    font-weight: 600;
+  }
+}
+
+/* ---- Content ---- */
+
+.content {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ---- Footer ---- */
+
+.site-footer {
+  margin-top: 48px;
+  background: var(--pm-bg-muted);
+  border-top: 1px solid var(--pm-border);
+}
+
+.footer-quote {
+  display: grid;
+  place-items: center;
+  padding: 26px 16px;
+  background: var(--pm-accent-soft);
+  text-align: center;
+
+  p {
+    max-width: 640px;
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--pm-accent-dark);
+  }
+}
+
+.footer-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 28px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 34px 16px 44px;
+  box-sizing: border-box;
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pm-text-muted);
+  }
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.footer-slogan {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--pm-text-muted);
+}
+
+.footer-rights {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--pm-text-muted);
+}
+
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+
+  a {
+    color: var(--pm-text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+
+    &:hover {
+      color: var(--pm-accent-dark);
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .search {
+    order: 5;
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .bar-inner {
+    flex-wrap: wrap;
+  }
+}

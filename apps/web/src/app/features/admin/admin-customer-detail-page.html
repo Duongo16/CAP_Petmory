@@ -1,0 +1,97 @@
+<div class="pm-page">
+  <a class="back-link" routerLink="/admin/customers">
+    ← {{ 'ADMIN.BACK_TO_CUSTOMERS' | translate }}
+  </a>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('READY') {
+      @if (customer(); as k) {
+        <header class="page-header">
+          <h1 class="title">{{ k.fullName }}</h1>
+          <p class="description">{{ k.email }}</p>
+        </header>
+
+        <section class="card">
+          <dl class="info-pair">
+            <dt>{{ 'ADMIN.RECIPIENT.CREATED_DATE' | translate }}</dt>
+            <dd>{{ k.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            <dt>{{ 'ADMIN.RECIPIENT.LOGIN_LAST' | translate }}</dt>
+            <dd>
+              {{
+                k.lastLoginAt
+                  ? (k.lastLoginAt | date: 'dd/MM/yyyy HH:mm')
+                  : ('ADMIN.NONE_YET' | translate)
+              }}
+            </dd>
+          </dl>
+        </section>
+
+        <section class="card">
+          <h2>{{ 'ADMIN.RECIPIENT.PET' | translate }}</h2>
+          @if (pets().length === 0) {
+            <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
+          } @else {
+            <ul class="mini-card">
+              @for (t of pets(); track t.raw._id) {
+                <li>
+                  <strong>{{ t.raw.name }}</strong>
+                  <span class="sub">{{ t.raw.kind }} {{ t.raw.breed }}</span>
+                  <span class="sub">{{ t.keyStatus | translate }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <section class="card">
+          <h2>{{ 'ADMIN.RECIPIENT.HISTORY_ORDER' | translate }}</h2>
+          @if (orders().length === 0) {
+            <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
+          } @else {
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">{{ 'ADMIN.ORDER.CODE' | translate }}</th>
+                    <th scope="col">{{ 'ADMIN.ORDER.ORDER_DATE' | translate }}</th>
+                    <th scope="col">{{ 'ADMIN.ORDER.TOTAL' | translate }}</th>
+                    <th scope="col">{{ 'ADMIN.ORDER.STATUS' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (d of orders(); track d.raw._id) {
+                    <tr>
+                      <td>
+                        <a class="order-code" [routerLink]="['/admin/orders', d.raw.orderCode]">
+                          {{ d.raw.orderCode }}
+                        </a>
+                      </td>
+                      <td>{{ d.raw.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                      <td class="right">{{ d.raw.total | amount: d.raw.currency }}</td>
+                      <td>
+                        <span class="status-chip" [attr.data-group]="d.groupColor">
+                          {{ d.keyStatus | translate }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      }
+    }
+  }
+</div>

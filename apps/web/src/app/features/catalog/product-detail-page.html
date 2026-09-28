@@ -1,0 +1,233 @@
+<div class="pm-page">
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center pm-empty"><p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+    }
+    @case ('READY') {
+      @if (product(); as product) {
+        <header class="page-header">
+          <button
+            type="button"
+            class="back-button"
+            (click)="back()"
+            [attr.aria-label]="'COMMON.BACK' | translate"
+          >
+            ←
+          </button>
+          <h1 class="page-name">{{ 'PRODUCT.PRODUCT_OF_VERSION' | translate }}</h1>
+        </header>
+
+        <div class="layout">
+          <section class="photo-column">
+            <div class="photo-frame pm-card">
+              @if (product.imageUrl) {
+                <img [src]="product.imageUrl" [alt]="product.name" />
+              } @else {
+                <div class="no-photo">
+                  <pm-icon name="paw" [size]="44" />
+                  <p>{{ 'PRODUCT.NONE_YET_PHOTO' | translate }}</p>
+                </div>
+              }
+
+              @if (user()) {
+                <button
+                  type="button"
+                  class="favourite"
+                  [class.is-on]="favourite()"
+                  (click)="toggleFavourite()"
+                >
+                  <pm-icon name="heart" [size]="18" [filled]="favourite()" />
+                  <span class="sr-only">{{ 'PRODUCT.FAVOURITE' | translate }}</span>
+                </button>
+              }
+            </div>
+          </section>
+
+          <section class="detail-column">
+            <h2 class="product-name">{{ product.name }}</h2>
+
+            <pm-rating
+              [value]="product.rating.average"
+              [count]="product.rating.count"
+              [size]="18"
+              [label]="'PRODUCT.RATING' | translate"
+            />
+
+            @if (total(); as total) {
+              <p class="headline-price">
+                {{ total | amount: sizeSelected()?.currency ?? 'VND' }}
+              </p>
+            }
+
+            <p class="description">{{ product.description }}</p>
+
+            <div class="group">
+              <h3 class="group-label">{{ 'PRODUCT.SIZE' | translate }}</h3>
+              <div class="sizes">
+                @for (size of sizes(); track size.code) {
+                  <button
+                    type="button"
+                    class="pm-chip size-chip"
+                    [class.is-selected]="sizeSelected()?.code === size.code"
+                    (click)="selectSize(size)"
+                  >
+                    {{ size.displayName }}
+                    <span class="chip-sub">{{ size.dimensions }}</span>
+                  </button>
+                }
+              </div>
+              @if (sizeSelected(); as size) {
+                <p class="explainer">{{ size.explainer }}</p>
+              }
+            </div>
+
+            <div class="group">
+              <h3 class="group-label">{{ 'PRODUCT.BASE' | translate }}</h3>
+              <div class="sizes">
+                @for (option of baseOptions(); track option.raw.code) {
+                  <button
+                    type="button"
+                    class="pm-chip base-chip"
+                    [class.is-selected]="option.selected"
+                    (click)="selectBase(option.raw)"
+                  >
+                    {{ option.raw.displayName }}
+                    @if (!option.free) {
+                      <span class="chip-sub">+ {{ option.delta | amount }}</span>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+
+            <dl class="spec">
+              <div class="line">
+                <dt>{{ 'PRODUCT.SPEC_MATERIAL' | translate }}</dt>
+                <dd>{{ product.material || ('PRODUCT.NOT_UPDATE' | translate) }}</dd>
+              </div>
+              @if (sizeSelected(); as size) {
+                <div class="line">
+                  <dt>{{ 'PRODUCT.SPEC_TIME' | translate }}</dt>
+                  <dd>{{ 'PRODUCT.DAYS' | translate: { count: size.productionDays } }}</dd>
+                </div>
+                <div class="line">
+                  <dt>{{ 'PRODUCT.SPEC_PHOTO' | translate }}</dt>
+                  <dd>{{ size.minPhotos }}</dd>
+                </div>
+              }
+            </dl>
+
+            <div class="group quantity">
+              <h3 class="group-label">{{ 'PRODUCT.QUANTITY' | translate }}</h3>
+              <div class="stepper">
+                <button
+                  type="button"
+                  (click)="changeQuantity(-1)"
+                  [disabled]="quantity() <= 1"
+                  aria-label="-"
+                >
+                  −
+                </button>
+                <span class="number" role="status">{{ quantity() }}</span>
+                <button
+                  type="button"
+                  (click)="changeQuantity(1)"
+                  [disabled]="quantity() >= 99"
+                  aria-label="+"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div class="buttons">
+              <button
+                type="button"
+                class="pm-button-primary"
+                [disabled]="pendingAdd()"
+                (click)="addToCart()"
+              >
+                <pm-icon name="cart" [size]="18" />
+                {{ 'PRODUCT.ADD_IN_HOUR' | translate }}
+              </button>
+            </div>
+
+            <p class="note">{{ 'PRODUCT.HANDMADE_NOTE' | translate }}</p>
+
+            <section class="accordion pm-card">
+              <button type="button" class="accordion-head" (click)="toggleDescription()">
+                <span>{{ 'PRODUCT.DETAIL_TOGGLE' | translate }}</span>
+                <pm-icon name="chevron" [size]="17" />
+              </button>
+              @if (descriptionOpen()) {
+                <div class="accordion-body">
+                  <p>{{ product.description }}</p>
+                  <p>{{ 'PRODUCT.HANDMADE_NOTE' | translate }}</p>
+                </div>
+              }
+            </section>
+          </section>
+        </div>
+
+        <section class="reviews">
+          <h2 class="pm-section-title">
+            {{ 'PRODUCT.REVIEWS' | translate: { count: product.rating.count } }}
+          </h2>
+
+          @if (canReview()) {
+            <form class="review-form pm-card" (ngSubmit)="sendReview()">
+              <p class="review-label">{{ 'PRODUCT.WRITE_REVIEW' | translate }}</p>
+              <pm-rating
+                [value]="draftRating()"
+                [interactive]="true"
+                [size]="26"
+                [label]="'PRODUCT.RATING' | translate"
+                (chosen)="draftRating.set($event)"
+              />
+              <label class="sr-only" for="review-comment">
+                {{ 'PRODUCT.REVIEW_COMMENT' | translate }}
+              </label>
+              <textarea
+                id="review-comment"
+                name="comment"
+                rows="3"
+                maxlength="1000"
+                [placeholder]="'PRODUCT.REVIEW_COMMENT' | translate"
+                [(ngModel)]="draftComment"
+              ></textarea>
+              <button type="submit" class="pm-button-primary" [disabled]="draftRating() < 1">
+                {{ 'PRODUCT.REVIEW_SUBMIT' | translate }}
+              </button>
+            </form>
+          }
+
+          @if (reviewSent()) {
+            <p class="review-thanks">{{ 'PRODUCT.REVIEW_SENT' | translate }}</p>
+          }
+
+          @if (reviews().length === 0) {
+            <p class="pm-empty">{{ 'PRODUCT.NO_REVIEW' | translate }}</p>
+          } @else {
+            <ul class="review-list">
+              @for (review of reviews(); track review.id) {
+                <li class="pm-card">
+                  <div class="review-head">
+                    <strong>{{ review.authorName }}</strong>
+                    <span>{{ review.createdAt | date: 'dd/MM/yyyy' }}</span>
+                  </div>
+                  <pm-rating [value]="review.rating" [label]="'PRODUCT.RATING' | translate" />
+                  @if (review.comment) {
+                    <p class="review-text">{{ review.comment }}</p>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    }
+  }
+</div>

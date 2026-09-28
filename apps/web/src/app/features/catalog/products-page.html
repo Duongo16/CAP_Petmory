@@ -1,0 +1,112 @@
+<div class="pm-page">
+  <header class="page-head">
+    <div>
+      <h1 class="pm-page-title">{{ 'PRODUCT.TITLE' | translate }}</h1>
+      <p class="pm-page-description">{{ 'PRODUCT.DESCRIPTION_PAGE' | translate }}</p>
+    </div>
+
+    <form class="search" role="search" (ngSubmit)="submitSearch()">
+      <label class="sr-only" for="product-search">{{ 'NAV.SEARCH' | translate }}</label>
+      <span class="search-glyph"><pm-icon name="search" [size]="17" /></span>
+      <input
+        id="product-search"
+        name="keyword"
+        type="search"
+        autocomplete="off"
+        [placeholder]="'PRODUCT.SEARCH_PLACEHOLDER' | translate"
+        [(ngModel)]="keyword"
+      />
+      @if (searching()) {
+        <button type="button" class="clear" (click)="clearSearch()">
+          <pm-icon name="close" [size]="15" />
+          <span class="sr-only">{{ 'COMMON.CANCEL' | translate }}</span>
+        </button>
+      }
+    </form>
+  </header>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="pm-button-secondary" (click)="load()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @default {
+      @if (empty()) {
+        <div class="pm-center">
+          <p class="pm-empty">
+            {{ (searching() ? 'PRODUCT.NO_MATCH' : 'PRODUCT.EMPTY') | translate }}
+          </p>
+          @if (searching()) {
+            <button type="button" class="pm-button-secondary" (click)="clearSearch()">
+              {{ 'PRODUCT.SHOW_ALL' | translate }}
+            </button>
+          }
+        </div>
+      } @else {
+        @if (searching()) {
+          <p class="result-count">
+            {{ 'PRODUCT.RESULT_COUNT' | translate: { count: cards().length } }}
+          </p>
+        }
+
+        <div class="grid">
+          @for (card of cards(); track card.raw.code) {
+            <a
+              class="product-card pm-card pm-card-interactive"
+              [routerLink]="['/products', card.raw.code]"
+            >
+              <div class="photo">
+                @if (card.raw.imageUrl) {
+                  <img [src]="card.raw.imageUrl" [alt]="card.raw.name" />
+                } @else {
+                  <span class="photo-blank"><pm-icon name="paw" [size]="34" /></span>
+                }
+
+                @if (user()) {
+                  <button
+                    type="button"
+                    class="favourite"
+                    [class.is-on]="card.favourite"
+                    (click)="toggleFavourite(card, $event)"
+                  >
+                    <pm-icon name="heart" [size]="17" [filled]="card.favourite" />
+                    <span class="sr-only">{{ 'PRODUCT.FAVOURITE' | translate }}</span>
+                  </button>
+                }
+              </div>
+
+              <div class="text">
+                <h2 class="name">{{ card.raw.name }}</h2>
+                <p class="sub">{{ card.raw.description }}</p>
+
+                <pm-rating
+                  [value]="card.raw.rating.average"
+                  [count]="card.raw.rating.count"
+                  [label]="'PRODUCT.RATING' | translate"
+                />
+
+                <p class="size-count">
+                  {{ 'PRODUCT.COUNT_SIZE' | translate: { count: card.sizeCount } }}
+                </p>
+
+                @if (card.priceFrom; as price) {
+                  <p class="price">
+                    <span class="label">{{ 'PRODUCT.PRICE_WORD' | translate }}</span>
+                    <strong>{{ price | amount }}</strong>
+                  </p>
+                }
+              </div>
+            </a>
+          }
+        </div>
+      }
+    }
+  }
+</div>

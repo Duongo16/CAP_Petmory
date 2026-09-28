@@ -1,0 +1,162 @@
+:host {
+  display: block;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--pm-gap);
+  align-items: start;
+}
+
+.qr-frame {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 24px;
+}
+
+.qr-image {
+  inline-size: 100%;
+  max-inline-size: 300px;
+  aspect-ratio: 1;
+  border-radius: var(--pm-radius-sm);
+}
+
+.amount {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.awaiting {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--pm-text-muted);
+}
+
+.info {
+  padding: 22px;
+}
+
+.section-title {
+  margin: 0 0 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.lines {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.line dt {
+  font-size: 0.82rem;
+  color: var(--pm-text-muted);
+  flex: 0 0 auto;
+}
+
+.line dd {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-align: end;
+}
+
+.copyable dd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+code {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+}
+
+.copy-button {
+  padding: 4px 10px;
+  border: 1px solid var(--pm-border);
+  border-radius: 999px;
+  background: var(--pm-bg);
+  color: var(--pm-accent-dark);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--pm-accent-soft);
+  }
+}
+
+.warning {
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--pm-text-muted);
+  line-height: 1.5;
+}
+
+/* ---- Payment received ---- */
+
+.done {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-inline-size: 460px;
+  margin: 40px auto;
+  padding: 40px 28px;
+  text-align: center;
+}
+
+.checkmark {
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  border-radius: 50%;
+  background: var(--pm-accent);
+  color: #ffffff;
+  font-size: 1.6rem;
+}
+
+.done-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.done .sub {
+  margin: 0 0 8px;
+  color: var(--pm-text-muted);
+  font-size: 0.9rem;
+}
+
+.done a {
+  text-decoration: none;
+}
+
+@media (max-width: 820px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

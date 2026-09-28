@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.angular/
+coverage/
+.env
+.env.local
+.env.backup-*
+*.log
+.DS_Store
+Thumbs.db
+uploads/
+test-screenshots/
+*.tsbuildinfo

@@ -1,0 +1,148 @@
+<div class="pm-page">
+  <a class="back-link no-print" [routerLink]="['/admin/orders', orderCode()]">
+    ← {{ 'ADMIN.PROFILE.BACK_TO_DETAIL' | translate }}
+  </a>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('READY') {
+      @if (profile(); as profile) {
+        <header class="page-header">
+          <h1 class="title">{{ 'ADMIN.PROFILE.TITLE' | translate }} {{ profile.orderCode }}</h1>
+          <span class="status-chip">{{ keyStatus() | translate }}</span>
+          <button class="pm-button-secondary" type="button" class="no-print" (click)="inRa()">
+            {{ 'ADMIN.PROFILE.PRINT' | translate }}
+          </button>
+        </header>
+
+        @if (missingItems().length > 0) {
+          <section class="card missing-warning" role="alert">
+            <h2>{{ 'ADMIN.PROFILE.REMAINING_MISSING' | translate }}</h2>
+            <ul>
+              @for (key of missingItems(); track key) {
+                <li>{{ key | translate }}</li>
+              }
+            </ul>
+          </section>
+        }
+
+        <section class="card">
+          <h2>{{ 'ADMIN.PROFILE.SCHEDULE' | translate }}</h2>
+          <dl class="info-pair">
+            <dt>{{ 'ADMIN.ORDER.ORDER_DATE' | translate }}</dt>
+            <dd>{{ profile.orderedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            <dt>{{ 'ADMIN.PROFILE.LEAD_TIME' | translate }}</dt>
+            <dd>{{ 'STUDIO.DAYS' | translate: { count: profile.productionDays } }}</dd>
+            <dt>{{ 'ADMIN.ORDER.DELIVERY_DATE' | translate }}</dt>
+            <dd>{{ profile.estimatedDelivery | date: 'dd/MM/yyyy' }}</dd>
+          </dl>
+        </section>
+
+        @for (item of items(); track item.designId) {
+          <section class="card">
+            <h2>{{ item.displayName }} ×{{ item.quantity }}</h2>
+
+            <dl class="info-pair">
+              @if (item.petName) {
+                <dt>{{ 'ADMIN.PROFILE.PET_NAME' | translate }}</dt>
+                <dd>{{ item.petName }}</dd>
+              }
+              <dt>{{ 'ADMIN.PROFILE.MODEL_SHOULD' | translate }}</dt>
+              <dd>{{ item.modelCode ?? ('ADMIN.NONE_YET' | translate) }}</dd>
+              @if (item.engraving?.name) {
+                <dt>{{ 'STUDIO.ENGRAVED_NAME' | translate }}</dt>
+                <dd>{{ item.engraving?.name }}</dd>
+              }
+              @if (item.engraving?.memorialDate) {
+                <dt>{{ 'STUDIO.MEMORIAL_DATE' | translate }}</dt>
+                <dd>{{ item.engraving?.memorialDate | date: 'dd/MM/yyyy' }}</dd>
+              }
+              @if (item.engraving?.message) {
+                <dt>{{ 'STUDIO.MESSAGE' | translate }}</dt>
+                <dd>{{ item.engraving?.message }}</dd>
+              }
+            </dl>
+
+            <h3>{{ 'ADMIN.PROFILE.WOOL_ROLL' | translate }}</h3>
+            @if (item.woolRolls.length === 0) {
+              <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
+            } @else {
+              <ul class="wool-list">
+                @for (wool of item.woolRolls; track wool.code) {
+                  <li>
+                    <span class="swatch-sm" [style.background-color]="wool.swatch" aria-hidden="true"></span>
+                    <strong>{{ wool.code }}</strong>
+                    <span>{{ wool.displayName }}</span>
+                  </li>
+                }
+              </ul>
+            }
+
+            <h3>{{ 'ADMIN.PROFILE.PREVIEW' | translate }}</h3>
+            @if (item.photos.length === 0) {
+              <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
+            } @else {
+              <div class="photo-grid">
+                @for (a of item.photos; track a.angle) {
+                  <figure>
+                    @if (sourcePhoto()[a.keyPhoto]; as src) {
+                      <img [src]="src" [alt]="a.key | translate" />
+                    } @else {
+                      <div class="photo-placeholder"><mat-spinner diameter="22" /></div>
+                    }
+                    <figcaption>{{ a.key | translate }}</figcaption>
+                  </figure>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        <section class="card">
+          <h2>{{ 'ADMIN.PROFILE.CUSTOMER_PHOTOS' | translate }}</h2>
+          @if (profile.petPhoto.length === 0) {
+            <p class="note">{{ 'ADMIN.PROFILE.NOT_SIZE_PHOTO' | translate }}</p>
+          } @else {
+            <ul class="source-photo-list">
+              @for (a of profile.petPhoto; track a.code) {
+                <li>
+                  <strong>{{ a.angle }}</strong>
+                  <span class="sub">{{ a.labelQuality }}</span>
+                  @if (a.isRestored) {
+                    <span class="sub">{{ 'PHOTO.VERSION_RESTORE' | translate }}</span>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <section class="card">
+          <h2>{{ 'ADMIN.ORDER.DELIVERY_INFO' | translate }}</h2>
+          <dl class="info-pair">
+            <dt>{{ 'CHECKOUT.FULL_NAME' | translate }}</dt>
+            <dd>{{ profile.delivery.fullName }}</dd>
+            <dt>{{ 'CHECKOUT.PHONE' | translate }}</dt>
+            <dd>{{ profile.delivery.phone }}</dd>
+            <dt>{{ 'CHECKOUT.ADDRESS' | translate }}</dt>
+            <dd>{{ profile.delivery.address }}, {{ profile.delivery.province }}</dd>
+            @if (profile.delivery.note) {
+              <dt>{{ 'CHECKOUT.NOTE' | translate }}</dt>
+              <dd>{{ profile.delivery.note }}</dd>
+            }
+          </dl>
+        </section>
+      }
+    }
+  }
+</div>

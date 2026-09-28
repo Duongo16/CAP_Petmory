@@ -1,0 +1,19 @@
+<ul class="social" [class.is-full]="variant() === 'full'">
+  @for (link of links; track link.url) {
+    <li>
+      <a
+        class="social-link"
+        [attr.data-tone]="link.tone"
+        [href]="link.url"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'SOCIAL.OPEN' | translate: { name: link.key | translate }"
+      >
+        <span class="glyph" aria-hidden="true">{{ link.glyph }}</span>
+        @if (variant() === 'full') {
+          <span class="name">{{ link.key | translate }}</span>
+        }
+      </a>
+    </li>
+  }
+</ul>

@@ -1,0 +1,54 @@
+<h1 class="pm-page-title">{{ 'ORDER.TITLE' | translate }}</h1>
+
+@switch (status()) {
+  @case ('LOADING') {
+    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+  }
+  @case ('ERROR') {
+    <div class="pm-center">
+      <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+      <button type="button" class="pm-button-secondary" (click)="reload()">{{ 'COMMON.RETRY' | translate }}</button>
+    </div>
+  }
+  @case ('EMPTY') {
+    <div class="pm-center">
+      <p class="pm-empty">{{ 'ORDER.EMPTY' | translate }}</p>
+      <a class="pm-button-primary" routerLink="/products">{{ 'CART.VIEW_PRODUCTS' | translate }}</a>
+    </div>
+  }
+  @case ('HAS_DATA') {
+    <ul class="list">
+      @for (line of rows(); track line.raw.orderCode) {
+        <li class="order-row pm-card">
+          <div class="first">
+            <span class="order-code">{{ line.raw.orderCode }}</span>
+            <span class="status-chip" [attr.data-status]="line.raw.status">
+              {{ line.keyStatus | translate }}
+            </span>
+          </div>
+
+          <ul class="lines">
+            @for (item of line.raw.rows; track item.sizeCode) {
+              <li>{{ item.displayName }} ×{{ item.quantity }}</li>
+            }
+          </ul>
+
+          <div class="footer">
+            <div class="info">
+              <span class="sub">{{ 'ORDER.ORDER_DATE' | translate }}: {{ line.raw.createdAt | date: 'dd/MM/yyyy' }}</span>
+              <span class="sub">{{ 'ORDER.DELIVERY_DATE' | translate }}: {{ line.raw.estimatedDelivery | date: 'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="right">
+              <span class="amount">{{ line.raw.total.$numberDecimal | amount: line.raw.currency }}</span>
+              @if (line.needsPayment) {
+                <a class="pm-button-primary small" [routerLink]="['/payments', line.raw.orderCode]">
+                  {{ 'ORDER.PAYMENT' | translate }}
+                </a>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+}

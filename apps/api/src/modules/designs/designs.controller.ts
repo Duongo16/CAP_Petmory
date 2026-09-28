@@ -1,0 +1,83 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { DesignsService } from './designs.service';
+import { SaveDesignDto, UploadPreviewDto } from './dto/design.dto';
+import { PreviewAngle } from './schemas/design.schema';
+import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
+
+@Controller('designs')
+export class DesignsController {
+  constructor(private readonly service: DesignsService) {}
+
+  @Get()
+  list(@CurrentUser() user: AuthUser) {
+    return this.service.listMine(user.userId);
+  }
+
+  /** Quote comes from the catalog. Declared before the parameterised path so it is not shadowed. */
+  @Get('quote')
+  quote(@Query('productTypeCode') kind: string, @Query('sizeCode') size: string) {
+    return this.service.quote(kind ?? '', size ?? '');
+  }
+
+  @Get(':id')
+  detail(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.service.findOwned(id, user.userId);
+  }
+
+  /**
+   * Serves the preview through a permission-checked path rather than exposing the
+   * storage folder. Anyone who is not the owner gets a not-found.
+   */
+  @Get(':id/preview/:angle')
+  async photo(
+    @Param('id') id: string,
+    @Param('angle') angle: PreviewAngle,
+    @CurrentUser() user: AuthUser,
+    @Res() res: Response,
+  ): Promise<void> {
+    const data = await this.service.readPreview(id, user.userId, angle);
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'private, max-age=300');
+    res.send(data);
+  }
+
+  @Post()
+  create(@Body() dto: SaveDesignDto, @CurrentUser() user: AuthUser) {
+    return this.service.create(user.userId, dto);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() dto: SaveDesignDto, @CurrentUser() user: AuthUser) {
+    return this.service.update(id, user.userId, dto);
+  }
+
+  @Post(':id/preview')
+  @UseInterceptors(FileInterceptor('file'))
+  loadPhoto(
+    @Param('id') id: string,
+    @Body() dto: UploadPreviewDto,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.service.savePreview(id, user.userId, dto.angle, file);
+  }
+
+  @Delete(':id')
+  hide(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.service.hide(id, user.userId);
+  }
+}

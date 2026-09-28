@@ -1,0 +1,135 @@
+<div class="pm-page">
+  <header class="page-header">
+    <h1 class="title">{{ 'ADMIN.CONFIG.TITLE' | translate }}</h1>
+    <p class="description">{{ 'ADMIN.CONFIG.DESCRIPTION' | translate }}</p>
+  </header>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('READY') {
+      @if (!isManager()) {
+        <p class="note warn">{{ 'ADMIN.CONFIG.MANAGER_ONLY' | translate }}</p>
+      }
+
+      @if (error(); as codeError) {
+        <p class="error" role="alert">{{ codeError | translate }}</p>
+      }
+      @if (saved()) {
+        <p class="saved" role="status">{{ 'ADMIN.CONFIG.SAVED' | translate }}</p>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <section class="card">
+          <h2>{{ 'ADMIN.CONFIG.ORDERS_GROUP' | translate }}</h2>
+          <div class="field-grid">
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PET_LIMIT' | translate }}</span>
+              <input type="number" formControlName="defaultPetProfileLimit" min="1" max="100" />
+              <small>{{ 'ADMIN.CONFIG.PET_LIMIT_HINT' | translate }}</small>
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.QR_EXPIRY' | translate }}</span>
+              <input type="number" formControlName="qrExpiryHours" min="1" max="720" />
+              <small>{{ 'ADMIN.CONFIG.QR_EXPIRY_HINT' | translate }}</small>
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.SHIPPING_DAYS' | translate }}</span>
+              <input type="number" formControlName="estimatedShippingDays" min="1" max="60" />
+              <small>{{ 'ADMIN.CONFIG.SHIPPING_DAYS_HINT' | translate }}</small>
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>{{ 'ADMIN.CONFIG.PHOTOS_GROUP' | translate }}</h2>
+          <div class="field-grid">
+            <label>
+              <span>{{ 'ADMIN.CONFIG.GOOD_THRESHOLD' | translate }}</span>
+              <input type="number" formControlName="goodShortEdgePx" min="200" max="8000" />
+              <small>{{ 'ADMIN.CONFIG.GOOD_THRESHOLD_HINT' | translate }}</small>
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.WARN_THRESHOLD' | translate }}</span>
+              <input type="number" formControlName="warnShortEdgePx" min="100" max="8000" />
+              <small>{{ 'ADMIN.CONFIG.WARN_THRESHOLD_HINT' | translate }}</small>
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.MAX_FILE_SIZE' | translate }}</span>
+              <input type="number" formControlName="maxPhotoSizeMb" min="1" max="50" />
+              <small>{{ 'ADMIN.CONFIG.FILE_SIZE_HINT' | translate }}</small>
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>{{ 'ADMIN.CONFIG.QUOTA_GROUP' | translate }}</h2>
+          <p class="note">{{ 'ADMIN.CONFIG.QUOTA_HINT' | translate }}</p>
+          <div class="field-grid">
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
+              <input type="number" formControlName="quotaDay" min="0" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</span>
+              <input type="number" formControlName="quotaMonth" min="0" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</span>
+              <input type="number" formControlName="quotaYear" min="0" />
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>{{ 'ADMIN.CONFIG.BANK_GROUP' | translate }}</h2>
+          <p class="note warn">{{ 'ADMIN.CONFIG.BANK_WARNING' | translate }}</p>
+          <div class="field-grid">
+            <label>
+              <span>{{ 'ADMIN.CONFIG.BANK_CODE' | translate }}</span>
+              <input type="text" formControlName="bankCode" inputmode="numeric" maxlength="6" />
+              <small>{{ 'ADMIN.CONFIG.BANK_CODE_HINT' | translate }}</small>
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.BANK_NAME' | translate }}</span>
+              <input type="text" formControlName="bankName" maxlength="100" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.ACCOUNT_NUMBER' | translate }}</span>
+              <input type="text" formControlName="accountNumber" inputmode="numeric" maxlength="20" />
+              <small>{{ 'ADMIN.CONFIG.ACCOUNT_NUMBER_HINT' | translate }}</small>
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.ACCOUNT_HOLDER' | translate }}</span>
+              <input type="text" formControlName="accountHolder" maxlength="100" />
+              <small>{{ 'ADMIN.CONFIG.ACCOUNT_HOLDER_HINT' | translate }}</small>
+            </label>
+          </div>
+        </section>
+
+        @if (isManager()) {
+          <div class="button-row">
+            <button class="pm-button-primary" type="submit" [disabled]="saving()">
+              {{ 'COMMON.SAVE' | translate }}
+            </button>
+            <button class="pm-button-secondary" type="button" (click)="reload()">
+              {{ 'ADMIN.CONFIG.DISCARD_CHANGES' | translate }}
+            </button>
+            @if (form.invalid && form.touched) {
+              <span class="field-error">{{ 'ADMIN.CONFIG.INVALID_FIELDS' | translate }}</span>
+            }
+          </div>
+        }
+      </form>
+    }
+  }
+</div>

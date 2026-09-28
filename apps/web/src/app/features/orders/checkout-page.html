@@ -1,0 +1,88 @@
+<h1 class="pm-page-title">{{ 'CHECKOUT.TITLE' | translate }}</h1>
+<p class="pm-page-description">{{ 'CHECKOUT.DESCRIPTION' | translate }}</p>
+
+@switch (status()) {
+  @case ('LOADING') {
+    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+  }
+  @case ('ERROR') {
+    <div class="pm-center pm-empty"><p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+  }
+  @case ('READY') {
+    @if (cart().items.length === 0) {
+      <div class="pm-center pm-empty"><p>{{ 'CART.EMPTY' | translate }}</p></div>
+    } @else {
+      <div class="layout">
+        <form class="form pm-card" [formGroup]="form" (ngSubmit)="send()">
+          <h2 class="section-title">{{ 'CHECKOUT.INFO_LABEL' | translate }}</h2>
+
+          <label class="field">
+            <span class="label">{{ 'CHECKOUT.FULL_NAME' | translate }}</span>
+            <input type="text" formControlName="fullName" autocomplete="name" />
+            @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+              <span class="field-error">{{ 'CHECKOUT.FULL_NAME_ERROR' | translate }}</span>
+            }
+          </label>
+
+          <label class="field">
+            <span class="label">{{ 'CHECKOUT.PHONE' | translate }}</span>
+            <input type="tel" formControlName="phone" autocomplete="tel" inputmode="numeric" />
+            @if (form.controls.phone.touched && form.controls.phone.invalid) {
+              <span class="field-error">{{ 'CHECKOUT.ERROR_PHONE' | translate }}</span>
+            }
+          </label>
+
+          <label class="field">
+            <span class="label">{{ 'CHECKOUT.ADDRESS' | translate }}</span>
+            <input type="text" formControlName="address" autocomplete="street-address" />
+            @if (form.controls.address.touched && form.controls.address.invalid) {
+              <span class="field-error">{{ 'CHECKOUT.ERROR_ADDRESS' | translate }}</span>
+            }
+          </label>
+
+          <label class="field">
+            <span class="label">{{ 'CHECKOUT.PROVINCE' | translate }}</span>
+            <input type="text" formControlName="province" autocomplete="address-level1" />
+            @if (form.controls.province.touched && form.controls.province.invalid) {
+              <span class="field-error">{{ 'CHECKOUT.ERROR_PROVINCE' | translate }}</span>
+            }
+          </label>
+
+          <label class="field">
+            <span class="label">{{ 'CHECKOUT.NOTE' | translate }}</span>
+            <textarea rows="3" formControlName="note"></textarea>
+          </label>
+
+          @if (error(); as codeError) {
+            <p class="generic-error" role="alert">{{ codeError | translate }}</p>
+          }
+
+          <button type="submit" class="pm-button-primary wide" [disabled]="pendingSend()">
+            {{ 'CHECKOUT.CONFIRM' | translate }}
+          </button>
+        </form>
+
+        <aside class="summary pm-card">
+          <h2 class="section-title">{{ 'CHECKOUT.ORDER_OF_VERSION' | translate }}</h2>
+          <ul class="list">
+            @for (item of cart().items; track item.id) {
+              <li class="line-item">
+                <span class="name">{{ item.displayName }}</span>
+                <span class="quantity">×{{ item.quantity }}</span>
+              </li>
+            }
+          </ul>
+          <div class="line">
+            <span>{{ 'CART.LEAD_TIME' | translate }}</span>
+            <strong>{{ 'PRODUCT.DAYS' | translate: { count: cart().productionDaysMax } }}</strong>
+          </div>
+          <div class="line total">
+            <span>{{ 'PRODUCT.TOTAL' | translate }}</span>
+            <strong class="amount">{{ cart().total | amount: cart().currency }}</strong>
+          </div>
+          <p class="note">{{ 'CART.SHIPPING_FEE_NOTE' | translate }}</p>
+        </aside>
+      </div>
+    }
+  }
+}

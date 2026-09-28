@@ -1,0 +1,376 @@
+<div class="pm-page">
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="center empty"><p>{{ 'STUDIO.NONE_YET_MODEL' | translate }}</p></div>
+    }
+    @case ('READY') {
+      <header class="page-header">
+        <h1 class="title">{{ 'STUDIO.TITLE' | translate }}</h1>
+
+        <ol class="steps">
+          @for (b of stepsDisplay(); track b.code; let i = $index) {
+            <li class="step-item">
+              <button
+                type="button"
+                class="step-button"
+                [class.current]="b.selected"
+                [class.passed]="i < stepCount() - 1"
+                [attr.aria-current]="b.selected ? 'step' : null"
+                (click)="setStep(b.code)"
+              >
+                <span class="count">{{ i + 1 }}</span>
+                <span class="name">{{ b.key | translate }}</span>
+              </button>
+            </li>
+          }
+        </ol>
+      </header>
+
+      <div class="layout">
+        <aside class="left-column">
+          @if (stepCurrent() === 'PICK_MODEL') {
+            <section class="block pm-card">
+              <div class="block-body">
+                <h2 class="section-title">{{ 'STUDIO.KIND_LABEL' | translate }}</h2>
+                <div class="filter-row">
+                  @for (tab of kindTabs(); track tab.kind) {
+                    <button
+                      type="button"
+                      class="pm-chip"
+                      [attr.aria-pressed]="kindSelected() === tab.kind"
+                      (click)="selectKind(tab.kind)"
+                    >
+                      {{ tab.key | translate }}
+                    </button>
+                  }
+                </div>
+
+                <h2 class="section-title spaced-top">{{ 'STUDIO.POSE_LABEL' | translate }}</h2>
+                <div class="filter-row">
+                  @for (tab of poseTabs(); track tab.pose) {
+                    <button
+                      type="button"
+                      class="pm-chip"
+                      [attr.aria-pressed]="poseSelected() === tab.pose"
+                      (click)="selectPose(tab.pose)"
+                    >
+                      {{ tab.key | translate }}
+                    </button>
+                  }
+                </div>
+                <p class="pose-note">{{ 'STUDIO.POSE_NOTE' | translate }}</p>
+
+                <h2 class="section-title spaced-top">{{ 'STUDIO.REALISTIC' | translate }}</h2>
+                <div class="model-list">
+                  @for (color of colorRealistic(); track color.code) {
+                    <button
+                      type="button"
+                      class="model-button"
+                      [class.selected]="baseModelSelected()?.code === color.code"
+                      (click)="selectBaseModel(color)"
+                    >
+                      {{ color.name }}
+                    </button>
+                  }
+                </div>
+
+                <h2 class="section-title spaced-top">{{ 'STUDIO.BLOCKY' | translate }}</h2>
+                <div class="model-list">
+                  @for (color of colorBlocky(); track color.code) {
+                    <button
+                      type="button"
+                      class="model-button"
+                      [class.selected]="baseModelSelected()?.code === color.code"
+                      (click)="selectBaseModel(color)"
+                    >
+                      {{ color.name }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </section>
+          }
+
+          @if (stepCurrent() === 'APPEARANCE') {
+            <section class="block pm-card">
+              <div class="block-body">
+                <h2 class="section-title">{{ 'STUDIO.PAINT_MODE' | translate }}</h2>
+                <mat-button-toggle-group
+                  class="paint-mode"
+                  [value]="paintMode()"
+                  (change)="setPaintMode($event.value)"
+                  [attr.aria-label]="'STUDIO.PAINT_MODE' | translate"
+                >
+                  <mat-button-toggle value="FILL">
+                    {{ 'STUDIO.MEASURE_ARRAY' | translate }}
+                  </mat-button-toggle>
+                  <mat-button-toggle value="BRUSH">
+                    {{ 'STUDIO.SCAN_SIZE' | translate }}
+                  </mat-button-toggle>
+                </mat-button-toggle-group>
+
+                @if (paintMode() === 'BRUSH') {
+                  <label class="brush-label" for="brush-size">{{ 'STUDIO.BRUSH_SIZE' | translate }}</label>
+                  <mat-slider class="slider" [min]="20" [max]="200" [step]="10" discrete>
+                    <input id="brush-size" matSliderThumb [value]="brushSize() * 1000" (valueChange)="setBrushSize($event)" />
+                  </mat-slider>
+                }
+
+                @if (colorPendingPaint(); as dangCam) {
+                  <div class="holding">
+                    <span class="dot" [style.background-color]="dangCam.swatch"></span>
+                    <span class="label">{{ dangCam.displayName }}</span>
+                    <button type="button" class="pm-button-secondary small" (click)="dropColorColor()">
+                      {{ 'STUDIO.DROP_COLOR' | translate }}
+                    </button>
+                  </div>
+                } @else {
+                  <p class="small-description">{{ 'STUDIO.PAINT_HINT' | translate }}</p>
+                }
+              </div>
+            </section>
+
+            <section class="block pm-card">
+              <div class="block-body">
+                <h2 class="section-title">{{ 'STUDIO.FUR_COLORS' | translate }}</h2>
+                <div class="color-grid">
+                  @for (code of furColors(); track code.code) {
+                    <button
+                      type="button"
+                      class="swatch"
+                      [class.holding-color]="colorPendingPaint()?.code === code.code"
+                      [style.background-color]="code.swatch"
+                      [matTooltip]="code.code + ' — ' + code.displayName"
+                      [attr.aria-label]="code.code + ' ' + code.displayName"
+                      (click)="pickPaintColor(code)"
+                    ></button>
+                  }
+                </div>
+
+                <h2 class="section-title spaced-top">{{ 'STUDIO.EYES_NOSE_COLORS' | translate }}</h2>
+                <div class="color-grid">
+                  @for (code of eyesNoseColors(); track code.code) {
+                    <button
+                      type="button"
+                      class="swatch"
+                      [class.holding-color]="colorPendingPaint()?.code === code.code"
+                      [style.background-color]="code.swatch"
+                      [matTooltip]="code.code + ' — ' + code.displayName"
+                      [attr.aria-label]="code.code + ' ' + code.displayName"
+                      (click)="pickPaintColor(code)"
+                    ></button>
+                  }
+                </div>
+              </div>
+            </section>
+          }
+
+          @if (stepCurrent() === 'PREVIEW') {
+            <section class="block pm-card">
+              <div class="block-body">
+                <h2 class="section-title">{{ 'STUDIO.PREVIEW' | translate }}</h2>
+                <p class="small-description">{{ 'STUDIO.PREVIEW_HINT' | translate }}</p>
+
+                <ul class="angle-list">
+                  @for (item of photosDisplay(); track item.angle) {
+                    <li>
+                      <img [src]="item.photo" [alt]="item.key | translate" />
+                      <span>{{ item.key | translate }}</span>
+                    </li>
+                  }
+                </ul>
+
+                @if (preview().length === 0) {
+                  <p class="small-description">{{ 'STUDIO.NOT_CAPTURED' | translate }}</p>
+                } @else {
+                  <p class="saved" role="status">
+                    {{ 'STUDIO.ANGLE_COUNT' | translate: { count: preview().length } }}
+                  </p>
+                }
+              </div>
+            </section>
+
+            <section class="block pm-card">
+              <div class="block-body">
+                <h2 class="section-title">{{ 'STUDIO.ACCESSORY' | translate }}</h2>
+                <p class="small-description">{{ 'STUDIO.ACCESSORY_SOON' | translate }}</p>
+              </div>
+            </section>
+          }
+
+          @if (stepCurrent() === 'COMPLETED') {
+            <section class="block pm-card">
+              <div class="block-body">
+                <h2 class="section-title">{{ 'STUDIO.SELECT_PRODUCT' | translate }}</h2>
+                <div class="choice-row">
+                  @for (kind of facade.types(); track kind.code) {
+                    <button
+                      type="button"
+                      class="choice-card"
+                      [class.selected]="facade.codeKindSelected() === kind.code"
+                      (click)="facade.selectKind(kind.code)"
+                    >
+                      {{ kind.name }}
+                    </button>
+                  }
+                </div>
+
+                @if (facade.sizes().length > 0) {
+                  <h2 class="section-title spaced-top">{{ 'STUDIO.SELECT_SIZE' | translate }}</h2>
+                  <div class="choice-row">
+                    @for (size of facade.sizes(); track size.code) {
+                      <button
+                        type="button"
+                        class="choice-card"
+                        [class.selected]="facade.sizeCodeSelected() === size.code"
+                        (click)="facade.selectSize(size.code)"
+                      >
+                        <span>{{ size.displayName }}</span>
+                        <small>{{ size.dimensions }}</small>
+                      </button>
+                    }
+                  </div>
+                }
+
+                @if (facade.quote(); as bg) {
+                  <dl class="summary spaced-top">
+                    <dt>{{ 'STUDIO.PRICE' | translate }}</dt>
+                    <dd class="price">{{ bg.unitPrice | amount: bg.currency }}</dd>
+                    <dt>{{ 'STUDIO.LEAD_TIME' | translate }}</dt>
+                    <dd>{{ 'STUDIO.DAYS' | translate: { count: bg.productionDays } }}</dd>
+                  </dl>
+                }
+              </div>
+            </section>
+
+            <section class="block pm-card">
+              <div class="block-body" [formGroup]="facade.form">
+                <h2 class="section-title">{{ 'STUDIO.ENGRAVING' | translate }}</h2>
+                <label class="input-field">
+                  <span>{{ 'STUDIO.NAME_DRAFT' | translate }}</span>
+                  <input type="text" formControlName="name" maxlength="100" />
+                </label>
+                <label class="input-field">
+                  <span>{{ 'STUDIO.PET_LABEL' | translate }}</span>
+                  <select formControlName="petId">
+                    <option value="">{{ 'STUDIO.PET_NONE' | translate }}</option>
+                    @for (pet of facade.pets(); track pet._id) {
+                      <option [value]="pet._id">{{ pet.name }}</option>
+                    }
+                  </select>
+                </label>
+                <p class="small-description">{{ 'STUDIO.PET_HINT' | translate }}</p>
+
+                <label class="input-field">
+                  <span>{{ 'STUDIO.ENGRAVED_NAME' | translate }}</span>
+                  <input type="text" formControlName="engravedName" maxlength="60" />
+                </label>
+                <label class="input-field">
+                  <span>{{ 'STUDIO.MEMORIAL_DATE' | translate }}</span>
+                  <input type="date" formControlName="memorialDate" />
+                </label>
+                <label class="input-field">
+                  <span>{{ 'STUDIO.MESSAGE' | translate }}</span>
+                  <textarea formControlName="message" rows="3" maxlength="300"></textarea>
+                </label>
+              </div>
+            </section>
+
+            <section class="block pm-card">
+              <div class="block-body">
+                <h2 class="section-title">{{ 'STUDIO.SUMMARY' | translate }}</h2>
+                <dl class="summary">
+                  <dt>{{ 'STUDIO.COLOR_CHOSEN' | translate }}</dt>
+                  <dd>{{ baseModelSelected()?.name }}</dd>
+                  <dt>{{ 'STUDIO.COUNT_COLOR_IN_USE' | translate }}</dt>
+                  <dd>{{ countColorInUse() }}</dd>
+                  <dt>{{ 'STUDIO.ORIGINAL_PHOTO_PREPARE' | translate }}</dt>
+                  <dd [class.missing]="!hasAllSixAngles()">{{ preview().length }} / 6</dd>
+                </dl>
+                @if (!hasAllSixAngles()) {
+                  <p class="small-description warn">{{ 'STUDIO.CAPTURE_REMINDER' | translate }}</p>
+                }
+
+                @if (facade.error(); as codeError) {
+                  <p class="error" role="alert">{{ codeError | translate }}</p>
+                }
+                @if (facade.statusSave() === 'SAVED') {
+                  <p class="saved" role="status">{{ 'STUDIO.SAVED' | translate }}</p>
+                }
+
+                <div class="button-row">
+                  <button
+                    type="button"
+                    class="pm-button-primary"
+                    [disabled]="facade.statusSave() === 'SAVING'"
+                    (click)="saveDraft()"
+                  >
+                    {{ 'STUDIO.SAVE_DRAFT' | translate }}
+                  </button>
+                  <button type="button" class="pm-button-secondary"
+                    [disabled]="!facade.canAddToCart()"
+                    (click)="addToCart()"
+                  >
+                    {{ 'STUDIO.ADD_IN_HOUR' | translate }}
+                  </button>
+                </div>
+
+                @if (facade.addedToCart()) {
+                  <p class="saved" role="status">
+                    {{ 'STUDIO.ADDED_IN_HOUR' | translate }}
+                    <a routerLink="/cart">{{ 'STUDIO.VIEW_CART' | translate }}</a>
+                  </p>
+                }
+                <p class="small-description">{{ 'STUDIO.FINISH_HINT' | translate }}</p>
+              </div>
+            </section>
+          }
+        </aside>
+
+        <section class="center-column">
+          @if (pathModel(); as path) {
+            <pm-viewer-3d
+              [pathModel]="path"
+              [colorPendingPaint]="colorCodePendingPaint()"
+              [paintMode]="paintMode()"
+              [brushSize]="brushSize()"
+              [statusPaint]="facade.paintSaved()"
+              (zoneDetected)="labelZoneDetected($event)"
+              (capturedSixAngles)="onSixAnglesCaptured($event)"
+              (painted)="recordPainted($event)"
+            />
+          }
+
+          <div class="bottom-bar">
+            <button type="button" class="pm-button-secondary" [disabled]="stepCount() === 1" (click)="previousStep()">
+              {{ 'STUDIO.BACK' | translate }}
+            </button>
+            <span class="spacer"></span>
+            <button type="button" class="pm-button-primary" [disabled]="isLastStep()" (click)="nextStep()">
+              {{ 'STUDIO.CONTINUE' | translate }}
+            </button>
+          </div>
+        </section>
+
+        <aside class="right-column">
+          <h2 class="section-title">{{ 'STUDIO.PREVIEW' | translate }}</h2>
+          @if (preview().length === 0) {
+            <p class="small-description">{{ 'STUDIO.NOT_CAPTURED' | translate }}</p>
+          } @else {
+            <div class="photo-list">
+              @for (item of photosDisplay(); track item.angle) {
+                <figure class="photo-card">
+                  <img [src]="item.photo" [alt]="item.key | translate" />
+                  <figcaption>{{ item.key | translate }}</figcaption>
+                </figure>
+              }
+            </div>
+          }
+        </aside>
+      </div>
+    }
+  }
+</div>

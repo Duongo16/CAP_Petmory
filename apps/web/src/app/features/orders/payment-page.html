@@ -1,0 +1,67 @@
+@switch (status()) {
+  @case ('LOADING') {
+    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+  }
+  @case ('ERROR') {
+    <div class="pm-center pm-empty"><p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+  }
+  @case ('READY') {
+    @if (maQr(); as qr) {
+      @if (isPaid()) {
+        <div class="done pm-card">
+          <span class="checkmark" aria-hidden="true">✓</span>
+          <h1 class="done-name">{{ 'PAYMENT.PAYMENT_RECEIVED' | translate }}</h1>
+          <p class="sub">{{ 'PAYMENT.PAYMENT_RECEIVED_TEXT' | translate: { orderCode: qr.orderCode } }}</p>
+          <a class="pm-button-primary" routerLink="/orders">{{ 'PAYMENT.VIEW_ORDER' | translate }}</a>
+        </div>
+      } @else {
+        <h1 class="pm-page-title">{{ 'PAYMENT.TITLE' | translate }}</h1>
+        <p class="pm-page-description">{{ 'PAYMENT.DESCRIPTION' | translate }}</p>
+
+        <div class="layout">
+          <section class="qr-frame pm-card">
+            <img class="qr-image" [src]="qr.qrImage" [alt]="'PAYMENT.QR_CODE' | translate" />
+            <p class="amount">{{ qr.amount | amount: qr.currency }}</p>
+            <p class="awaiting" role="status">{{ 'PAYMENT.WAITING' | translate }}</p>
+          </section>
+
+          <section class="info pm-card">
+            <h2 class="section-title">{{ 'PAYMENT.MANUAL_TRANSFER' | translate }}</h2>
+
+            <dl class="lines">
+              <div class="line">
+                <dt>{{ 'PAYMENT.BANK' | translate }}</dt>
+                <dd>{{ qr.bankName }}</dd>
+              </div>
+              <div class="line">
+                <dt>{{ 'PAYMENT.TEXT_ACCOUNT' | translate }}</dt>
+                <dd>{{ qr.accountHolder }}</dd>
+              </div>
+              <div class="line copyable">
+                <dt>{{ 'PAYMENT.ACCOUNT_NUMBER' | translate }}</dt>
+                <dd>
+                  <code>{{ qr.accountNumber }}</code>
+                  <button type="button" class="copy-button" (click)="copy(qr.accountNumber, 'STK')">
+                    {{ copied() === 'STK' ? ('PAYMENT.COPIED' | translate) : ('PAYMENT.COPY' | translate) }}
+                  </button>
+                </dd>
+              </div>
+              <div class="line copyable">
+                <dt>{{ 'PAYMENT.CONTENT' | translate }}</dt>
+                <dd>
+                  <code>{{ qr.transferMessage }}</code>
+                  <button type="button" class="copy-button" (click)="copy(qr.transferMessage, 'ND')">
+                    {{ copied() === 'ND' ? ('PAYMENT.COPIED' | translate) : ('PAYMENT.COPY' | translate) }}
+                  </button>
+                </dd>
+              </div>
+            </dl>
+
+            <p class="warning">{{ 'PAYMENT.WARNING_CONTENT' | translate }}</p>
+            <p class="note">{{ 'PAYMENT.EXPIRY_NOTE' | translate }}</p>
+          </section>
+        </div>
+      }
+    }
+  }
+}

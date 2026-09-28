@@ -1,0 +1,57 @@
+:host {
+  display: block;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin: 0 0 var(--pm-gap);
+}
+
+.add-card {
+  border-radius: var(--pm-radius);
+  margin-bottom: var(--pm-gap);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  align-items: start;
+
+  button {
+    height: 56px;
+  }
+}
+
+.error {
+  margin: 8px 0 0;
+  color: var(--pm-danger);
+  font-size: 0.875rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--pm-gap);
+}
+
+.pet-card {
+  border-radius: var(--pm-radius);
+  border-left: 4px solid transparent;
+}
+
+.memorial {
+  border-left-color: var(--pm-memorial);
+}
+
+.center {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.empty {
+  color: var(--pm-text-muted);
+}

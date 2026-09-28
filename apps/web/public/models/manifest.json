@@ -1,0 +1,233 @@
+{
+  "version": 3,
+  "description": "Declares the base models and their material zones. The viewer reads the zones straight from the model file; this file only attaches a display label and the colour group each zone may use.",
+  "zoneMaterial": [
+    {
+      "name": "PM_FUR_MAIN",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": true
+    },
+    {
+      "name": "PM_FUR_SECONDARY",
+      "labelDisplay": "PET.ZONE.BELLY_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": true
+    },
+    {
+      "name": "PM_EARS",
+      "labelDisplay": "PET.ZONE.EARS",
+      "colorGroupAllowed": "FUR",
+      "required": true
+    },
+    {
+      "name": "PM_TAIL",
+      "labelDisplay": "PET.ZONE.TAIL",
+      "colorGroupAllowed": "FUR",
+      "required": true
+    },
+    {
+      "name": "PM_EYES",
+      "labelDisplay": "PET.ZONE.EYES",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": true
+    },
+    {
+      "name": "PM_NOSE",
+      "labelDisplay": "PET.ZONE.NOSE",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": true
+    },
+    {
+      "name": "Main",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "Main_Light",
+      "labelDisplay": "PET.ZONE.BELLY_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "Grey",
+      "labelDisplay": "PET.ZONE.GREY_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "Black",
+      "labelDisplay": "PET.ZONE.NOSE",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "Nose",
+      "labelDisplay": "PET.ZONE.NOSE",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "Eyes",
+      "labelDisplay": "PET.ZONE.EYES",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "Eyes_White",
+      "labelDisplay": "PET.ZONE.IRIS",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "Eyes_Pupil",
+      "labelDisplay": "PET.ZONE.PUPIL",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "Eyes_Black",
+      "labelDisplay": "PET.ZONE.EYE_RIM",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "colormap",
+      "labelDisplay": "PET.ZONE.WHOLE_BODY",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    }
+  ],
+  "baseModel": [
+    {
+      "code": "Q-SHIBA",
+      "name": "Shiba Inu",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-ShibaInu.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "REALISTIC"
+    },
+    {
+      "code": "Q-HUSKY",
+      "name": "Husky",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-Husky.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "REALISTIC"
+    },
+    {
+      "code": "Q-FOX",
+      "name": "Cáo nhỏ",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "q-Fox.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "REALISTIC"
+    },
+    {
+      "code": "TEMP-CAT",
+      "name": "Mèo",
+      "kind": "CAT",
+      "pose": "STANDING",
+      "file": "animal-cat.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "BLOCKY"
+    },
+    {
+      "code": "TEMP-DOG",
+      "name": "Chó",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "animal-dog.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "BLOCKY"
+    },
+    {
+      "code": "TEMP-BUNNY",
+      "name": "Thỏ",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "animal-bunny.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "BLOCKY"
+    },
+    {
+      "code": "TEMP-FOX",
+      "name": "Cáo",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "animal-fox.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "BLOCKY"
+    },
+    {
+      "code": "TEMP-PANDA",
+      "name": "Gấu trúc",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "animal-panda.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "BLOCKY"
+    },
+    {
+      "code": "TEMP-TIGER",
+      "name": "Hổ",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "animal-tiger.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "BLOCKY"
+    },
+    {
+      "code": "DOG-SITTING",
+      "name": "Chó ngồi",
+      "kind": "DOG",
+      "pose": "SITTING",
+      "file": "dog-sitting.glb",
+      "ready": false
+    },
+    {
+      "code": "DOG-STANDING",
+      "name": "Chó đứng",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-standing.glb",
+      "ready": false
+    },
+    {
+      "code": "CAT-SITTING",
+      "name": "Mèo ngồi",
+      "kind": "CAT",
+      "pose": "SITTING",
+      "file": "cat-sitting.glb",
+      "ready": false
+    },
+    {
+      "code": "CAT-LYING",
+      "name": "Mèo nằm",
+      "kind": "CAT",
+      "pose": "LYING",
+      "file": "cat-lying.glb",
+      "ready": false
+    }
+  ],
+  "source": {
+    "author": "Kenney",
+    "site": "https://kenney.nl",
+    "licence": "CC0 1.0 Universal",
+    "origin": "Cube Pets 2.0",
+    "note": "Hai bo mo hinh cung ton tai de so sanh: Kenney Cube Pets dang khoi vuong, va Quaternius dang that. Bo phu kien nen khong bat buoc dung chung mot bo nua."
+  }
+}

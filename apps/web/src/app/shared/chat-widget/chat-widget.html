@@ -1,0 +1,66 @@
+<button
+  type="button"
+  class="open-button"
+  [attr.aria-expanded]="pendingOpen()"
+  aria-controls="assistant-panel"
+  (click)="toggle()"
+>
+  <span aria-hidden="true">💬</span>
+  <span class="button-text">{{ 'ASSISTANT.TITLE' | translate }}</span>
+</button>
+
+@if (pendingOpen()) {
+  <section id="assistant-panel" class="frame" [attr.aria-label]="'ASSISTANT.TITLE' | translate">
+    <header class="panel-header">
+      <h2>{{ 'ASSISTANT.TITLE' | translate }}</h2>
+      <button type="button" class="close-button" (click)="toggle()">
+        <span aria-hidden="true">✕</span>
+        <span class="sr-only">{{ 'COMMON.CLOSE' | translate }}</span>
+      </button>
+    </header>
+
+    <div class="disclaimer">{{ 'ASSISTANT.DISCLAIMER' | translate }}</div>
+
+    <div class="history" role="log" aria-live="polite">
+      @for (message of history(); track message.id) {
+        <div class="message" [class.from-customer]="message.fromCustomer">
+          <p class="bubble">{{ message.content }}</p>
+          @if (message.path; as dd) {
+            <button type="button" class="goto-button" (click)="openPath(dd)">
+              {{ 'ASSISTANT.GO_TO' | translate }}
+            </button>
+          }
+        </div>
+      }
+      @if (waiting()) {
+        <p class="typing">{{ 'ASSISTANT.PENDING_ANSWER' | translate }}</p>
+      }
+    </div>
+
+    @if (suggestions().length > 0) {
+      <div class="suggestion-row">
+        @for (gy of suggestions(); track gy.code) {
+          <button type="button" class="chip" (click)="selectSuggestion(gy.key)">
+            {{ gy.key | translate }}
+          </button>
+        }
+      </div>
+    }
+
+    <form class="input-row" (ngSubmit)="sendFromInput()">
+      <label class="sr-only" for="assistant-input">{{ 'ASSISTANT.INPUT' | translate }}</label>
+      <input
+        id="assistant-input"
+        type="text"
+        autocomplete="off"
+        [placeholder]="'ASSISTANT.INPUT' | translate"
+        [ngModel]="contentInput()"
+        (ngModelChange)="contentInput.set($event)"
+        name="question"
+      />
+      <button type="submit" class="send-button" [disabled]="waiting()">
+        {{ 'ASSISTANT.SEND' | translate }}
+      </button>
+    </form>
+  </section>
+}

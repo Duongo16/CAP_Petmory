@@ -1,0 +1,67 @@
+<div class="pm-page">
+  <header class="page-header">
+    <h1 class="title">{{ 'ADMIN.LOG.TITLE' | translate }}</h1>
+    <p class="description">{{ 'ADMIN.LOG.DESCRIPTION' | translate }}</p>
+    <button class="pm-button-secondary" type="button" (click)="reload()">
+      {{ 'ADMIN.REFRESH' | translate }}
+    </button>
+  </header>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('READY') {
+      @if (rows().length === 0) {
+        <div class="pm-center pm-empty"><p>{{ 'ADMIN.LOG.EMPTY' | translate }}</p></div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'ADMIN.LOG.AT' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.LOG.TRANSACTION_ID' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.LOG.AMOUNT' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.LOG.CONTENT' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.LOG.ORDER_CODE' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.LOG.RESULT' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of rows(); track t.raw._id) {
+                <tr>
+                  <td>{{ t.raw.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+                  <td class="small-code">{{ t.raw.transactionId }}</td>
+                  <td class="right">{{ t.raw.amount | amount }}</td>
+                  <td class="content">{{ t.raw.transferMessage }}</td>
+                  <td>
+                    @if (t.raw.detectedReference) {
+                      <a class="order-code" [routerLink]="['/admin/orders', t.raw.detectedReference]">
+                        {{ t.raw.detectedReference }}
+                      </a>
+                    } @else {
+                      <span class="sub">{{ 'ADMIN.NONE_YET' | translate }}</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="status-chip" [attr.data-group]="t.match ? 'good' : 'bad'">
+                      {{ t.keyResult | translate }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  }
+</div>
