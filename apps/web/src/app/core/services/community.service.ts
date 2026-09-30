@@ -64,6 +64,11 @@ export class CommunityService {
     return this.http.post(`${this.base}/community/posts/${id}/photos`, form);
   }
 
+  /** Nho may chu tai buc anh o duong dan tren mang ve, thay cho tep tren may. */
+  addPhotoByLink(id: string, url: string): Observable<unknown> {
+    return this.http.post(`${this.base}/community/posts/${id}/photos/from-link`, { url });
+  }
+
   comment(id: string, content: string): Observable<unknown> {
     return this.http.post(`${this.base}/community/posts/${id}/comments`, { content });
   }
@@ -96,6 +101,10 @@ export class CommunityService {
 
   postsOf(userId: string): Observable<CommunityPost[]> {
     return this.http.get<CommunityPost[]>(`${this.base}/community/users/${userId}/posts`);
+  }
+
+  updateProfile(data: { fullName?: string; phone?: string; avatarUrl?: string }): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${this.base}/community/users/me`, data);
   }
 
   /** Where a post photo is served from, for use in an image source. */

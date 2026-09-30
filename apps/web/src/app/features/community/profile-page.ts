@@ -10,21 +10,29 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommunityService } from '../../core/services/community.service';
 import { AuthService } from '../../core/services/auth.service';
+import { TokenStore } from '../../core/services/token-store';
 import { CommunityPost, CommunityProfile } from '../../core/models/community.model';
 import { topicKey } from './community-topics';
 import { Icon } from '../../shared/icon/icon';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
+interface EditForm {
+  fullName: FormControl<string>;
+  phone: FormControl<string>;
+  avatarUrl: FormControl<string>;
+}
+
 @Component({
   selector: 'pm-community-profile-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, TranslatePipe, MatProgressSpinnerModule, Icon],
+  imports: [RouterLink, DatePipe, TranslatePipe, MatProgressSpinnerModule, Icon, ReactiveFormsModule],
   templateUrl: './profile-page.html',
   styleUrl: './profile-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,9 +40,9 @@ type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 export class CommunityProfilePage implements OnInit {
   private readonly service = inject(CommunityService);
   private readonly auth = inject(AuthService);
+  private readonly store = inject(TokenStore);
   private readonly destroyRef = inject(DestroyRef);
 
-  /** Account id from the URL, via the router's parameter binding. */
   readonly id = input.required<string>();
 
   readonly user = this.auth.user;
@@ -42,7 +50,15 @@ export class CommunityProfilePage implements OnInit {
   readonly profile = signal<CommunityProfile | null>(null);
   private readonly posts = signal<CommunityPost[]>([]);
 
-  /** Each card carries its translation keys, so the view calls no functions. */
+  readonly editMode = signal(false);
+  readonly saving = signal(false);
+
+  readonly editForm = new FormGroup<EditForm>({
+    fullName: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
+    phone: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(20)] }),
+    avatarUrl: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(500)] }),
+  });
+
   readonly cards = computed(() =>
     this.posts().map((p) => ({
       raw: p,
@@ -74,6 +90,53 @@ export class CommunityProfilePage implements OnInit {
       .postsOf(this.id())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: (list) => this.posts.set(list), error: () => undefined });
+  }
+
+  openEdit(): void {
+    const p = this.profile();
+    if (!p) {
+      return;
+    }
+    this.editForm.setValue({
+      fullName: p.fullName,
+      phone: p.phone ?? '',
+      avatarUrl: p.avatarUrl ?? '',
+    });
+    this.editMode.set(true);
+  }
+
+  cancelEdit(): void {
+    this.editMode.set(false);
+  }
+
+  saveProfile(): void {
+    if (this.editForm.invalid || this.saving()) {
+      return;
+    }
+    const { fullName, phone, avatarUrl } = this.editForm.getRawValue();
+    this.saving.set(true);
+    this.service
+      .updateProfile({ fullName, phone, avatarUrl })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.profile.update((p) =>
+            p
+              ? {
+                  ...p,
+                  fullName,
+                  initial: fullName.trim().charAt(0).toUpperCase() || '?',
+                  phone: phone || null,
+                  avatarUrl: avatarUrl || null,
+                }
+              : p,
+          );
+          this.store.patchUser({ fullName });
+          this.saving.set(false);
+          this.editMode.set(false);
+        },
+        error: () => this.saving.set(false),
+      });
   }
 
   toggleFollow(): void {

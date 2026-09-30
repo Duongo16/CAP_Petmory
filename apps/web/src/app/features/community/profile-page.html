@@ -18,12 +18,24 @@
         <header class="cover pm-card">
           <div class="cover-art"><pm-icon name="paw" [size]="40" /></div>
           <div class="identity">
-            <span class="avatar" aria-hidden="true">{{ p.initial }}</span>
+            @if (p.avatarUrl) {
+              <img class="avatar avatar-img" [src]="p.avatarUrl" alt="" />
+            } @else {
+              <span class="avatar" aria-hidden="true">{{ p.initial }}</span>
+            }
             <div class="identity-text">
-              <h1>{{ p.fullName }}</h1>
+              <p class="role">{{ 'COMMUNITY.PROFILE.ROLE' | translate }}</p>
+              <h1 class="pm-page-title">{{ p.fullName }}</h1>
               <p class="handle">{{ p.handle }}</p>
+              @if (p.phone) {
+                <p class="handle">{{ p.phone }}</p>
+              }
             </div>
-            @if (user() && !p.mine) {
+            @if (p.mine) {
+              <button type="button" class="pm-chip" (click)="openEdit()">
+                {{ 'COMMUNITY.PROFILE.EDIT' | translate }}
+              </button>
+            } @else if (user() && !p.mine) {
               <button
                 type="button"
                 class="pm-chip"
@@ -53,6 +65,41 @@
             </div>
           </dl>
         </header>
+
+        @if (p.mine && editMode()) {
+          <section class="edit-card pm-card">
+            <h2 class="edit-title">{{ 'COMMUNITY.PROFILE.EDIT_TITLE' | translate }}</h2>
+            <form [formGroup]="editForm" (ngSubmit)="saveProfile()">
+              <div class="field">
+                <label class="field-name" for="profile-name">
+                  {{ 'COMMUNITY.PROFILE.FULL_NAME' | translate }}
+                </label>
+                <input id="profile-name" type="text" formControlName="fullName" />
+              </div>
+              <div class="field">
+                <label class="field-name" for="profile-phone">
+                  {{ 'COMMUNITY.PROFILE.PHONE' | translate }}
+                </label>
+                <input id="profile-phone" type="tel" formControlName="phone" />
+              </div>
+              <div class="field">
+                <label class="field-name" for="profile-avatar">
+                  {{ 'COMMUNITY.PROFILE.AVATAR_URL' | translate }}
+                </label>
+                <input id="profile-avatar" type="url" formControlName="avatarUrl" />
+              </div>
+              <div class="edit-actions">
+                <button type="button" class="plain" (click)="cancelEdit()">
+                  {{ 'COMMON.CANCEL' | translate }}
+                </button>
+                <button type="submit" class="strong" [disabled]="editForm.invalid || saving()">
+                  {{ 'COMMUNITY.PROFILE.SAVE' | translate }}
+                  <pm-icon name="check" [size]="15" />
+                </button>
+              </div>
+            </form>
+          </section>
+        }
 
         <div class="layout">
           <section class="posts">

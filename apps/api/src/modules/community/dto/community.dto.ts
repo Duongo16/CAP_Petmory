@@ -49,6 +49,24 @@ export class WriteCommentDto {
   content!: string;
 }
 
+export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(100)
+  fullName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  avatarUrl?: string;
+}
+
 export class FeedQueryDto {
   @IsOptional()
   @IsEnum(PostTopic, { message: 'Chu de khong hop le' })

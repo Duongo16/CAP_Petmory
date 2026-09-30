@@ -1,9 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { promises as fs } from 'fs';
-import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { Post, PostDocument, PostTopic } from './schemas/post.schema';
 import { Comment, CommentDocument } from './schemas/comment.schema';
@@ -15,16 +12,17 @@ import {
   SavedPost,
   SavedPostDocument,
 } from './schemas/reaction.schema';
-import { FeedQueryDto, WriteCommentDto, WritePostDto } from './dto/community.dto';
+import { FeedQueryDto, UpdateProfileDto, WriteCommentDto, WritePostDto } from './dto/community.dto';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Pet, PetDocument } from '../pets/schemas/pet.schema';
+import { StorageFolder, StorageService } from '../../common/storage/storage.service';
 import { MSG } from '../../common/constants/messages';
 
 /** Mongo raises this code when a unique index rejects a duplicate row. */
 const DUPLICATE_KEY = 11000;
 const PAGE_SIZE_DEFAULT = 10;
 const PAGE_SIZE_MAX = 30;
-const PHOTO_MAX = 4;
+const PHOTO_MAX = 5;
 const PHOTO_MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const NOT_AN_IMAGE = 'Chi nhan anh JPG, PNG hoac WEBP';
@@ -63,7 +61,6 @@ function escape(str: string): string {
 
 @Injectable()
 export class CommunityService {
-  private readonly dir: string;
 
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
@@ -73,10 +70,8 @@ export class CommunityService {
     @InjectModel(Follow.name) private readonly followModel: Model<FollowDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Pet.name) private readonly petModel: Model<PetDocument>,
-    config: ConfigService,
-  ) {
-    this.dir = path.resolve(config.get<string>('upload.dir') ?? './uploads', 'community');
-  }
+    private readonly storage: StorageService,
+  ) {}
 
   // --- Feed ---
 
@@ -322,8 +317,7 @@ export class CommunityService {
       throw new BadRequestException(`Moi bai viet toi da ${PHOTO_MAX} anh`);
     }
     const fileName = `${randomUUID()}.${file.mimetype === 'image/png' ? 'png' : 'jpg'}`;
-    await fs.mkdir(this.dir, { recursive: true });
-    await fs.writeFile(path.join(this.dir, fileName), file.buffer);
+    await this.storage.save(StorageFolder.COMMUNITY, fileName, file.buffer, file.mimetype);
     post.photos.push(fileName);
     await post.save();
     return post;
@@ -335,7 +329,7 @@ export class CommunityService {
     if (!post || !post.photos.includes(fileName)) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
-    return fs.readFile(path.join(this.dir, fileName));
+    return this.storage.read(StorageFolder.COMMUNITY, fileName);
   }
 
   // --- Comments ---
@@ -469,7 +463,7 @@ export class CommunityService {
 
   async profile(userId: string, viewer: string | null) {
     const id = this.toId(userId);
-    const user = await this.userModel.findById(id).select('fullName email').exec();
+    const user = await this.userModel.findById(id).select('fullName email phone avatarUrl').exec();
     if (!user) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
@@ -491,6 +485,8 @@ export class CommunityService {
       fullName,
       initial: fullName.trim().charAt(0).toUpperCase() || '?',
       handle: `@${user.email.split('@')[0]}`,
+      phone: user.phone ?? null,
+      avatarUrl: user.avatarUrl ?? null,
       postCount,
       followerCount,
       followingCount,
@@ -503,6 +499,22 @@ export class CommunityService {
         breed: p.breed,
       })),
     };
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    const id = this.toId(userId);
+    const update: Record<string, string | null> = {};
+    if (dto.fullName !== undefined) {
+      update['fullName'] = dto.fullName.trim();
+    }
+    if (dto.phone !== undefined) {
+      update['phone'] = dto.phone.trim() || null;
+    }
+    if (dto.avatarUrl !== undefined) {
+      update['avatarUrl'] = dto.avatarUrl.trim() || null;
+    }
+    await this.userModel.findByIdAndUpdate(id, { $set: update }).exec();
+    return { ok: true };
   }
 
   /** The posts written by one person, for their profile page. */

@@ -15,6 +15,12 @@ export class User {
   @Prop({ required: true, trim: true })
   fullName!: string;
 
+  @Prop({ type: String, default: null, trim: true })
+  phone!: string | null;
+
+  @Prop({ type: String, default: null, trim: true })
+  avatarUrl!: string | null;
+
   @Prop({ type: [String], enum: Role, default: [Role.CUSTOMER] })
   roles!: Role[];
 
@@ -30,6 +36,16 @@ export class User {
 
   @Prop({ type: Date, default: null })
   lastLoginAt!: Date | null;
+
+  /**
+   * Moc phien dang nhap.
+   *
+   * Moi the ra vao deu mang con so nay. Doi mat khau thi con so tang len,
+   * va moi the phat truoc do lap tuc khong con dung duoc nua. Khong co no
+   * thi nguoi da chiem tai khoan van o lai ben trong sau khi chu doi mat khau.
+   */
+  @Prop({ type: Number, default: 1 })
+  tokenEpoch!: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -4,10 +4,10 @@
 
 .back-link {
   display: inline-block;
-  margin-bottom: 14px;
+  margin-bottom: var(--pm-space-3);
   color: var(--pm-text-muted);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: var(--pm-text-md);
   font-weight: 600;
 
   &:hover {
@@ -19,7 +19,7 @@
 
 .cover {
   position: relative;
-  padding: 0 24px 22px;
+  padding: 0 var(--pm-space-6) var(--pm-space-5);
   margin-bottom: var(--pm-gap);
   overflow: hidden;
 }
@@ -36,7 +36,7 @@
 .identity {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--pm-space-3);
   margin-top: -28px;
 }
 
@@ -60,36 +60,35 @@
 
   h1 {
     margin: 0;
-    font-size: 1.35rem;
     font-weight: 800;
   }
 }
 
 .handle {
-  margin: 2px 0 0;
-  font-size: 0.875rem;
+  margin: var(--pm-space-1) 0 0;
+  font-size: var(--pm-text-md);
   color: var(--pm-text-muted);
 }
 
 .stats {
   display: flex;
   gap: 28px;
-  margin: 18px 0 0;
+  margin: var(--pm-space-4) 0 0;
 
   div {
     display: flex;
     flex-direction: column-reverse;
-    gap: 2px;
+    gap: var(--pm-space-1);
   }
 
   dt {
-    font-size: 0.78rem;
+    font-size: var(--pm-text-xs);
     color: var(--pm-text-muted);
   }
 
   dd {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: var(--pm-text-lg);
     font-weight: 800;
   }
 }
@@ -110,13 +109,13 @@
 }
 
 .side-card {
-  padding: 18px;
+  padding: var(--pm-space-4);
 }
 
 .post-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--pm-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -124,8 +123,8 @@
   a {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px;
+    gap: var(--pm-space-3);
+    padding: var(--pm-space-3);
     text-decoration: none;
     color: inherit;
   }
@@ -144,23 +143,23 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 5px;
+  gap: var(--pm-space-1);
   min-width: 0;
 
   strong {
-    font-size: 1rem;
+    font-size: var(--pm-text-base);
   }
 }
 
 .post-meta {
-  font-size: 0.78rem;
+  font-size: var(--pm-text-xs);
   color: var(--pm-text-muted);
 }
 
 .pet-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--pm-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -168,7 +167,7 @@
   li {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--pm-space-2);
   }
 }
 
@@ -184,11 +183,11 @@
 .pet-text {
   display: flex;
   flex-direction: column;
-  font-size: 0.78rem;
+  font-size: var(--pm-text-xs);
   color: var(--pm-text-muted);
 
   strong {
-    font-size: 0.9rem;
+    font-size: var(--pm-text-md);
     color: var(--pm-text);
   }
 }
@@ -197,4 +196,103 @@
   .layout {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* ---- Bo sung theo thiet ke ---- */
+
+.role {
+  display: inline-flex;
+  align-self: flex-start;
+  margin: 0 0 var(--pm-space-1);
+  padding: var(--pm-space-1) var(--pm-space-2);
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/*
+ * So dem hien tren, chu dan hien duoi.
+ * Danh sach dinh nghia von viet chu dan truoc cho dung nghia, nen dao chieu
+ * bang kieu chu khong doi cau truc.
+ */
+.stats div {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+.stats dd {
+  margin: 0;
+  font-size: var(--pm-text-xl);
+  font-weight: 700;
+  color: var(--pm-text);
+}
+
+.stats dt {
+  margin-block-start: 2px;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}
+
+/* ---- Avatar image variant ---- */
+
+.avatar-img {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border: 3px solid var(--pm-bg-card);
+  border-radius: 999px;
+  object-fit: cover;
+  background: var(--pm-bg-muted);
+}
+
+/* ---- Edit profile form ---- */
+
+.edit-card {
+  padding: var(--pm-space-5);
+  margin-bottom: var(--pm-gap);
+}
+
+.edit-title {
+  margin: 0 0 var(--pm-space-4);
+  font-size: var(--pm-text-lg);
+  font-weight: 700;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-1);
+  margin-bottom: var(--pm-space-3);
+}
+
+.field-name {
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+  color: var(--pm-text-muted);
+}
+
+.field input {
+  padding: var(--pm-space-2) var(--pm-space-3);
+  border: 1px solid var(--pm-border-strong);
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-bg-muted);
+  color: var(--pm-text);
+  font: inherit;
+  font-size: var(--pm-text-md);
+
+  &:focus-visible {
+    outline: 2px solid var(--pm-accent);
+    outline-offset: 1px;
+  }
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pm-space-3);
+  margin-top: var(--pm-space-4);
 }

@@ -52,6 +52,8 @@ export interface CommunityProfile {
   fullName: string;
   initial: string;
   handle: string;
+  phone: string | null;
+  avatarUrl: string | null;
   postCount: number;
   followerCount: number;
   followingCount: number;

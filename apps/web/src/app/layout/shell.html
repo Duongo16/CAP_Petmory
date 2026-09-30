@@ -3,7 +3,7 @@
 <header class="top-bar">
   <div class="bar-inner">
     <a class="brand" routerLink="/home">
-      <span class="brand-mark" aria-hidden="true"><pm-icon name="paw" [size]="18" /></span>
+      <img class="brand-mark" src="img/logo-mark.png" alt="" width="34" height="34" />
       <span class="brand-name">{{ 'COMMON.APP_NAME' | translate }}</span>
     </a>
 
@@ -13,20 +13,9 @@
       }
     </nav>
 
-    <form class="search" role="search" (ngSubmit)="submitSearch()">
-      <label class="sr-only" for="global-search">{{ 'NAV.SEARCH' | translate }}</label>
-      <span class="search-glyph"><pm-icon name="search" [size]="17" /></span>
-      <input
-        id="global-search"
-        name="keyword"
-        type="search"
-        autocomplete="off"
-        [placeholder]="'NAV.SEARCH_PLACEHOLDER' | translate"
-        [(ngModel)]="keyword"
-      />
-    </form>
-
     <div class="bar-actions">
+      <pm-theme-toggle />
+
       <a class="cart-button pm-icon-button" routerLink="/cart" routerLinkActive="selected">
         <pm-icon name="cart" />
         <span class="sr-only">{{ 'NAV.CART' | translate }}</span>
@@ -51,8 +40,9 @@
 
           @if (menuOpen()) {
             <div class="account-menu pm-card" role="menu">
-              @for (item of accountMenu; track item.path) {
+              @for (item of menu; track item.path) {
                 <a
+                  class="only-narrow"
                   role="menuitem"
                   [routerLink]="item.path"
                   routerLinkActive="selected"
@@ -60,6 +50,36 @@
                 >
                   {{ item.key | translate }}
                 </a>
+              }
+              @if (isInternal()) {
+                <p class="menu-group">{{ 'NAV.STAFF_AREA' | translate }}</p>
+                @if (isManager()) {
+                  @for (item of managerMenu; track item.path) {
+                    <a
+                      class="internal-link"
+                      role="menuitem"
+                      [routerLink]="item.path"
+                      routerLinkActive="selected"
+                      (click)="closeMenu()"
+                    >
+                      {{ item.key | translate }}
+                    </a>
+                  }
+                }
+                @if (isAccountAdmin()) {
+                  @for (item of staffAccountMenu; track item.path) {
+                    <a
+                      class="internal-link"
+                      role="menuitem"
+                      [routerLink]="item.path"
+                      routerLinkActive="selected"
+                      (click)="closeMenu()"
+                    >
+                      {{ item.key | translate }}
+                    </a>
+                  }
+                }
+                <p class="menu-group">{{ 'NAV.ACCOUNT' | translate }}</p>
               }
               <a role="menuitem" [routerLink]="['/community/users', u.id]" (click)="closeMenu()">
                 {{ 'NAV.MY_PROFILE' | translate }}
@@ -74,23 +94,6 @@
     </div>
   </div>
 
-  @if (isInternal()) {
-    <div class="staff-bar">
-      <span class="staff-tag">{{ 'NAV.STAFF_AREA' | translate }}</span>
-      @for (item of internalMenu; track item.path) {
-        <a class="internal-link" [routerLink]="item.path" routerLinkActive="selected">
-          {{ item.key | translate }}
-        </a>
-      }
-      @if (isOperations()) {
-        @for (item of operationsMenu; track item.path) {
-          <a class="internal-link" [routerLink]="item.path" routerLinkActive="selected">
-            {{ item.key | translate }}
-          </a>
-        }
-      }
-    </div>
-  }
 </header>
 
 <main class="content" id="main">
@@ -104,7 +107,7 @@
 
   <div class="footer-inner">
     <div class="footer-brand">
-      <span class="brand-mark" aria-hidden="true"><pm-icon name="paw" [size]="18" /></span>
+      <img class="brand-mark" src="img/logo-mark.png" alt="" width="34" height="34" />
       <span class="brand-name">{{ 'COMMON.APP_NAME' | translate }}</span>
       <p class="footer-slogan">{{ 'FOOTER.SLOGAN' | translate }}</p>
       <p class="footer-rights">{{ 'FOOTER.RIGHTS' | translate }}</p>
@@ -125,3 +128,4 @@
 </footer>
 
 <pm-chat-widget />
+<pm-bottom-nav />

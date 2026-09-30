@@ -14,12 +14,14 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { CommunityService } from './community.service';
-import { FeedQueryDto, WriteCommentDto, WritePostDto } from './dto/community.dto';
+import { FeedQueryDto, UpdateProfileDto, WriteCommentDto, WritePostDto } from './dto/community.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/constants/roles';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuditService } from '../../common/audit.service';
+import { ImageLinkDto } from '../../common/storage/image-link.dto';
+import { RemoteImageService } from '../../common/storage/remote-image';
 
 const RESOURCE = 'CommunityPost';
 const ONE_POST = 'posts/:id';
@@ -29,6 +31,7 @@ export class CommunityController {
   constructor(
     private readonly service: CommunityService,
     private readonly audit: AuditService,
+    private readonly remote: RemoteImageService,
   ) {}
 
   /** The feed is readable signed out. A session only adds the viewer own reactions. */
@@ -70,6 +73,15 @@ export class CommunityController {
   ) {
     const data = await this.service.readPhoto(id, fileName);
     res.setHeader('Content-Type', fileName.endsWith('.png') ? 'image/png' : 'image/jpeg');
+    /*
+     * Anh bai viet phai xem duoc tu trang web, von chay o mot cong khac.
+     * Mac dinh bao ve dat la chi cung nguon, nen the anh tren trang bi chan
+     * thang va khong bai viet nao hien duoc anh. Day la bai viet cong khai,
+     * ai cung doc duoc, nen mo ra la dung; cac duong dan rieng tu van giu
+     * mac dinh chat che.
+     */
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Cache-Control', 'public, max-age=300');
     res.send(data);
   }
 
@@ -101,6 +113,17 @@ export class CommunityController {
     return this.service.addPhoto(id, user.userId, file);
   }
 
+  /** Nhan mot duong dan anh tren mang thay cho tep tren may khach. */
+  @HttpPost('posts/:id/photos/from-link')
+  async addPhotoByLink(
+    @Param('id') id: string,
+    @Body() dto: ImageLinkDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    const file = await this.remote.fetch(dto.url);
+    return this.service.addPhoto(id, user.userId, file);
+  }
+
   @Delete(ONE_POST)
   async remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     const post = await this.service.hide(id, user.userId);
@@ -114,7 +137,7 @@ export class CommunityController {
   }
 
   /** Internal staff can take down a post that breaks the house rules. */
-  @Roles(Role.MANAGER, Role.ADMIN)
+  @Roles(Role.MANAGER)
   @Delete('posts/:id/moderate')
   async moderate(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     const post = await this.service.hide(id, null);
@@ -146,6 +169,11 @@ export class CommunityController {
   @HttpPost('posts/:id/save')
   toggleSave(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.toggleSave(id, user.userId);
+  }
+
+  @Patch('users/me')
+  updateProfile(@Body() dto: UpdateProfileDto, @CurrentUser() user: AuthUser) {
+    return this.service.updateProfile(user.userId, dto);
   }
 
   @HttpPost('users/:id/follow')

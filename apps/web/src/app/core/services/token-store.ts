@@ -29,6 +29,16 @@ export class TokenStore {
     this.user.set(user);
   }
 
+  patchUser(patch: Partial<User>): void {
+    const current = this.user();
+    if (!current) {
+      return;
+    }
+    const updated = { ...current, ...patch };
+    this.write(KEY_USER, JSON.stringify(updated));
+    this.user.set(updated);
+  }
+
   remove(): void {
     this.write(KEY_ACCESS, null);
     this.write(KEY_REFRESH, null);
