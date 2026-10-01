@@ -56,6 +56,15 @@
 
 /* ---------- Hinh minh hoa ben phai hai khoi cuoi ---------- */
 
+/*
+ * Hai khoi nay cat phan hinh tran ra ngoai, ma mot khoi da cat thi duoc phep
+ * co nho hon noi dung trong cot doc. Giu nguyen chieu cao de chu khong bi mat.
+ */
+.treasure,
+.keepsake {
+  flex-shrink: 0;
+}
+
 .treasure > :not(.treasure-art),
 .keepsake > :not(.keepsake-art) {
   position: relative;
