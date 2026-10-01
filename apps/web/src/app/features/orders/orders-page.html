@@ -1,54 +1,180 @@
-<h1 class="pm-page-title">{{ 'ORDER.TITLE' | translate }}</h1>
-
-@switch (status()) {
-  @case ('LOADING') {
-    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
-  }
-  @case ('ERROR') {
-    <div class="pm-center">
-      <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
-      <button type="button" class="pm-button-secondary" (click)="reload()">{{ 'COMMON.RETRY' | translate }}</button>
+<div class="flex flex-col gap-8 w-full max-w-[1180px] mx-auto px-6 pt-7 pb-16 box-border">
+  <header class="flex items-end justify-between gap-6 flex-wrap pb-5 border-b border-edge">
+    <div>
+      <p class="flex gap-2 m-0 text-xs font-semibold tracking-[0.04em] text-ink-muted">
+        <span>{{ 'ORDER.EYEBROW_ACCOUNT' | translate }}</span>
+        <span class="text-accent">{{ 'ORDER.EYEBROW_HERE' | translate }}</span>
+      </p>
+      <h1 class="mt-1 m-0 font-bold text-ink pm-page-title">{{ 'ORDER.TITLE' | translate }}</h1>
     </div>
-  }
-  @case ('EMPTY') {
-    <div class="pm-center">
-      <p class="pm-empty">{{ 'ORDER.EMPTY' | translate }}</p>
-      <a class="pm-button-primary" routerLink="/products">{{ 'CART.VIEW_PRODUCTS' | translate }}</a>
-    </div>
-  }
-  @case ('HAS_DATA') {
-    <ul class="list">
-      @for (line of rows(); track line.raw.orderCode) {
-        <li class="order-row pm-card">
-          <div class="first">
-            <span class="order-code">{{ line.raw.orderCode }}</span>
-            <span class="status-chip" [attr.data-status]="line.raw.status">
-              {{ line.keyStatus | translate }}
-            </span>
-          </div>
 
-          <ul class="lines">
-            @for (item of line.raw.rows; track item.sizeCode) {
-              <li>{{ item.displayName }} ×{{ item.quantity }}</li>
-            }
-          </ul>
+    @if (status() === 'DONE') {
+      <nav class="flex gap-1 flex-wrap" [attr.aria-label]="'ORDER.FILTER_LABEL' | translate">
+        @for (chip of chips(); track chip.group) {
+          <button
+            type="button"
+            class="px-4 py-2 border border-transparent rounded-full bg-transparent text-ink-muted font-[inherit] text-base font-medium cursor-pointer hover:border-edge-strong transition-colors duration-150"
+            [class.on]="chosen() === chip.group"
+            [attr.aria-pressed]="chosen() === chip.group"
+            (click)="choose(chip.group)"
+          >
+            {{ chip.key | translate }} ({{ chip.count }})
+          </button>
+        }
+      </nav>
+    }
+  </header>
 
-          <div class="footer">
-            <div class="info">
-              <span class="sub">{{ 'ORDER.ORDER_DATE' | translate }}: {{ line.raw.createdAt | date: 'dd/MM/yyyy' }}</span>
-              <span class="sub">{{ 'ORDER.DELIVERY_DATE' | translate }}: {{ line.raw.estimatedDelivery | date: 'dd/MM/yyyy' }}</span>
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="flex flex-col items-center gap-3 py-14 px-5 text-ink-muted text-center">
+        <p>{{ 'COMMON.LOADING' | translate }}</p>
+      </div>
+    }
+    @case ('ERROR') {
+      <div class="flex flex-col items-center gap-3 py-14 px-5 text-ink-muted text-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="tw-btn-secondary" (click)="reload()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
+    @case ('EMPTY') {
+      <div class="flex flex-col items-center gap-3 py-14 px-5 text-ink-muted text-center rounded-lg bg-muted">
+        <span class="grid place-items-center w-[60px] h-[60px] rounded-full bg-card text-accent" aria-hidden="true">
+          <pm-icon name="cart" [size]="30" />
+        </span>
+        <p>{{ 'ORDER.EMPTY' | translate }}</p>
+        <a class="tw-btn-primary" routerLink="/products">{{ 'CART.VIEW_PRODUCTS' | translate }}</a>
+      </div>
+    }
+    @case ('DONE') {
+      <div class="grid gap-8 items-start" style="grid-template-columns: minmax(0,800fr) minmax(0,384fr)">
+        <section class="stream flex flex-col gap-6 min-w-0">
+          @if (emptyGroup()) {
+            <div class="flex flex-col items-center gap-3 py-14 px-5 text-ink-muted text-center rounded-lg bg-muted">
+              <p>{{ 'ORDER.NONE_IN_GROUP' | translate }}</p>
             </div>
-            <div class="right">
-              <span class="amount">{{ line.raw.total.$numberDecimal | amount: line.raw.currency }}</span>
-              @if (line.needsPayment) {
-                <a class="pm-button-primary small" [routerLink]="['/payments', line.raw.orderCode]">
-                  {{ 'ORDER.PAYMENT' | translate }}
-                </a>
+          }
+
+          @for (card of cards(); track card.raw.orderCode) {
+            <article class="flex flex-col gap-4 p-6 rounded-lg bg-card border border-edge shadow-card">
+              <header class="flex items-center justify-between gap-4 flex-wrap pb-4 border-b border-edge">
+                <span class="flex items-baseline gap-2 flex-wrap text-xs">
+                  <span class="font-bold text-ink-muted">{{ 'ORDER.CODE' | translate }}</span>
+                  <strong class="font-bold text-ink">{{ card.raw.orderCode }}</strong>
+                  <span class="text-ink-muted">
+                    {{ 'ORDER.ORDER_DATE' | translate }}: {{ card.raw.createdAt | date: 'dd/MM/yyyy' }}
+                  </span>
+                </span>
+                <span class="chip-status px-3 py-1 rounded-full bg-muted text-ink-muted text-xs font-semibold" [attr.data-tone]="card.statusTone">
+                  {{ card.statusKey | translate }}
+                </span>
+              </header>
+
+              <div class="flex flex-col gap-2">
+                <span class="self-start px-2 py-1 rounded-sm bg-muted text-xs font-semibold text-ink-muted">{{ 'ORDER.HANDMADE' | translate }}</span>
+                <div class="flex items-baseline justify-between gap-6 flex-wrap">
+                  <h2 class="m-0 text-xl font-bold text-ink">{{ card.headline }}</h2>
+                  <strong class="text-lg font-bold whitespace-nowrap text-ink">
+                    {{ card.raw.total.$numberDecimal | amount: card.raw.currency }}
+                  </strong>
+                </div>
+
+                <ul class="flex flex-col gap-1 m-0 p-0 list-none">
+                  @for (row of card.rows; track row.raw.productTypeCode + row.raw.sizeCode) {
+                    <li class="flex items-center gap-2 flex-wrap text-xs font-medium text-ink-muted">
+                      <span>{{ 'ORDER.KIND' | translate }} {{ row.sizeName }}</span>
+                      <span class="text-edge-strong" aria-hidden="true">•</span>
+                      <span>{{ 'ORDER.QUANTITY' | translate }} ×{{ row.raw.quantity }}</span>
+                      @if (row.raw.petName) {
+                        <span class="text-edge-strong" aria-hidden="true">•</span>
+                        <span class="text-accent">{{ row.raw.petName }}</span>
+                      }
+                    </li>
+                  }
+                </ul>
+
+                <p class="flex items-center gap-2 flex-wrap m-0 text-xs text-ink-muted">
+                  <span>
+                    {{ 'ORDER.DELIVERY_DATE' | translate }}:
+                    {{ card.raw.estimatedDelivery | date: 'dd/MM/yyyy' }}
+                  </span>
+                  <span class="text-edge-strong" aria-hidden="true">•</span>
+                  <span class="font-medium text-success">{{ 'ORDER.WARRANTY' | translate }}</span>
+                </p>
+              </div>
+
+              @if (card.stage > 0) {
+                <section class="p-4 rounded-md bg-muted">
+                  <h3 class="m-0 mb-2 text-xs font-bold tracking-[0.03em] text-ink">{{ 'ORDER.TRACK_TITLE' | translate }}</h3>
+                  <ol class="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-2 m-0 p-0 list-none">
+                    @for (key of stageKeys; track key; let at = $index) {
+                      <li
+                        class="px-2 py-2 rounded-sm text-xs font-medium text-ink-muted transition-colors duration-150"
+                        [class.bg-card]="at >= card.stage"
+                        [class.bg-accent-soft]="at < card.stage"
+                        [class.font-bold]="at < card.stage"
+                        [class.text-accent]="at < card.stage"
+                      >
+                        {{ at + 1 }}. {{ key | translate }}
+                      </li>
+                    }
+                  </ol>
+                </section>
               }
-            </div>
-          </div>
-        </li>
-      }
-    </ul>
+
+              <footer class="flex items-center justify-between gap-4 flex-wrap pt-4 border-t border-edge">
+                <span class="flex flex-col">
+                  <span class="text-xs text-ink-muted">{{ 'ORDER.PAID_TOTAL' | translate }}</span>
+                  <strong class="text-2xl font-bold text-ink">{{ card.raw.total.$numberDecimal | amount: card.raw.currency }}</strong>
+                </span>
+
+                <span class="flex gap-2 flex-wrap">
+                  @if (card.needsPayment) {
+                    <a class="px-4 py-2 rounded-full bg-accent text-on-accent text-xs font-semibold no-underline transition-colors duration-150" [routerLink]="['/payments', card.raw.orderCode]">
+                      {{ 'ORDER.PAYMENT' | translate }}
+                    </a>
+                  } @else {
+                    <a class="px-4 py-2 rounded-full border border-edge-strong bg-card text-ink-muted text-xs font-semibold no-underline transition-colors duration-150" [routerLink]="['/payments', card.raw.orderCode]">
+                      {{ 'ORDER.SEE_RECEIPT' | translate }}
+                    </a>
+                  }
+                  @if (card.finished) {
+                    <a class="px-4 py-2 rounded-full bg-accent text-on-accent text-xs font-semibold no-underline transition-colors duration-150" routerLink="/products">{{ 'ORDER.ORDER_AGAIN' | translate }}</a>
+                  } @else {
+                    <a class="px-4 py-2 rounded-full border border-edge-strong bg-card text-ink-muted text-xs font-semibold no-underline transition-colors duration-150" routerLink="/community">{{ 'ORDER.ASK_ARTISAN' | translate }}</a>
+                  }
+                </span>
+              </footer>
+            </article>
+          }
+        </section>
+
+        <aside class="side flex flex-col gap-6">
+          <section class="flex flex-col gap-3 p-6 rounded-lg bg-muted border border-edge">
+            <h2 class="m-0 text-base font-bold tracking-[0.03em] text-accent">{{ 'ORDER.PROMISE_TITLE' | translate }}</h2>
+            <p class="m-0 text-xs leading-[1.65] text-ink-muted">{{ 'ORDER.PROMISE_TEXT' | translate }}</p>
+            <p class="flex items-center justify-between gap-3 m-0 pt-3 border-t border-edge text-xs font-semibold text-ink-muted">
+              <span>{{ 'ORDER.PROMISE_MATCH' | translate }}</span>
+              <strong class="text-accent">{{ 'ORDER.PROMISE_MATCH_VALUE' | translate }}</strong>
+            </p>
+          </section>
+
+          <section class="flex flex-col gap-2 p-6 rounded-lg bg-card border border-edge shadow-card">
+            <h2 class="m-0 text-base font-bold text-ink">{{ 'ORDER.HELP_TITLE' | translate }}</h2>
+            <p class="m-0 mb-1 text-xs leading-[1.6] text-ink-muted">{{ 'ORDER.HELP_TEXT' | translate }}</p>
+            <a class="flex items-center gap-2 px-3 py-2 rounded-md bg-muted text-ink-muted text-xs font-medium no-underline hover:bg-accent-soft transition-colors duration-150" routerLink="/community">
+              <span class="text-accent"><pm-icon name="comment" [size]="15" /></span>
+              {{ 'ORDER.HELP_COMMUNITY' | translate }}
+            </a>
+            <a class="flex items-center gap-2 px-3 py-2 rounded-md bg-muted text-ink-muted text-xs font-medium no-underline hover:bg-accent-soft transition-colors duration-150" routerLink="/restore">
+              <span class="text-accent"><pm-icon name="image" [size]="15" /></span>
+              {{ 'ORDER.HELP_RESTORE' | translate }}
+            </a>
+          </section>
+        </aside>
+      </div>
+    }
   }
-}
+</div>

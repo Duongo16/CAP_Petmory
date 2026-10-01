@@ -1,233 +1,281 @@
-<div class="pm-page">
-  @switch (status()) {
-    @case ('LOADING') {
-      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
-    }
-    @case ('ERROR') {
-      <div class="pm-center pm-empty"><p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
-    }
-    @case ('READY') {
-      @if (product(); as product) {
-        <header class="page-header">
-          <button
-            type="button"
-            class="back-button"
-            (click)="back()"
-            [attr.aria-label]="'COMMON.BACK' | translate"
-          >
-            ←
-          </button>
-          <h1 class="page-name">{{ 'PRODUCT.PRODUCT_OF_VERSION' | translate }}</h1>
-        </header>
+@switch (status()) {
+  @case ('LOADING') {
+    <p class="py-16 px-5 text-center text-ink-muted">{{ 'COMMON.LOADING' | translate }}</p>
+  }
+  @case ('ERROR') {
+    <p class="py-16 px-5 text-center text-ink-muted">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+  }
+  @case ('READY') {
+    @if (product(); as product) {
+      <nav class="flex items-center justify-between gap-4 flex-wrap px-6 py-2 bg-muted text-sm" [attr.aria-label]="'PRODUCT.CRUMBS' | translate">
+        <span class="inline-flex items-center gap-2 text-ink-muted">
+          <a class="text-ink-muted no-underline hover:text-accent transition-colors duration-150" routerLink="/home">{{ 'NAV.HOME' | translate }}</a>
+          <pm-icon name="chevron" [size]="11" />
+          <a class="text-ink-muted no-underline hover:text-accent transition-colors duration-150" routerLink="/products">{{ 'NAV.PRODUCT' | translate }}</a>
+          <pm-icon name="chevron" [size]="11" />
+          <span class="font-medium text-accent">{{ product.name }}</span>
+        </span>
+        <span class="inline-flex items-center gap-1 font-medium text-success">
+          <pm-icon name="check" [size]="13" />
+          {{ 'PRODUCT.PROMISE' | translate }}
+        </span>
+      </nav>
 
-        <div class="layout">
-          <section class="photo-column">
-            <div class="photo-frame pm-card">
+      <div class="flex flex-col gap-10 px-4 pt-8 pb-14 mx-auto max-w-[1180px] box-border">
+        <div class="grid grid-cols-1 nav:grid-cols-2 gap-10 items-start">
+          <!-- Gallery column -->
+          <section class="flex flex-col gap-4">
+            <div class="stage relative grid place-items-center overflow-hidden aspect-square rounded-lg bg-muted text-edge-strong">
               @if (product.imageUrl) {
                 <img [src]="product.imageUrl" [alt]="product.name" />
               } @else {
-                <div class="no-photo">
-                  <pm-icon name="paw" [size]="44" />
-                  <p>{{ 'PRODUCT.NONE_YET_PHOTO' | translate }}</p>
-                </div>
+                <span aria-hidden="true"><pm-icon name="paw" [size]="56" /></span>
               }
+              <span class="absolute top-[14px] left-[14px] flex gap-2 flex-wrap max-w-[calc(100%-28px)]">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-success-soft text-success">{{ 'PRODUCT.TAG_MATERIAL' | translate }}</span>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-ink text-card">{{ 'PRODUCT.TAG_HANDMADE' | translate }}</span>
+              </span>
+              <span class="absolute bottom-[14px] left-[14px] right-[14px] px-3 py-2 rounded-sm bg-ink text-card text-xs opacity-[0.88]">{{ 'PRODUCT.STAGE_NOTE' | translate }}</span>
+            </div>
 
+            <article class="flex gap-3 p-4 rounded-md bg-card border border-edge">
+              <span class="grid place-items-center flex-none w-10 h-10 rounded-sm bg-accent-soft text-accent" aria-hidden="true">
+                <pm-icon name="heart" [size]="18" />
+              </span>
+              <div>
+                <h2 class="m-0 text-lg font-semibold text-ink">{{ 'PRODUCT.PROMISE_TITLE' | translate }}</h2>
+                <p class="mt-1 m-0 text-sm leading-[1.55] text-ink-muted">{{ 'PRODUCT.PROMISE_TEXT' | translate }}</p>
+              </div>
+            </article>
+          </section>
+
+          <!-- Picker column -->
+          <section class="flex flex-col gap-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-soft text-amber">{{ 'PRODUCT.BADGE_MOST_ORDERED' | translate }}</span>
+              <span class="text-sm text-ink-muted">{{ 'PRODUCT.CODE' | translate }} {{ product.code }}</span>
               @if (user()) {
                 <button
                   type="button"
-                  class="favourite"
-                  [class.is-on]="favourite()"
+                  class="grid place-items-center w-[34px] h-[34px] ml-auto border border-edge-strong rounded-full bg-card cursor-pointer transition-colors duration-150"
+                  [class.text-danger]="favourite()"
+                  [class.text-ink-muted]="!favourite()"
                   (click)="toggleFavourite()"
                 >
-                  <pm-icon name="heart" [size]="18" [filled]="favourite()" />
+                  <pm-icon name="heart" [size]="16" [filled]="favourite()" />
                   <span class="sr-only">{{ 'PRODUCT.FAVOURITE' | translate }}</span>
                 </button>
               }
             </div>
-          </section>
 
-          <section class="detail-column">
-            <h2 class="product-name">{{ product.name }}</h2>
+            <h1 class="m-0 font-medium leading-[1.2] text-ink pm-page-title">{{ product.name }}</h1>
 
-            <pm-rating
-              [value]="product.rating.average"
-              [count]="product.rating.count"
-              [size]="18"
-              [label]="'PRODUCT.RATING' | translate"
-            />
+            <p class="flex items-center gap-2 m-0 text-base text-ink-muted">
+              <span class="text-amber"><pm-icon name="star" [size]="15" /></span>
+              <strong class="text-ink">{{ product.rating.average || '—' }}</strong>
+              <span class="text-edge-strong" aria-hidden="true">•</span>
+              <span class="font-medium text-accent">
+                {{ 'PRODUCT.REVIEW_COUNT' | translate: { count: product.rating.count } }}
+              </span>
+            </p>
 
-            @if (total(); as total) {
-              <p class="headline-price">
-                {{ total | amount: sizeSelected()?.currency ?? 'VND' }}
+            @if (total(); as amount) {
+              <p class="mt-1 m-0">
+                <strong class="text-[2.75rem] font-semibold text-amber">{{ amount | amount }}</strong>
               </p>
             }
+            <p class="m-0 text-sm text-ink-muted">{{ product.description }}</p>
 
-            <p class="description">{{ product.description }}</p>
+            <p class="flex items-center gap-2 flex-wrap m-0 text-sm text-ink-muted">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-success-soft text-success">{{ 'PRODUCT.FREE_SHIPPING' | translate }}</span>
+              <span>{{ 'PRODUCT.SHIPPING_NOTE' | translate }}</span>
+            </p>
 
-            <div class="group">
-              <h3 class="group-label">{{ 'PRODUCT.SIZE' | translate }}</h3>
-              <div class="sizes">
+            <!-- Step 1: size -->
+            <fieldset class="mt-1 m-0 p-0 border-0">
+              <legend class="p-0 text-lg font-semibold text-ink">{{ 'PRODUCT.STEP_SIZE' | translate }}</legend>
+              <div class="flex flex-col gap-2 mt-[10px]">
                 @for (size of sizes(); track size.code) {
                   <button
                     type="button"
-                    class="pm-chip size-chip"
-                    [class.is-selected]="sizeSelected()?.code === size.code"
+                    class="option flex flex-col gap-1 flex-1 px-4 py-3 rounded-md border border-edge-strong bg-card font-[inherit] text-start cursor-pointer transition-colors duration-150"
+                    [class.picked]="sizeSelected()?.code === size.code"
                     (click)="selectSize(size)"
                   >
-                    {{ size.displayName }}
-                    <span class="chip-sub">{{ size.dimensions }}</span>
+                    <span class="flex items-baseline gap-2">
+                      <strong class="text-lg font-semibold text-ink">{{ size.displayName }}</strong>
+                      <span class="text-base font-semibold text-accent">{{ size.dimensions }}</span>
+                    </span>
+                    <span class="text-sm leading-[1.5] text-ink-muted">{{ size.explainer }}</span>
+                    <span class="text-xs font-bold text-amber">{{ size.price.$numberDecimal | amount }}</span>
                   </button>
                 }
               </div>
-              @if (sizeSelected(); as size) {
-                <p class="explainer">{{ size.explainer }}</p>
-              }
-            </div>
+            </fieldset>
 
-            <div class="group">
-              <h3 class="group-label">{{ 'PRODUCT.BASE' | translate }}</h3>
-              <div class="sizes">
-                @for (option of baseOptions(); track option.raw.code) {
-                  <button
-                    type="button"
-                    class="pm-chip base-chip"
-                    [class.is-selected]="option.selected"
-                    (click)="selectBase(option.raw)"
-                  >
-                    {{ option.raw.displayName }}
-                    @if (!option.free) {
-                      <span class="chip-sub">+ {{ option.delta | amount }}</span>
-                    }
-                  </button>
-                }
-              </div>
-            </div>
-
-            <dl class="spec">
-              <div class="line">
-                <dt>{{ 'PRODUCT.SPEC_MATERIAL' | translate }}</dt>
-                <dd>{{ product.material || ('PRODUCT.NOT_UPDATE' | translate) }}</dd>
-              </div>
-              @if (sizeSelected(); as size) {
-                <div class="line">
-                  <dt>{{ 'PRODUCT.SPEC_TIME' | translate }}</dt>
-                  <dd>{{ 'PRODUCT.DAYS' | translate: { count: size.productionDays } }}</dd>
+            <!-- Step 2: base -->
+            @if (baseOptions().length > 0) {
+              <fieldset class="mt-1 m-0 p-0 border-0">
+                <legend class="p-0 text-lg font-semibold text-ink">{{ 'PRODUCT.STEP_BASE' | translate }}</legend>
+                <p class="mt-1 mb-2 text-sm text-ink-muted">{{ 'PRODUCT.BASE_FREE_NAME' | translate }}</p>
+                <div class="flex flex-row flex-wrap gap-2 mt-[10px]">
+                  @for (one of baseOptions(); track one.raw.code) {
+                    <button
+                      type="button"
+                      class="option flex flex-col gap-1 flex-1 px-4 py-3 rounded-md border border-edge-strong bg-card font-[inherit] text-start cursor-pointer transition-colors duration-150"
+                      [class.picked]="one.selected"
+                      (click)="selectBase(one.raw)"
+                    >
+                      <strong class="text-lg font-semibold text-ink">{{ one.raw.displayName }}</strong>
+                      <span class="text-xs font-bold" [class.text-ink-muted]="one.free" [class.text-amber]="!one.free">
+                        @if (one.free) {
+                          {{ 'PRODUCT.BASE_NO_EXTRA' | translate }}
+                        } @else {
+                          + {{ one.delta | amount }}
+                        }
+                      </span>
+                    </button>
+                  }
                 </div>
-                <div class="line">
-                  <dt>{{ 'PRODUCT.SPEC_PHOTO' | translate }}</dt>
-                  <dd>{{ size.minPhotos }}</dd>
+              </fieldset>
+            }
+
+            <!-- Specs -->
+            <dl class="flex flex-wrap gap-x-6 gap-y-2 mt-2 px-4 py-3 rounded-md bg-muted">
+              <div>
+                <dt class="text-sm text-ink-muted">{{ 'PRODUCT.SPEC_MATERIAL' | translate }}</dt>
+                <dd class="mt-1 m-0 text-base font-semibold text-ink">{{ product.material || ('PRODUCT.NOT_UPDATE' | translate) }}</dd>
+              </div>
+              @if (sizeSelected(); as size) {
+                <div>
+                  <dt class="text-sm text-ink-muted">{{ 'PRODUCT.SPEC_TIME' | translate }}</dt>
+                  <dd class="mt-1 m-0 text-base font-semibold text-ink">{{ 'PRODUCT.DAYS' | translate: { count: size.productionDays } }}</dd>
+                </div>
+                <div>
+                  <dt class="text-sm text-ink-muted">{{ 'PRODUCT.SPEC_PHOTO' | translate }}</dt>
+                  <dd class="mt-1 m-0 text-base font-semibold text-ink">{{ 'PRODUCT.PHOTO_COUNT' | translate: { count: size.minPhotos } }}</dd>
                 </div>
               }
             </dl>
 
-            <div class="group quantity">
-              <h3 class="group-label">{{ 'PRODUCT.QUANTITY' | translate }}</h3>
-              <div class="stepper">
-                <button
-                  type="button"
-                  (click)="changeQuantity(-1)"
-                  [disabled]="quantity() <= 1"
-                  aria-label="-"
-                >
-                  −
-                </button>
-                <span class="number" role="status">{{ quantity() }}</span>
-                <button
-                  type="button"
-                  (click)="changeQuantity(1)"
-                  [disabled]="quantity() >= 99"
-                  aria-label="+"
-                >
-                  +
-                </button>
+            <!-- Buy -->
+            <div class="flex items-center gap-3 mt-[6px]">
+              <div class="inline-flex items-center p-1 border border-edge-strong rounded-full bg-card" role="group" [attr.aria-label]="'PRODUCT.QUANTITY' | translate">
+                <button type="button" class="w-8 h-8 border-0 rounded-full bg-muted text-ink text-base cursor-pointer" (click)="changeQuantity(-1)" [disabled]="quantity() <= 1">−</button>
+                <span class="min-w-7 text-lg font-bold text-center">{{ quantity() }}</span>
+                <button type="button" class="w-8 h-8 border-0 rounded-full bg-muted text-ink text-base cursor-pointer" (click)="changeQuantity(1)">+</button>
               </div>
-            </div>
-
-            <div class="buttons">
               <button
                 type="button"
-                class="pm-button-primary"
-                [disabled]="pendingAdd()"
+                class="to-cart flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 border-0 rounded-full bg-amber text-on-accent font-[inherit] text-base font-bold cursor-pointer transition-colors duration-150"
+                [disabled]="pendingAdd() || !sizeSelected()"
                 (click)="addToCart()"
               >
-                <pm-icon name="cart" [size]="18" />
+                <pm-icon name="cart" [size]="16" />
                 {{ 'PRODUCT.ADD_IN_HOUR' | translate }}
               </button>
             </div>
 
-            <p class="note">{{ 'PRODUCT.HANDMADE_NOTE' | translate }}</p>
+            <a class="inline-flex items-center justify-center gap-2 px-6 py-3 border-0 rounded-full bg-accent text-on-accent text-base font-bold no-underline transition-colors duration-150" routerLink="/studio">
+              <pm-icon name="star" [size]="15" />
+              {{ 'PRODUCT.OPEN_STUDIO' | translate }}
+            </a>
 
-            <section class="accordion pm-card">
-              <button type="button" class="accordion-head" (click)="toggleDescription()">
-                <span>{{ 'PRODUCT.DETAIL_TOGGLE' | translate }}</span>
-                <pm-icon name="chevron" [size]="17" />
-              </button>
-              @if (descriptionOpen()) {
-                <div class="accordion-body">
-                  <p>{{ product.description }}</p>
-                  <p>{{ 'PRODUCT.HANDMADE_NOTE' | translate }}</p>
-                </div>
-              }
-            </section>
+            <p class="m-0 text-sm leading-[1.55] text-ink-muted">{{ 'PRODUCT.HANDMADE_NOTE' | translate }}</p>
           </section>
         </div>
 
-        <section class="reviews">
-          <h2 class="pm-section-title">
-            {{ 'PRODUCT.REVIEWS' | translate: { count: product.rating.count } }}
-          </h2>
-
-          @if (canReview()) {
-            <form class="review-form pm-card" (ngSubmit)="sendReview()">
-              <p class="review-label">{{ 'PRODUCT.WRITE_REVIEW' | translate }}</p>
-              <pm-rating
-                [value]="draftRating()"
-                [interactive]="true"
-                [size]="26"
-                [label]="'PRODUCT.RATING' | translate"
-                (chosen)="draftRating.set($event)"
-              />
-              <label class="sr-only" for="review-comment">
-                {{ 'PRODUCT.REVIEW_COMMENT' | translate }}
-              </label>
-              <textarea
-                id="review-comment"
-                name="comment"
-                rows="3"
-                maxlength="1000"
-                [placeholder]="'PRODUCT.REVIEW_COMMENT' | translate"
-                [(ngModel)]="draftComment"
-              ></textarea>
-              <button type="submit" class="pm-button-primary" [disabled]="draftRating() < 1">
-                {{ 'PRODUCT.REVIEW_SUBMIT' | translate }}
+        <!-- Detail tabs -->
+        <section class="p-7 rounded-lg bg-muted">
+          <div class="tabs flex gap-1 flex-wrap mb-5" role="tablist">
+            @for (one of tabs; track one.value) {
+              <button
+                type="button"
+                role="tab"
+                class="px-4 py-2 border-0 rounded-full bg-transparent text-ink-muted font-[inherit] text-base font-medium cursor-pointer transition-colors duration-150"
+                [class.on]="tab() === one.value"
+                [attr.aria-selected]="tab() === one.value"
+                (click)="setTab(one.value)"
+              >
+                {{ one.key | translate }}
+                @if (one.value === 'REVIEWS') {
+                  ({{ product.rating.count }})
+                }
               </button>
-            </form>
-          }
+            }
+          </div>
 
-          @if (reviewSent()) {
-            <p class="review-thanks">{{ 'PRODUCT.REVIEW_SENT' | translate }}</p>
-          }
-
-          @if (reviews().length === 0) {
-            <p class="pm-empty">{{ 'PRODUCT.NO_REVIEW' | translate }}</p>
-          } @else {
-            <ul class="review-list">
-              @for (review of reviews(); track review.id) {
-                <li class="pm-card">
-                  <div class="review-head">
-                    <strong>{{ review.authorName }}</strong>
-                    <span>{{ review.createdAt | date: 'dd/MM/yyyy' }}</span>
-                  </div>
-                  <pm-rating [value]="review.rating" [label]="'PRODUCT.RATING' | translate" />
-                  @if (review.comment) {
-                    <p class="review-text">{{ review.comment }}</p>
-                  }
-                </li>
+          <div role="tabpanel">
+            @switch (tab()) {
+              @case ('STORY') {
+                <h2 class="m-0 text-2xl font-medium text-ink">{{ 'PRODUCT.STORY_TITLE' | translate }}</h2>
+                <p class="mt-3 max-w-[60rem] text-base leading-[1.7] text-ink-muted">{{ 'PRODUCT.STORY_TEXT' | translate }}</p>
+                <div class="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4 mt-5">
+                  <article class="p-4 rounded-md bg-card border border-edge">
+                    <h3 class="m-0 text-lg font-semibold text-accent">{{ 'PRODUCT.NOTE_EYES' | translate }}</h3>
+                    <p class="mt-2 m-0 text-sm leading-[1.6] text-ink-muted">{{ 'PRODUCT.NOTE_EYES_TEXT' | translate }}</p>
+                  </article>
+                  <article class="p-4 rounded-md bg-card border border-edge">
+                    <h3 class="m-0 text-lg font-semibold text-amber">{{ 'PRODUCT.NOTE_COAT' | translate }}</h3>
+                    <p class="mt-2 m-0 text-sm leading-[1.6] text-ink-muted">{{ 'PRODUCT.NOTE_COAT_TEXT' | translate }}</p>
+                  </article>
+                </div>
               }
-            </ul>
-          }
+              @case ('PROCESS') {
+                <h2 class="m-0 text-2xl font-medium text-ink">{{ 'PRODUCT.PROCESS_TITLE' | translate }}</h2>
+                <p class="mt-3 max-w-[60rem] text-base leading-[1.7] text-ink-muted">{{ 'PRODUCT.PROCESS_TEXT' | translate }}</p>
+              }
+              @case ('CARE') {
+                <h2 class="m-0 text-2xl font-medium text-ink">{{ 'PRODUCT.CARE_TITLE' | translate }}</h2>
+                <p class="mt-3 max-w-[60rem] text-base leading-[1.7] text-ink-muted">{{ 'PRODUCT.CARE_TEXT' | translate }}</p>
+              }
+              @case ('REVIEWS') {
+                @if (canReview()) {
+                  <form class="flex flex-col items-start gap-2 mb-5 p-4 rounded-md bg-card border border-edge" (ngSubmit)="sendReview()">
+                    <p class="m-0 text-base font-semibold text-ink">{{ 'PRODUCT.WRITE_REVIEW' | translate }}</p>
+                    <pm-rating
+                      [value]="draftRating()"
+                      [interactive]="true"
+                      [label]="'PRODUCT.RATING' | translate"
+                      (chosen)="draftRating.set($event)"
+                    />
+                    <label class="sr-only" for="review-comment">
+                      {{ 'PRODUCT.REVIEW_COMMENT' | translate }}
+                    </label>
+                    <textarea
+                      id="review-comment"
+                      rows="3"
+                      class="w-full box-border px-3 py-3 rounded-sm border border-edge-strong bg-muted text-ink font-[inherit] text-base resize-y focus-visible:outline-2 focus-visible:outline-accent"
+                      [(ngModel)]="draftComment"
+                      [ngModelOptions]="{ standalone: true }"
+                      [placeholder]="'PRODUCT.REVIEW_COMMENT' | translate"
+                    ></textarea>
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-3 border-0 rounded-full bg-accent text-on-accent text-base font-bold cursor-pointer" [disabled]="draftRating() < 1">
+                      {{ 'PRODUCT.REVIEW_SUBMIT' | translate }}
+                    </button>
+                  </form>
+                }
+                @if (reviewSent()) {
+                  <p class="m-0 mb-4 px-4 py-2 rounded-sm bg-success-soft text-success text-base font-semibold">{{ 'PRODUCT.REVIEW_SENT' | translate }}</p>
+                }
+                @if (reviews().length === 0) {
+                  <p class="mt-3 text-base leading-[1.7] text-ink-muted">{{ 'PRODUCT.NO_REVIEW' | translate }}</p>
+                } @else {
+                  <ul class="flex flex-col gap-3 m-0 p-0 list-none">
+                    @for (one of reviews(); track one.id) {
+                      <li class="px-4 py-3 rounded-md bg-card border border-edge">
+                        <pm-rating [value]="one.rating" [label]="'PRODUCT.RATING' | translate" />
+                        <p class="mt-2 m-0 text-base leading-[1.6] text-ink-muted">{{ one.comment }}</p>
+                        <span class="block mt-[7px] text-xs font-semibold text-ink-muted">{{ one.authorName }}</span>
+                      </li>
+                    }
+                  </ul>
+                }
+              }
+            }
+          </div>
         </section>
-      }
+      </div>
     }
   }
-</div>
+}
