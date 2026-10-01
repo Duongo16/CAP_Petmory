@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  min-block-size: 100vh;
+  background: var(--pm-bg);
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--pm-accent);
+}
+
+.photo-caption {
+  background: linear-gradient(to top, var(--pm-text), transparent);
+}

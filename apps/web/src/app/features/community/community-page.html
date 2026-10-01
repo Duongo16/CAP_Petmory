@@ -1,15 +1,32 @@
-<div class="pm-page community">
-  <section class="banner">
-    <div class="banner-text">
-      <h1>{{ 'COMMUNITY.TITLE' | translate }}</h1>
-      <p>{{ 'COMMUNITY.SUBTITLE' | translate }}</p>
+<div class="pm-page">
+  <section class="banner flex items-center justify-between gap-5 px-[30px] py-7 mb-[var(--pm-gap)] rounded-xl border border-edge">
+    <div>
+      <p class="flex items-center gap-3 flex-wrap m-0 mb-2">
+        <span class="text-xs font-bold tracking-[0.08em] text-accent">{{ 'COMMUNITY.EYEBROW' | translate }}</span>
+        <span class="px-2 py-1 rounded-full bg-amber-soft text-amber text-sm font-medium">
+          {{ 'COMMUNITY.MEMBERS' | translate: { count: facade.memberCount() } }}
+        </span>
+      </p>
+      <h1 class="m-0 mb-1 font-extrabold tracking-tight pm-page-title">{{ 'COMMUNITY.TITLE' | translate }}</h1>
+      <p class="m-0 max-w-[44ch] text-ink-muted">{{ 'COMMUNITY.SUBTITLE' | translate }}</p>
     </div>
-    <span class="banner-art" aria-hidden="true"><pm-icon name="paw" [size]="42" /></span>
+
+    <div class="flex items-center gap-4">
+      <span class="flex" aria-hidden="true">
+        @for (one of facade.faces(); track one.id) {
+          <span class="grid place-items-center w-[34px] h-[34px] -ml-2 first:ml-0 border-2 border-card rounded-full bg-accent text-on-accent text-xs font-bold">{{ one.initials }}</span>
+        }
+        @if (facade.moreFaces() > 0) {
+          <span class="grid place-items-center w-[34px] h-[34px] -ml-2 border-2 border-card rounded-full bg-accent-soft text-accent text-xs font-bold">+{{ facade.moreFaces() }}</span>
+        }
+      </span>
+      <span class="text-accent" aria-hidden="true"><pm-icon name="paw" [size]="42" /></span>
+    </div>
   </section>
 
-  <div class="layout">
-    <div class="feed-column">
-      <div class="chips" role="group" [attr.aria-label]="'COMMUNITY.TOPIC.ALL' | translate">
+  <div class="grid grid-cols-[minmax(0,1fr)_280px] gap-[var(--pm-gap)] items-start max-nav:grid-cols-1">
+    <div class="flex flex-col gap-[var(--pm-gap)] min-w-0">
+      <div class="flex flex-wrap gap-2" role="group" [attr.aria-label]="'COMMUNITY.TOPIC.ALL' | translate">
         @for (chip of facade.chips(); track chip.key) {
           <button
             type="button"
@@ -24,101 +41,33 @@
       </div>
 
       @if (user()) {
-        <section class="composer pm-card">
-          @if (!composing()) {
-            <div class="composer-row">
-              <span class="avatar" aria-hidden="true">{{ user()!.fullName.charAt(0) }}</span>
-              <button type="button" class="composer-prompt" (click)="openComposer('MOMENT')">
-                {{ 'COMMUNITY.COMPOSER.PROMPT' | translate }}
-              </button>
-            </div>
-            <div class="composer-actions">
-              <button type="button" class="pm-chip" (click)="openComposer('MOMENT')">
-                <pm-icon name="image" [size]="17" /> {{ 'COMMUNITY.COMPOSER.PHOTO' | translate }}
-              </button>
-              <button type="button" class="pm-chip" (click)="openComposer('MEMORIAL')">
-                <pm-icon name="candle" [size]="17" /> {{ 'COMMUNITY.COMPOSER.MEMORIAL' | translate }}
-              </button>
-              <button type="button" class="pm-chip" (click)="openComposer('EXPERIENCE')">
-                <pm-icon name="bulb" [size]="17" /> {{ 'COMMUNITY.COMPOSER.TEMPLATE' | translate }}
-              </button>
-            </div>
-          } @else {
-            <form class="composer-form" (ngSubmit)="submit()">
-              <div class="field">
-                <label for="draft-topic">{{ 'COMMUNITY.COMPOSER.TOPIC_LABEL' | translate }}</label>
-                <select id="draft-topic" name="topic" [(ngModel)]="draftTopic">
-                  @for (option of topicOptions(); track option.topic) {
-                    <option [value]="option.topic">{{ option.key | translate }}</option>
-                  }
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="draft-title">{{ 'COMMUNITY.COMPOSER.TITLE_LABEL' | translate }}</label>
-                <input id="draft-title" name="title" maxlength="200" [(ngModel)]="draftTitle" />
-              </div>
-
-              <div class="field">
-                <label for="draft-content">{{ 'COMMUNITY.COMPOSER.CONTENT_LABEL' | translate }}</label>
-                <textarea
-                  id="draft-content"
-                  name="content"
-                  rows="5"
-                  maxlength="5000"
-                  [(ngModel)]="draftContent"
-                ></textarea>
-                <button type="button" class="link-button" (click)="useTemplate()">
-                  {{ 'COMMUNITY.COMPOSER.TEMPLATE' | translate }}
-                </button>
-                <p class="hint">{{ 'COMMUNITY.COMPOSER.TEMPLATE_HINT' | translate }}</p>
-              </div>
-
-              <div class="field">
-                <label for="draft-tag">{{ 'COMMUNITY.COMPOSER.TAGS_LABEL' | translate }}</label>
-                <div class="tag-row">
-                  @for (tag of draftTags(); track tag) {
-                    <button type="button" class="pm-chip is-selected" (click)="removeTag(tag)">
-                      {{ tag }} <span aria-hidden="true">×</span>
-                    </button>
-                  }
-                  <input
-                    id="draft-tag"
-                    name="tag"
-                    [placeholder]="'COMMUNITY.COMPOSER.TAG_PLACEHOLDER' | translate"
-                    [(ngModel)]="tagInput"
-                    (keydown.enter)="$event.preventDefault(); addTag()"
-                  />
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="upload" for="draft-photo">
-                  <pm-icon name="image" [size]="19" />
-                  <span>{{ photoName() || ('COMMUNITY.COMPOSER.UPLOAD_HINT' | translate) }}</span>
-                </label>
-                <input
-                  id="draft-photo"
-                  class="sr-only"
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  (change)="chooseFile($event)"
-                />
-              </div>
-
-              <div class="composer-footer">
-                <button type="button" class="pm-button-secondary" (click)="closeComposer()">
-                  {{ 'COMMUNITY.COMPOSER.CANCEL' | translate }}
-                </button>
-                <button type="submit" class="pm-button-primary" [disabled]="!canSubmit()">
-                  {{ 'COMMUNITY.COMPOSER.SUBMIT' | translate }}
-                </button>
-              </div>
-            </form>
-          }
+        <section class="pm-card p-4">
+          <div class="flex items-center gap-3">
+            <span class="grid place-items-center w-[38px] h-[38px] rounded-full bg-accent text-on-accent font-bold flex-shrink-0" aria-hidden="true">{{ user()!.fullName.charAt(0) }}</span>
+            <button
+              type="button"
+              class="flex-1 py-3 px-4 border border-edge-strong rounded-full bg-muted text-ink-muted font-sans text-left cursor-pointer transition-colors duration-150 hover:border-accent"
+              id="composer-open"
+              [disabled]="sending()"
+              (click)="openComposer('MOMENT')"
+            >
+              {{ 'COMMUNITY.COMPOSER.PROMPT' | translate }}
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button type="button" class="pm-chip" [disabled]="sending()" (click)="openComposer('MOMENT')">
+              <pm-icon name="image" [size]="17" /> {{ 'COMMUNITY.COMPOSER.PHOTO' | translate }}
+            </button>
+            <button type="button" class="pm-chip" [disabled]="sending()" (click)="openComposer('MEMORIAL')">
+              <pm-icon name="candle" [size]="17" /> {{ 'COMMUNITY.COMPOSER.MEMORIAL' | translate }}
+            </button>
+            <button type="button" class="pm-chip" [disabled]="sending()" (click)="openComposer('EXPERIENCE')">
+              <pm-icon name="bulb" [size]="17" /> {{ 'COMMUNITY.COMPOSER.TEMPLATE' | translate }}
+            </button>
+          </div>
         </section>
       } @else {
-        <p class="pm-empty sign-in-note">{{ 'COMMUNITY.SIGN_IN_TO_POST' | translate }}</p>
+        <p class="pm-empty p-4 text-center">{{ 'COMMUNITY.SIGN_IN_TO_POST' | translate }}</p>
       }
 
       @switch (facade.status()) {
@@ -137,15 +86,15 @@
           @if (facade.empty()) {
             <p class="pm-empty pm-center">{{ 'COMMUNITY.EMPTY' | translate }}</p>
           } @else {
-            <ul class="post-list">
+            <ul class="flex flex-col gap-[var(--pm-gap)] m-0 p-0 list-none">
               @for (card of facade.cards(); track card.raw.id) {
-                <li class="post-card pm-card pm-card-interactive">
-                  <header class="post-head">
-                    <a class="author" [routerLink]="['/community/users', card.raw.author.id]">
-                      <span class="avatar" aria-hidden="true">{{ card.raw.author.initial }}</span>
-                      <span class="author-text">
-                        <span class="author-name">{{ card.raw.author.fullName }}</span>
-                        <span class="post-meta">
+                <li class="pm-card pm-card-interactive p-4">
+                  <header class="flex items-center justify-between gap-3">
+                    <a class="flex items-center gap-2 no-underline text-inherit" [routerLink]="['/community/users', card.raw.author.id]">
+                      <span class="grid place-items-center w-[38px] h-[38px] rounded-full bg-accent text-on-accent font-bold flex-shrink-0" aria-hidden="true">{{ card.raw.author.initial }}</span>
+                      <span class="flex flex-col">
+                        <span class="font-semibold text-base text-ink">{{ card.raw.author.fullName }}</span>
+                        <span class="text-xs text-ink-muted">
                           {{ card.raw.createdAt | date: 'dd/MM/yyyy HH:mm' }} ·
                           {{ card.topicKey | translate }}
                         </span>
@@ -159,13 +108,13 @@
                     }
                   </header>
 
-                  <a class="post-body" [routerLink]="['/community/posts', card.raw.id]">
-                    <h2 class="post-title">{{ card.raw.title }}</h2>
-                    <p class="post-text">{{ card.raw.content }}</p>
+                  <a class="block mt-3 no-underline text-inherit" [routerLink]="['/community/posts', card.raw.id]">
+                    <h2 class="m-0 mb-1 text-base font-bold text-ink">{{ card.raw.title }}</h2>
+                    <p class="m-0 text-ink-muted text-base leading-[1.55] line-clamp-3">{{ card.raw.content }}</p>
                   </a>
 
                   @if (card.photoUrls.length > 0) {
-                    <a class="post-photos" [routerLink]="['/community/posts', card.raw.id]">
+                    <a class="post-photos block mt-3" [routerLink]="['/community/posts', card.raw.id]">
                       @for (url of card.photoUrls; track url) {
                         <img
                           [src]="url"
@@ -176,14 +125,14 @@
                   }
 
                   @if (card.raw.tags.length > 0) {
-                    <ul class="tag-list">
+                    <ul class="flex flex-wrap gap-1 mt-3 m-0 p-0 list-none text-xs">
                       @for (tag of card.raw.tags; track tag) {
                         <li class="pm-status">#{{ tag }}</li>
                       }
                     </ul>
                   }
 
-                  <footer class="post-foot">
+                  <footer class="flex items-center gap-2 mt-3 pt-3 border-t border-edge">
                     <button
                       type="button"
                       class="react"
@@ -221,7 +170,7 @@
             </ul>
 
             @if (facade.pageCount() > 1) {
-              <div class="paging">
+              <div class="flex items-center justify-center gap-3 text-base font-semibold">
                 <button
                   type="button"
                   class="pm-button-secondary"
@@ -246,11 +195,11 @@
       }
     </div>
 
-    <aside class="side-column">
-      <section class="pm-card side-card">
+    <aside class="sticky top-[88px] flex flex-col gap-[var(--pm-gap)] max-nav:static">
+      <section class="pm-card p-4">
         <h2 class="pm-section-title">{{ 'COMMUNITY.DISCOVER.TITLE' | translate }}</h2>
-        <p class="hint">{{ 'COMMUNITY.DISCOVER.SUBTITLE' | translate }}</p>
-        <ul class="scope-list">
+        <p class="m-0 text-sm text-ink-muted">{{ 'COMMUNITY.DISCOVER.SUBTITLE' | translate }}</p>
+        <ul class="flex flex-wrap gap-2 mt-3 m-0 p-0 list-none">
           @for (chip of scopeChips(); track chip.scope) {
             <li>
               <button
@@ -266,19 +215,19 @@
         </ul>
       </section>
 
-      <section class="pm-card side-card">
+      <section class="pm-card p-4">
         <h2 class="pm-section-title">{{ 'FOOTER.FOLLOW' | translate }}</h2>
         <pm-social-links variant="full" />
       </section>
     </aside>
   </div>
 
-  <ul class="value-strip">
+  <ul class="grid gap-4 mt-9 p-5 list-none rounded-xl bg-muted border border-edge [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
     @for (value of values; track value.titleKey) {
-      <li>
-        <span class="value-glyph"><pm-icon [name]="value.icon" [size]="18" /></span>
-        <span class="value-text">
-          <strong>{{ value.titleKey | translate }}</strong>
+      <li class="flex items-start gap-2">
+        <span class="grid place-items-center w-9 h-9 flex-shrink-0 rounded-full bg-accent-soft text-accent"><pm-icon [name]="value.icon" [size]="18" /></span>
+        <span class="flex flex-col gap-1 text-sm text-ink-muted">
+          <strong class="text-ink text-base">{{ value.titleKey | translate }}</strong>
           <span>{{ value.textKey | translate }}</span>
         </span>
       </li>

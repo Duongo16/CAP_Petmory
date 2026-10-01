@@ -1,127 +1,198 @@
-<a class="skip-link" href="#main">{{ 'COMMON.SKIP_TO_CONTENT' | translate }}</a>
+<a
+  class="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-2 focus-visible:z-50 focus-visible:px-4 focus-visible:py-2 focus-visible:rounded-full focus-visible:bg-accent focus-visible:text-on-accent focus-visible:font-semibold"
+  href="#main"
+>{{ 'COMMON.SKIP_TO_CONTENT' | translate }}</a>
 
-<header class="top-bar">
-  <div class="bar-inner">
-    <a class="brand" routerLink="/home">
-      <img class="brand-mark" src="img/logo-mark.png" alt="" width="34" height="34" />
-      <span class="brand-name">{{ 'COMMON.APP_NAME' | translate }}</span>
+<!-- ───── Header ───── -->
+<header class="sticky top-0 z-10 border-b border-edge bg-card/95 backdrop-blur-md transition-shadow">
+  <div class="flex items-center gap-4 max-w-[1180px] mx-auto px-6 py-3 box-border">
+
+    <!-- Brand -->
+    <a class="inline-flex items-center gap-2.5 flex-shrink-0 no-underline text-ink" routerLink="/home">
+      <img
+        class="w-9 h-9 rounded-xl object-cover bg-accent-soft"
+        src="img/logo-mark.png" alt="" width="36" height="36"
+      />
+      <span class="text-lg font-extrabold tracking-wide">{{ 'COMMON.APP_NAME' | translate }}</span>
     </a>
 
-    <nav class="nav" [attr.aria-label]="'NAV.MAIN' | translate">
+    <!-- Desktop nav -->
+    <nav
+      class="hidden nav:flex items-center gap-0.5 flex-[0_0_auto]"
+      [attr.aria-label]="'NAV.MAIN' | translate"
+    >
       @for (item of menu; track item.path) {
-        <a [routerLink]="item.path" routerLinkActive="selected">{{ item.key | translate }}</a>
+        <a
+          class="px-3 py-2 rounded-full text-ink-muted no-underline text-sm font-medium whitespace-nowrap
+                 transition-colors duration-150
+                 hover:text-ink hover:bg-muted
+                 [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
+          [routerLink]="item.path" routerLinkActive="selected"
+        >{{ item.key | translate }}</a>
       }
     </nav>
 
-    <div class="bar-actions">
+    <!-- Actions -->
+    <div class="flex items-center gap-2 flex-shrink-0 ml-auto">
       <pm-theme-toggle />
 
-      <a class="cart-button pm-icon-button" routerLink="/cart" routerLinkActive="selected">
+      <!-- Cart -->
+      <a
+        class="relative inline-grid place-items-center w-10 h-10 rounded-full text-ink no-underline
+               transition-colors duration-150
+               hover:bg-accent-soft hover:text-accent-dark
+               [&.selected]:bg-accent-soft"
+        routerLink="/cart" routerLinkActive="selected"
+        [attr.aria-label]="'NAV.CART' | translate"
+      >
         <pm-icon name="cart" />
-        <span class="sr-only">{{ 'NAV.CART' | translate }}</span>
         @if (cartItemCount() > 0) {
-          <span class="badge" role="status">{{ cartItemCount() }}</span>
+          <span
+            class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full
+                   bg-accent text-on-accent text-[0.65rem] font-bold leading-[18px] text-center"
+            role="status"
+          >{{ cartItemCount() }}</span>
         }
       </a>
 
+      <!-- Account button -->
       @if (user(); as u) {
-        <div class="account">
+        <div class="relative">
           <button
             type="button"
-            class="account-button"
+            class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-edge-strong bg-card
+                   text-ink font-[inherit] cursor-pointer
+                   transition-colors duration-150
+                   hover:border-accent"
             [attr.aria-expanded]="menuOpen()"
             aria-haspopup="true"
             (click)="toggleMenu()"
           >
-            <span class="avatar" aria-hidden="true">{{ initial() }}</span>
-            <span class="user-name">{{ u.fullName }}</span>
-            <pm-icon name="chevron" [size]="15" />
+            <span
+              class="grid place-items-center w-8 h-8 rounded-full bg-accent text-on-accent text-sm font-bold flex-shrink-0"
+              aria-hidden="true"
+            >{{ initial() }}</span>
+            <span class="hidden nav:block text-sm font-semibold whitespace-nowrap max-w-28 truncate">{{ u.fullName }}</span>
+            <pm-icon name="chevron" [size]="14" />
           </button>
 
+          <!-- Dropdown -->
           @if (menuOpen()) {
-            <div class="account-menu pm-card" role="menu">
+            <div
+              class="absolute top-[calc(100%+8px)] right-0 z-20 flex flex-col min-w-[200px] p-2 rounded-lg bg-card border border-edge shadow-elevated"
+              role="menu"
+            >
+              <!-- Nav items shown only on mobile (narrow) -->
               @for (item of menu; track item.path) {
                 <a
-                  class="only-narrow"
+                  class="hidden max-nav:block px-3 py-2 rounded-md no-underline text-ink text-sm
+                         transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
                   role="menuitem"
-                  [routerLink]="item.path"
-                  routerLinkActive="selected"
+                  [routerLink]="item.path" routerLinkActive="selected"
                   (click)="closeMenu()"
-                >
-                  {{ item.key | translate }}
-                </a>
+                >{{ item.key | translate }}</a>
               }
+
+              <!-- Staff section -->
               @if (isInternal()) {
-                <p class="menu-group">{{ 'NAV.STAFF_AREA' | translate }}</p>
+                <p class="mx-3 mt-2 mb-1 text-ink-muted text-[0.65rem] font-bold tracking-widest uppercase">
+                  {{ 'NAV.STAFF_AREA' | translate }}
+                </p>
                 @if (isManager()) {
                   @for (item of managerMenu; track item.path) {
                     <a
-                      class="internal-link"
+                      class="px-3 py-2 rounded-md no-underline text-ink text-sm
+                             transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
                       role="menuitem"
-                      [routerLink]="item.path"
-                      routerLinkActive="selected"
+                      [routerLink]="item.path" routerLinkActive="selected"
                       (click)="closeMenu()"
-                    >
-                      {{ item.key | translate }}
-                    </a>
+                    >{{ item.key | translate }}</a>
                   }
                 }
                 @if (isAccountAdmin()) {
                   @for (item of staffAccountMenu; track item.path) {
                     <a
-                      class="internal-link"
+                      class="px-3 py-2 rounded-md no-underline text-ink text-sm
+                             transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
                       role="menuitem"
-                      [routerLink]="item.path"
-                      routerLinkActive="selected"
+                      [routerLink]="item.path" routerLinkActive="selected"
                       (click)="closeMenu()"
-                    >
-                      {{ item.key | translate }}
-                    </a>
+                    >{{ item.key | translate }}</a>
                   }
                 }
-                <p class="menu-group">{{ 'NAV.ACCOUNT' | translate }}</p>
+                <p class="mx-3 mt-2 mb-1 text-ink-muted text-[0.65rem] font-bold tracking-widest uppercase">
+                  {{ 'NAV.ACCOUNT' | translate }}
+                </p>
               }
-              <a role="menuitem" [routerLink]="['/community/users', u.id]" (click)="closeMenu()">
-                {{ 'NAV.MY_PROFILE' | translate }}
-              </a>
-              <button type="button" role="menuitem" class="logout-item" (click)="logout()">
-                {{ 'NAV.LOGOUT' | translate }}
-              </button>
+
+              <!-- My profile -->
+              <a
+                class="px-3 py-2 rounded-md no-underline text-ink text-sm transition-colors hover:bg-muted"
+                role="menuitem"
+                [routerLink]="['/community/users', u.id]"
+                (click)="closeMenu()"
+              >{{ 'NAV.MY_PROFILE' | translate }}</a>
+
+              <!-- Logout -->
+              <button
+                type="button"
+                class="mt-1 px-3 py-2 text-left rounded-b-md border-0 border-t border-edge bg-transparent
+                       text-danger font-semibold text-sm font-[inherit] cursor-pointer
+                       transition-colors hover:bg-danger-soft"
+                role="menuitem"
+                (click)="logout()"
+              >{{ 'NAV.LOGOUT' | translate }}</button>
             </div>
           }
         </div>
       }
     </div>
   </div>
-
 </header>
 
-<main class="content" id="main">
+<!-- ───── Content ───── -->
+<main class="flex-1 min-h-0 nav:pb-0 max-nav:pb-[calc(84px+env(safe-area-inset-bottom))]" id="main">
   <router-outlet />
 </main>
 
-<footer class="site-footer">
-  <div class="footer-quote">
-    <p>{{ 'FOOTER.TAGLINE' | translate }}</p>
+<!-- ───── Footer ───── -->
+<footer class="mt-12 bg-muted border-t border-edge">
+  <!-- Tagline band -->
+  <div class="grid place-items-center px-4 py-10 bg-accent-soft text-center">
+    <p class="max-w-2xl m-0 text-base font-semibold italic text-accent-dark">
+      {{ 'FOOTER.TAGLINE' | translate }}
+    </p>
   </div>
 
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <img class="brand-mark" src="img/logo-mark.png" alt="" width="34" height="34" />
-      <span class="brand-name">{{ 'COMMON.APP_NAME' | translate }}</span>
-      <p class="footer-slogan">{{ 'FOOTER.SLOGAN' | translate }}</p>
-      <p class="footer-rights">{{ 'FOOTER.RIGHTS' | translate }}</p>
+  <!-- Link grid -->
+  <div class="grid gap-7 max-w-[1180px] mx-auto px-4 py-9 box-border [grid-template-columns:repeat(auto-fit,minmax(210px,1fr))]">
+
+    <!-- Brand column -->
+    <div class="flex flex-col items-start gap-1">
+      <img class="w-9 h-9 rounded-xl object-cover bg-accent-soft" src="img/logo-mark.png" alt="" width="36" height="36" />
+      <span class="text-lg font-extrabold tracking-wide text-ink">{{ 'COMMON.APP_NAME' | translate }}</span>
+      <p class="mt-1 m-0 text-sm italic text-ink-muted">{{ 'FOOTER.SLOGAN' | translate }}</p>
+      <p class="m-0 text-xs text-ink-muted">{{ 'FOOTER.RIGHTS' | translate }}</p>
     </div>
 
-    <nav class="footer-nav" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
-      <h2>{{ 'FOOTER.EXPLORE' | translate }}</h2>
+    <!-- Explore nav -->
+    <nav class="flex flex-col items-start gap-2" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
+      <h2 class="m-0 mb-3 text-xs font-bold tracking-[0.08em] uppercase text-ink-muted">
+        {{ 'FOOTER.EXPLORE' | translate }}
+      </h2>
       @for (item of footerMenu; track item.path) {
-        <a [routerLink]="item.path">{{ item.key | translate }}</a>
+        <a
+          class="text-ink-muted no-underline text-sm transition-colors hover:text-accent-dark"
+          [routerLink]="item.path"
+        >{{ item.key | translate }}</a>
       }
     </nav>
 
+    <!-- Social links -->
     <div class="footer-contact">
-      <h2>{{ 'FOOTER.FOLLOW' | translate }}</h2>
+      <h2 class="m-0 mb-3 text-xs font-bold tracking-[0.08em] uppercase text-ink-muted">
+        {{ 'FOOTER.FOLLOW' | translate }}
+      </h2>
       <pm-social-links variant="full" />
     </div>
   </div>

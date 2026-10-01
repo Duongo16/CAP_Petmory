@@ -1,0 +1,184 @@
+/* Khung cac man noi bo, dung theo thiet ke Figma: thanh ben trai va noi dung ben phai. */
+
+:host {
+  display: block;
+}
+
+.desk {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  min-block-size: 100%;
+}
+
+/* ---------- Thanh ben ---------- */
+
+/*
+ * The rail paints the whole column so the tint runs the length of the page,
+ * while the part a reader uses stays in view as the screen beside it scrolls.
+ */
+.rail {
+  background: var(--pm-bg-muted);
+  border-inline-end: 1px solid var(--pm-border);
+}
+
+.rail-inner {
+  position: sticky;
+  inset-block-start: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-4);
+  block-size: 100vh;
+  padding: var(--pm-space-5) var(--pm-space-3);
+}
+
+.rail-head {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-space-3);
+  padding-inline: var(--pm-space-3);
+}
+
+.rail-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+}
+
+.rail-title {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.rail-title strong {
+  font-family: var(--pm-font-display);
+  font-size: var(--pm-text-base);
+  font-weight: 700;
+  color: var(--pm-text);
+}
+
+.rail-title span {
+  font-size: var(--pm-text-xs);
+  color: var(--pm-text-muted);
+}
+
+.rail-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-1);
+}
+
+.rail-group {
+  margin: var(--pm-space-2) 0 var(--pm-space-1);
+  padding-inline: var(--pm-space-3);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--pm-text-muted);
+}
+
+.rail-divider {
+  height: 1px;
+  background: var(--pm-border);
+  margin: var(--pm-space-1) 0;
+}
+
+.rail-link {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-space-2);
+  padding: var(--pm-space-2) var(--pm-space-3);
+  border-radius: var(--pm-radius-sm);
+  color: var(--pm-text-body);
+  font-size: var(--pm-text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background 130ms ease,
+    color 130ms ease;
+}
+
+.rail-link:hover {
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+}
+
+.rail-link.on {
+  background: var(--pm-memorial);
+  color: var(--pm-on-accent);
+  font-weight: 600;
+}
+
+.rail-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-2);
+  margin-block-start: auto;
+  padding: var(--pm-space-3);
+  border-radius: var(--pm-radius);
+  background: var(--pm-bg-card);
+}
+
+.rail-who {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.rail-who strong {
+  overflow: hidden;
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--pm-text);
+}
+
+.rail-who span {
+  font-size: var(--pm-text-xs);
+  color: var(--pm-text-muted);
+}
+
+.rail-out {
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+  color: var(--pm-accent);
+}
+
+.desk-main {
+  min-inline-size: 0;
+}
+
+@media (max-width: 900px) {
+  .desk {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--pm-border);
+  }
+
+  .rail-inner {
+    position: static;
+    block-size: auto;
+  }
+
+  .rail-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .rail-group {
+    inline-size: 100%;
+  }
+
+  .rail-foot {
+    margin-block-start: 0;
+  }
+}

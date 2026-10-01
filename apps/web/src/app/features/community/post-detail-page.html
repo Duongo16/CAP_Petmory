@@ -23,14 +23,16 @@
                 <span class="author-text">
                   <span class="author-name">{{ d.post.author.fullName }}</span>
                   <span class="post-meta">
-                    {{ d.post.createdAt | date: 'dd/MM/yyyy HH:mm' }} ·
-                    {{ topicKey() | translate }}
+                    {{ d.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                    <span class="meta-dot" aria-hidden="true">•</span>
+                    {{ 'COMMUNITY.POST.PUBLIC' | translate }}
                   </span>
                 </span>
               </a>
             </header>
 
-            <h1 class="post-title">{{ d.post.title }}</h1>
+            <span class="topic-chip">{{ topicKey() | translate }}</span>
+            <h1 class="post-title pm-page-title">{{ d.post.title }}</h1>
             <p class="post-text">{{ d.post.content }}</p>
 
             @if (photoUrls().length > 0) {
@@ -53,6 +55,14 @@
                   </figcaption>
                 }
               </figure>
+
+              <aside class="turn-into">
+                <span class="turn-text">{{ 'COMMUNITY.POST.TURN_INTO' | translate }}</span>
+                <a class="turn-go" routerLink="/studio">
+                  {{ 'COMMUNITY.POST.TURN_GO' | translate }}
+                  <pm-icon name="chevron" [size]="12" />
+                </a>
+              </aside>
 
               @if (photoUrls().length > 1) {
                 <ul class="thumbs">

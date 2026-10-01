@@ -1,0 +1,231 @@
+/*
+ * Khung chung cua moi hop thoai them va sua.
+ *
+ * Tach ra day de nam hop thoai deu co cung mot dang: dau trang, than cuon
+ * duoc, chan dat nut. Tung hop thoai chi con phai viet phan rieng cua no.
+ */
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-3);
+  box-sizing: border-box;
+  padding: var(--pm-space-5) var(--pm-space-6);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+}
+
+.sheet-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pm-space-4);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--pm-accent);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.sheet-title {
+  margin: var(--pm-space-1) 0 0;
+  font-family: var(--pm-font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+}
+
+.shut {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 32px;
+  block-size: 32px;
+  border: 0;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-muted);
+  color: var(--pm-text-body);
+  cursor: pointer;
+  transition:
+    background 130ms ease,
+    color 130ms ease;
+
+  &:hover {
+    background: var(--pm-danger-soft);
+    color: var(--pm-danger);
+  }
+}
+
+/*
+ * Than hop thoai cuon rieng, de dau trang va chan luon nhin thay du bieu mau
+ * co dai den dau.
+ */
+.sheet-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-3);
+  overflow-y: auto;
+  max-block-size: min(62vh, 620px);
+  margin: 0 calc(var(--pm-space-6) * -1);
+  padding: var(--pm-space-1) var(--pm-space-6);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--pm-space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-1);
+  min-inline-size: 0;
+}
+
+.field-name {
+  color: var(--pm-text);
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  inline-size: 100%;
+  box-sizing: border-box;
+  padding: var(--pm-space-2) var(--pm-space-3);
+  border: 1px solid var(--pm-border-strong);
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-bg-muted);
+  color: var(--pm-text);
+  font-family: inherit;
+  font-size: var(--pm-text-sm);
+  transition: border-color 130ms ease;
+
+  &:hover:not(:disabled):not(:focus-visible) {
+    border-color: var(--pm-accent);
+  }
+}
+
+.field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.field input:disabled {
+  color: var(--pm-text-muted);
+  cursor: not-allowed;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--pm-accent);
+  outline-offset: 1px;
+}
+
+/* O tich nam ngang vi nhan cua no la mot cau, khong phai mot ten truong. */
+.tick {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--pm-space-2);
+  color: var(--pm-text-body);
+  font-size: var(--pm-text-sm);
+  cursor: pointer;
+
+  input {
+    inline-size: 16px;
+    block-size: 16px;
+    padding: 0;
+  }
+}
+
+.field-note {
+  margin: 0;
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-xs);
+}
+
+.field-error {
+  margin: 0;
+  color: var(--pm-danger);
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+}
+
+.sheet-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pm-space-2);
+  padding-block-start: var(--pm-space-1);
+  border-block-start: 1px solid var(--pm-border);
+  margin-block-start: var(--pm-space-1);
+}
+
+.plain,
+.strong {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pm-space-2);
+  padding: var(--pm-space-3) var(--pm-space-5);
+  border-radius: var(--pm-radius-sm);
+  font-family: inherit;
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 130ms ease,
+    border-color 130ms ease,
+    color 130ms ease,
+    transform 130ms ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.plain {
+  border: 1px solid var(--pm-border-strong);
+  background: var(--pm-bg-card);
+  color: var(--pm-text-body);
+
+  &:hover:not(:disabled) {
+    background: var(--pm-bg-muted);
+    border-color: var(--pm-border-strong);
+  }
+}
+
+.strong {
+  border: 0;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+
+  &:hover:not(:disabled) {
+    background: var(--pm-accent-dark);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+}
+
+@media (max-width: 600px) {
+  .sheet {
+    padding: var(--pm-space-4);
+  }
+
+  .sheet-body {
+    max-block-size: 64vh;
+    margin: 0 calc(var(--pm-space-4) * -1);
+    padding-inline: var(--pm-space-4);
+  }
+
+  .pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

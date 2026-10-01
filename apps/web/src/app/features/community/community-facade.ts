@@ -1,5 +1,6 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { CommunityService } from '../../core/services/community.service';
 import {
   CommunityPost,
@@ -70,6 +71,31 @@ export class CommunityFacade {
   );
 
   readonly empty = computed(() => this.status() === 'DONE' && this.posts().length === 0);
+
+  /**
+   * A few of the people who have written, shown as initials beside the heading.
+   *
+   * These come from the posts actually on screen rather than a made up figure,
+   * so the row never claims members the community does not have.
+   */
+  readonly faces = computed(() => {
+    const seen = new Map<string, string>();
+    for (const post of this.posts()) {
+      if (!seen.has(post.author.id)) {
+        seen.set(post.author.id, post.author.initial);
+      }
+    }
+    return [...seen].slice(0, 3).map(([id, initials]) => ({ id, initials }));
+  });
+
+  /** How many more people have written than the row has room for. */
+  readonly moreFaces = computed(() => {
+    const people = new Set(this.posts().map((p) => p.author.id));
+    return Math.max(0, people.size - 3);
+  });
+
+  /** How many different people have written, counted from the posts on screen. */
+  readonly memberCount = computed(() => new Set(this.posts().map((p) => p.author.id)).size);
 
   /** The filter chips, with "all" first and a count on each topic. */
   readonly chips = computed<TopicChip[]>(() => {
@@ -160,25 +186,31 @@ export class CommunityFacade {
       .subscribe({ next: () => this.load(), error: () => undefined });
   }
 
-  /** Saves the post, then uploads the picture if the author attached one. */
-  write(input: WritePostInput, photo: File | null, onDone: () => void): void {
+  /**
+   * Saves the post, then sends whatever pictures the author attached, whether
+   * those came off their own machine or from a link they pasted.
+   *
+   * A failure on the pictures does not undo the post. The writing is the part
+   * that matters, and losing it because one upload went wrong would be worse
+   * than a post that is missing an image.
+   */
+  write(input: WritePostInput, photos: File[], links: string[], onDone: () => void): void {
     this.service
       .write(input)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        switchMap((created) => {
+          const sending = [
+            ...photos.map((photo) => this.service.addPhoto(created._id, photo, photo.name)),
+            ...links.map((link) => this.service.addPhotoByLink(created._id, link)),
+          ];
+          return sending.length === 0
+            ? of(created)
+            : forkJoin(sending).pipe(catchError(() => of(created)));
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
-        next: (created) => {
-          if (!photo) {
-            this.finishWrite(onDone);
-            return;
-          }
-          this.service
-            .addPhoto(created._id, photo, photo.name)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe({
-              next: () => this.finishWrite(onDone),
-              error: () => this.finishWrite(onDone),
-            });
-        },
+        next: () => this.finishWrite(onDone),
         error: () => this.status.set('ERROR'),
       });
   }

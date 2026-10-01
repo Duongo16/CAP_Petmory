@@ -13,74 +13,186 @@ html {
 }
 
 /**
- * Shared interface tokens. A later restyle only needs changes here, not in
- * every individual screen.
+ * Bien dung chung cua giao dien.
+ *
+ * Bang mau duoi day duoc rut ra tu chinh tep logo, nen doi logo thi chi phai
+ * doi o day chu khong phai do lai tung man hinh.
  */
 :root {
-  /* Backgrounds and surfaces */
-  --pm-bg: #fffaf0;
+  /* Nen va mat phang, lay tu mau giay kem cua logo */
+  --pm-bg: #fffaf2;
   --pm-bg-card: #ffffff;
-  --pm-bg-muted: #fdf4e4;
-  --pm-bg-sunken: #fcefd8;
-  --pm-bg-3d: #fdf3e2;
+  --pm-bg-muted: #fdf2e2;
+  --pm-bg-sunken: #f8e8d2;
+  --pm-bg-3d: #fdf2e2;
 
-  /* Brand colours */
-  --pm-accent: #f6a92b;
-  --pm-accent-dark: #e18f15;
-  --pm-accent-soft: #fdeed2;
-  --pm-accent-ring: #f6a92b40;
-  --pm-on-accent: #402c0b;
-  --pm-memorial: #8c6fa6;
-  --pm-memorial-soft: #f1ebf6;
-  --pm-danger: #c0392b;
-  --pm-danger-soft: #fbeae8;
-  --pm-success: #3e9b5f;
-  --pm-success-soft: #e8f5ec;
-  --pm-info: #3b7dd8;
-  --pm-info-soft: #e7f0fc;
-  --pm-star: #f5a623;
+  /*
+   * Mau thuong hieu, lay tu chu PETMORY tren logo.
+   *
+   * Mau cam tren logo rat tuoi nen dung lam chu thi doc khong ra. Mau nhan o
+   * day la chinh sac cam do nhung dam hon, vua du de vua lam chu tren nen
+   * sang vua lam nen cho chu trang. Sac cam nguyen ban cua logo van duoc giu,
+   * dat o muc mau ho phach tuoi va chi dung cho mang trang tri.
+   */
+  --pm-accent: #a8500c;
+  --pm-accent-dark: #843e08;
+  --pm-accent-soft: #fce7ce;
+  --pm-accent-ring: #a8500c40;
+  --pm-on-accent: #ffffff;
+  --pm-memorial: #5b6640;
+  --pm-memorial-soft: #e6ead8;
 
-  /* Text and borders */
-  --pm-text: #3a2f22;
-  --pm-text-muted: #8b7f6e;
-  --pm-border: #f0e3cd;
-  --pm-border-strong: #e3d1b2;
+  /* Mau vang am, lay tu bo long cho tren logo */
+  --pm-amber: #8a5406;
+  --pm-amber-bright: #fb8b1f;
+  --pm-amber-soft: #fde2bb;
+  --pm-on-amber: #2e1a00;
 
-  /* Shape */
-  --pm-radius-lg: 24px;
-  --pm-radius: 16px;
-  --pm-radius-sm: 10px;
-  --pm-gap: 20px;
-  --pm-shadow: 0 1px 2px rgba(122, 85, 24, 0.05), 0 10px 28px rgba(122, 85, 24, 0.07);
-  --pm-shadow-lifted: 0 2px 4px rgba(122, 85, 24, 0.06), 0 18px 40px rgba(122, 85, 24, 0.12);
+  --pm-danger: #b3261e;
+  --pm-danger-soft: #ffdad5;
+  --pm-on-danger-soft: #8c1108;
+  --pm-success: #3a6248;
+  --pm-success-soft: #cfe9d6;
+  --pm-on-success-soft: #0c2d18;
+  --pm-info: #4a3726;
+  --pm-info-soft: #f7e7d3;
+  --pm-star: #e0870c;
+
+  /* Lop phu mo phan anh bi cat bo trong hop sua anh */
+  --pm-shade-crop: rgba(44, 29, 16, 0.52);
+
+  /* Giay cua quyen so ky niem */
+  --pm-ink: #3a2a18;
+  --pm-paper-cream: #fbf1de;
+  --pm-paper-kraft: #e8d3ae;
+  --pm-paper-mark: rgba(120, 96, 66, 0.22);
+  --pm-paper-bloom: #fdeee4;
+  --pm-paper-petal: rgba(214, 150, 105, 0.35);
+  --pm-book-cover: #c4661a;
+  --pm-book-edge: rgba(60, 40, 25, 0.18);
+
+  /* Chu va vien */
+  --pm-text: #2c1d10;
+  --pm-text-body: #4a3726;
+  --pm-text-muted: #6b5541;
+  --pm-border: #e8ceab;
+  --pm-border-strong: #a8835a;
+
+  /* Hinh khoi */
+  --pm-radius-lg: 16px;
+  --pm-radius: 12px;
+  --pm-radius-sm: 8px;
+  --pm-radius-pill: 9999px;
+  --pm-gap: 16px;
+
+  /*
+   * Thang khoang cach, sau bac theo boi so cua bon.
+   *
+   * Moi khoang dem va moi khe giua cac o deu lay tu day. Dat san mot thang roi
+   * chon trong thang thi cac man hinh tho ra deu nhau, con moi cho tu go mot
+   * con so thi khong bao gio deu duoc.
+   */
+  --pm-space-1: 4px;
+  --pm-space-2: 8px;
+  --pm-space-3: 12px;
+  --pm-space-4: 16px;
+  --pm-space-5: 20px;
+  --pm-space-6: 24px;
+  --pm-space-8: 32px;
+
+  /*
+   * Thang co chu, tam bac.
+   *
+   * Lay dung tam co chu dang duoc dung nhieu nhat trong ma nguon, nen ap thang
+   * nay vao khong lam doi dang chu hien co, chi bo di cac co le nam xen giua.
+   */
+  --pm-text-xs: 0.75rem;
+  --pm-text-sm: 0.8125rem;
+  --pm-text-md: 0.875rem;
+  --pm-text-base: 1rem;
+  --pm-text-lg: 1.125rem;
+  --pm-text-xl: 1.25rem;
+  --pm-text-2xl: 1.5rem;
+  --pm-text-3xl: 2rem;
+
+  /*
+   * Ba be rong khung trang.
+   *
+   * Man hinh nao cung phai chon mot trong ba, de chuyen qua lai giua cac man
+   * thi noi dung khong nhay sang trai roi sang phai.
+   */
+  --pm-frame: 1180px;
+  --pm-frame-wide: 1320px;
+  --pm-frame-narrow: 760px;
+
+  /* Le hai ben khung trang, va khoang cach tu thanh tren xuong noi dung. */
+  --pm-frame-gutter: 24px;
+  --pm-frame-top: 28px;
+  /*
+   * Kieu chu hien thi, dung dung bo chu ghi trong hop dong thiet ke giao dien.
+   * Bo chu nay co day du dau tieng Viet nen khong bi vo dau o bat ky man nao.
+   */
+  --pm-font: 'Be Vietnam Pro', Roboto, 'Helvetica Neue', sans-serif;
+  /*
+   * Kieu chu viet tay cua quyen so. Chon bo chu co du dau tieng Viet, va van
+   * de san bo chu thuong o phia sau de khi mang cham thi chu van doc duoc.
+   */
+  --pm-font-hand: 'Patrick Hand', 'Quicksand', 'Be Vietnam Pro', cursive;
+  --pm-font-display: 'Noto Serif', Georgia, serif;
+  --pm-shadow: 0 1px 2px rgba(74, 48, 24, 0.06), 0 10px 28px rgba(74, 48, 24, 0.08);
+  --pm-shadow-lifted: 0 2px 4px rgba(74, 48, 24, 0.07), 0 18px 40px rgba(74, 48, 24, 0.14);
 }
 
 @mixin pm-dark-tokens {
-  --pm-bg: #1b1713;
-  --pm-bg-card: #251f19;
-  --pm-bg-muted: #2d251d;
-  --pm-bg-sunken: #332a20;
-  --pm-bg-3d: #2a231b;
+  --pm-bg: #1a140e;
+  --pm-bg-card: #251c14;
+  --pm-bg-muted: #2e241a;
+  --pm-bg-sunken: #382c20;
+  --pm-bg-3d: #2a2018;
 
-  --pm-accent: #f2b45c;
-  --pm-accent-dark: #ffc978;
-  --pm-accent-soft: #3a2d1a;
-  --pm-accent-ring: #f2b45c40;
-  --pm-on-accent: #2a1c06;
-  --pm-memorial: #c0a8d4;
-  --pm-memorial-soft: #332a3c;
-  --pm-danger: #f0a49a;
-  --pm-danger-soft: #3d2622;
-  --pm-success: #7fc79a;
-  --pm-success-soft: #22332a;
-  --pm-info: #8fb8f0;
-  --pm-info-soft: #222c3a;
-  --pm-star: #f2b45c;
+  --pm-accent: #ffb877;
+  --pm-accent-dark: #ffd2a8;
+  --pm-accent-soft: #4a2d11;
+  --pm-accent-ring: #ffb87740;
+  --pm-on-accent: #4a2100;
+  --pm-memorial: #c3ceaa;
+  --pm-memorial-soft: #333c24;
 
-  --pm-text: #f2e9dc;
-  --pm-text-muted: #a89a86;
-  --pm-border: #3b3128;
-  --pm-border-strong: #4b3f32;
+  --pm-amber: #f7bf78;
+  --pm-amber-bright: #fb8b1f;
+  --pm-amber-soft: #4d3306;
+  --pm-on-amber: #ffe2ba;
+
+  --pm-danger: #ffb4ab;
+  --pm-danger-soft: #59150f;
+  --pm-on-danger-soft: #ffdad5;
+  --pm-success: #a8d4b6;
+  --pm-success-soft: #21402c;
+  --pm-on-success-soft: #cfe9d6;
+  --pm-info: #d8c6ae;
+  --pm-info-soft: #3a2c1e;
+  --pm-star: #f7bf78;
+
+  --pm-shade-crop: rgba(0, 0, 0, 0.62);
+
+  /*
+   * Giay cua quyen so o che do toi van la giay, chi dam lai mot chut. Doi
+   * giay thanh mau toi thi anh dan len va net chu viet tay deu mat het.
+   */
+  --pm-ink: #2b2118;
+  --pm-paper-cream: #ecdfc6;
+  --pm-paper-kraft: #d7bf99;
+  --pm-paper-mark: rgba(90, 72, 48, 0.28);
+  --pm-paper-bloom: #edd9cc;
+  --pm-paper-petal: rgba(186, 138, 102, 0.38);
+  --pm-book-cover: #96491a;
+  --pm-book-edge: rgba(0, 0, 0, 0.4);
+
+  --pm-text: #f4e8da;
+  --pm-text-body: #ddcdb8;
+  --pm-text-muted: #b3a08a;
+  --pm-border: #3d3226;
+  --pm-border-strong: #87745c;
 
   --pm-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 10px 28px rgba(0, 0, 0, 0.3);
   --pm-shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.42);
@@ -96,13 +208,31 @@ html {
   @include pm-dark-tokens;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   height: 100%;
   margin: 0;
-  font-family: 'Be Vietnam Pro', Roboto, 'Helvetica Neue', sans-serif;
+  font-family: var(--pm-font);
   background: var(--pm-bg);
   color: var(--pm-text);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--pm-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
 }
 
 /* ---- Utility classes shared by every screen ---- */
@@ -112,6 +242,9 @@ body {
   border: 1px solid var(--pm-border);
   border-radius: var(--pm-radius);
   box-shadow: var(--pm-shadow);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
 }
 
 /** A card that reacts to the pointer, used for anything clickable in a grid. */
@@ -129,17 +262,35 @@ body {
   }
 }
 
+/**
+ * Tieu de chinh cua mot man hinh.
+ *
+ * Mot co chu duy nhat cho ca ba muoi man. Truoc day moi man tu chon mot co, tu
+ * muoi tam den bon muoi tam cham anh, nen nhin vao khong biet dau la ten man.
+ */
+/*
+ * Viet kem ten the o day la co y.
+ *
+ * Cac man hinh deu co san mot lop rieng cho tieu de kem co chu rieng. Neu o
+ * day cung chi viet mot lop thi hai ben ngang nhau va lop cua man hinh thang,
+ * vi no duoc nap sau. Viet kem ten the thi quy tac nay manh hon, nen ap duoc
+ * mot co chu duy nhat ma khong phai go bo khai bao trong ba muoi tep.
+ */
+h1.pm-page-title,
 .pm-page-title {
-  font-size: 1.6rem;
+  font-size: var(--pm-text-3xl);
   font-weight: 700;
   letter-spacing: -0.01em;
-  margin: 0 0 6px;
+  line-height: 1.2;
+  margin: 0 0 var(--pm-space-2);
 }
 
 .pm-page-description {
-  margin: 0 0 var(--pm-gap);
+  margin: 0;
+  max-width: 62ch;
   color: var(--pm-text-muted);
-  font-size: 0.925rem;
+  font-size: var(--pm-text-md);
+  line-height: 1.6;
 }
 
 /** Section heading with the small amber rule the design uses above a block. */
@@ -337,13 +488,66 @@ body {
   color: var(--pm-text-muted);
 }
 
-/** Page shell: one consistent maximum width and side gutter. */
+/**
+ * Khung trang dung chung.
+ *
+ * Moi man hinh phai boc noi dung trong mot trong ba be rong nay, de chuyen qua
+ * lai giua cac man thi noi dung khong nhay sang trai roi sang phai. Ba be rong
+ * la: chuan cho hau het man, rong cho man can be ngang, va hep cho man doc mot
+ * mach nhu phuc hoi anh.
+ */
 .pm-page {
   width: 100%;
-  max-width: 1180px;
+  max-width: var(--pm-frame);
   margin: 0 auto;
-  padding: 28px 16px 64px;
+  padding: var(--pm-frame-top) var(--pm-frame-gutter) 64px;
   box-sizing: border-box;
+}
+
+.pm-page-wide {
+  max-width: var(--pm-frame-wide);
+}
+
+.pm-page-narrow {
+  max-width: var(--pm-frame-narrow);
+}
+
+/**
+ * Dau trang dung chung.
+ *
+ * Gom mot dong chu nho phia tren, mot tieu de chinh, mot cau mo ta, va mot cho
+ * trong ben phai de dat nut thao tac. Dung chung mot khoi nay thi cac man hinh
+ * co cung mot nhip mo dau, thay vi moi man tu bay mot kieu.
+ */
+.pm-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--pm-space-6);
+}
+
+.pm-page-head-text {
+  min-width: 0;
+}
+
+/** Dong chu nho nam tren tieu de, viet hoa va thua chu. */
+.pm-page-eyebrow {
+  margin: 0 0 var(--pm-space-1);
+  color: var(--pm-accent);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/** Cho dat nut thao tac ben phai dau trang. */
+.pm-page-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-space-2);
+  align-items: center;
 }
 
 /** Hidden from sight but still read out and still reachable by keyboard. */
@@ -359,7 +563,52 @@ body {
   border: 0;
 }
 
-:focus-visible {
-  outline: 3px solid var(--pm-accent-ring);
-  outline-offset: 2px;
+
+/* ---- Hop thoai dung chung ---- */
+
+.pm-dialog .mat-mdc-dialog-surface {
+  border-radius: var(--pm-radius-lg);
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow-lifted);
+}
+
+/*
+ * Hop thoai rong.
+ *
+ * Mat dinh cua thu vien khoa be rong toi da cua khung hop thoai lai, nen mot
+ * bieu mau nhieu cot bi bop chat du da xin rong hon. Lop nay go cai khoa do
+ * ra, chi cho nhung hop thoai that su can.
+ */
+.pm-dialog-wide {
+  --mat-dialog-container-max-width: 100%;
+}
+
+/* ---- Modern scrollbar (Webkit) ---- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pm-border-strong);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pm-accent);
+}
+
+/* ---- Page transition animation ---- */
+@keyframes pm-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pm-page,
+.tw-page {
+  animation: pm-fade-in 220ms ease-out;
 }

@@ -1,0 +1,160 @@
+/* Tailwind CSS v4 — imported before styles.scss so base comes first */
+@import "tailwindcss";
+
+/* ---- Design tokens (CSS-variable based for automatic dark-mode support) ---- */
+@theme {
+  /* Brand palette — reference the CSS vars defined in styles.scss so dark mode flips automatically */
+  --color-accent:         var(--pm-accent);
+  --color-accent-dark:    var(--pm-accent-dark);
+  --color-accent-soft:    var(--pm-accent-soft);
+  --color-on-accent:      var(--pm-on-accent);
+  --color-danger:         var(--pm-danger);
+  --color-danger-soft:    var(--pm-danger-soft);
+  --color-success:        var(--pm-success);
+  --color-success-soft:   var(--pm-success-soft);
+  --color-memorial:       var(--pm-memorial);
+  --color-memorial-soft:  var(--pm-memorial-soft);
+  --color-amber:          var(--pm-amber);
+  --color-amber-soft:     var(--pm-amber-soft);
+  --color-star:           var(--pm-star);
+
+  /* Surface palette */
+  --color-surface:        var(--pm-bg);
+  --color-card:           var(--pm-bg-card);
+  --color-muted:          var(--pm-bg-muted);
+  --color-sunken:         var(--pm-bg-sunken);
+
+  /* Text palette */
+  --color-ink:            var(--pm-text);
+  --color-ink-muted:      var(--pm-text-muted);
+
+  /* Border palette */
+  --color-edge:           var(--pm-border);
+  --color-edge-strong:    var(--pm-border-strong);
+
+  /* Fonts */
+  --font-sans:   'Be Vietnam Pro', Roboto, 'Helvetica Neue', sans-serif;
+  --font-hand:   'Patrick Hand', 'Quicksand', 'Be Vietnam Pro', cursive;
+  --font-serif:  'Noto Serif', Georgia, serif;
+
+  /* Border-radius */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card:     0 1px 2px rgba(74,48,24,0.06), 0 10px 28px rgba(74,48,24,0.08);
+  --shadow-elevated: 0 2px 4px rgba(74,48,24,0.07), 0 18px 40px rgba(74,48,24,0.14);
+
+  /* Custom breakpoint matching the project's mobile threshold */
+  --breakpoint-nav:  900px;
+}
+
+/* ---- Global utility layer — project-wide helpers expressed as Tailwind components ---- */
+@layer components {
+  /* Card */
+  .tw-card {
+    @apply bg-card border border-edge rounded-md shadow-card;
+  }
+  .tw-card-interactive {
+    @apply tw-card transition-all duration-150 ease-out;
+    &:hover, &:focus-within {
+      @apply -translate-y-0.5 shadow-elevated border-edge-strong;
+    }
+  }
+
+  /* Buttons */
+  .tw-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+           rounded-full bg-accent text-on-accent font-semibold
+           border-none cursor-pointer no-underline
+           transition-all duration-150 ease-out
+           hover:bg-accent-dark hover:-translate-y-px
+           disabled:opacity-45 disabled:cursor-not-allowed disabled:translate-y-0;
+  }
+  .tw-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+           rounded-full bg-card text-ink font-semibold
+           border border-edge-strong cursor-pointer no-underline
+           transition-all duration-150 ease-out
+           hover:bg-accent-soft hover:border-accent
+           disabled:opacity-45 disabled:cursor-not-allowed;
+  }
+  .tw-btn-icon {
+    @apply inline-grid place-items-center w-10 h-10 p-0
+           rounded-full bg-transparent border border-transparent
+           text-ink cursor-pointer
+           transition-colors duration-150
+           hover:bg-accent-soft hover:text-accent-dark;
+  }
+  .tw-chip {
+    @apply inline-flex items-center gap-1.5 px-4 py-2
+           rounded-full bg-card text-ink font-medium text-sm
+           border border-edge-strong cursor-pointer no-underline
+           transition-all duration-150
+           hover:border-accent
+           aria-pressed-true:bg-accent aria-pressed-true:border-accent aria-pressed-true:text-on-accent
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* Page containers */
+  .tw-page {
+    @apply w-full max-w-[1180px] mx-auto px-6 pt-7 pb-16 box-border;
+  }
+  .tw-page-wide  { @apply max-w-[1320px]; }
+  .tw-page-narrow { @apply max-w-[760px]; }
+
+  /* Section heading */
+  .tw-section-title {
+    @apply flex items-center gap-2.5 text-[1.15rem] font-bold mb-4;
+    &::before {
+      content: '';
+      @apply block w-1 h-[1.1em] rounded-full bg-accent flex-shrink-0;
+    }
+  }
+
+  /* Modern form input */
+  .tw-input {
+    @apply w-full px-3.5 py-2.5 rounded-sm border border-edge-strong bg-muted text-ink text-sm
+           font-sans placeholder:text-ink-muted
+           transition-colors duration-150
+           hover:border-accent
+           focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1;
+  }
+
+  /* Eyebrow label */
+  .tw-eyebrow {
+    @apply text-xs font-bold tracking-[0.08em] uppercase text-accent;
+  }
+
+  /* Status badges */
+  .tw-badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .tw-badge-success { @apply bg-success-soft text-success; }
+  .tw-badge-danger  { @apply bg-danger-soft text-danger; }
+  .tw-badge-amber   { @apply bg-amber-soft text-amber; }
+  .tw-badge-muted   { @apply bg-muted text-ink-muted; }
+  .tw-badge-accent  { @apply bg-accent-soft text-accent-dark; }
+
+  /* Avatar */
+  .tw-avatar {
+    @apply grid place-items-center rounded-full bg-accent text-on-accent font-bold flex-shrink-0;
+  }
+
+  /* Divider */
+  .tw-divider {
+    @apply flex items-center gap-3 text-xs text-ink-muted;
+    &::before, &::after {
+      content: '';
+      @apply flex-1 h-px bg-edge;
+    }
+  }
+
+  /* Back link */
+  .tw-back {
+    @apply inline-flex items-center gap-1 mb-4 text-sm font-semibold text-ink-muted no-underline
+           transition-colors duration-150 hover:text-accent-dark;
+  }
+}

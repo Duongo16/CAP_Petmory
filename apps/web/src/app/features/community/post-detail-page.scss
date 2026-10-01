@@ -4,11 +4,12 @@
 
 .back-link {
   display: inline-block;
-  margin-bottom: 14px;
+  margin-bottom: var(--pm-space-3);
   color: var(--pm-text-muted);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: var(--pm-text-md);
   font-weight: 600;
+  transition: color 130ms ease;
 
   &:hover {
     color: var(--pm-accent-dark);
@@ -23,7 +24,7 @@
 }
 
 .main-column {
-  padding: 22px;
+  padding: var(--pm-space-5);
   min-width: 0;
 }
 
@@ -36,7 +37,7 @@
 }
 
 .side-card {
-  padding: 18px;
+  padding: var(--pm-space-4);
 }
 
 /* ---- Author ---- */
@@ -44,7 +45,7 @@
 .author {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--pm-space-2);
   text-decoration: none;
   color: inherit;
 }
@@ -63,7 +64,7 @@
   &.sm {
     width: 32px;
     height: 32px;
-    font-size: 0.82rem;
+    font-size: var(--pm-text-sm);
   }
 }
 
@@ -78,19 +79,18 @@
 }
 
 .post-meta {
-  font-size: 0.78rem;
+  font-size: var(--pm-text-xs);
   color: var(--pm-text-muted);
 }
 
 .follow {
-  margin-top: 12px;
+  margin-top: var(--pm-space-3);
 }
 
 /* ---- Post body ---- */
 
 .post-title {
-  margin: 16px 0 10px;
-  font-size: 1.45rem;
+  margin: var(--pm-space-4) 0 var(--pm-space-2);
   font-weight: 800;
   letter-spacing: -0.01em;
 }
@@ -104,7 +104,7 @@
 
 .gallery {
   position: relative;
-  margin: 18px 0 0;
+  margin: var(--pm-space-4) 0 0;
 
   img {
     width: 100%;
@@ -126,10 +126,18 @@
   border-radius: 999px;
   background: var(--pm-bg-card);
   color: var(--pm-text);
-  font-size: 1.3rem;
+  font-size: var(--pm-text-xl);
   cursor: pointer;
   box-shadow: var(--pm-shadow);
   transform: translate3d(0, -50%, 0);
+  transition:
+    background 130ms ease,
+    box-shadow 130ms ease;
+
+  &:hover {
+    background: var(--pm-accent-soft);
+    box-shadow: var(--pm-shadow-lifted);
+  }
 
   &.prev {
     left: 12px;
@@ -144,17 +152,17 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  padding: 4px 11px;
+  padding: var(--pm-space-1) var(--pm-space-3);
   border-radius: 999px;
   background: var(--pm-bg-card);
-  font-size: 0.75rem;
+  font-size: var(--pm-text-xs);
   font-weight: 700;
 }
 
 .thumbs {
   display: flex;
-  gap: 8px;
-  margin: 10px 0 0;
+  gap: var(--pm-space-2);
+  margin: var(--pm-space-2) 0 0;
   padding: 0;
   list-style: none;
 
@@ -182,33 +190,33 @@
 .tag-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 14px 0 0;
+  gap: var(--pm-space-1);
+  margin: var(--pm-space-3) 0 0;
   padding: 0;
   list-style: none;
-  font-size: 0.75rem;
+  font-size: var(--pm-text-xs);
 }
 
 .post-foot {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 14px;
+  gap: var(--pm-space-2);
+  margin-top: var(--pm-space-4);
+  padding-top: var(--pm-space-3);
   border-top: 1px solid var(--pm-border);
 }
 
 .react {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 13px;
+  gap: var(--pm-space-1);
+  padding: var(--pm-space-2) var(--pm-space-3);
   border: none;
   border-radius: 999px;
   background: transparent;
   color: var(--pm-text-muted);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: var(--pm-text-md);
   font-weight: 600;
   cursor: pointer;
 
@@ -230,26 +238,26 @@
 /* ---- Comments ---- */
 
 .comments {
-  margin-top: 26px;
-  padding-top: 18px;
+  margin-top: var(--pm-space-6);
+  padding-top: var(--pm-space-4);
   border-top: 1px solid var(--pm-border);
 }
 
 .comment-form {
   display: flex;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: var(--pm-space-2);
+  margin-bottom: var(--pm-space-4);
 
   input {
     flex: 1 1 auto;
     min-width: 0;
-    padding: 11px 16px;
+    padding: var(--pm-space-3) var(--pm-space-4);
     border: 1px solid var(--pm-border-strong);
     border-radius: 999px;
     background: var(--pm-bg-muted);
     color: var(--pm-text);
     font: inherit;
-    font-size: 0.9rem;
+    font-size: var(--pm-text-md);
 
     &:focus {
       border-color: var(--pm-accent);
@@ -262,34 +270,34 @@
 .comment-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--pm-space-4);
   margin: 0;
   padding: 0;
   list-style: none;
 
   li {
     display: flex;
-    gap: 10px;
+    gap: var(--pm-space-2);
   }
 }
 
 .comment-head {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin: 0 0 3px;
-  font-size: 0.8rem;
+  gap: var(--pm-space-2);
+  margin: 0 0 var(--pm-space-1);
+  font-size: var(--pm-text-sm);
   color: var(--pm-text-muted);
 
   strong {
     color: var(--pm-text);
-    font-size: 0.9rem;
+    font-size: var(--pm-text-md);
   }
 }
 
 .comment-text {
   margin: 0;
-  font-size: 0.925rem;
+  font-size: var(--pm-text-md);
   line-height: 1.5;
 }
 
@@ -298,9 +306,9 @@
 .info-list {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 8px 14px;
+  gap: var(--pm-space-2) var(--pm-space-3);
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--pm-text-md);
 
   dt {
     color: var(--pm-text-muted);
@@ -316,7 +324,7 @@
 .related-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--pm-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -324,9 +332,14 @@
   a {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--pm-space-2);
     text-decoration: none;
     color: inherit;
+    transition: color 130ms ease;
+
+    &:hover {
+      color: var(--pm-accent);
+    }
   }
 
   img,
@@ -348,13 +361,13 @@
 .related-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--pm-space-1);
   min-width: 0;
-  font-size: 0.78rem;
+  font-size: var(--pm-text-xs);
   color: var(--pm-text-muted);
 
   strong {
-    font-size: 0.875rem;
+    font-size: var(--pm-text-md);
     color: var(--pm-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -369,5 +382,76 @@
 
   .side-column {
     position: static;
+  }
+}
+
+/* ---- Bo sung theo thiet ke ---- */
+
+.meta-dot {
+  color: var(--pm-border-strong);
+}
+
+.topic-chip {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: var(--pm-space-1) var(--pm-space-3);
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent);
+  font-size: var(--pm-text-sm);
+  font-weight: 500;
+}
+
+.post-title {
+  margin: var(--pm-space-2) 0 0;
+  font-family: var(--pm-font-display);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--pm-text);
+}
+
+.post-text {
+  font-size: var(--pm-text-lg);
+  line-height: 1.7;
+  color: var(--pm-text-body);
+}
+
+/* Loi moi bien mot khoanh khac thanh ky vat that. */
+.turn-into {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pm-space-3);
+  flex-wrap: wrap;
+  margin-block-start: 14px;
+  padding: var(--pm-space-3) var(--pm-space-4);
+  border-radius: var(--pm-radius);
+  background: var(--pm-bg-muted);
+}
+
+.turn-text {
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text);
+}
+
+.turn-go {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pm-space-1);
+  padding: var(--pm-space-2) var(--pm-space-4);
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background 130ms ease,
+    transform 130ms ease;
+
+  &:hover {
+    background: var(--pm-accent-dark);
+    transform: translateY(-1px);
   }
 }

@@ -1,5 +1,5 @@
 <div class="pm-page">
-  <a class="back-link" routerLink="/community">← {{ 'COMMUNITY.POST.BACK' | translate }}</a>
+  <a class="inline-block mb-3 text-ink-muted no-underline font-semibold text-base transition-colors duration-150 hover:text-accent-dark" routerLink="/community">← {{ 'COMMUNITY.POST.BACK' | translate }}</a>
 
   @switch (status()) {
     @case ('LOADING') {
@@ -15,20 +15,22 @@
     }
     @default {
       @if (profile(); as p) {
-        <header class="cover pm-card">
-          <div class="cover-art"><pm-icon name="paw" [size]="40" /></div>
-          <div class="identity">
+        <header class="pm-card relative px-6 pb-5 mb-[var(--pm-gap)] overflow-hidden">
+          <div class="cover-art grid place-items-center h-[130px] -mx-6 text-accent">
+            <pm-icon name="paw" [size]="40" />
+          </div>
+          <div class="flex items-center gap-3 -mt-7">
             @if (p.avatarUrl) {
-              <img class="avatar avatar-img" [src]="p.avatarUrl" alt="" />
+              <img class="w-[72px] h-[72px] flex-shrink-0 border-[3px] border-card rounded-full object-cover bg-muted" [src]="p.avatarUrl" alt="" />
             } @else {
-              <span class="avatar" aria-hidden="true">{{ p.initial }}</span>
+              <span class="grid place-items-center w-[72px] h-[72px] flex-shrink-0 border-[3px] border-card rounded-full bg-accent text-on-accent text-[1.6rem] font-bold" aria-hidden="true">{{ p.initial }}</span>
             }
-            <div class="identity-text">
-              <p class="role">{{ 'COMMUNITY.PROFILE.ROLE' | translate }}</p>
-              <h1 class="pm-page-title">{{ p.fullName }}</h1>
-              <p class="handle">{{ p.handle }}</p>
+            <div class="flex-1 min-w-0">
+              <p class="inline-flex self-start m-0 mb-1 px-2 py-1 rounded-full bg-accent-soft text-accent text-xs font-bold tracking-[0.06em]">{{ 'COMMUNITY.PROFILE.ROLE' | translate }}</p>
+              <h1 class="m-0 font-extrabold pm-page-title">{{ p.fullName }}</h1>
+              <p class="mt-1 m-0 text-base text-ink-muted">{{ p.handle }}</p>
               @if (p.phone) {
-                <p class="handle">{{ p.phone }}</p>
+                <p class="mt-1 m-0 text-base text-ink-muted">{{ p.phone }}</p>
               }
             </div>
             @if (p.mine) {
@@ -50,49 +52,49 @@
             }
           </div>
 
-          <dl class="stats">
-            <div>
-              <dt>{{ 'COMMUNITY.PROFILE.POSTS' | translate }}</dt>
-              <dd>{{ p.postCount }}</dd>
+          <dl class="flex gap-7 mt-4">
+            <div class="flex flex-col-reverse items-center gap-1">
+              <dt class="text-xs text-ink-muted">{{ 'COMMUNITY.PROFILE.POSTS' | translate }}</dt>
+              <dd class="m-0 text-xl font-bold text-ink">{{ p.postCount }}</dd>
             </div>
-            <div>
-              <dt>{{ 'COMMUNITY.PROFILE.FOLLOWERS' | translate }}</dt>
-              <dd>{{ p.followerCount }}</dd>
+            <div class="flex flex-col-reverse items-center gap-1">
+              <dt class="text-xs text-ink-muted">{{ 'COMMUNITY.PROFILE.FOLLOWERS' | translate }}</dt>
+              <dd class="m-0 text-xl font-bold text-ink">{{ p.followerCount }}</dd>
             </div>
-            <div>
-              <dt>{{ 'COMMUNITY.PROFILE.FOLLOWING' | translate }}</dt>
-              <dd>{{ p.followingCount }}</dd>
+            <div class="flex flex-col-reverse items-center gap-1">
+              <dt class="text-xs text-ink-muted">{{ 'COMMUNITY.PROFILE.FOLLOWING' | translate }}</dt>
+              <dd class="m-0 text-xl font-bold text-ink">{{ p.followingCount }}</dd>
             </div>
           </dl>
         </header>
 
         @if (p.mine && editMode()) {
-          <section class="edit-card pm-card">
-            <h2 class="edit-title">{{ 'COMMUNITY.PROFILE.EDIT_TITLE' | translate }}</h2>
+          <section class="pm-card p-5 mb-[var(--pm-gap)]">
+            <h2 class="m-0 mb-4 text-lg font-bold text-ink">{{ 'COMMUNITY.PROFILE.EDIT_TITLE' | translate }}</h2>
             <form [formGroup]="editForm" (ngSubmit)="saveProfile()">
-              <div class="field">
-                <label class="field-name" for="profile-name">
+              <div class="flex flex-col gap-1 mb-3">
+                <label class="text-sm font-semibold text-ink-muted" for="profile-name">
                   {{ 'COMMUNITY.PROFILE.FULL_NAME' | translate }}
                 </label>
-                <input id="profile-name" type="text" formControlName="fullName" />
+                <input class="px-3 py-2 border border-edge-strong rounded-sm bg-muted text-ink font-sans text-base focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1" id="profile-name" type="text" formControlName="fullName" />
               </div>
-              <div class="field">
-                <label class="field-name" for="profile-phone">
+              <div class="flex flex-col gap-1 mb-3">
+                <label class="text-sm font-semibold text-ink-muted" for="profile-phone">
                   {{ 'COMMUNITY.PROFILE.PHONE' | translate }}
                 </label>
-                <input id="profile-phone" type="tel" formControlName="phone" />
+                <input class="px-3 py-2 border border-edge-strong rounded-sm bg-muted text-ink font-sans text-base focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1" id="profile-phone" type="tel" formControlName="phone" />
               </div>
-              <div class="field">
-                <label class="field-name" for="profile-avatar">
+              <div class="flex flex-col gap-1 mb-3">
+                <label class="text-sm font-semibold text-ink-muted" for="profile-avatar">
                   {{ 'COMMUNITY.PROFILE.AVATAR_URL' | translate }}
                 </label>
-                <input id="profile-avatar" type="url" formControlName="avatarUrl" />
+                <input class="px-3 py-2 border border-edge-strong rounded-sm bg-muted text-ink font-sans text-base focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1" id="profile-avatar" type="url" formControlName="avatarUrl" />
               </div>
-              <div class="edit-actions">
-                <button type="button" class="plain" (click)="cancelEdit()">
+              <div class="flex justify-end gap-3 mt-4">
+                <button type="button" class="px-4 py-2 border-0 bg-transparent text-ink-muted font-sans text-sm font-semibold cursor-pointer transition-colors duration-150 hover:text-ink" (click)="cancelEdit()">
                   {{ 'COMMON.CANCEL' | translate }}
                 </button>
-                <button type="submit" class="strong" [disabled]="editForm.invalid || saving()">
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded-sm border-0 bg-accent text-on-accent font-sans text-sm font-semibold cursor-pointer transition-colors duration-150 hover:bg-accent-dark disabled:opacity-60 disabled:cursor-not-allowed" [disabled]="editForm.invalid || saving()">
                   {{ 'COMMUNITY.PROFILE.SAVE' | translate }}
                   <pm-icon name="check" [size]="15" />
                 </button>
@@ -101,25 +103,25 @@
           </section>
         }
 
-        <div class="layout">
-          <section class="posts">
+        <div class="grid grid-cols-[minmax(0,1fr)_280px] gap-[var(--pm-gap)] items-start max-nav:grid-cols-1">
+          <section>
             <h2 class="pm-section-title">{{ 'COMMUNITY.PROFILE.POSTS' | translate }}</h2>
             @if (empty()) {
               <p class="pm-empty">{{ 'COMMUNITY.PROFILE.NO_POST' | translate }}</p>
             } @else {
-              <ul class="post-list">
+              <ul class="flex flex-col gap-3 m-0 p-0 list-none">
                 @for (card of cards(); track card.raw.id) {
                   <li class="pm-card pm-card-interactive">
-                    <a [routerLink]="['/community/posts', card.raw.id]">
+                    <a class="flex items-center gap-3 p-3 no-underline text-inherit" [routerLink]="['/community/posts', card.raw.id]">
                       @if (card.cover) {
-                        <img [src]="card.cover" alt="" />
+                        <img class="w-[84px] h-[84px] flex-shrink-0 rounded-sm object-cover bg-muted" [src]="card.cover" alt="" />
                       }
-                      <div class="post-text">
+                      <div class="flex flex-col items-start gap-1 min-w-0">
                         <span class="pm-status" data-tone="accent">
                           {{ card.topicKey | translate }}
                         </span>
-                        <strong>{{ card.raw.title }}</strong>
-                        <span class="post-meta">
+                        <strong class="text-base text-ink">{{ card.raw.title }}</strong>
+                        <span class="text-xs text-ink-muted">
                           {{ card.raw.createdAt | date: 'dd/MM/yyyy' }} ·
                           {{ card.raw.likeCount }} · {{ card.raw.commentCount }}
                         </span>
@@ -131,20 +133,20 @@
             }
           </section>
 
-          <aside class="side-column">
-            <section class="pm-card side-card">
+          <aside class="flex flex-col gap-[var(--pm-gap)]">
+            <section class="pm-card p-4">
               <h2 class="pm-section-title">
                 {{ 'COMMUNITY.PROFILE.PETS' | translate: { count: p.pets.length } }}
               </h2>
               @if (p.pets.length === 0) {
                 <p class="pm-empty">{{ 'COMMON.NO_DATA' | translate }}</p>
               } @else {
-                <ul class="pet-list">
+                <ul class="flex flex-col gap-3 m-0 p-0 list-none">
                   @for (pet of p.pets; track pet.id) {
-                    <li>
-                      <span class="pet-avatar"><pm-icon name="paw" [size]="19" /></span>
-                      <span class="pet-text">
-                        <strong>{{ pet.name }}</strong>
+                    <li class="flex items-center gap-2">
+                      <span class="grid place-items-center w-[42px] h-[42px] rounded-full bg-muted text-ink"><pm-icon name="paw" [size]="19" /></span>
+                      <span class="flex flex-col text-xs text-ink-muted">
+                        <strong class="text-base text-ink">{{ pet.name }}</strong>
                         <span>{{ pet.kind }} {{ pet.breed }}</span>
                       </span>
                     </li>

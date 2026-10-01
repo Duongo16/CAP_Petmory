@@ -1,0 +1,148 @@
+<form class="sheet" (ngSubmit)="submit()">
+  <header class="sheet-head">
+    <div>
+      <p class="eyebrow">{{ 'COMMUNITY.TITLE' | translate }}</p>
+      <h2 class="sheet-title">{{ 'COMMUNITY.COMPOSER.PROMPT' | translate }}</h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="sheet-body">
+    <div class="field">
+      <label class="field-name" for="draft-topic">{{ 'COMMUNITY.COMPOSER.TOPIC_LABEL' | translate }}</label>
+      <select
+        id="draft-topic"
+        name="topic"
+        [ngModel]="topic()"
+        (ngModelChange)="topic.set($event)"
+      >
+        @for (option of topicOptions; track option.topic) {
+          <option [value]="option.topic">{{ option.key | translate }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="draft-title">{{ 'COMMUNITY.COMPOSER.TITLE_LABEL' | translate }}</label>
+      <input
+        id="draft-title"
+        name="title"
+        maxlength="200"
+        [ngModel]="title()"
+        (ngModelChange)="title.set($event)"
+      />
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="draft-content">{{ 'COMMUNITY.COMPOSER.CONTENT_LABEL' | translate }}</label>
+      <textarea
+        id="draft-content"
+        name="content"
+        rows="7"
+        maxlength="5000"
+        [ngModel]="content()"
+        (ngModelChange)="content.set($event)"
+      ></textarea>
+      <button type="button" class="link-button" (click)="useTemplate()">
+        {{ 'COMMUNITY.COMPOSER.TEMPLATE' | translate }}
+      </button>
+      <p class="field-note">{{ 'COMMUNITY.COMPOSER.TEMPLATE_HINT' | translate }}</p>
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="draft-tag">{{ 'COMMUNITY.COMPOSER.TAGS_LABEL' | translate }}</label>
+      <div class="tag-row">
+        @for (tag of tags(); track tag) {
+          <button type="button" class="pm-chip is-selected" (click)="removeTag(tag)">
+            {{ tag }} <span aria-hidden="true">×</span>
+          </button>
+        }
+        <input
+          id="draft-tag"
+          name="tag"
+          [placeholder]="'COMMUNITY.COMPOSER.TAG_PLACEHOLDER' | translate"
+          [ngModel]="tagInput()"
+          (ngModelChange)="tagInput.set($event)"
+          (keydown.enter)="$event.preventDefault(); addTag()"
+        />
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="upload-head">
+        <span class="field-name">{{ 'COMMUNITY.COMPOSER.PHOTO' | translate }}</span>
+        <span class="upload-count">{{ photoCount() }}/{{ photoMax }}</span>
+      </div>
+      <label class="upload" for="draft-photo">
+        <pm-icon name="image" [size]="19" />
+        <span>{{ 'COMMUNITY.COMPOSER.UPLOAD_HINT' | translate }}</span>
+      </label>
+      <input
+        id="draft-photo"
+        class="sr-only"
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        multiple
+        (change)="chooseFile($event)"
+      />
+
+      <pm-image-link
+        boxId="draft-photo-link"
+        [disabled]="photoFull()"
+        (picked)="addLink($event)"
+      />
+
+      @if (photoError(); as message) {
+        <p class="field-error">{{ message | translate }}</p>
+      }
+
+      @if (photoLink().length > 0) {
+        <ul class="upload-list">
+          @for (one of photoLink(); track one; let i = $index) {
+            <li>
+              <span class="upload-name">{{ one }}</span>
+              <button
+                type="button"
+                class="upload-drop"
+                (click)="dropLink(i)"
+                [attr.aria-label]="'COMMON.REMOVE' | translate"
+              >
+                <pm-icon name="close" [size]="13" />
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (photo().length > 0) {
+        <ul class="upload-list">
+          @for (one of photo(); track one.name + one.size; let i = $index) {
+            <li>
+              <span class="upload-name">{{ one.name }}</span>
+              <button
+                type="button"
+                class="upload-drop"
+                (click)="dropPhoto(i)"
+                [attr.aria-label]="'COMMON.REMOVE' | translate"
+              >
+                <pm-icon name="close" [size]="13" />
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+  <footer class="sheet-foot">
+    <button type="button" class="plain" (click)="close()">
+      {{ 'COMMUNITY.COMPOSER.CANCEL' | translate }}
+    </button>
+    <button type="submit" class="strong" id="draft-submit" [disabled]="!canSubmit()">
+      {{ 'COMMUNITY.COMPOSER.SUBMIT' | translate }}
+      <pm-icon name="check" [size]="15" />
+    </button>
+  </footer>
+</form>
