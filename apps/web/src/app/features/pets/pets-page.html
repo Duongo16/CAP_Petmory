@@ -41,57 +41,49 @@
     @case ('HAS_DATA') {
       <ul class="grid grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))] gap-4 m-0 p-0 list-none">
         @for (pet of list(); track pet._id) {
-          <li class="pet-card tw-card-interactive flex flex-col gap-4 p-5"
-            [class.memorial]="pet.status === 'PASSED_AWAY'">
-            <div class="flex items-start gap-3">
-              <span class="grid place-items-center flex-none w-14 h-14 rounded-[18px] border-2 border-accent-soft overflow-hidden" aria-hidden="true">
-                <pm-pet-face [petId]="pet._id" [avatarUrl]="pet.avatarUrl" [kind]="pet.kind" [name]="pet.name" [size]="52" />
+          <li class="pet-card" [class.memorial]="pet.status === 'PASSED_AWAY'">
+            <button type="button" class="pet-open pet-photo" (click)="show(pet)" [attr.aria-label]="'PET.VIEW_PROFILE' | translate">
+              <pm-pet-face [petId]="pet._id" [avatarUrl]="pet.avatarUrl" [kind]="pet.kind" [name]="pet.name" [size]="280" [fill]="true" />
+              <span class="pet-scrim" aria-hidden="true"></span>
+              <span class="pet-view" aria-hidden="true">
+                <pm-icon name="eye" [size]="14" />
+                {{ 'PET.VIEW_PROFILE' | translate }}
               </span>
-              <div class="flex-1 min-w-0">
-                <h2 class="m-0 text-base font-bold text-ink truncate">{{ pet.name }}</h2>
-                <p class="m-0 mt-0.5 text-[13px] text-ink-muted">{{ labelKind(pet) | translate }}@if (pet.breed) { · {{ pet.breed }} }</p>
-              </div>
-              <span class="tw-badge"
-                [class.tw-badge-success]="pet.status !== 'PASSED_AWAY'"
-                [class.tw-badge-memorial]="pet.status === 'PASSED_AWAY'">
-                {{ labelStatus(pet) | translate }}
-              </span>
+            </button>
+
+            <span class="pet-status tw-badge"
+              [class.tw-badge-success]="pet.status !== 'PASSED_AWAY'"
+              [class.tw-badge-memorial]="pet.status === 'PASSED_AWAY'">
+              {{ labelStatus(pet) | translate }}
+            </span>
+
+            <div class="pet-deeds">
+              <a class="deed" [routerLink]="['/pets', pet._id, 'journal']" [queryParams]="{ view: 'photos' }"
+                [attr.aria-label]="'PET.MANAGE_PHOTOS' | translate" [attr.title]="'PET.MANAGE_PHOTOS' | translate">
+                <pm-icon name="image" [size]="15" />
+              </a>
+              <button type="button" class="deed" (click)="edit(pet)"
+                [attr.aria-label]="'COMMON.EDIT' | translate" [attr.title]="'COMMON.EDIT' | translate">
+                <pm-icon name="pencil" [size]="15" />
+              </button>
+              <button type="button" class="deed deed-danger" (click)="hide(pet)"
+                [attr.aria-label]="'COMMON.REMOVE' | translate" [attr.title]="'COMMON.REMOVE' | translate">
+                <pm-icon name="trash" [size]="15" />
+              </button>
             </div>
 
-            <dl class="flex flex-wrap gap-x-6 gap-y-2 m-0 pt-4 border-t border-edge-soft">
-              <div>
-                <dt class="text-[11px] font-bold tracking-[0.06em] text-ink-muted uppercase">{{ 'PET.GENDER_LABEL' | translate }}</dt>
-                <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ labelGender(pet) | translate }}</dd>
-              </div>
-              @if (pet.birthDate) {
-                <div>
-                  <dt class="text-[11px] font-bold tracking-[0.06em] text-ink-muted uppercase">{{ 'PET.BIRTH_DATE' | translate }}</dt>
-                  <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ pet.birthDate | date: 'dd/MM/yyyy' }}</dd>
-                </div>
-              }
-              @if (pet.passedAwayDate) {
-                <div>
-                  <dt class="text-[11px] font-bold tracking-[0.06em] text-ink-muted uppercase">{{ 'PET.PASSED_DATE' | translate }}</dt>
-                  <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ pet.passedAwayDate | date: 'dd/MM/yyyy' }}</dd>
-                </div>
-              }
-            </dl>
-
-            <div class="pet-deeds flex gap-2 flex-wrap mt-auto">
-              <button type="button" class="pet-open tw-btn-primary tw-btn-sm" (click)="show(pet)">
-                <pm-icon name="eye" [size]="15" />
-                {{ 'PET.VIEW_PROFILE' | translate }}
-              </button>
-              <a class="tw-btn-secondary tw-btn-sm" [routerLink]="['/pets', pet._id, 'journal']" [queryParams]="{ view: 'photos' }">
-                <pm-icon name="image" [size]="15" />
-                {{ 'PET.MANAGE_PHOTOS' | translate }}
-              </a>
-              <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="edit(pet)">
-                {{ 'COMMON.EDIT' | translate }}
-              </button>
-              <button type="button" class="tw-btn-ghost tw-btn-sm text-danger ml-auto" (click)="hide(pet)">
-                {{ 'COMMON.REMOVE' | translate }}
-              </button>
+            <div class="pet-body">
+              <h2 class="pet-name">{{ pet.name }}</h2>
+              <p class="pet-kind">{{ labelKind(pet) | translate }}@if (pet.breed) { · {{ pet.breed }} }</p>
+              <p class="pet-facts">
+                <span>{{ labelGender(pet) | translate }}</span>
+                @if (pet.birthDate) {
+                  <span><pm-icon name="calendar" [size]="13" /> {{ pet.birthDate | date: 'dd/MM/yyyy' }}</span>
+                }
+                @if (pet.passedAwayDate) {
+                  <span><pm-icon name="candle" [size]="13" /> {{ pet.passedAwayDate | date: 'dd/MM/yyyy' }}</span>
+                }
+              </p>
             </div>
           </li>
         }

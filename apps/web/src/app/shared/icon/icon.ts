@@ -38,6 +38,7 @@ const PATHS: Record<string, string> = {
   camera: 'M4 8h3l2-3h6l2 3h3v11H4V8Zm8 8.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z',
   calendar: 'M4 5h16v15H4V5Zm0 5h16M9 3v4m6-4v4',
   users: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 9a6 6 0 0 1 12 0m1-15a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 6',
+  pencil: 'M4 20h4L19 9l-4-4L4 16v4Zm9-13 4 4',
   lock: 'M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z',
   eye: 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
   bell: 'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Zm4 4a2 2 0 0 0 4 0',

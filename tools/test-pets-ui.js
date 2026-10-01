@@ -179,7 +179,7 @@ async function makePhoto(tint) {
   await page.waitForTimeout(1200);
 
   // --- Editing reopens the same form, filled in ---
-  await page.locator('.pet-deeds button', { hasText: 'Sửa' }).first().click();
+  await page.locator('.pet-deeds [aria-label="Sửa"]').first().click();
   await page.waitForSelector('.sheet', { timeout: 15000 });
   ok('Bam sua thi mo lai dung hop thoai do', await page.locator('.sheet').isVisible());
   ok('Ten da duoc dien san',
