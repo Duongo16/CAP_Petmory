@@ -48,7 +48,7 @@ async function makePhoto() {
 
 (async () => {
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 1000 }, acceptDownloads: true });
   const broken = [];
   page.on('pageerror', (e) => broken.push(String(e)));
 
@@ -61,7 +61,7 @@ async function makePhoto() {
   await settle(page);
   await page.fill('#login-email', EMAIL);
   await page.fill('#login-password', 'Password@123');
-  await page.click('.submit');
+  await page.click('button[type=submit]');
   await page.waitForURL('**/home', { timeout: 30000 });
 
   await page.request.post(`${API}/pets`, {
@@ -80,44 +80,42 @@ async function makePhoto() {
   fs.writeFileSync(file, await makePhoto());
   await page.setInputFiles('#restore-file', file);
 
-  await page.waitForSelector('.sheet', { timeout: 60000 });
-  ok('Hop thoai so sanh tu mo ra', await page.locator('.sheet').isVisible());
+  await page.waitForSelector('.preview img', { timeout: 15000 });
+  ok('Anh vua chon hien xem truoc', await page.locator('.preview img').isVisible());
+  await page.locator('.preview-drop').click();
+  await page.waitForSelector('label.drop', { timeout: 5000 });
+  ok('Bo anh chon nham thi quay ve buoc dau', await page.locator('label.drop').isVisible());
+
+  await page.setInputFiles('#restore-file', file);
+  await page.waitForSelector('#restore-run', { timeout: 15000 });
+  await page.click('#restore-run');
+  await page.waitForSelector('.stage .shot-after', { timeout: 60000 });
+  await page.waitForTimeout(600);
   ok('Co thanh truot chia doi', await page.locator('#split-range').count() === 1);
   ok('Co ca anh truoc va anh sau', (await page.locator('.stage img').count()) === 2);
 
-  const numbers = await page.locator('.tile dd').allInnerTexts();
+  const numbers = await page.locator('.facts dd').allInnerTexts();
   ok('Ba so do deu co gia tri that', numbers.length === 3 && numbers.every((t) => t.trim() && !t.includes('undefined')),
     numbers.join(' | '));
 
-  const link = page.locator('a.plain');
+  const link = page.locator('#restore-download');
   ok('Nut tai ve la mot lien ket that co thuoc tinh tai xuong',
-    (await link.count()) === 1 && (await link.first().getAttribute('download') ?? '').endsWith('.png'),
-    await link.first().getAttribute('download') ?? 'khong co');
+    (await link.count()) === 1 && (await link.getAttribute('download') ?? '').endsWith('.png'),
+    await link.getAttribute('download') ?? 'khong co');
+  const [saved] = await Promise.all([page.waitForEvent('download'), link.click()]);
+  ok('Tai ve duoc ban phuc hoi', saved.suggestedFilename().endsWith('-phuc-hoi.png'), saved.suggestedFilename());
 
   await page.screenshot({ path: path.join(OUT, 'restore-2-compare.png') });
 
-  await page.locator('.modes button').nth(1).click();
-  await page.waitForTimeout(400);
-  ok('Doi sang kieu dat canh nhau', (await page.locator('.pair figure').count()) === 2);
-
-  await page.locator('.modes button').first().click();
-  await page.waitForTimeout(300);
   const before = await page.locator('.shot-after').evaluate((el) => getComputedStyle(el).clipPath);
   await page.locator('#split-range').fill('20');
   await page.waitForTimeout(300);
   const after = await page.locator('.shot-after').evaluate((el) => getComputedStyle(el).clipPath);
   ok('Keo thanh truot lam anh cat lai that su', before !== after, `${before} -> ${after}`);
 
-  const pick = page.locator('#attach-pet');
-  const petCount = await pick.locator('option').count();
-  ok('Hop chon ho so co du lieu', petCount >= 1, `${petCount} lua chon`);
-
-  await page.locator('.shut').click();
-  await page.waitForTimeout(600);
-  ok('Dong hop thoai duoc', (await page.locator('.sheet').count()) === 0);
-  ok('Anh vua phuc hoi nam trong danh sach chua gan',
-    (await page.locator('.kept-item').count()) >= 1);
-  await page.screenshot({ path: path.join(OUT, 'restore-3-list.png'), fullPage: true });
+  await page.locator('.actions button').click();
+  await page.waitForSelector('label.drop', { timeout: 5000 });
+  ok('Phuc hoi anh khac thi quay ve buoc dau', await page.locator('label.drop').isVisible());
 
   ok('Khong co loi nao trong trang', broken.length === 0, broken.slice(0, 2).join(' | '));
 

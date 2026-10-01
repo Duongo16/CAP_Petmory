@@ -1,22 +1,27 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { TranslatePipe } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
-import { Pet, PetPhoto, RestoreOperation } from '../../core/models/api.model';
-import { PetsService } from '../../core/services/pets.service';
-import { PhotosService } from '../../core/services/photos.service';
+import { PhotoRestoreService } from '../../core/services/photo-restore.service';
 import { Icon } from '../../shared/icon/icon';
-import { CompareDialog, CompareInput, CompareResult } from './compare-dialog';
 
-/** What is applied to every picture sent here. */
-const OPERATIONS: RestoreOperation[] = ['UPSCALE', 'SHARPEN', 'DENOISE', 'EXPOSURE'];
-
-/** The largest file worth sending, matching what the server will accept. */
+/** Tep lon nhat duoc gui, khop voi gioi han phia may chu. */
 const SIZE_MAX_MB = 25;
 
 const ACCEPTED = ['image/png', 'image/jpeg'];
 
+/** Kich thuoc that cua mot tam anh, doc khi anh tai xong. */
+interface Size {
+  width: number;
+  height: number;
+}
+
+/**
+ * Phuc hoi anh, mot cong cu dung rieng.
+ *
+ * Nguoi dung chon mot tam anh, xem truoc, bam phuc hoi, so sanh truoc sau roi
+ * tai ban moi ve may. Khong co buoc nao cham toi ho so hay album thu cung.
+ */
 @Component({
   selector: 'pm-restore-page',
   standalone: true,
@@ -25,44 +30,40 @@ const ACCEPTED = ['image/png', 'image/jpeg'];
   styleUrl: './restore-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RestorePage implements OnInit {
-  private readonly photos = inject(PhotosService);
-  private readonly pets = inject(PetsService);
-  private readonly dialog = inject(MatDialog);
+export class RestorePage {
+  private readonly restorer = inject(PhotoRestoreService);
   private readonly destroyRef = inject(DestroyRef);
 
+  readonly chosen = signal<File | null>(null);
+  readonly beforeUrl = signal<string | null>(null);
+  readonly afterUrl = signal<string | null>(null);
+  readonly resemblance = signal<number | null>(null);
   readonly working = signal(false);
   readonly error = signal<string | null>(null);
-  readonly done = signal<string | null>(null);
-
-  /** Restored pictures not yet attached to any pet. */
-  readonly loose = signal<PetPhoto[]>([]);
-  readonly petList = signal<Pet[]>([]);
-
-  /** True while a file is being dragged over the drop area. */
   readonly hovering = signal(false);
 
-  ngOnInit(): void {
-    this.reload();
-  }
+  /** Vi tri duong chia giua anh goc va ban phuc hoi, tinh theo phan tram. */
+  readonly split = signal(50);
 
-  reload(): void {
-    forkJoin({ loose: this.photos.listLoose(), pets: this.pets.list() })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: ({ loose, pets }) => {
-          this.loose.set(loose.filter((p) => p.isRestored));
-          this.petList.set(pets);
-        },
-        error: () => this.error.set('RESTORE.LOAD_FAILED'),
-      });
+  readonly sizeBefore = signal<Size | null>(null);
+  readonly sizeAfter = signal<Size | null>(null);
+
+  /** Ten tep tai ve, giu ten goc va them hau to. */
+  readonly downloadName = computed(() => {
+    const name = this.chosen()?.name ?? 'petmory';
+    return `${name.replace(/\.[^.]+$/, '')}-phuc-hoi.png`;
+  });
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.dropUrls());
   }
 
   pick(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+    input.value = '';
     if (file) {
-      this.send(file);
+      this.take(file);
     }
   }
 
@@ -80,16 +81,54 @@ export class RestorePage implements OnInit {
     this.hovering.set(false);
     const file = event.dataTransfer?.files?.[0];
     if (file) {
-      this.send(file);
+      this.take(file);
     }
   }
 
-  /** Opens the comparison for a picture restored on an earlier visit. */
-  reopen(photo: PetPhoto): void {
-    this.show(photo, photo);
+  /** Bo anh dang chon de quay ve buoc dau. */
+  clear(): void {
+    this.dropUrls();
+    this.chosen.set(null);
+    this.error.set(null);
   }
 
-  private send(file: File): void {
+  run(): void {
+    const file = this.chosen();
+    if (!file || this.working()) {
+      return;
+    }
+    this.working.set(true);
+    this.error.set(null);
+    this.restorer
+      .restore(file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ picture, resemblance }) => {
+          this.working.set(false);
+          this.afterUrl.set(URL.createObjectURL(picture));
+          this.resemblance.set(resemblance);
+          this.split.set(50);
+        },
+        error: (problem: HttpErrorResponse) => {
+          this.working.set(false);
+          this.error.set(problem.status === 429 ? 'RESTORE.QUOTA' : 'RESTORE.FAILED');
+        },
+      });
+  }
+
+  setSplit(event: Event): void {
+    this.split.set(Number((event.target as HTMLInputElement).value));
+  }
+
+  readBefore(event: Event): void {
+    this.sizeBefore.set(this.sizeOf(event));
+  }
+
+  readAfter(event: Event): void {
+    this.sizeAfter.set(this.sizeOf(event));
+  }
+
+  private take(file: File): void {
     if (!ACCEPTED.includes(file.type)) {
       this.error.set('RESTORE.WRONG_TYPE');
       return;
@@ -98,85 +137,28 @@ export class RestorePage implements OnInit {
       this.error.set('RESTORE.TOO_BIG');
       return;
     }
-    this.working.set(true);
+    this.dropUrls();
     this.error.set(null);
-    this.done.set(null);
-
-    this.photos
-      .restoreFresh(file, OPERATIONS)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (pair) => {
-          this.working.set(false);
-          this.reload();
-          this.show(pair.original, pair.restored);
-        },
-        error: () => {
-          this.working.set(false);
-          this.error.set('RESTORE.FAILED');
-        },
-      });
+    this.chosen.set(file);
+    this.beforeUrl.set(URL.createObjectURL(file));
   }
 
-  /** Fetches both pictures through the checked path, then opens the comparison. */
-  private show(original: PetPhoto, restored: PetPhoto): void {
-    forkJoin({
-      before: this.photos.content(original.originalPhoto ?? original._id),
-      after: this.photos.content(restored._id),
-    })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: ({ before, after }) => {
-          const beforeUrl = URL.createObjectURL(before);
-          const afterUrl = URL.createObjectURL(after);
-          const input: CompareInput = {
-            original,
-            restored,
-            beforeUrl,
-            afterUrl,
-            pets: this.petList(),
-          };
-          this.dialog
-            .open<CompareDialog, CompareInput, CompareResult>(CompareDialog, {
-              data: input,
-              width: 'min(900px, 96vw)',
-              maxHeight: '94vh',
-              panelClass: 'pm-dialog',
-            })
-            .afterClosed()
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe((result) => {
-              // Tra lai bo nho cua hai dia chi tam, neu khong thi moi lan mo
-              // lai giu them mot ban anh trong bo nho cho toi khi tai lai trang.
-              URL.revokeObjectURL(beforeUrl);
-              this.answer(result, restored, afterUrl);
-            });
-        },
-        error: () => this.error.set('RESTORE.LOAD_FAILED'),
-      });
+  private sizeOf(event: Event): Size {
+    const img = event.target as HTMLImageElement;
+    return { width: img.naturalWidth, height: img.naturalHeight };
   }
 
-  private answer(
-    result: CompareResult | undefined,
-    restored: PetPhoto,
-    afterUrl: string,
-  ): void {
-    URL.revokeObjectURL(afterUrl);
-    if (result?.action === 'ATTACH') {
-      this.join(restored._id, result.pet);
+  /** Tra lai bo nho cua cac dia chi tam truoc khi thay anh khac. */
+  private dropUrls(): void {
+    for (const url of [this.beforeUrl(), this.afterUrl()]) {
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
     }
-  }
-
-  private join(photoId: string, petId: string): void {
-    this.photos
-      .attach(photoId, petId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.done.set('RESTORE.ATTACHED');
-          this.reload();
-        },
-        error: () => this.error.set('RESTORE.ATTACH_FAILED'),
-      });
+    this.beforeUrl.set(null);
+    this.afterUrl.set(null);
+    this.resemblance.set(null);
+    this.sizeBefore.set(null);
+    this.sizeAfter.set(null);
   }
 }

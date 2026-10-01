@@ -7,7 +7,6 @@ import {
   PhotoAngle,
   AngleCheckResult,
   PhotoRules,
-  RestorationPair,
   RestoreOperation,
 } from '../models/api.model';
 
@@ -85,33 +84,6 @@ export class PhotosService {
   restore(codePhoto: string, operation: RestoreOperation[]): Observable<PetPhoto> {
     return this.http.post<PetPhoto>(`${this.base}/pet-photos/${codePhoto}/restore`, {
       operation,
-    });
-  }
-
-  /**
-   * Sends one photograph to be cleaned up, with no pet attached.
-   *
-   * The restoration screen stands on its own, so nothing here needs a profile.
-   * The caller decides afterwards whether to keep the result.
-   */
-  restoreFresh(file: File, operation: RestoreOperation[]): Observable<RestorationPair> {
-    const form = new FormData();
-    form.append('file', file, file.name);
-    for (const one of operation) {
-      form.append('operation[]', one);
-    }
-    return this.http.post<RestorationPair>(`${this.base}/pet-photos/restoration`, form);
-  }
-
-  /** Restored pictures that no pet has claimed yet. */
-  listLoose(): Observable<PetPhoto[]> {
-    return this.http.get<PetPhoto[]>(`${this.base}/pet-photos/restoration`);
-  }
-
-  /** Moves a loose picture onto a pet profile. */
-  attach(codePhoto: string, petId: string): Observable<PetPhoto> {
-    return this.http.post<PetPhoto>(`${this.base}/pet-photos/${codePhoto}/attach`, {
-      pet: petId,
     });
   }
 

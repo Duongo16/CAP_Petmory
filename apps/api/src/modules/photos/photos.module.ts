@@ -4,6 +4,8 @@ import { MulterModule } from '@nestjs/platform-express';
 import { PetPhoto, PetPhotoSchema } from './schemas/pet-photo.schema';
 import { PhotosService } from './photos.service';
 import { PhotosController } from './photos.controller';
+import { PhotoRestoreController } from './photo-restore.controller';
+import { PhotoRestoreService } from './photo-restore.service';
 import { PetsModule } from '../pets/pets.module';
 import { BusinessConfigModule } from '../business-config/business-config.module';
 
@@ -15,8 +17,8 @@ import { BusinessConfigModule } from '../business-config/business-config.module'
     PetsModule,
     BusinessConfigModule,
   ],
-  controllers: [PhotosController],
-  providers: [PhotosService],
+  controllers: [PhotosController, PhotoRestoreController],
+  providers: [PhotosService, PhotoRestoreService],
   exports: [PhotosService],
 })
 export class PhotosModule {}

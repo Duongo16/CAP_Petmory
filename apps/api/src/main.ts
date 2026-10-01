@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { HEADER_RESEMBLANCE } from './modules/photos/photo-restore.controller';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -10,7 +11,11 @@ async function bootstrap(): Promise<void> {
 
   app.use(helmet());
   app.setGlobalPrefix('api');
-  app.enableCors({ origin: config.getOrThrow<string>('webOrigin'), credentials: true });
+  app.enableCors({
+    origin: config.getOrThrow<string>('webOrigin'),
+    credentials: true,
+    exposedHeaders: [HEADER_RESEMBLANCE],
+  });
 
   /**
    * Reject bad input at the boundary. Only fields declared on the DTO are

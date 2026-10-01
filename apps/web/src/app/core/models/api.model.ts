@@ -530,12 +530,6 @@ export interface PetPhoto {
   createdAt: string;
 }
 
-/** What the restoration screen gets back: the picture before and after. */
-export interface RestorationPair {
-  original: PetPhoto;
-  restored: PetPhoto;
-}
-
 export interface AngleCheckResult {
   missing: PhotoAngle[];
   rawAngle: boolean;

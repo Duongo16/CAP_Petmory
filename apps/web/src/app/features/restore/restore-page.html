@@ -8,63 +8,88 @@
   @if (error(); as message) {
     <p class="note note-bad" role="alert">{{ message | translate }}</p>
   }
-  @if (done(); as message) {
-    <p class="note note-good" role="status">{{ message | translate }}</p>
-  }
 
-  <label
-    class="drop"
-    [class.hovering]="hovering()"
-    [class.busy]="working()"
-    for="restore-file"
-    (dragover)="dragOver($event)"
-    (dragleave)="dragOut()"
-    (drop)="drop($event)"
-  >
-    <span class="drop-mark" aria-hidden="true"><pm-icon name="image" [size]="28" /></span>
-    @if (working()) {
-      <span class="drop-name">{{ 'RESTORE.WORKING' | translate }}</span>
-      <span class="drop-sub">{{ 'RESTORE.WORKING_SUB' | translate }}</span>
-    } @else {
+  @if (beforeUrl(); as before) {
+    <section class="work tw-card">
+      @if (afterUrl(); as after) {
+        <div class="stage" [style.--split.%]="split()">
+          <img class="shot" [src]="before" [alt]="'RESTORE.BEFORE' | translate" (load)="readBefore($event)" />
+          <img class="shot shot-after" [src]="after" [alt]="'RESTORE.AFTER' | translate" (load)="readAfter($event)" />
+          <span class="seam" aria-hidden="true"></span>
+          <span class="label label-before">{{ 'RESTORE.BEFORE' | translate }}</span>
+          <span class="label label-after">{{ 'RESTORE.AFTER' | translate }}</span>
+          <label class="sr-only" for="split-range">{{ 'RESTORE.DRAG_HINT' | translate }}</label>
+          <input id="split-range" class="range" type="range" min="0" max="100" step="1" [value]="split()" (input)="setSplit($event)" />
+        </div>
+        <p class="hint">{{ 'RESTORE.DRAG_HINT' | translate }}</p>
+
+        <dl class="facts">
+          @if (sizeBefore(); as size) {
+            <div><dt>{{ 'RESTORE.SIZE_BEFORE' | translate }}</dt><dd>{{ size.width }} × {{ size.height }}</dd></div>
+          }
+          @if (sizeAfter(); as size) {
+            <div><dt>{{ 'RESTORE.SIZE_AFTER' | translate }}</dt><dd>{{ size.width }} × {{ size.height }}</dd></div>
+          }
+          @if (resemblance() !== null) {
+            <div><dt>{{ 'RESTORE.RESEMBLANCE' | translate }}</dt><dd>{{ resemblance() }}%</dd></div>
+          }
+        </dl>
+
+        <div class="actions">
+          <a class="tw-btn-primary" id="restore-download" [href]="after" [attr.download]="downloadName()">
+            <pm-icon name="download" [size]="16" />
+            {{ 'RESTORE.DOWNLOAD' | translate }}
+          </a>
+          <button type="button" class="tw-btn-secondary" (click)="clear()">
+            {{ 'RESTORE.ANOTHER' | translate }}
+          </button>
+        </div>
+      } @else {
+        <figure class="preview">
+          <img [src]="before" [alt]="'RESTORE.BEFORE' | translate" />
+          @if (working()) {
+            <span class="preview-busy" role="status">
+              <span class="spinner" aria-hidden="true"></span>
+              {{ 'RESTORE.WORKING_SUB' | translate }}
+            </span>
+          } @else {
+            <button type="button" class="preview-drop" (click)="clear()" [attr.aria-label]="'COMMON.REMOVE' | translate">
+              <pm-icon name="close" [size]="14" />
+            </button>
+          }
+        </figure>
+        <div class="actions">
+          <button type="button" class="tw-btn-primary" id="restore-run" [disabled]="working()" (click)="run()">
+            <pm-icon name="sparkle" [size]="16" />
+            {{ (working() ? 'RESTORE.WORKING' : 'RESTORE.RUN') | translate }}
+          </button>
+          @if (!working()) {
+            <label class="tw-btn-secondary" for="restore-file">{{ 'RESTORE.CHANGE' | translate }}</label>
+          }
+        </div>
+      }
+    </section>
+  } @else {
+    <label
+      class="drop"
+      [class.hovering]="hovering()"
+      for="restore-file"
+      (dragover)="dragOver($event)"
+      (dragleave)="dragOut()"
+      (drop)="drop($event)"
+    >
+      <span class="drop-mark" aria-hidden="true"><pm-icon name="image" [size]="28" /></span>
       <span class="drop-name">{{ 'RESTORE.DROP' | translate }}</span>
       <span class="drop-sub">{{ 'RESTORE.DROP_SUB' | translate }}</span>
-    }
-    <input
-      id="restore-file"
-      class="sr-only"
-      type="file"
-      accept="image/png,image/jpeg"
-      [disabled]="working()"
-      (change)="pick($event)"
-    />
-  </label>
+    </label>
+  }
 
-  <section class="kept">
-    <h2 class="kept-title tw-section-title">{{ 'RESTORE.KEPT' | translate }}</h2>
-
-    @if (loose().length === 0) {
-      <p class="empty tw-empty">{{ 'RESTORE.NONE_YET' | translate }}</p>
-    } @else {
-      <ul class="kept-list">
-        @for (photo of loose(); track photo._id) {
-          <li class="kept-item">
-            <span class="kept-mark" aria-hidden="true"><pm-icon name="sparkle" [size]="20" /></span>
-            <div class="kept-text">
-              <strong>{{ photo.originalName }}</strong>
-              <span>
-                {{ photo.quality.width }} × {{ photo.quality.height }}
-                @if (photo.resemblance !== null) {
-                  · {{ 'RESTORE.RESEMBLANCE' | translate }} {{ photo.resemblance }}%
-                }
-              </span>
-            </div>
-            <button type="button" class="kept-open tw-btn-secondary tw-btn-sm" (click)="reopen(photo)">
-              {{ 'RESTORE.OPEN_AGAIN' | translate }}
-              <pm-icon name="chevron" [size]="13" />
-            </button>
-          </li>
-        }
-      </ul>
-    }
-  </section>
+  <input
+    id="restore-file"
+    class="sr-only"
+    type="file"
+    accept="image/png,image/jpeg"
+    [disabled]="working()"
+    (change)="pick($event)"
+  />
 </div>
