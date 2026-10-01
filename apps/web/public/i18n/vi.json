@@ -73,6 +73,7 @@
     "PASSWORD_ERROR": "Mật khẩu tối thiểu 8 ký tự",
     "FULL_NAME_ERROR": "Vui lòng nhập họ tên",
     "BAD_CREDENTIALS": "Email hoặc mật khẩu không đúng",
+    "BACK_HOME": "Về trang chủ",
     "BRAND_SUB": "KỶ VẬT & KÝ ỨC",
     "LOGIN_EYEBROW": "SỔ LƯU NIỆM SỐ",
     "LOGIN_TITLE": "Đăng nhập Petmory",

@@ -73,6 +73,7 @@
     "PASSWORD_ERROR": "The password needs at least 8 characters",
     "FULL_NAME_ERROR": "Please enter your name",
     "BAD_CREDENTIALS": "That email or password is not right",
+    "BACK_HOME": "Back to home",
     "BRAND_SUB": "KEEPSAKES & MEMORIES",
     "LOGIN_EYEBROW": "YOUR MEMORY BOOK",
     "LOGIN_TITLE": "Sign in to Petmory",
