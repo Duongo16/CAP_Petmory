@@ -1,0 +1,10 @@
+:host {
+  display: block;
+}
+
+.chip-on {
+  border-color: var(--pm-accent);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+  font-weight: 600;
+}

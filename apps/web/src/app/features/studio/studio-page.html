@@ -1,28 +1,35 @@
-<div class="pm-page">
+<div class="w-full max-w-[1180px] mx-auto px-6 pt-7 pb-16 box-border">
   @switch (status()) {
     @case ('LOADING') {
-      <div class="center"><mat-spinner diameter="40" /></div>
+      <div class="grid place-items-center py-12 text-center"><mat-spinner diameter="40" /></div>
     }
     @case ('ERROR') {
-      <div class="center empty"><p>{{ 'STUDIO.NONE_YET_MODEL' | translate }}</p></div>
+      <div class="grid place-items-center py-12 text-center text-ink-muted"><p>{{ 'STUDIO.NONE_YET_MODEL' | translate }}</p></div>
     }
     @case ('READY') {
-      <header class="page-header">
-        <h1 class="title">{{ 'STUDIO.TITLE' | translate }}</h1>
+      <header class="flex flex-wrap items-center gap-4 mb-4 px-6 py-4 rounded-md bg-card border border-edge">
+        <div class="flex items-center gap-2">
+          <span class="grid place-items-center flex-none w-9 h-9 rounded-sm bg-accent-soft text-accent" aria-hidden="true">
+            <pm-icon name="star" [size]="15" />
+          </span>
+          <span class="flex flex-col">
+            <span class="text-xs font-bold tracking-[0.08em] text-amber">{{ 'STUDIO.EYEBROW' | translate }}</span>
+            <h1 class="mt-1 m-0 font-semibold text-ink pm-page-title">{{ 'STUDIO.TITLE' | translate }}</h1>
+          </span>
+        </div>
 
-        <ol class="steps">
+        <ol class="steps flex items-center gap-1 m-0 p-0 list-none flex-1">
           @for (b of stepsDisplay(); track b.code; let i = $index) {
-            <li class="step-item">
+            <li class="step-item flex items-center">
               <button
                 type="button"
-                class="step-button"
-                [class.current]="b.selected"
-                [class.passed]="i < stepCount() - 1"
+                class="step-button inline-flex items-center gap-2 px-3 py-2 border-0 rounded-full bg-none text-ink-muted text-sm cursor-pointer hover:bg-muted focus-visible:bg-muted transition-colors"
+                [class.step-current]="b.selected"
                 [attr.aria-current]="b.selected ? 'step' : null"
                 (click)="setStep(b.code)"
               >
-                <span class="count">{{ i + 1 }}</span>
-                <span class="name">{{ b.key | translate }}</span>
+                <span class="step-count grid place-items-center w-[22px] h-[22px] rounded-full bg-sunken text-ink-muted text-xs font-bold">{{ i + 1 }}</span>
+                <span class="step-name">{{ b.key | translate }}</span>
               </button>
             </li>
           }
@@ -30,12 +37,17 @@
       </header>
 
       <div class="layout">
-        <aside class="left-column">
+        <aside class="flex flex-col gap-3">
           @if (stepCurrent() === 'PICK_MODEL') {
-            <section class="block pm-card">
-              <div class="block-body">
-                <h2 class="section-title">{{ 'STUDIO.KIND_LABEL' | translate }}</h2>
-                <div class="filter-row">
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4">
+                <a class="inline-flex items-center gap-2 px-4 py-2 border border-edge-strong rounded-full bg-card text-ink-muted text-sm font-semibold no-underline hover:border-accent hover:text-accent transition-colors" routerLink="/suggest">{{ 'NAV.SUGGEST' | translate }}</a>
+              </div>
+            </section>
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4">
+                <h2 class="m-0 mb-2 text-sm font-semibold text-ink">{{ 'STUDIO.KIND_LABEL' | translate }}</h2>
+                <div class="flex flex-wrap gap-2">
                   @for (tab of kindTabs(); track tab.kind) {
                     <button
                       type="button"
@@ -48,8 +60,8 @@
                   }
                 </div>
 
-                <h2 class="section-title spaced-top">{{ 'STUDIO.POSE_LABEL' | translate }}</h2>
-                <div class="filter-row">
+                <h2 class="m-0 mb-2 mt-4 text-sm font-semibold text-ink">{{ 'STUDIO.POSE_LABEL' | translate }}</h2>
+                <div class="flex flex-wrap gap-2">
                   @for (tab of poseTabs(); track tab.pose) {
                     <button
                       type="button"
@@ -61,15 +73,16 @@
                     </button>
                   }
                 </div>
-                <p class="pose-note">{{ 'STUDIO.POSE_NOTE' | translate }}</p>
+                <p class="mt-2 text-xs text-ink-muted">{{ 'STUDIO.POSE_NOTE' | translate }}</p>
 
-                <h2 class="section-title spaced-top">{{ 'STUDIO.REALISTIC' | translate }}</h2>
-                <div class="model-list">
-                  @for (color of colorRealistic(); track color.code) {
+                <h2 class="m-0 mb-2 mt-4 text-sm font-semibold text-ink">{{ 'STUDIO.FELTED' | translate }}</h2>
+                <p class="mt-2 text-xs text-ink-muted">{{ 'STUDIO.FELTED_NOTE' | translate }}</p>
+                <div class="flex flex-wrap gap-1">
+                  @for (color of colorFelted(); track color.code) {
                     <button
                       type="button"
-                      class="model-button"
-                      [class.selected]="baseModelSelected()?.code === color.code"
+                      class="model-btn px-3 py-2 border border-edge rounded-full bg-none text-inherit text-sm cursor-pointer hover:bg-muted focus-visible:bg-muted transition-colors"
+                      [class.model-btn--on]="baseModelSelected()?.code === color.code"
                       (click)="selectBaseModel(color)"
                     >
                       {{ color.name }}
@@ -77,13 +90,27 @@
                   }
                 </div>
 
-                <h2 class="section-title spaced-top">{{ 'STUDIO.BLOCKY' | translate }}</h2>
-                <div class="model-list">
+                <h2 class="m-0 mb-2 mt-4 text-sm font-semibold text-ink">{{ 'STUDIO.REALISTIC' | translate }}</h2>
+                <div class="flex flex-wrap gap-1">
+                  @for (color of colorRealistic(); track color.code) {
+                    <button
+                      type="button"
+                      class="model-btn px-3 py-2 border border-edge rounded-full bg-none text-inherit text-sm cursor-pointer hover:bg-muted focus-visible:bg-muted transition-colors"
+                      [class.model-btn--on]="baseModelSelected()?.code === color.code"
+                      (click)="selectBaseModel(color)"
+                    >
+                      {{ color.name }}
+                    </button>
+                  }
+                </div>
+
+                <h2 class="m-0 mb-2 mt-4 text-sm font-semibold text-ink">{{ 'STUDIO.BLOCKY' | translate }}</h2>
+                <div class="flex flex-wrap gap-1">
                   @for (color of colorBlocky(); track color.code) {
                     <button
                       type="button"
-                      class="model-button"
-                      [class.selected]="baseModelSelected()?.code === color.code"
+                      class="model-btn px-3 py-2 border border-edge rounded-full bg-none text-inherit text-sm cursor-pointer hover:bg-muted focus-visible:bg-muted transition-colors"
+                      [class.model-btn--on]="baseModelSelected()?.code === color.code"
                       (click)="selectBaseModel(color)"
                     >
                       {{ color.name }}
@@ -95,11 +122,11 @@
           }
 
           @if (stepCurrent() === 'APPEARANCE') {
-            <section class="block pm-card">
-              <div class="block-body">
-                <h2 class="section-title">{{ 'STUDIO.PAINT_MODE' | translate }}</h2>
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4">
+                <h2 class="m-0 mb-2 text-sm font-semibold text-ink">{{ 'STUDIO.PAINT_MODE' | translate }}</h2>
                 <mat-button-toggle-group
-                  class="paint-mode"
+                  class="w-full"
                   [value]="paintMode()"
                   (change)="setPaintMode($event.value)"
                   [attr.aria-label]="'STUDIO.PAINT_MODE' | translate"
@@ -113,35 +140,35 @@
                 </mat-button-toggle-group>
 
                 @if (paintMode() === 'BRUSH') {
-                  <label class="brush-label" for="brush-size">{{ 'STUDIO.BRUSH_SIZE' | translate }}</label>
-                  <mat-slider class="slider" [min]="20" [max]="200" [step]="10" discrete>
+                  <label class="block mt-2 text-xs text-ink-muted" for="brush-size">{{ 'STUDIO.BRUSH_SIZE' | translate }}</label>
+                  <mat-slider class="w-full" [min]="20" [max]="200" [step]="10" discrete>
                     <input id="brush-size" matSliderThumb [value]="brushSize() * 1000" (valueChange)="setBrushSize($event)" />
                   </mat-slider>
                 }
 
                 @if (colorPendingPaint(); as dangCam) {
-                  <div class="holding">
-                    <span class="dot" [style.background-color]="dangCam.swatch"></span>
-                    <span class="label">{{ dangCam.displayName }}</span>
-                    <button type="button" class="pm-button-secondary small" (click)="dropColorColor()">
+                  <div class="flex items-center gap-2 mt-2 px-2 py-1 border border-edge rounded-sm">
+                    <span class="w-5 h-5 rounded-full border border-edge flex-none" [style.background-color]="dangCam.swatch"></span>
+                    <span class="flex-1 text-sm">{{ dangCam.displayName }}</span>
+                    <button type="button" class="pm-button-secondary small text-sm" (click)="dropColorColor()">
                       {{ 'STUDIO.DROP_COLOR' | translate }}
                     </button>
                   </div>
                 } @else {
-                  <p class="small-description">{{ 'STUDIO.PAINT_HINT' | translate }}</p>
+                  <p class="mt-2 text-xs text-ink-muted leading-relaxed">{{ 'STUDIO.PAINT_HINT' | translate }}</p>
                 }
               </div>
             </section>
 
-            <section class="block pm-card">
-              <div class="block-body">
-                <h2 class="section-title">{{ 'STUDIO.FUR_COLORS' | translate }}</h2>
-                <div class="color-grid">
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4">
+                <h2 class="m-0 mb-2 text-sm font-semibold text-ink">{{ 'STUDIO.FUR_COLORS' | translate }}</h2>
+                <div class="grid grid-cols-[repeat(auto-fill,minmax(30px,1fr))] gap-1">
                   @for (code of furColors(); track code.code) {
                     <button
                       type="button"
-                      class="swatch"
-                      [class.holding-color]="colorPendingPaint()?.code === code.code"
+                      class="swatch aspect-square border border-edge rounded-[6px] cursor-pointer p-0 transition-transform duration-[120ms] hover:scale-110 focus-visible:scale-110"
+                      [class.swatch--holding]="colorPendingPaint()?.code === code.code"
                       [style.background-color]="code.swatch"
                       [matTooltip]="code.code + ' — ' + code.displayName"
                       [attr.aria-label]="code.code + ' ' + code.displayName"
@@ -150,13 +177,13 @@
                   }
                 </div>
 
-                <h2 class="section-title spaced-top">{{ 'STUDIO.EYES_NOSE_COLORS' | translate }}</h2>
-                <div class="color-grid">
+                <h2 class="m-0 mb-2 mt-4 text-sm font-semibold text-ink">{{ 'STUDIO.EYES_NOSE_COLORS' | translate }}</h2>
+                <div class="grid grid-cols-[repeat(auto-fill,minmax(30px,1fr))] gap-1">
                   @for (code of eyesNoseColors(); track code.code) {
                     <button
                       type="button"
-                      class="swatch"
-                      [class.holding-color]="colorPendingPaint()?.code === code.code"
+                      class="swatch aspect-square border border-edge rounded-[6px] cursor-pointer p-0 transition-transform duration-[120ms] hover:scale-110 focus-visible:scale-110"
+                      [class.swatch--holding]="colorPendingPaint()?.code === code.code"
                       [style.background-color]="code.swatch"
                       [matTooltip]="code.code + ' — ' + code.displayName"
                       [attr.aria-label]="code.code + ' ' + code.displayName"
@@ -169,48 +196,48 @@
           }
 
           @if (stepCurrent() === 'PREVIEW') {
-            <section class="block pm-card">
-              <div class="block-body">
-                <h2 class="section-title">{{ 'STUDIO.PREVIEW' | translate }}</h2>
-                <p class="small-description">{{ 'STUDIO.PREVIEW_HINT' | translate }}</p>
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4">
+                <h2 class="m-0 mb-2 text-sm font-semibold text-ink">{{ 'STUDIO.PREVIEW' | translate }}</h2>
+                <p class="mt-2 text-xs text-ink-muted leading-relaxed">{{ 'STUDIO.PREVIEW_HINT' | translate }}</p>
 
-                <ul class="angle-list">
+                <ul class="grid grid-cols-3 gap-2 mt-3 p-0 list-none">
                   @for (item of photosDisplay(); track item.angle) {
-                    <li>
-                      <img [src]="item.photo" [alt]="item.key | translate" />
+                    <li class="flex flex-col gap-1 text-xs text-ink-muted text-center">
+                      <img [src]="item.photo" [alt]="item.key | translate" class="w-full aspect-square object-cover rounded-sm bg-muted" />
                       <span>{{ item.key | translate }}</span>
                     </li>
                   }
                 </ul>
 
                 @if (preview().length === 0) {
-                  <p class="small-description">{{ 'STUDIO.NOT_CAPTURED' | translate }}</p>
+                  <p class="mt-2 text-xs text-ink-muted leading-relaxed">{{ 'STUDIO.NOT_CAPTURED' | translate }}</p>
                 } @else {
-                  <p class="saved" role="status">
+                  <p class="mt-2 px-3 py-2 rounded-sm bg-accent-soft text-accent-dark text-sm" role="status">
                     {{ 'STUDIO.ANGLE_COUNT' | translate: { count: preview().length } }}
                   </p>
                 }
               </div>
             </section>
 
-            <section class="block pm-card">
-              <div class="block-body">
-                <h2 class="section-title">{{ 'STUDIO.ACCESSORY' | translate }}</h2>
-                <p class="small-description">{{ 'STUDIO.ACCESSORY_SOON' | translate }}</p>
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4">
+                <h2 class="m-0 mb-2 text-sm font-semibold text-ink">{{ 'STUDIO.ACCESSORY' | translate }}</h2>
+                <p class="mt-2 text-xs text-ink-muted leading-relaxed">{{ 'STUDIO.ACCESSORY_SOON' | translate }}</p>
               </div>
             </section>
           }
 
           @if (stepCurrent() === 'COMPLETED') {
-            <section class="block pm-card">
-              <div class="block-body">
-                <h2 class="section-title">{{ 'STUDIO.SELECT_PRODUCT' | translate }}</h2>
-                <div class="choice-row">
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4">
+                <h2 class="m-0 mb-2 text-sm font-semibold text-ink">{{ 'STUDIO.SELECT_PRODUCT' | translate }}</h2>
+                <div class="flex flex-wrap gap-2">
                   @for (kind of facade.types(); track kind.code) {
                     <button
                       type="button"
-                      class="choice-card"
-                      [class.selected]="facade.codeKindSelected() === kind.code"
+                      class="flex flex-col gap-1 px-3 py-2 border border-edge rounded-sm bg-card text-ink text-sm text-left cursor-pointer hover:border-accent transition-colors"
+                      [class.choice-on]="facade.codeKindSelected() === kind.code"
                       (click)="facade.selectKind(kind.code)"
                     >
                       {{ kind.name }}
@@ -219,98 +246,98 @@
                 </div>
 
                 @if (facade.sizes().length > 0) {
-                  <h2 class="section-title spaced-top">{{ 'STUDIO.SELECT_SIZE' | translate }}</h2>
-                  <div class="choice-row">
+                  <h2 class="m-0 mb-2 mt-4 text-sm font-semibold text-ink">{{ 'STUDIO.SELECT_SIZE' | translate }}</h2>
+                  <div class="flex flex-wrap gap-2">
                     @for (size of facade.sizes(); track size.code) {
                       <button
                         type="button"
-                        class="choice-card"
-                        [class.selected]="facade.sizeCodeSelected() === size.code"
+                        class="flex flex-col gap-1 px-3 py-2 border border-edge rounded-sm bg-card text-ink text-sm text-left cursor-pointer hover:border-accent transition-colors"
+                        [class.choice-on]="facade.sizeCodeSelected() === size.code"
                         (click)="facade.selectSize(size.code)"
                       >
                         <span>{{ size.displayName }}</span>
-                        <small>{{ size.dimensions }}</small>
+                        <small class="text-ink-muted text-xs">{{ size.dimensions }}</small>
                       </button>
                     }
                   </div>
                 }
 
                 @if (facade.quote(); as bg) {
-                  <dl class="summary spaced-top">
-                    <dt>{{ 'STUDIO.PRICE' | translate }}</dt>
-                    <dd class="price">{{ bg.unitPrice | amount: bg.currency }}</dd>
-                    <dt>{{ 'STUDIO.LEAD_TIME' | translate }}</dt>
-                    <dd>{{ 'STUDIO.DAYS' | translate: { count: bg.productionDays } }}</dd>
+                  <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 mt-4 m-0 text-sm">
+                    <dt class="text-ink-muted">{{ 'STUDIO.PRICE' | translate }}</dt>
+                    <dd class="m-0 font-bold text-accent">{{ bg.unitPrice | amount: bg.currency }}</dd>
+                    <dt class="text-ink-muted">{{ 'STUDIO.LEAD_TIME' | translate }}</dt>
+                    <dd class="m-0 font-medium">{{ 'STUDIO.DAYS' | translate: { count: bg.productionDays } }}</dd>
                   </dl>
                 }
               </div>
             </section>
 
-            <section class="block pm-card">
-              <div class="block-body" [formGroup]="facade.form">
-                <h2 class="section-title">{{ 'STUDIO.ENGRAVING' | translate }}</h2>
-                <label class="input-field">
-                  <span>{{ 'STUDIO.NAME_DRAFT' | translate }}</span>
-                  <input type="text" formControlName="name" maxlength="100" />
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4" [formGroup]="facade.form">
+                <h2 class="m-0 mb-3 text-sm font-semibold text-ink">{{ 'STUDIO.ENGRAVING' | translate }}</h2>
+                <label class="flex flex-col gap-1 mb-3">
+                  <span class="text-sm font-semibold text-ink">{{ 'STUDIO.NAME_DRAFT' | translate }}</span>
+                  <input type="text" formControlName="name" maxlength="100" class="px-3 py-2 border border-edge rounded-sm bg-card text-ink text-sm focus-visible:outline-2 focus-visible:outline-accent" />
                 </label>
-                <label class="input-field">
-                  <span>{{ 'STUDIO.PET_LABEL' | translate }}</span>
-                  <select formControlName="petId">
+                <label class="flex flex-col gap-1 mb-3">
+                  <span class="text-sm font-semibold text-ink">{{ 'STUDIO.PET_LABEL' | translate }}</span>
+                  <select formControlName="petId" class="px-3 py-2 border border-edge rounded-sm bg-card text-ink text-sm focus-visible:outline-2 focus-visible:outline-accent">
                     <option value="">{{ 'STUDIO.PET_NONE' | translate }}</option>
                     @for (pet of facade.pets(); track pet._id) {
                       <option [value]="pet._id">{{ pet.name }}</option>
                     }
                   </select>
                 </label>
-                <p class="small-description">{{ 'STUDIO.PET_HINT' | translate }}</p>
+                <p class="mt-2 text-xs text-ink-muted leading-relaxed">{{ 'STUDIO.PET_HINT' | translate }}</p>
 
-                <label class="input-field">
-                  <span>{{ 'STUDIO.ENGRAVED_NAME' | translate }}</span>
-                  <input type="text" formControlName="engravedName" maxlength="60" />
+                <label class="flex flex-col gap-1 mb-3">
+                  <span class="text-sm font-semibold text-ink">{{ 'STUDIO.ENGRAVED_NAME' | translate }}</span>
+                  <input type="text" formControlName="engravedName" maxlength="60" class="px-3 py-2 border border-edge rounded-sm bg-card text-ink text-sm focus-visible:outline-2 focus-visible:outline-accent" />
                 </label>
-                <label class="input-field">
-                  <span>{{ 'STUDIO.MEMORIAL_DATE' | translate }}</span>
-                  <input type="date" formControlName="memorialDate" />
+                <label class="flex flex-col gap-1 mb-3">
+                  <span class="text-sm font-semibold text-ink">{{ 'STUDIO.MEMORIAL_DATE' | translate }}</span>
+                  <input type="date" formControlName="memorialDate" class="px-3 py-2 border border-edge rounded-sm bg-card text-ink text-sm focus-visible:outline-2 focus-visible:outline-accent" />
                 </label>
-                <label class="input-field">
-                  <span>{{ 'STUDIO.MESSAGE' | translate }}</span>
-                  <textarea formControlName="message" rows="3" maxlength="300"></textarea>
+                <label class="flex flex-col gap-1 mb-3">
+                  <span class="text-sm font-semibold text-ink">{{ 'STUDIO.MESSAGE' | translate }}</span>
+                  <textarea formControlName="message" rows="3" maxlength="300" class="px-3 py-2 border border-edge rounded-sm bg-card text-ink text-sm resize-y focus-visible:outline-2 focus-visible:outline-accent"></textarea>
                 </label>
               </div>
             </section>
 
-            <section class="block pm-card">
-              <div class="block-body">
-                <h2 class="section-title">{{ 'STUDIO.SUMMARY' | translate }}</h2>
-                <dl class="summary">
-                  <dt>{{ 'STUDIO.COLOR_CHOSEN' | translate }}</dt>
-                  <dd>{{ baseModelSelected()?.name }}</dd>
-                  <dt>{{ 'STUDIO.COUNT_COLOR_IN_USE' | translate }}</dt>
-                  <dd>{{ countColorInUse() }}</dd>
-                  <dt>{{ 'STUDIO.ORIGINAL_PHOTO_PREPARE' | translate }}</dt>
-                  <dd [class.missing]="!hasAllSixAngles()">{{ preview().length }} / 6</dd>
+            <section class="bg-card border border-edge rounded-md shadow-card">
+              <div class="p-4">
+                <h2 class="m-0 mb-2 text-sm font-semibold text-ink">{{ 'STUDIO.SUMMARY' | translate }}</h2>
+                <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 m-0 text-sm">
+                  <dt class="text-ink-muted">{{ 'STUDIO.COLOR_CHOSEN' | translate }}</dt>
+                  <dd class="m-0 font-medium">{{ baseModelSelected()?.name }}</dd>
+                  <dt class="text-ink-muted">{{ 'STUDIO.COUNT_COLOR_IN_USE' | translate }}</dt>
+                  <dd class="m-0 font-medium">{{ countColorInUse() }}</dd>
+                  <dt class="text-ink-muted">{{ 'STUDIO.ORIGINAL_PHOTO_PREPARE' | translate }}</dt>
+                  <dd class="m-0 font-medium" [class.text-danger]="!hasAllSixAngles()">{{ preview().length }} / 6</dd>
                 </dl>
                 @if (!hasAllSixAngles()) {
-                  <p class="small-description warn">{{ 'STUDIO.CAPTURE_REMINDER' | translate }}</p>
+                  <p class="mt-2 px-2 py-2 text-xs text-ink-muted leading-relaxed border-l-[3px] border-l-amber bg-muted">{{ 'STUDIO.CAPTURE_REMINDER' | translate }}</p>
                 }
 
                 @if (facade.error(); as codeError) {
-                  <p class="error" role="alert">{{ codeError | translate }}</p>
+                  <p class="mt-2 text-sm text-danger" role="alert">{{ codeError | translate }}</p>
                 }
                 @if (facade.statusSave() === 'SAVED') {
-                  <p class="saved" role="status">{{ 'STUDIO.SAVED' | translate }}</p>
+                  <p class="mt-2 px-3 py-2 rounded-sm bg-accent-soft text-accent-dark text-sm" role="status">{{ 'STUDIO.SAVED' | translate }}</p>
                 }
 
-                <div class="button-row">
+                <div class="flex flex-wrap gap-2 mt-3">
                   <button
                     type="button"
-                    class="pm-button-primary"
+                    class="tw-btn-primary"
                     [disabled]="facade.statusSave() === 'SAVING'"
                     (click)="saveDraft()"
                   >
                     {{ 'STUDIO.SAVE_DRAFT' | translate }}
                   </button>
-                  <button type="button" class="pm-button-secondary"
+                  <button type="button" class="tw-btn-secondary"
                     [disabled]="!facade.canAddToCart()"
                     (click)="addToCart()"
                   >
@@ -319,12 +346,12 @@
                 </div>
 
                 @if (facade.addedToCart()) {
-                  <p class="saved" role="status">
+                  <p class="mt-2 px-3 py-2 rounded-sm bg-accent-soft text-accent-dark text-sm" role="status">
                     {{ 'STUDIO.ADDED_IN_HOUR' | translate }}
-                    <a routerLink="/cart">{{ 'STUDIO.VIEW_CART' | translate }}</a>
+                    <a class="text-inherit" routerLink="/cart">{{ 'STUDIO.VIEW_CART' | translate }}</a>
                   </p>
                 }
-                <p class="small-description">{{ 'STUDIO.FINISH_HINT' | translate }}</p>
+                <p class="mt-2 text-xs text-ink-muted leading-relaxed">{{ 'STUDIO.FINISH_HINT' | translate }}</p>
               </div>
             </section>
           }
@@ -334,6 +361,8 @@
           @if (pathModel(); as path) {
             <pm-viewer-3d
               [pathModel]="path"
+              [bodyShape]="bodyShapeSelected()"
+              [colorByZone]="colorByZone()"
               [colorPendingPaint]="colorCodePendingPaint()"
               [paintMode]="paintMode()"
               [brushSize]="brushSize()"
@@ -344,27 +373,27 @@
             />
           }
 
-          <div class="bottom-bar">
-            <button type="button" class="pm-button-secondary" [disabled]="stepCount() === 1" (click)="previousStep()">
+          <div class="flex items-center gap-2 mt-3">
+            <button type="button" class="tw-btn-secondary" [disabled]="stepCount() === 1" (click)="previousStep()">
               {{ 'STUDIO.BACK' | translate }}
             </button>
-            <span class="spacer"></span>
-            <button type="button" class="pm-button-primary" [disabled]="isLastStep()" (click)="nextStep()">
+            <span class="flex-1"></span>
+            <button type="button" class="tw-btn-primary" [disabled]="isLastStep()" (click)="nextStep()">
               {{ 'STUDIO.CONTINUE' | translate }}
             </button>
           </div>
         </section>
 
-        <aside class="right-column">
-          <h2 class="section-title">{{ 'STUDIO.PREVIEW' | translate }}</h2>
+        <aside class="flex flex-col gap-3">
+          <h2 class="m-0 text-sm font-semibold text-ink">{{ 'STUDIO.PREVIEW' | translate }}</h2>
           @if (preview().length === 0) {
-            <p class="small-description">{{ 'STUDIO.NOT_CAPTURED' | translate }}</p>
+            <p class="text-xs text-ink-muted leading-relaxed">{{ 'STUDIO.NOT_CAPTURED' | translate }}</p>
           } @else {
-            <div class="photo-list">
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-2">
               @for (item of photosDisplay(); track item.angle) {
-                <figure class="photo-card">
-                  <img [src]="item.photo" [alt]="item.key | translate" />
-                  <figcaption>{{ item.key | translate }}</figcaption>
+                <figure class="m-0 text-center">
+                  <img [src]="item.photo" [alt]="item.key | translate" class="w-full aspect-square object-cover border border-edge rounded-sm bg-muted" />
+                  <figcaption class="mt-1 text-xs text-ink-muted">{{ item.key | translate }}</figcaption>
                 </figure>
               }
             </div>
