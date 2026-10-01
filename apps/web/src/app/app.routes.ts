@@ -66,9 +66,11 @@ export const routes: Routes = [
           import('./features/community/community-page').then((m) => m.CommunityPage),
       },
       {
+        // Bai viet nay mo thanh popup tren dong tin, nen link cu dua ve do.
         path: 'community/posts/:id',
-        loadComponent: () =>
-          import('./features/community/post-detail-page').then((m) => m.PostDetailPage),
+        pathMatch: 'full',
+        redirectTo: ({ params }) =>
+          inject(Router).createUrlTree(['/community'], { queryParams: { post: params['id'] } }),
       },
       {
         path: 'community/users/:id',

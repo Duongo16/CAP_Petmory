@@ -20,24 +20,6 @@
           <span class="count-chip tw-badge tw-badge-accent">
             {{ 'MEMORY.COUNT_MOMENT' | translate: { count: facade.total() } }}
           </span>
-          <div class="book-tools flex flex-wrap items-center gap-2 ms-auto max-nav:ms-0 max-nav:w-full">
-            <button type="button" class="tool tw-btn-secondary" (click)="openShares()">
-              <pm-icon name="users" [size]="15" />
-              {{ 'MEMORY.SHARE_MANAGE' | translate }}
-            </button>
-            <button type="button" class="tool tw-btn-secondary" (click)="openExport()">
-              <pm-icon name="book" [size]="15" />
-              {{ 'MEMORY.EXPORT' | translate }}
-            </button>
-            <a class="tool tw-btn-secondary" [routerLink]="['/pets', facade.pet()?._id, 'slideshow']">
-              <pm-icon name="image" [size]="15" />
-              {{ 'MEMORY.SLIDESHOW' | translate }}
-            </a>
-            <button type="button" class="write tw-btn-primary" [disabled]="facade.pending()" (click)="openWriter()">
-              <pm-icon name="bookmark" [size]="16" />
-              {{ 'MEMORY.ADD' | translate }}
-            </button>
-          </div>
         </div>
         <p class="sub tw-page-sub">{{ 'MEMORY.BOOK_SUB' | translate }}</p>
 
@@ -50,19 +32,39 @@
 
       </header>
 
-      <nav class="view-switch tw-tabs self-start" [attr.aria-label]="'BOOK.VIEW_LABEL' | translate">
-        @for (tab of tabs; track tab.view) {
-          <button
-            type="button"
-            class="tw-tab"
-            [class.on]="view() === tab.view"
-            [attr.aria-pressed]="view() === tab.view"
-            (click)="show(tab.view)"
-          >
-            {{ tab.key | translate }}
+      <div class="toolbar flex flex-wrap items-center gap-3">
+        <nav class="view-switch tw-tabs" [attr.aria-label]="'BOOK.VIEW_LABEL' | translate">
+          @for (tab of tabs; track tab.view) {
+            <button
+              type="button"
+              class="tw-tab"
+              [class.on]="view() === tab.view"
+              [attr.aria-pressed]="view() === tab.view"
+              (click)="show(tab.view)"
+            >
+              {{ tab.key | translate }}
+            </button>
+          }
+        </nav>
+        <div class="book-tools flex flex-wrap items-center gap-2 ms-auto max-nav:ms-0">
+          <button type="button" class="tool tw-btn-secondary" (click)="openShares()">
+            <pm-icon name="users" [size]="15" />
+            {{ 'MEMORY.SHARE_MANAGE' | translate }}
           </button>
-        }
-      </nav>
+          <button type="button" class="tool tw-btn-secondary" (click)="openExport()">
+            <pm-icon name="book" [size]="15" />
+            {{ 'MEMORY.EXPORT' | translate }}
+          </button>
+          <a class="tool tw-btn-secondary" [routerLink]="['/pets', facade.pet()?._id, 'slideshow']">
+            <pm-icon name="image" [size]="15" />
+            {{ 'MEMORY.SLIDESHOW' | translate }}
+          </a>
+          <button type="button" class="write tw-btn-primary" [disabled]="facade.pending()" (click)="openWriter()">
+            <pm-icon name="bookmark" [size]="16" />
+            {{ 'MEMORY.ADD' | translate }}
+          </button>
+        </div>
+      </div>
 
       @if (facade.pageProblem(); as trouble) {
         <p class="note m-0 rounded-md bg-amber-soft px-4 py-3 text-sm text-on-amber" role="alert">{{ trouble | translate }}</p>

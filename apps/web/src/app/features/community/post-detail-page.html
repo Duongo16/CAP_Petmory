@@ -1,8 +1,10 @@
-<div class="pm-page">
-  <a class="back-link tw-back" routerLink="/community">
-    <span class="rotate-180 inline-flex"><pm-icon name="chevron" [size]="14" /></span>
-    {{ 'COMMUNITY.POST.BACK' | translate }}
-  </a>
+<div class="pm-page" [class.in-popup]="inPopup()">
+  @if (!inPopup()) {
+    <a class="back-link tw-back" routerLink="/community">
+      <span class="rotate-180 inline-flex"><pm-icon name="chevron" [size]="14" /></span>
+      {{ 'COMMUNITY.POST.BACK' | translate }}
+    </a>
+  }
 
   @switch (status()) {
     @case ('LOADING') {
@@ -133,6 +135,7 @@
                     {{ 'COMMUNITY.DETAIL.COMMENT_PLACEHOLDER' | translate }}
                   </label>
                   <input
+                    #commentBox
                     id="comment-input"
                     class="tw-input"
                     name="comment"
@@ -182,7 +185,7 @@
                 <ul class="related-list">
                   @for (card of relatedCards(); track card.raw.id) {
                     <li>
-                      <a [routerLink]="['/community/posts', card.raw.id]">
+                      <a routerLink="/community" [queryParams]="{ post: card.raw.id }">
                         @if (card.cover) {
                           <img [src]="card.cover" alt="" />
                         } @else {

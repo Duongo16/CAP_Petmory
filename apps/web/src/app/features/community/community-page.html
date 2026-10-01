@@ -26,16 +26,6 @@
 
   <div class="grid grid-cols-[minmax(0,1fr)_300px] gap-6 items-start max-nav:grid-cols-1">
     <div class="flex flex-col gap-5 min-w-0">
-      <div class="filters flex flex-wrap items-center gap-2">
-        <label class="tw-label" for="community-topic-filter">{{ 'COMMUNITY.FILTER_LABEL' | translate }}</label>
-        <select id="community-topic-filter" class="tw-select w-auto min-w-56" (change)="chooseTopicFrom($event)">
-          @for (chip of facade.chips(); track chip.key) {
-            <option [value]="chip.topic ?? ''" [selected]="facade.topic() === chip.topic">
-              {{ chip.key | translate }} ({{ chip.count }})
-            </option>
-          }
-        </select>
-      </div>
 
       @if (user()) {
         <section class="pm-card p-5">
@@ -106,13 +96,13 @@
                     }
                   </header>
 
-                  <a class="post-body block mt-4 no-underline text-inherit" [routerLink]="['/community/posts', card.raw.id]">
+                  <a class="post-body block mt-4 no-underline text-inherit" routerLink="/community" [queryParams]="{ post: card.raw.id }">
                     <h2 class="post-title m-0 mb-1.5 font-serif text-xl font-medium leading-snug text-ink">{{ card.raw.title }}</h2>
                     <p class="m-0 text-body text-[15px] leading-[1.6] line-clamp-3">{{ card.raw.content }}</p>
                   </a>
 
                   @if (card.photoUrls.length > 0) {
-                    <a class="post-photos block mt-4" [routerLink]="['/community/posts', card.raw.id]">
+                    <a class="post-photos block mt-4" routerLink="/community" [queryParams]="{ post: card.raw.id }">
                       @for (url of card.photoUrls; track url) {
                         <img
                           [src]="url"
@@ -142,7 +132,7 @@
                       <span class="sr-only">{{ 'COMMUNITY.POST.LIKE' | translate }}</span>
                     </button>
 
-                    <a class="react" [routerLink]="['/community/posts', card.raw.id]">
+                    <a class="react" routerLink="/community" [queryParams]="{ post: card.raw.id, comment: 1 }">
                       <pm-icon name="comment" [size]="17" />
                       <span>{{ card.raw.commentCount }}</span>
                       <span class="sr-only">{{ 'COMMUNITY.POST.COMMENT' | translate }}</span>

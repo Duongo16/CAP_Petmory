@@ -1,0 +1,6 @@
+<div class="post-popup">
+  <button type="button" class="post-close tw-btn-icon" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+    <pm-icon name="close" [size]="16" />
+  </button>
+  <pm-post-detail-page [id]="data.id" [inPopup]="true" [focusComment]="data.comment" />
+</div>

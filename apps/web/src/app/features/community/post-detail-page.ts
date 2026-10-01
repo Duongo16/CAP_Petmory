@@ -1,4 +1,15 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -30,6 +41,23 @@ export class PostDetailPage implements OnInit {
 
   /** Post id from the URL, via the router's parameter binding. */
   readonly id = input.required<string>();
+
+  /** Shown inside a popup over the feed, so the back link is left out. */
+  readonly inPopup = input(false);
+
+  /** Opened from a comment button: put the cursor in the comment box once it appears. */
+  readonly focusComment = input(false);
+
+  private readonly commentBox = viewChild<ElementRef<HTMLInputElement>>('commentBox');
+  private focused = false;
+
+  protected readonly focusWhenReady = effect(() => {
+    const box = this.commentBox();
+    if (box && this.focusComment() && !this.focused) {
+      this.focused = true;
+      box.nativeElement.focus();
+    }
+  });
 
   readonly user = this.auth.user;
   readonly status = signal<ScreenState>('LOADING');

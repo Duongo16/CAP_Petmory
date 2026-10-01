@@ -453,3 +453,8 @@
     }
   }
 }
+
+/* Inside the popup the page frame keeps its own padding but drops the page width cap. */
+.in-popup {
+  padding-block-start: 0;
+}

@@ -11,8 +11,6 @@ const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
 /** Cac o tren man hinh duoc chi den nhieu lan, gom lai mot cho. */
 const CARD_POST = '.post-card';
-const FILTER_TOPIC = '#community-topic-filter';
-const OPTION_TOPIC = '#community-topic-filter option';
 
 const OUT = path.join(__dirname, '..', 'test-screenshots');
 const PASSWORD = 'Password@123';
@@ -74,9 +72,8 @@ async function run() {
 
   // --- The feed ---
   await page.goto(`${WEB}/community`, { waitUntil: 'networkidle' });
-  await page.waitForSelector(FILTER_TOPIC, { timeout: 30000 });
-  const chips = await page.locator(OPTION_TOPIC).count();
-  res.push(check('Every topic is offered in the filter', chips === 7, `${chips} options`));
+  await page.waitForSelector('.banner h1', { timeout: 30000 });
+  res.push(check('The topic filter is gone', (await page.locator('#community-topic-filter').count()) === 0));
   res.push(check('The banner carries the community heading',
     (await page.locator('.banner h1').innerText()).length > 0));
   res.push(check('The composer is offered to a signed-in member',
@@ -133,24 +130,12 @@ async function run() {
   res.push(check('The heart counts up', heartAfter === heartBefore + 1,
     `${heartBefore} -> ${heartAfter}`));
 
-  // --- Filtering ---
-  // Chon mot chu de trong hop chon, khong gia dinh chu de nao dang rong. Co so
-  // du lieu dung chung voi moi lan chay truoc.
-  await page.selectOption(FILTER_TOPIC, { index: 2 });
-  await page.waitForTimeout(1200);
-  const listed = await page.locator(CARD_POST).count();
-  res.push(check('Loc theo chu de tra ve dung so bai cua chu de do',
-    listed > 0 || (await page.locator('.pm-empty').count()) > 0,
-    `${listed} bai`));
-
-  await page.selectOption(FILTER_TOPIC, { index: 0 });
-  await page.waitForTimeout(1200);
-
   // --- The post detail ---
   await page.locator('.post-card .post-body').first().click();
-  await page.waitForURL('**/community/posts/**', { timeout: 20000 });
-  // The feed cards also carry .post-title, so the detail heading is picked by tag.
-  await page.waitForSelector('h1.post-title', { timeout: 20000 });
+  // The post opens as a popup over the feed, not on a page of its own.
+  await page.waitForSelector('pm-post-detail-dialog h1.post-title', { timeout: 20000 });
+  res.push(check('The post opens in a popup over the feed',
+    page.url().includes('/community?post=')));
   res.push(check('The detail opens with the title',
     (await page.locator('h1.post-title').innerText()).includes('Miu')));
   res.push(check('The side rail shows the view count',
@@ -161,6 +146,16 @@ async function run() {
   await page.waitForTimeout(1600);
   res.push(check('A comment appears under the post',
     (await page.locator('.comment-list li').count()) === 1));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(800);
+  res.push(check('Closing the popup leaves the feed', (await page.locator('pm-post-detail-dialog').count()) === 0));
+
+  // The comment button goes straight to the comment box.
+  await page.locator('.post-card a.react').first().click();
+  await page.waitForSelector('pm-post-detail-dialog #comment-input', { timeout: 20000 });
+  await page.waitForTimeout(400);
+  res.push(check('The comment button puts the cursor in the comment box',
+    (await page.evaluate(() => document.activeElement?.id)) === 'comment-input'));
   await page.screenshot({ path: path.join(OUT, 'community-3-detail.png'), fullPage: true });
 
   // --- The public profile ---
