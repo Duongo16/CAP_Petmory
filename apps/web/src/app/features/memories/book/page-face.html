@@ -1,0 +1,93 @@
+<div class="sheet" [class]="paperClass()" [class.is-cover]="face().kind !== 'MOMENT'">
+  @switch (face().kind) {
+    @case ('COVER') {
+      <div class="cover">
+        @if (face().avatarUrl) {
+          <img class="cover-face" [src]="face().avatarUrl" [alt]="face().petName" />
+        } @else {
+          <span class="cover-face cover-blank" aria-hidden="true"></span>
+        }
+        <h2>{{ face().petName }}</h2>
+        @if (face().tagline) {
+          <p class="cover-line">{{ face().tagline }}</p>
+        }
+        <p class="cover-count">
+          {{ 'MEMORY.COUNT_MOMENT' | translate: { count: face().momentCount } }}
+        </p>
+      </div>
+    }
+    @case ('END') {
+      <div class="cover end">
+        <p class="cover-line">{{ 'BOOK.END' | translate }}</p>
+      </div>
+    }
+    @case ('BLANK') {
+      <div class="empty-page"></div>
+    }
+    @case ('MOMENT') {
+      @if (face().moment; as one) {
+        @if (decorated()) {
+          <div class="canvas">
+            @for (item of items(); track $index) {
+              <div
+                class="item"
+                [class.is-text]="item.raw.kind === 'TEXT'"
+                [style.left.%]="item.raw.x"
+                [style.top.%]="item.raw.y"
+                [style.width.%]="item.raw.width"
+                [style.transform]="'rotate(' + item.raw.rotate + 'deg)'"
+                [style.z-index]="item.raw.z"
+              >
+                @switch (item.raw.kind) {
+                  @case ('TEXT') {
+                    <p
+                      class="text"
+                      [class]="'font-' + (item.raw.fontKey || 'HAND').toLowerCase()"
+                      [style.color]="item.raw.color || null"
+                    >{{ item.raw.text }}</p>
+                  }
+                  @case ('PHOTO') {
+                    @if (item.source) {
+                      <img class="shot" [src]="item.source" [alt]="one.title" />
+                    }
+                  }
+                  @case ('STICKER') {
+                    @if (item.path) {
+                      <svg class="sticker" viewBox="0 0 100 100" aria-hidden="true">
+                        <path [attr.d]="item.path" [attr.fill]="item.raw.color || '#b0413e'" />
+                      </svg>
+                    }
+                  }
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="plain">
+            <p class="plain-when">
+              {{ one.happenedAt | date: 'dd/MM/yyyy' }}
+              @if (one.place) {
+                <span class="plain-place">· {{ one.place }}</span>
+              }
+            </p>
+            <h2 class="plain-title">{{ one.title }}</h2>
+            @if (one.body) {
+              <p class="plain-body">{{ one.body }}</p>
+            }
+            @if (plainShots().length > 0) {
+              <div class="plain-shots">
+                @for (src of plainShots(); track src) {
+                  <img [src]="src" [alt]="one.title" />
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  }
+
+  @if (face().number > 0) {
+    <span class="folio">{{ face().number }}</span>
+  }
+</div>

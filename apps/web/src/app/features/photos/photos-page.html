@@ -1,189 +1,185 @@
-<div class="pm-page">
-  <a class="back-link" routerLink="/pets">← {{ 'PHOTO.BACK_TO_PETS' | translate }}</a>
-
-  <header class="page-header">
-    <h1 class="title">{{ 'PHOTO.TITLE' | translate }}</h1>
-    <p class="description">{{ 'PHOTO.DESCRIPTION' | translate }}</p>
-
-    <div class="progress" role="status">
-      <span class="angle-count" [class.raw]="facade.rawAngle()">
-        {{ facade.anglesFilled() }}/{{ facade.requiredAngleCount }}
-      </span>
-      <span>{{ (facade.rawAngle() ? 'PHOTO.RAW_ANGLE' : 'PHOTO.REMAINING_MISSING_ANGLE') | translate }}</span>
+<div class="pm-page album">
+  <header class="head">
+    <div>
+      <a class="back tw-back" routerLink="/pets">
+        <pm-icon name="chevron" [size]="13" />
+        {{ 'PHOTO.BACK_TO_PETS' | translate }}
+      </a>
+      <h1 class="pm-section-title pm-page-title">{{ facade.petName() || ('PHOTO.TITLE' | translate) }}</h1>
+      <p class="sub tw-page-sub">{{ 'PHOTO.SUB' | translate }}</p>
     </div>
+
+    <label class="strong tw-btn-primary" for="album-file" [class.busy]="facade.uploading()">
+      <pm-icon name="image" [size]="16" />
+      {{ (facade.uploading() ? 'PHOTO.SENDING' : 'PHOTO.ADD') | translate }}
+      <input
+        id="album-file"
+        class="sr-only"
+        type="file"
+        accept="image/png,image/jpeg"
+        multiple
+        [disabled]="facade.uploading() || facade.full()"
+        (change)="pick($event)"
+      />
+    </label>
+
+    <pm-image-link
+      boxId="album-link"
+      [disabled]="facade.uploading() || facade.full()"
+      [busy]="facade.uploading()"
+      (picked)="facade.addLink($event)"
+    />
   </header>
 
-  @if (facade.error(); as codeError) {
-    <p class="error" role="alert">{{ codeError | translate }}</p>
+  <p class="tally">
+    {{ facade.count() }}/{{ facade.limit }}
+    @if (facade.full()) {
+      · {{ 'PHOTO.FULL' | translate }}
+    }
+  </p>
+
+  @if (facade.error(); as message) {
+    <p class="note" role="alert">{{ message | translate }}</p>
   }
 
   @switch (facade.status()) {
     @case ('LOADING') {
-      <div class="pm-center"><mat-spinner diameter="40" /></div>
+      <p class="centre">{{ 'COMMON.LOADING' | translate }}</p>
     }
     @case ('ERROR') {
-      <div class="pm-center">
+      <div class="centre">
         <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
-        <button class="pm-button-secondary" type="button" (click)="facade.reload()">
+        <button type="button" class="plain tw-btn-secondary" (click)="facade.reload()">
           {{ 'COMMON.RETRY' | translate }}
         </button>
       </div>
     }
-    @case ('READY') {
-      <section class="operations-panel">
-        <h2>{{ 'PHOTO.SELECT_OPERATION' | translate }}</h2>
-        <p class="note">{{ 'PHOTO.NOTE_RESTORE' | translate }}</p>
-        <div class="checkbox-row">
-          @for (op of operations(); track op.code) {
-            <mat-checkbox [checked]="op.chosen" (change)="changeOperation(op.code, $event.checked)">
-              {{ op.key | translate }}
-            </mat-checkbox>
-          }
-        </div>
-      </section>
-
-      <div class="angle-grid">
-        @for (o of facade.tiles(); track o.angle) {
-          <section class="angle-slot" [class.missing]="o.required && !o.photo">
-            <h2 class="angle-name">
-              {{ o.keyAngle | translate }}
-              @if (o.required) {
-                <span class="asterisk" [attr.aria-label]="'PHOTO.REQUIRED' | translate">*</span>
-              }
-            </h2>
-
-            @if (o.photo; as photo) {
-              <div class="photo-frame">
-                @if (facade.sourcePhoto()[photo.raw._id]; as src) {
-                  <img [src]="src" [alt]="o.keyAngle | translate" />
-                } @else {
-                  <div class="photo-loading"><mat-spinner diameter="28" /></div>
-                }
-              </div>
-
-              <p class="label" [attr.data-label]="photo.raw.quality.label">
-                {{ photo.keyLabel | translate }}
-              </p>
-              <p class="spec">{{ photo.raw.quality.width }}×{{ photo.raw.quality.height }}</p>
-
-              @if (photo.warningKeys.length > 0) {
-                <ul class="warning">
-                  @for (key of photo.warningKeys; track key) {
-                    <li>{{ key | translate }}</li>
-                  }
-                </ul>
-              }
-
-              <div class="button-row">
-                @if (photo.shouldRestore && !o.versionRestore) {
-                  <button
-                    class="pm-button-primary"
-                    type="button"
-                    [disabled]="facade.pendingRestore() === photo.raw._id"
-                    (click)="startRestore(photo.raw._id)"
-                  >
-                    {{ 'PHOTO.RESTORE' | translate }}
-                  </button>
-                }
-                @if (o.versionRestore) {
-                  <button class="pm-button-secondary" type="button" (click)="facade.openCompare(photo.raw._id)">
-                    {{ 'PHOTO.VIEW_COMPARISON' | translate }}
-                  </button>
-                }
-                <button class="pm-button-secondary small" type="button" (click)="facade.remove(photo.raw)">
-                  {{ 'COMMON.REMOVE' | translate }}
-                </button>
-              </div>
-
-              @if (o.versionRestore?.raw?.confirmedByOwner) {
-                <p class="in-use">{{ 'PHOTO.PENDING_BUILD_VERSION_RESTORE' | translate }}</p>
-              }
-            } @else {
-              <label class="empty-slot" [attr.for]="o.slotId">
-                <span class="photo-frame empty" aria-hidden="true">＋</span>
-                <span class="choose-button">{{ 'PHOTO.SELECT_FILE' | translate }}</span>
-                <input
-                  class="visually-hidden"
-                  type="file"
-                  accept="image/jpeg,image/png"
-                  [id]="o.slotId"
-                  [attr.aria-label]="o.keyAngle | translate"
-                  (change)="selectFile(o, $event)"
-                />
-              </label>
-              @if (facade.uploading() === o.angle) {
-                <div class="pm-center"><mat-spinner diameter="24" /></div>
-              }
-            }
-          </section>
-        }
+    @case ('EMPTY') {
+      <div class="centre empty tw-empty">
+        <span class="empty-mark" aria-hidden="true"><pm-icon name="image" [size]="32" /></span>
+        <p>{{ 'PHOTO.EMPTY' | translate }}</p>
+        <p class="empty-hint">{{ 'PHOTO.EMPTY_HINT' | translate }}</p>
       </div>
     }
-  }
-
-  @if (cellCompare(); as o) {
-    @if (o.photo && o.versionRestore) {
-      <div
-        class="overlay"
-        role="dialog"
-        aria-modal="true"
-        [attr.aria-label]="'PHOTO.COMPARE' | translate"
-        (keydown.escape)="facade.openCompare(null)"
-      >
-        <div class="compare-dialog" cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
-          <h2>{{ 'PHOTO.COMPARE' | translate }}</h2>
-
-          <div class="photo-pair">
-            <figure>
-              <figcaption>{{ 'PHOTO.VERSION_ANGLE' | translate }}</figcaption>
-              @if (facade.sourcePhoto()[o.photo.raw._id]; as src) {
-                <img [src]="src" [alt]="'PHOTO.VERSION_ANGLE' | translate" />
-              }
-              <p class="spec">
-                {{ o.photo.raw.quality.width }}×{{ o.photo.raw.quality.height }} ·
-                {{ o.photo.keyLabel | translate }}
-              </p>
-            </figure>
-            <figure>
-              <figcaption>{{ 'PHOTO.VERSION_RESTORE' | translate }}</figcaption>
-              @if (facade.sourcePhoto()[o.versionRestore.raw._id]; as src) {
-                <img [src]="src" [alt]="'PHOTO.VERSION_RESTORE' | translate" />
-              }
-              <p class="spec">
-                {{ o.versionRestore.raw.quality.width }}×{{ o.versionRestore.raw.quality.height }} ·
-                {{ o.versionRestore.keyLabel | translate }}
-              </p>
-              @if (o.versionRestore.raw.resemblance !== null) {
-                <p class="spec">
-                  {{
-                    'PHOTO.RESEMBLANCE'
-                      | translate: { percent: o.versionRestore.raw.resemblance }
-                  }}
-                </p>
-              }
-            </figure>
+    @case ('HAS_DATA') {
+      <section class="verdict tw-card">
+        <div class="verdict-head">
+          <div>
+            <p class="verdict-eyebrow">{{ 'PHOTO.CHECK_EYEBROW' | translate }}</p>
+            <h2 class="verdict-title">{{ 'PHOTO.CHECK_TITLE' | translate }}</h2>
           </div>
-
-          @if (o.versionRestore.resemblanceLow) {
-            <p class="resemblance-warning" role="alert">
-              {{ 'PHOTO.RESEMBLANCE_LOW' | translate }}
-            </p>
-          }
-
-          <p class="note">{{ 'PHOTO.NOTE_CONFIRM' | translate }}</p>
-
-          <div class="button-row">
-            <button class="pm-button-primary" type="button" (click)="facade.decide(o.versionRestore.raw, true)">
-              {{ 'PHOTO.USE_THIS_VERSION' | translate }}
-            </button>
-            <button class="pm-button-secondary" type="button" (click)="facade.decide(o.versionRestore.raw, false)">
-              {{ 'PHOTO.KEEP_VERSION_ANGLE' | translate }}
-            </button>
-            <button class="pm-button-secondary small" type="button" (click)="facade.openCompare(null)">
-              {{ 'COMMON.CLOSE' | translate }}
-            </button>
-          </div>
+          <span class="verdict-share">
+            <strong>{{ facade.readyCount() }}/{{ facade.count() }}</strong>
+            {{ 'PHOTO.CHECK_READY' | translate }}
+          </span>
         </div>
+
+        <span class="verdict-rail" aria-hidden="true">
+          <span class="verdict-done" [style.inline-size.%]="facade.readyShare()"></span>
+        </span>
+
+        <p class="verdict-note">
+          @if (facade.weakCount() > 0) {
+            {{ 'PHOTO.CHECK_WEAK' | translate: { count: facade.weakCount() } }}
+            <a routerLink="/restore">{{ 'PHOTO.CHECK_GO_RESTORE' | translate }}</a>
+          } @else {
+            {{ 'PHOTO.CHECK_ALL_GOOD' | translate }}
+          }
+        </p>
+      </section>
+
+      <div class="two">
+        <div class="two-left">
+          <ul class="grid">
+            @for (tile of facade.tiles(); track tile.photo._id) {
+              <li class="shot">
+                <div class="shot-photo">
+                  @if (tile.source) {
+                    <img [src]="tile.source" [alt]="tile.photo.originalName" />
+                  }
+                  @if (tile.restored) {
+                    <span class="shot-badge">{{ 'PHOTO.HAS_RESTORED' | translate }}</span>
+                  }
+                </div>
+
+                <div class="shot-text">
+                  <span class="shot-grade" [attr.data-tone]="tile.gradeTone">
+                    {{ tile.gradeKey | translate }}
+                  </span>
+                  <strong>{{ tile.photo.originalName }}</strong>
+                  <span class="shot-size">
+                    {{ tile.photo.quality.width }} × {{ tile.photo.quality.height }}
+                  </span>
+
+                  @if (tile.findingKeys.length > 0) {
+                    <ul class="shot-findings">
+                      @for (key of tile.findingKeys; track key) {
+                        <li>{{ key | translate }}</li>
+                      }
+                    </ul>
+                  }
+
+                  @if (tile.wantsRestoring) {
+                    <a class="shot-fix" routerLink="/restore">
+                      <pm-icon name="bulb" [size]="13" />
+                      {{ 'PHOTO.FIX_IT' | translate }}
+                    </a>
+                  }
+                </div>
+
+                <button
+                  type="button"
+                  class="shot-drop"
+                  (click)="remove(tile)"
+                  [attr.aria-label]="'COMMON.REMOVE' | translate"
+                >
+                  <pm-icon name="trash" [size]="14" />
+                </button>
+              </li>
+            }
+          </ul>
+
+          <p class="hint">
+            <pm-icon name="bulb" [size]="14" />
+            {{ 'PHOTO.RESTORE_HINT' | translate }}
+            <a routerLink="/restore">{{ 'NAV.RESTORE' | translate }}</a>
+          </p>
+        </div>
+
+        <aside class="adviser tw-card">
+          <p class="adviser-eyebrow">{{ 'PHOTO.ADVISER_EYEBROW' | translate }}</p>
+          <h2 class="adviser-title">{{ 'PHOTO.ADVISER_TITLE' | translate }}</h2>
+          <p class="adviser-sub">{{ 'PHOTO.ADVISER_SUB' | translate }}</p>
+
+          <ol class="journey">
+            @for (key of journey; track key; let at = $index) {
+              <li class="journey-step" [class.here]="at === 0">
+                <span class="journey-no">{{ at + 1 }}</span>
+                {{ key | translate }}
+              </li>
+            }
+          </ol>
+
+          <dl class="adviser-notes">
+            <div>
+              <dt>{{ 'PHOTO.ADVISER_ANGLES' | translate }}</dt>
+              <dd>{{ 'PHOTO.ADVISER_ANGLES_TEXT' | translate }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'PHOTO.ADVISER_LIGHT' | translate }}</dt>
+              <dd>{{ 'PHOTO.ADVISER_LIGHT_TEXT' | translate }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'PHOTO.ADVISER_SIZE' | translate }}</dt>
+              <dd>{{ 'PHOTO.ADVISER_SIZE_TEXT' | translate }}</dd>
+            </div>
+          </dl>
+
+          <a class="adviser-go" routerLink="/studio">
+            {{ 'PHOTO.ADVISER_GO' | translate }}
+            <pm-icon name="chevron" [size]="13" />
+          </a>
+        </aside>
       </div>
     }
   }

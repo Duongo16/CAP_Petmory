@@ -6,32 +6,91 @@
   padding: 24px 24px 48px;
 }
 
+/*
+ * Mot o nhap dung chung cho ca khu noi bo: cao 44, vien day 1.5, nen trang
+ * cua the, va vong sang mau dat khi dang go.
+ */
+@mixin admin-input {
+  inline-size: 100%;
+  min-block-size: 44px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1.5px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font: inherit;
+  font-size: var(--pm-text-md);
+  outline: none;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+
+  &::placeholder {
+    color: var(--pm-text-muted);
+  }
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: var(--pm-border-strong);
+  }
+
+  &:focus {
+    border-color: var(--pm-accent);
+    box-shadow: 0 0 0 4px var(--pm-accent-soft);
+  }
+
+  &:disabled {
+    background: var(--pm-bg-muted);
+    color: var(--pm-text-muted);
+    cursor: not-allowed;
+  }
+}
+
 .back-link {
-  display: inline-block;
-  margin-bottom: var(--pm-space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--pm-space-4);
   color: var(--pm-text-muted);
+  font-size: var(--pm-text-md);
+  font-weight: 600;
   text-decoration: none;
+  transition: color 150ms ease;
 
   &:hover {
     color: var(--pm-accent);
   }
 }
 
+/*
+ * Dau trang: dong chu nho va cau mo ta chiem tron mot hang, tieu de dung cung
+ * hang voi nhan trang thai, nut thao tac day ve ben phai.
+ */
 .page-header {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--pm-space-3);
-  margin-bottom: var(--pm-gap);
+  align-items: center;
+  gap: var(--pm-space-3) var(--pm-space-4);
+  margin-bottom: 28px;
+
+  > .board-eyebrow,
+  > .description {
+    flex-basis: 100%;
+  }
+
+  > .pm-button-secondary,
+  > .pm-button-primary {
+    margin-inline-start: auto;
+  }
 }
 
 /* Header gom tieu de + o tim kiem thanh mot hang, tiet kiem chieu doc. */
 .order-bar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--pm-space-4);
   flex-wrap: wrap;
-  margin-bottom: var(--pm-space-4);
+  margin-bottom: var(--pm-space-6);
 
   .search-row {
     flex: 1;
@@ -63,11 +122,12 @@
   display: flex;
   align-items: center;
   gap: var(--pm-space-2);
-  margin: 0 0 var(--pm-space-1);
+  margin: 0;
   font-size: var(--pm-text-xs);
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--pm-accent-dark);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pm-amber);
 
   &::before {
     content: '';
@@ -85,22 +145,56 @@
   }
 }
 
+/*
+ * Tieu de trang theo co chu chung: chu co chan, nang 500. Lop nay chi go le
+ * duoi, khong dat lai co chu, de khong de len kieu chung.
+ */
 .title {
   margin: 0;
-  font-size: var(--pm-text-xl);
-  font-weight: 600;
+  font-family: var(--pm-font-display);
+  font-size: clamp(1.625rem, 2.6vw, 2.125rem);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--pm-text);
 }
 
 .description {
   margin: 0;
+  max-width: 62ch;
   color: var(--pm-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.6;
 }
 
 .error {
-  padding: var(--pm-space-2) var(--pm-space-3);
-  border-radius: var(--pm-radius-sm);
-  background: var(--pm-bg-card);
-  color: var(--pm-danger);
+  margin: 0 0 var(--pm-gap);
+  padding: 12px 16px;
+  border-radius: var(--pm-radius);
+  background: var(--pm-danger-soft);
+  color: var(--pm-on-danger-soft);
+  font-size: var(--pm-text-md);
+  font-weight: 500;
+}
+
+/* Dong bao ngan ngay tren bang: dung chung nhan trang thai, nhung trai ngang. */
+p.pm-status {
+  display: flex;
+  margin: 0 0 var(--pm-gap);
+  padding: 12px 16px;
+  border-radius: var(--pm-radius);
+  font-size: var(--pm-text-md);
+  font-weight: 500;
+  white-space: normal;
+
+  &[data-tone='bad'] {
+    background: var(--pm-danger-soft);
+    color: var(--pm-on-danger-soft);
+  }
+
+  &[data-tone='good'] {
+    background: var(--pm-success-soft);
+    color: var(--pm-on-success-soft);
+  }
 }
 
 /* --- Counter board at the top of the dispatch screen --- */
@@ -237,30 +331,26 @@
   color: var(--pm-danger);
 }
 
+
 /* --- Search row --- */
 .search-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--pm-space-2);
+  gap: 10px;
   margin-bottom: var(--pm-gap);
   padding: 12px 16px;
   border: 1px solid var(--pm-border);
-  border-radius: 18px;
+  border-radius: 20px;
   background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
 
   input {
+    @include admin-input;
+
     flex: 1;
+    inline-size: auto;
     min-width: 180px;
-    min-height: 44px;
-    box-sizing: border-box;
-    padding: 0 14px;
-    border: 1.5px solid var(--pm-border);
-    border-radius: 12px;
-    background: var(--pm-bg-muted);
-    color: var(--pm-text);
-    font: inherit;
-    font-size: var(--pm-text-sm);
   }
 }
 
@@ -470,41 +560,101 @@
   line-height: 32px;
 }
 
+
+/* Nut nho trong dong bang hoac goc the, cung kieu nut phu nhung thap hon. */
+.plain {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: 36px;
+  padding: 0 14px;
+  border: 1.5px solid var(--pm-border);
+  border-radius: var(--pm-radius-sm);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font: inherit;
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /*
+   * Nut xoa nhe hon nut sua.
+   *
+   * Thao tac pha huy khong nen moi goi ngang voi thao tac hang ngay, nen no bo
+   * vien va bo nen, chi giu mau chu.
+   */
+  &.danger {
+    border-color: transparent;
+    background: transparent;
+    color: var(--pm-danger);
+
+    &:hover:not(:disabled) {
+      background: var(--pm-danger-soft);
+      color: var(--pm-on-danger-soft);
+    }
+  }
+}
+
 /* --- Detail page --- */
 .two-column-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
   gap: var(--pm-gap);
+  margin-bottom: var(--pm-gap);
+
+  > .card {
+    margin-bottom: 0;
+  }
 }
 
 .card {
   margin-bottom: var(--pm-gap);
-  padding: var(--pm-space-5);
+  padding: var(--pm-space-6);
   border: 1px solid var(--pm-border);
-  border-radius: var(--pm-radius-lg);
+  border-radius: 20px;
   background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
 
   h2 {
-    margin: 0 0 var(--pm-space-3);
+    margin: 0 0 var(--pm-space-4);
     font-family: var(--pm-font-display);
-    font-size: var(--pm-text-lg);
-    font-weight: 600;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--pm-text);
   }
 
   h2 + * + h2,
   dl + h2 {
-    margin-top: var(--pm-space-4);
+    margin-top: var(--pm-space-6);
   }
 
-  input {
-    width: 100%;
-    padding: var(--pm-space-3) var(--pm-space-3);
-    border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius-sm);
-    background: var(--pm-bg);
-    color: var(--pm-text);
-    font: inherit;
+  input:not([type='checkbox']):not([type='radio']) {
+    @include admin-input;
   }
+}
+
+/* Bang dat trong mot the thi bo bong va bo goc nho lai, the ngoai da lo phan khung. */
+.card .table-wrap,
+.pm-card > .table-wrap {
+  border-radius: var(--pm-radius-lg);
+  box-shadow: none;
 }
 
 /* --- Heading row inside a card, with a small figure beside the name --- */
@@ -527,18 +677,25 @@
 }
 
 .pack-chip {
-  margin-bottom: var(--pm-space-3);
-  padding: var(--pm-space-1) var(--pm-space-2);
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
   border-radius: var(--pm-radius-pill);
   background: var(--pm-success-soft);
   color: var(--pm-on-success-soft);
-  font-size: var(--pm-text-sm);
-  font-weight: 500;
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .stage-count {
-  font-size: var(--pm-text-sm);
+  padding: 4px 12px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-muted);
   color: var(--pm-text-body);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 /* --- The four stages of a run, read left to right --- */
@@ -546,25 +703,34 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: var(--pm-space-2);
-  margin: 0 0 var(--pm-space-4);
+  margin: 0 0 var(--pm-space-5);
   padding: 0;
   list-style: none;
 }
 
 .stage {
-  padding: var(--pm-space-2) var(--pm-space-3);
-  border-radius: var(--pm-radius-sm);
+  display: flex;
+  align-items: center;
+  min-block-size: 44px;
+  box-sizing: border-box;
+  padding: 8px 14px;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
   background: var(--pm-bg-muted);
   font-size: var(--pm-text-sm);
+  font-weight: 500;
   color: var(--pm-text-muted);
 }
 
 .stage.done {
-  color: var(--pm-success);
-  font-weight: 500;
+  border-color: transparent;
+  background: var(--pm-success-soft);
+  color: var(--pm-on-success-soft);
+  font-weight: 600;
 }
 
 .stage.here {
+  border-color: var(--pm-amber);
   background: var(--pm-amber-soft);
   color: var(--pm-on-amber);
   font-weight: 700;
@@ -575,8 +741,8 @@
   align-items: baseline;
   justify-content: flex-end;
   gap: var(--pm-space-3);
-  margin: var(--pm-space-4) 0 0;
-  padding-top: var(--pm-space-3);
+  margin: var(--pm-space-4) 0;
+  padding-top: var(--pm-space-4);
   border-top: 1px solid var(--pm-border);
 
   span {
@@ -587,6 +753,7 @@
   strong {
     font-family: var(--pm-font-display);
     font-size: var(--pm-text-2xl);
+    font-weight: 500;
     color: var(--pm-accent);
   }
 }
@@ -594,7 +761,7 @@
 /* Cancelling is not the same kind of act as moving a run on, so it reads apart. */
 .button-row .pm-button-primary[data-group='bad'] {
   background: var(--pm-bg-card);
-  border: 1px solid var(--pm-border-strong);
+  border: 1.5px solid var(--pm-border-strong);
   color: var(--pm-danger);
   box-shadow: none;
 }
@@ -611,14 +778,14 @@
 .info-pair {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--pm-space-1);
+  gap: 2px;
   margin: 0;
 
   dt {
-    margin-top: var(--pm-space-2);
+    margin-top: var(--pm-space-3);
     font-size: var(--pm-text-xs);
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--pm-text-muted);
   }
@@ -629,56 +796,92 @@
 
   dd {
     margin: 0;
-    font-size: var(--pm-text-md);
+    font-size: 0.9375rem;
     font-weight: 500;
+    line-height: 1.5;
     color: var(--pm-text);
+  }
+
+  dd.accent {
+    color: var(--pm-accent);
   }
 }
 
 .field-label {
   display: block;
-  margin-bottom: var(--pm-space-1);
-  color: var(--pm-text-muted);
-  font-size: var(--pm-text-md);
+  margin-bottom: 6px;
+  color: var(--pm-text);
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
 }
 
 .button-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--pm-space-2);
-  margin-top: var(--pm-space-3);
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--pm-space-4);
 }
 
 .note {
   margin: 0;
   color: var(--pm-text-muted);
   font-size: var(--pm-text-md);
+  line-height: 1.6;
 }
 
+/* Dong thoi gian: moi muc la mot cham tron noi voi nhau bang mot vach doc. */
 .timeline {
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 6px;
   list-style: none;
 
   li {
+    position: relative;
     display: grid;
-    gap: var(--pm-space-1);
-    padding: var(--pm-space-2) 0 var(--pm-space-2) var(--pm-space-4);
+    gap: 2px;
+    padding: 0 0 var(--pm-space-5) var(--pm-space-6);
     border-left: 2px solid var(--pm-border);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset-block-start: 2px;
+      inset-inline-start: -7px;
+      inline-size: 12px;
+      block-size: 12px;
+      box-sizing: border-box;
+      border: 2px solid var(--pm-accent);
+      border-radius: var(--pm-radius-pill);
+      background: var(--pm-bg-card);
+    }
+
+    &:first-child::before {
+      background: var(--pm-accent);
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+      border-left-color: transparent;
+    }
   }
 }
 
 .timestamp {
   color: var(--pm-text-muted);
-  font-size: var(--pm-text-sm);
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .action {
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--pm-text);
 }
 
 .summary {
   font-size: var(--pm-text-md);
+  color: var(--pm-text-body);
 }
 
 .reason {
@@ -699,9 +902,9 @@
 /* --- Business settings form --- */
 .field-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   grid-auto-rows: auto;
-  gap: var(--pm-space-4);
+  gap: var(--pm-space-4) var(--pm-space-5);
 
   /*
    * Each field is a strip of the same three rows as its neighbours, so a name
@@ -711,18 +914,20 @@
     display: grid;
     grid-row: span 3;
     grid-template-rows: subgrid;
-    gap: var(--pm-space-1);
+    gap: 6px;
   }
 
   label > span {
     align-self: end;
-    font-size: var(--pm-text-md);
+    font-size: var(--pm-text-sm);
     font-weight: 600;
+    color: var(--pm-text);
   }
 
   small {
     color: var(--pm-text-muted);
     font-size: var(--pm-text-xs);
+    line-height: 1.5;
   }
 
   input.ng-invalid.ng-touched {
@@ -731,27 +936,35 @@
 }
 
 .saved {
-  padding: var(--pm-space-2) var(--pm-space-3);
-  border-radius: var(--pm-radius-sm);
-  background: var(--pm-accent-soft);
-  color: var(--pm-accent-dark);
+  margin: 0 0 var(--pm-gap);
+  padding: 12px 16px;
+  border-radius: var(--pm-radius);
+  background: var(--pm-success-soft);
+  color: var(--pm-on-success-soft);
+  font-size: var(--pm-text-md);
+  font-weight: 500;
 }
 
 .note.warn {
-  padding: var(--pm-space-2) var(--pm-space-3);
-  border-left: 3px solid var(--pm-memorial);
-  background: var(--pm-bg-muted);
+  margin-bottom: var(--pm-gap);
+  padding: 12px 16px;
+  border-radius: var(--pm-radius);
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
 }
 
 .field-error {
   align-self: center;
   color: var(--pm-danger);
   font-size: var(--pm-text-md);
+  font-weight: 500;
 }
 
 /* --- Production file for the workshop --- */
 .missing-warning {
   border-color: var(--pm-danger);
+  background: var(--pm-danger-soft);
+  color: var(--pm-on-danger-soft);
 
   h2 {
     color: var(--pm-danger);
@@ -759,13 +972,18 @@
 
   ul {
     margin: 0;
-    padding-left: var(--pm-space-4);
+    padding-left: var(--pm-space-5);
+    line-height: 1.7;
   }
 }
 
 .card h3 {
-  margin: var(--pm-space-4) 0 var(--pm-space-2);
-  font-size: var(--pm-text-base);
+  margin: var(--pm-space-6) 0 var(--pm-space-3);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pm-text-muted);
 }
 
 .wool-list {
@@ -779,26 +997,29 @@
   li {
     display: flex;
     align-items: center;
-    gap: var(--pm-space-2);
-    padding: var(--pm-space-2) var(--pm-space-2);
+    gap: 10px;
+    min-block-size: 44px;
+    box-sizing: border-box;
+    padding: 8px 12px;
     border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius-sm);
+    border-radius: var(--pm-radius);
+    background: var(--pm-bg-card);
     font-size: var(--pm-text-md);
   }
 }
 
 .swatch-sm {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex: 0 0 auto;
-  border: 1px solid var(--pm-border);
-  border-radius: 4px;
+  border: 1px solid var(--pm-border-strong);
+  border-radius: 6px;
 }
 
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: var(--pm-space-2);
+  gap: var(--pm-space-3);
 
   figure {
     margin: 0;
@@ -806,12 +1027,13 @@
 
   img {
     width: 100%;
-    border-radius: var(--pm-radius-sm);
+    border: 1px solid var(--pm-border);
+    border-radius: var(--pm-radius);
     background: var(--pm-bg-muted);
   }
 
   figcaption {
-    margin-top: var(--pm-space-1);
+    margin-top: 6px;
     color: var(--pm-text-muted);
     font-size: var(--pm-text-xs);
     text-align: center;
@@ -822,7 +1044,7 @@
   display: grid;
   place-items: center;
   aspect-ratio: 1;
-  border-radius: var(--pm-radius-sm);
+  border-radius: var(--pm-radius);
   background: var(--pm-bg-muted);
 }
 
@@ -835,9 +1057,12 @@
   list-style: none;
 
   li {
-    padding: var(--pm-space-2) var(--pm-space-2);
+    display: grid;
+    gap: 2px;
+    padding: 10px 14px;
     border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius-sm);
+    border-radius: var(--pm-radius);
+    background: var(--pm-bg-muted);
     font-size: var(--pm-text-md);
   }
 }
@@ -858,12 +1083,12 @@
 .group-sub {
   margin: var(--pm-space-1) 0 0;
   font-size: var(--pm-text-sm);
-  color: var(--pm-text-body);
+  color: var(--pm-text-muted);
 }
 
 .group-count {
-  padding: var(--pm-space-1) var(--pm-space-2);
-  border-radius: 999px;
+  padding: 4px 12px;
+  border-radius: var(--pm-radius-pill);
   background: var(--pm-bg-muted);
   color: var(--pm-text-muted);
   font-size: var(--pm-text-xs);
@@ -880,29 +1105,32 @@
 .plan-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--pm-space-4);
+  gap: var(--pm-space-3);
   margin: 0;
 
   div {
     display: flex;
     flex-direction: column;
     gap: var(--pm-space-1);
-    padding: var(--pm-space-3);
+    padding: var(--pm-space-4) var(--pm-space-5);
     border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius);
+    border-radius: var(--pm-radius-lg);
     background: var(--pm-bg-muted);
   }
 
   dt {
-    font-size: var(--pm-text-sm);
-    color: var(--pm-text-body);
+    font-size: var(--pm-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--pm-text-muted);
   }
 
   dd {
     margin: 0;
     font-family: var(--pm-font-display);
-    font-size: var(--pm-text-lg);
-    font-weight: 600;
+    font-size: 1.375rem;
+    font-weight: 500;
     color: var(--pm-text);
   }
 
@@ -922,10 +1150,10 @@
 
 .quality {
   margin-bottom: var(--pm-gap);
-  padding: 0.875rem 1rem;
+  padding: var(--pm-space-4) var(--pm-space-5);
   border: 1px solid var(--pm-border);
-  border-radius: var(--pm-radius);
-  background: var(--pm-bg-card);
+  border-radius: var(--pm-radius-lg);
+  background: var(--pm-bg-muted);
 
   .quality-head {
     display: flex;
@@ -933,30 +1161,36 @@
     gap: 0.5rem;
     align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 0.625rem;
+    margin-bottom: 0.75rem;
 
     h3 {
       margin: 0;
       font-family: var(--pm-font-display);
       font-size: var(--pm-text-base);
-      font-weight: 600;
+      font-weight: 500;
+      letter-spacing: normal;
+      text-transform: none;
       color: var(--pm-text);
     }
   }
 
   .quality-left {
-    font-size: var(--pm-text-sm);
-    font-weight: 600;
-    color: var(--pm-amber);
+    padding: 4px 12px;
+    border-radius: var(--pm-radius-pill);
+    background: var(--pm-amber-soft);
+    font-size: var(--pm-text-xs);
+    font-weight: 700;
+    color: var(--pm-on-amber);
 
     &.done {
-      color: var(--pm-success);
+      background: var(--pm-success-soft);
+      color: var(--pm-on-success-soft);
     }
   }
 
   .quality-list {
     display: grid;
-    gap: 0.375rem;
+    gap: 0.25rem;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -967,12 +1201,13 @@
       gap: 0.5rem;
       align-items: center;
       justify-content: space-between;
+      min-block-size: 40px;
     }
   }
 
   .quality-tick {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.625rem;
     align-items: center;
     font-size: var(--pm-text-md);
     color: var(--pm-text);
@@ -1005,34 +1240,21 @@
 /* O nhieu dong cho phieu kiem tra chat luong, moi dong la mot muc. */
 label.wide {
   display: grid;
-  gap: var(--pm-space-1);
+  gap: 6px;
 
   > span {
-    font-size: var(--pm-text-md);
+    font-size: var(--pm-text-sm);
     font-weight: 600;
     color: var(--pm-text);
   }
 
   textarea {
-    width: 100%;
-    min-height: 160px;
-    padding: var(--pm-space-2) var(--pm-space-3);
-    border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius-sm);
-    background: var(--pm-bg-card);
-    color: var(--pm-text);
-    font: inherit;
+    @include admin-input;
+
+    min-block-size: 160px;
+    padding: 12px 14px;
     line-height: 1.6;
     resize: vertical;
-  }
-
-  textarea:focus {
-    outline: none;
-    border-color: var(--pm-accent);
-  }
-
-  textarea:disabled {
-    color: var(--pm-text-muted);
   }
 
   small {
@@ -1064,7 +1286,7 @@ label.wide {
 
 .row-tools {
   display: flex;
-  gap: var(--pm-space-1);
+  gap: var(--pm-space-2);
   white-space: nowrap;
 }
 
@@ -1074,9 +1296,9 @@ tr.picked {
 
 .stock-form {
   display: grid;
-  gap: var(--pm-space-2);
-  margin-top: var(--pm-space-4);
-  padding-top: var(--pm-space-4);
+  gap: var(--pm-space-3);
+  margin-top: var(--pm-space-5);
+  padding-top: var(--pm-space-5);
   border-top: 1px solid var(--pm-border);
 
   h3 {
@@ -1112,9 +1334,9 @@ tr.picked {
     display: flex;
     gap: var(--pm-space-3);
     align-items: baseline;
-    padding: var(--pm-space-2) var(--pm-space-3);
+    padding: 10px 14px;
     border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius-sm);
+    border-radius: var(--pm-radius);
   }
 }
 
@@ -1148,6 +1370,11 @@ tr.picked {
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+
+  &:hover {
+    color: var(--pm-accent-dark);
+    text-decoration: underline;
+  }
 }
 
 /* Cac o nhap gia, mot o cho moi to hop. */
@@ -1159,17 +1386,13 @@ tr.picked {
 .price-row {
   display: grid;
   grid-template-columns: 1fr 160px;
-  gap: var(--pm-space-2);
+  gap: var(--pm-space-3);
   align-items: center;
   font-size: var(--pm-text-sm);
 
   input {
-    padding: var(--pm-space-2) var(--pm-space-2);
-    border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius-sm);
-    background: var(--pm-bg-card);
-    color: var(--pm-text);
-    font: inherit;
+    @include admin-input;
+
     text-align: right;
   }
 }
@@ -1188,36 +1411,39 @@ tr.picked {
   }
 }
 
-/* Chon khoang thoi gian cho bao cao. */
+/* Chon khoang thoi gian cho bao cao: mot the thap, hai o ngay va nut xem. */
 .period {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--pm-space-3);
+  gap: var(--pm-space-3) var(--pm-space-4);
   align-items: flex-end;
   margin-bottom: var(--pm-gap);
+  padding: var(--pm-space-4) var(--pm-space-5);
+  border: 1px solid var(--pm-border);
+  border-radius: 20px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
 
   label {
     display: grid;
-    gap: var(--pm-space-1);
+    flex: 1 1 180px;
+    gap: 6px;
+    max-inline-size: 260px;
     font-size: var(--pm-text-sm);
-    color: var(--pm-text-muted);
+    font-weight: 600;
+    color: var(--pm-text);
   }
 
   input {
-    padding: var(--pm-space-2) var(--pm-space-2);
-    border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius-sm);
-    background: var(--pm-bg-card);
-    color: var(--pm-text);
-    font: inherit;
+    @include admin-input;
   }
 }
 
 .ready-file {
   margin: 0 0 var(--pm-gap);
-  padding: var(--pm-space-2) var(--pm-space-3);
-  border: 1px dashed var(--pm-accent);
-  border-radius: var(--pm-radius-sm);
+  padding: 12px 16px;
+  border: 1.5px dashed var(--pm-accent);
+  border-radius: var(--pm-radius);
   background: var(--pm-accent-soft);
   font-size: var(--pm-text-md);
 
@@ -1229,20 +1455,21 @@ tr.picked {
 
 .big-number {
   font-family: var(--pm-font-display);
-  font-size: 1.375rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .late-name {
-  margin: var(--pm-space-4) 0 0;
+  margin: var(--pm-space-5) 0 0;
   font-size: var(--pm-text-md);
   font-weight: 600;
 }
 
 .late-list {
   display: grid;
-  gap: var(--pm-space-1);
-  margin: var(--pm-space-2) 0 0;
+  gap: var(--pm-space-2);
+  margin: var(--pm-space-3) 0 0;
   padding: 0;
   list-style: none;
 
@@ -1250,17 +1477,17 @@ tr.picked {
     display: flex;
     gap: var(--pm-space-3);
     justify-content: space-between;
-    padding: var(--pm-space-2) var(--pm-space-3);
+    padding: 10px 14px;
     border: 1px solid var(--pm-border);
-    border-radius: var(--pm-radius-sm);
+    border-radius: var(--pm-radius);
     font-size: var(--pm-text-sm);
   }
 }
 
 /* Tieu de nho trong mot the, tach cac nhom truong cua cung mot muc. */
 .sub-head {
-  margin: var(--pm-space-4) 0 var(--pm-space-2);
+  margin: var(--pm-space-5) 0 var(--pm-space-3);
   font-size: var(--pm-text-md);
   font-weight: 700;
-  color: var(--pm-text-soft);
+  color: var(--pm-text-body);
 }

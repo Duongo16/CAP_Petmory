@@ -1,95 +1,95 @@
-<div class="w-full max-w-[1180px] mx-auto px-6 pt-7 pb-16 box-border flex flex-col gap-5">
-  <header class="flex items-end justify-between gap-4 flex-wrap">
+<div class="tw-page flex flex-col gap-6">
+  <header class="tw-page-head mb-0">
     <div>
-      <h1 class="tw-section-title">{{ 'PET.TITLE' | translate }}</h1>
-      <p class="mt-1 text-sm text-ink-muted">{{ 'PET.SUB' | translate }}</p>
+      <h1 class="tw-page-title">{{ 'PET.TITLE' | translate }}</h1>
+      <p class="tw-page-sub">{{ 'PET.SUB' | translate }}</p>
     </div>
-    <button type="button" class="tw-btn-primary inline-flex items-center gap-2" [disabled]="working()" (click)="add()">
-      <pm-icon name="paw" [size]="16" />
+    <button type="button" class="strong tw-btn-primary" [disabled]="working()" (click)="add()">
+      <pm-icon name="paw" [size]="17" />
       {{ 'PET.ADD_NEW' | translate }}
     </button>
   </header>
 
   @if (error(); as message) {
-    <p class="m-0 px-4 py-3 rounded-sm bg-danger-soft text-danger text-sm font-semibold" role="alert">{{ message | translate }}</p>
+    <p class="m-0 px-4 py-3 rounded-md bg-danger-soft text-on-danger-soft text-sm font-semibold" role="alert">{{ message | translate }}</p>
   }
 
   @switch (status()) {
     @case ('LOADING') {
-      <p class="py-10 text-center text-ink-muted">{{ 'COMMON.LOADING' | translate }}</p>
+      <p class="tw-empty m-0">{{ 'COMMON.LOADING' | translate }}</p>
     }
     @case ('ERROR') {
-      <div class="flex flex-col items-center gap-3 py-10 text-center text-ink-muted">
-        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
-        <button type="button" class="inline-flex items-center gap-2 px-3 py-2 border border-edge-strong bg-card text-ink-muted text-xs font-semibold rounded-sm cursor-pointer" (click)="reload()">
+      <div class="tw-empty">
+        <p class="m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="tw-btn-secondary" (click)="reload()">
           {{ 'COMMON.RETRY' | translate }}
         </button>
       </div>
     }
     @case ('EMPTY') {
-      <div class="flex flex-col items-center gap-3 py-10 text-center text-ink-muted bg-muted rounded-lg">
-        <span class="grid place-items-center w-[62px] h-[62px] rounded-full bg-card text-accent" aria-hidden="true">
-          <pm-icon name="paw" [size]="34" />
+      <div class="tw-empty">
+        <span class="grid place-items-center w-16 h-16 rounded-full bg-accent-soft text-accent" aria-hidden="true">
+          <pm-icon name="paw" [size]="32" />
         </span>
-        <p>{{ 'PET.EMPTY' | translate }}</p>
+        <p class="m-0 text-body">{{ 'PET.EMPTY' | translate }}</p>
         <button type="button" class="tw-btn-primary" (click)="add()">
+          <pm-icon name="plus" [size]="17" />
           {{ 'PET.ADD_NEW' | translate }}
         </button>
       </div>
     }
     @case ('HAS_DATA') {
-      <ul class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 m-0 p-0 list-none">
+      <ul class="grid grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))] gap-4 m-0 p-0 list-none">
         @for (pet of list(); track pet._id) {
-          <li class="flex flex-col gap-3 p-4 bg-card rounded-md border border-edge shadow-card transition-all duration-150 hover:-translate-y-0.5 hover:shadow-elevated hover:border-edge-strong"
+          <li class="pet-card tw-card-interactive flex flex-col gap-4 p-5"
             [class.memorial]="pet.status === 'PASSED_AWAY'">
             <div class="flex items-start gap-3">
-              <span class="grid place-items-center flex-none w-10 h-10 rounded-md bg-accent-soft text-accent overflow-hidden" aria-hidden="true">
-                @if (faceOf()[pet._id]; as face) {
-                  <img [src]="face" alt="" class="w-full h-full object-cover" />
-                } @else {
-                  <pm-icon name="paw" [size]="20" />
-                }
+              <span class="grid place-items-center flex-none w-14 h-14 rounded-[18px] border-2 border-accent-soft overflow-hidden" aria-hidden="true">
+                <pm-pet-face [petId]="pet._id" [avatarUrl]="pet.avatarUrl" [kind]="pet.kind" [name]="pet.name" [size]="52" />
               </span>
               <div class="flex-1 min-w-0">
-                <h2 class="m-0 text-base font-semibold text-ink">{{ pet.name }}</h2>
-                <p class="mt-1 text-xs text-ink-muted">{{ labelKind(pet) | translate }}@if (pet.breed) { · {{ pet.breed }} }</p>
+                <h2 class="m-0 text-base font-bold text-ink truncate">{{ pet.name }}</h2>
+                <p class="m-0 mt-0.5 text-[13px] text-ink-muted">{{ labelKind(pet) | translate }}@if (pet.breed) { · {{ pet.breed }} }</p>
               </div>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                [class.bg-success-soft]="pet.status !== 'PASSED_AWAY'"
-                [class.text-success]="pet.status !== 'PASSED_AWAY'"
-                [class.bg-muted]="pet.status === 'PASSED_AWAY'"
-                [class.text-ink-muted]="pet.status === 'PASSED_AWAY'">
+              <span class="tw-badge"
+                [class.tw-badge-success]="pet.status !== 'PASSED_AWAY'"
+                [class.tw-badge-memorial]="pet.status === 'PASSED_AWAY'">
                 {{ labelStatus(pet) | translate }}
               </span>
             </div>
 
-            <dl class="flex flex-wrap gap-x-4 gap-y-2 m-0 pt-3 border-t border-edge">
+            <dl class="flex flex-wrap gap-x-6 gap-y-2 m-0 pt-4 border-t border-edge-soft">
               <div>
-                <dt class="text-[0.625rem] font-semibold tracking-[0.04em] text-ink-muted uppercase">{{ 'PET.GENDER_LABEL' | translate }}</dt>
-                <dd class="mt-1 text-sm text-ink">{{ labelGender(pet) | translate }}</dd>
+                <dt class="text-[11px] font-bold tracking-[0.06em] text-ink-muted uppercase">{{ 'PET.GENDER_LABEL' | translate }}</dt>
+                <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ labelGender(pet) | translate }}</dd>
               </div>
               @if (pet.birthDate) {
                 <div>
-                  <dt class="text-[0.625rem] font-semibold tracking-[0.04em] text-ink-muted uppercase">{{ 'PET.BIRTH_DATE' | translate }}</dt>
-                  <dd class="mt-1 text-sm text-ink">{{ pet.birthDate | date: 'dd/MM/yyyy' }}</dd>
+                  <dt class="text-[11px] font-bold tracking-[0.06em] text-ink-muted uppercase">{{ 'PET.BIRTH_DATE' | translate }}</dt>
+                  <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ pet.birthDate | date: 'dd/MM/yyyy' }}</dd>
                 </div>
               }
               @if (pet.passedAwayDate) {
                 <div>
-                  <dt class="text-[0.625rem] font-semibold tracking-[0.04em] text-ink-muted uppercase">{{ 'PET.PASSED_DATE' | translate }}</dt>
-                  <dd class="mt-1 text-sm text-ink">{{ pet.passedAwayDate | date: 'dd/MM/yyyy' }}</dd>
+                  <dt class="text-[11px] font-bold tracking-[0.06em] text-ink-muted uppercase">{{ 'PET.PASSED_DATE' | translate }}</dt>
+                  <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ pet.passedAwayDate | date: 'dd/MM/yyyy' }}</dd>
                 </div>
               }
             </dl>
 
-            <div class="flex gap-2 flex-wrap mt-auto pt-1">
-              <a class="inline-flex items-center gap-2 px-3 py-2 border border-edge-strong bg-card text-ink-muted text-xs font-semibold rounded-sm no-underline" [routerLink]="['/pets', pet._id, 'photos']">
+            <div class="pet-deeds flex gap-2 flex-wrap mt-auto">
+              <button type="button" class="pet-open tw-btn-primary tw-btn-sm" (click)="show(pet)">
+                <pm-icon name="eye" [size]="15" />
+                {{ 'PET.VIEW_PROFILE' | translate }}
+              </button>
+              <a class="tw-btn-secondary tw-btn-sm" [routerLink]="['/pets', pet._id, 'photos']">
+                <pm-icon name="image" [size]="15" />
                 {{ 'PET.MANAGE_PHOTOS' | translate }}
               </a>
-              <button type="button" class="inline-flex items-center gap-2 px-3 py-2 border border-edge-strong bg-card text-ink-muted text-xs font-semibold rounded-sm cursor-pointer" (click)="edit(pet)">
+              <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="edit(pet)">
                 {{ 'COMMON.EDIT' | translate }}
               </button>
-              <button type="button" class="inline-flex items-center gap-2 px-3 py-2 border border-transparent bg-transparent text-danger text-xs font-semibold rounded-sm cursor-pointer" (click)="hide(pet)">
+              <button type="button" class="tw-btn-ghost tw-btn-sm text-danger ml-auto" (click)="hide(pet)">
                 {{ 'COMMON.REMOVE' | translate }}
               </button>
             </div>

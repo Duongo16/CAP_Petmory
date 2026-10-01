@@ -12,13 +12,21 @@ export class BusinessConfigService {
     @InjectModel(BusinessConfig.name) private readonly model: Model<BusinessConfigDocument>,
   ) {}
 
-  /** Always returns a record, creating one if none exists yet. */
+  /**
+   * Always returns a record, making one on first use.
+   *
+   * The write decides whether the row is made or read, rather than looking
+   * first and writing after: two calls arriving together both found nothing
+   * and the second was refused by the database.
+   */
   async get(): Promise<BusinessConfigDocument> {
-    const existing = await this.model.findOne({ key: KEY_DEFAULT }).exec();
-    if (existing) {
-      return existing;
-    }
-    return this.model.create({ key: KEY_DEFAULT });
+    return this.model
+      .findOneAndUpdate(
+        { key: KEY_DEFAULT },
+        { $setOnInsert: { key: KEY_DEFAULT } },
+        { upsert: true, new: true, setDefaultsOnInsert: true },
+      )
+      .exec();
   }
 
   async update(
@@ -30,11 +38,34 @@ export class BusinessConfigService {
     const after = await this.model
       .findOneAndUpdate(
         { key: KEY_DEFAULT },
-        { $set: { ...replaceChange, lastEditedBy: editor } },
+        { $set: { ...this.asFields(replaceChange), lastEditedBy: editor } },
         { new: true },
       )
       .exec();
     return after ?? before;
+  }
+
+  /**
+   * Trai don gia va han muc ra thanh tung duong dan rieng.
+   *
+   * Ghi ca cum mot luc thi nhung muc khong duoc gui se bi xoa, tuc la doi mot
+   * muc se am tham lam mat cac muc con lai. Ghi theo tung duong dan thi chi
+   * dung vao dung muc nguoi dung vua sua.
+   */
+  private asFields(replaceChange: UpdateConfigDto): Record<string, unknown> {
+    const { aiUnitPrice, aiQuota, ...rest } = replaceChange;
+    const out: Record<string, unknown> = { ...rest };
+    for (const [name, value] of Object.entries(aiUnitPrice ?? {})) {
+      if (value !== undefined) {
+        out[`aiUnitPrice.${name}`] = value;
+      }
+    }
+    for (const [name, value] of Object.entries(aiQuota ?? {})) {
+      if (value !== undefined) {
+        out[`aiQuota.${name}`] = value;
+      }
+    }
+    return out;
   }
 
   /**

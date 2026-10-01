@@ -6,11 +6,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ConfigService } from '@nestjs/config';
 import { Model, Types } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { promises as fs } from 'fs';
-import * as path from 'path';
 import {
   ANGLE_REQUIRED,
   PhotoAngle,
@@ -22,6 +19,9 @@ import { RestoreOperation } from './dto/photo.dto';
 import { measureResemblance, restorePhoto, scorePhoto } from './image-tool';
 import { PetsService } from '../pets/pets.service';
 import { BusinessConfigService } from '../business-config/business-config.service';
+import { StorageFolder, StorageService } from '../../common/storage/storage.service';
+import { AiUsageService } from '../ai/ai-usage.service';
+import { AiKind, AiMode } from '../ai/schemas/ai-usage.schema';
 import { MSG } from '../../common/constants/messages';
 
 /** Accepts three still-image formats only. Video files are rejected outright. */
@@ -39,16 +39,14 @@ const QUOTA_WINDOWS: { name: 'day' | 'month' | 'year'; hours: number }[] = [
 
 @Injectable()
 export class PhotosService {
-  private readonly dir: string;
 
   constructor(
     @InjectModel(PetPhoto.name) private readonly model: Model<PetPhotoDocument>,
     private readonly pets: PetsService,
     private readonly businessConfig: BusinessConfigService,
-    config: ConfigService,
-  ) {
-    this.dir = path.resolve(config.getOrThrow<string>('upload.dir'));
-  }
+    private readonly storage: StorageService,
+    private readonly usage: AiUsageService,
+  ) {}
 
   async listByPet(petId: string, owner: string) {
     await this.pets.findOwned(petId, owner);
@@ -69,10 +67,53 @@ export class PhotosService {
   async load(
     petId: string,
     owner: string,
-    angle: PhotoAngle,
+    angle: PhotoAngle | undefined,
     file: Express.Multer.File,
   ): Promise<PetPhotoDocument> {
     await this.pets.findOwned(petId, owner);
+    return this.store(petId, owner, angle ?? PhotoAngle.GENERAL, file);
+  }
+
+  /**
+   * Keeps a picture that does not belong to any pet yet.
+   *
+   * The restoration screen stands on its own: someone brings a photograph,
+   * sees what it looks like cleaned up, and only then decides whether it joins
+   * a pet profile or is simply downloaded and forgotten.
+   */
+  loadLoose(owner: string, file: Express.Multer.File): Promise<PetPhotoDocument> {
+    return this.store(null, owner, PhotoAngle.GENERAL, file);
+  }
+
+  /** Every restored picture of this customer that no pet has claimed yet. */
+  listLoose(owner: string) {
+    return this.model
+      .find({ owner: new Types.ObjectId(owner), pet: null, isHidden: false })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  /** Moves a loose picture, and the original it came from, onto a pet. */
+  async attach(codePhoto: string, petId: string, owner: string): Promise<PetPhotoDocument> {
+    await this.pets.findOwned(petId, owner);
+    const photo = await this.findOwned(codePhoto, owner);
+    if (photo.pet) {
+      throw new BadRequestException('Anh nay da thuoc ve mot ho so roi');
+    }
+    const pet = new Types.ObjectId(petId);
+    if (photo.originalPhoto) {
+      await this.model.updateOne({ _id: photo.originalPhoto, owner: photo.owner }, { $set: { pet } });
+    }
+    photo.pet = pet;
+    return photo.save();
+  }
+
+  private async store(
+    petId: string | null,
+    owner: string,
+    angle: PhotoAngle,
+    file: Express.Multer.File,
+  ): Promise<PetPhotoDocument> {
     const cf = await this.businessConfig.get();
 
     if (!file?.buffer?.length) {
@@ -83,12 +124,14 @@ export class PhotosService {
       throw new BadRequestException(`Anh vuot qua ${cf.maxPhotoSizeMb} MB`);
     }
 
-    const currentCount = await this.model.countDocuments({
-      pet: new Types.ObjectId(petId),
-      isHidden: false,
-    });
-    if (currentCount >= COUNT_PHOTO_MAX) {
-      throw new BadRequestException(`Moi thu cung chi luu toi da ${COUNT_PHOTO_MAX} anh`);
+    if (petId) {
+      const currentCount = await this.model.countDocuments({
+        pet: new Types.ObjectId(petId),
+        isHidden: false,
+      });
+      if (currentCount >= COUNT_PHOTO_MAX) {
+        throw new BadRequestException(`Moi thu cung chi luu toi da ${COUNT_PHOTO_MAX} anh`);
+      }
     }
 
         // Check the file's real format; the extension sent by the client is not trusted.
@@ -108,7 +151,7 @@ export class PhotosService {
     await this.writeFile(fileName, file.buffer);
 
     return this.model.create({
-      pet: new Types.ObjectId(petId),
+      pet: petId ? new Types.ObjectId(petId) : null,
       owner: new Types.ObjectId(owner),
       angle,
       fileName,
@@ -133,7 +176,7 @@ export class PhotosService {
 
   async readContent(codePhoto: string, owner: string): Promise<{ data: Buffer; fileType: string }> {
     const photo = await this.findOwned(codePhoto, owner);
-    const data = await fs.readFile(path.join(this.dir, photo.fileName));
+    const data = await this.storage.read(StorageFolder.PET, photo.fileName);
     return { data, fileType: photo.fileType };
   }
 
@@ -157,7 +200,7 @@ export class PhotosService {
     const cf = await this.businessConfig.get();
     await this.checkRestoreQuota(owner, cf.aiQuota?.[KEY_QUOTA_RESTORE]);
 
-    const rawData = await fs.readFile(path.join(this.dir, angle.fileName));
+    const rawData = await this.storage.read(StorageFolder.PET, angle.fileName);
     const dataNext = await restorePhoto(rawData, operation);
 
     const { quality } = await scorePhoto(dataNext, {
@@ -179,7 +222,7 @@ export class PhotosService {
       { $set: { isHidden: true } },
     );
 
-    return this.model.create({
+    const made = await this.model.create({
       pet: angle.pet,
       owner: angle.owner,
       angle: angle.angle,
@@ -193,6 +236,21 @@ export class PhotosService {
       isRestored: true,
       confirmedByOwner: false,
     });
+
+    /*
+     * Ghi mot dong vao so luot dung, kem don gia luc nay.
+     *
+     * Bao cao chi phi doc thang tu so do, nen mot lan phuc hoi khong duoc ghi
+     * la mot lan khong bao gio xuat hien trong bao cao. Ghi sau khi anh da
+     * duoc tao, vi chi luc do moi chac chan la cong viec that su da lam.
+     */
+    await this.usage.record(
+      AiKind.RESTORE_PHOTO,
+      owner,
+      AiMode.LIVE,
+      made._id.toString(),
+    );
+    return made;
   }
 
   /**
@@ -250,7 +308,7 @@ export class PhotosService {
   }
 
   private async writeFile(fileName: string, data: Buffer): Promise<void> {
-    await fs.mkdir(this.dir, { recursive: true });
-    await fs.writeFile(path.join(this.dir, fileName), data);
+    const kind = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    await this.storage.save(StorageFolder.PET, fileName, data, kind);
   }
 }

@@ -107,6 +107,18 @@ export class CommunityService {
     return this.http.patch<{ ok: boolean }>(`${this.base}/community/users/me`, data);
   }
 
+  /** Sends a profile picture from the device; the answer names the stored file. */
+  uploadAvatar(file: File): Observable<{ fileName: string }> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+    return this.http.post<{ fileName: string }>(`${this.base}/community/users/me/avatar`, form);
+  }
+
+  /** Where an uploaded profile picture is served from. */
+  avatarUrl(userId: string, fileName: string): string {
+    return `${this.base}/community/users/${userId}/avatar/${fileName}`;
+  }
+
   /** Where a post photo is served from, for use in an image source. */
   photoUrl(postId: string, fileName: string): string {
     return `${this.base}/community/posts/${postId}/photos/${fileName}`;

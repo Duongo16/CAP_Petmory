@@ -12,16 +12,12 @@ const h = require('./harness');
 
 /** The edges the requirements declare. Anything not here must be refused. */
 const ALLOWED = {
-  AWAITING_PAYMENT: ['PAID', 'PAYMENT_EXPIRED', 'CANCELLED'],
+  AWAITING_PAYMENT: ['PAID', 'CANCELLED'],
   PAID: ['IN_PRODUCTION', 'CANCELLED'],
-  IN_PRODUCTION: ['QUALITY_CHECK', 'CANCELLED'],
-  QUALITY_CHECK: ['READY_TO_SHIP', 'IN_PRODUCTION', 'CANCELLED'],
-  READY_TO_SHIP: ['SHIPPING', 'CANCELLED'],
-  SHIPPING: ['DELIVERED', 'CANCELLED'],
-  DELIVERED: ['COMPLETED'],
+  IN_PRODUCTION: ['SHIPPING', 'CANCELLED'],
+  SHIPPING: ['COMPLETED', 'CANCELLED'],
   COMPLETED: [],
   CANCELLED: [],
-  PAYMENT_EXPIRED: ['AWAITING_PAYMENT', 'CANCELLED'],
 };
 
 const ALL_STATES = Object.keys(ALLOWED);
@@ -75,14 +71,16 @@ async function scenario(report) {
   const walkTo = {
     PAID: ['PAID'],
     IN_PRODUCTION: ['PAID', 'IN_PRODUCTION'],
-    QUALITY_CHECK: ['PAID', 'IN_PRODUCTION', 'QUALITY_CHECK'],
-    READY_TO_SHIP: ['PAID', 'IN_PRODUCTION', 'QUALITY_CHECK', 'READY_TO_SHIP'],
-    SHIPPING: ['PAID', 'IN_PRODUCTION', 'QUALITY_CHECK', 'READY_TO_SHIP', 'SHIPPING'],
-    DELIVERED: ['PAID', 'IN_PRODUCTION', 'QUALITY_CHECK', 'READY_TO_SHIP', 'SHIPPING', 'DELIVERED'],
+    SHIPPING: ['PAID', 'IN_PRODUCTION', 'SHIPPING'],
+    COMPLETED: ['PAID', 'IN_PRODUCTION', 'SHIPPING', 'COMPLETED'],
   };
   for (const [state, path] of Object.entries(walkTo)) {
     const probe = await placeOrder(customer, `probe-${state}`);
     for (const step of path) {
+      // Khong giao hang khi phieu kiem dinh con muc chua tich.
+      if (step === 'SHIPPING') {
+        await h.passQualityCheck(probe.code, manager);
+      }
       await move(manager, probe.code, step);
     }
     const seen = await h.call(`/admin/orders/${probe.code}`, { headers: manager.auth });
@@ -98,9 +96,13 @@ async function scenario(report) {
   const journey = await placeOrder(customer, 'journey');
   await h.sendTransfer(journey.code, Number(journey.total));
 
-  const longPath = ['IN_PRODUCTION', 'QUALITY_CHECK', 'READY_TO_SHIP', 'SHIPPING', 'DELIVERED', 'COMPLETED'];
+  const longPath = ['IN_PRODUCTION', 'SHIPPING', 'COMPLETED'];
   let walked = true;
   for (const status of longPath) {
+    // Khong giao hang khi phieu kiem dinh con muc chua tich.
+    if (status === 'SHIPPING') {
+      await h.passQualityCheck(journey.code, manager);
+    }
     const res = await move(manager, journey.code, status);
     if (res.status !== 200) {
       walked = false;
@@ -109,15 +111,14 @@ async function scenario(report) {
   }
   report.check('Every declared edge along the long path is allowed', walked);
 
-  // --- The step back from quality check ---
-  report.step('Quality check can send the piece back to production');
+  // --- Hang chua qua kiem dinh thi khong giao duoc ---
+  report.step('An order still on the checklist cannot be shipped');
   const back = await placeOrder(customer, 'back');
   await h.sendTransfer(back.code, Number(back.total));
   await move(manager, back.code, 'IN_PRODUCTION');
-  await move(manager, back.code, 'QUALITY_CHECK');
-  const sentBack = await move(manager, back.code, 'IN_PRODUCTION');
-  report.check('Quality check back to production is allowed',
-    sentBack.status === 200, String(sentBack.status));
+  const tooSoon = await move(manager, back.code, 'SHIPPING');
+  report.check('Shipping is refused while the checklist is open',
+    tooSoon.status === 400, String(tooSoon.status));
 
   // --- Moves that are not drawn ---
   report.step('Every move that is not drawn is refused');

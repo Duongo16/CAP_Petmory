@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CatalogService } from '../../core/services/catalog.service';
 import { ProductType } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
-import { Rating } from '../../shared/rating/rating';
 import { Icon } from '../../shared/icon/icon';
 
 /**
@@ -20,17 +20,28 @@ interface SellingPoint {
 
 /** One numbered step in the process strip, with its keys written out the same way. */
 interface ProcessStep {
-  number: number;
+  number: string;
+  tone: string;
   nameKey: string;
   textKey: string;
 }
 
+/** One quote in the stories strip. */
+interface Story {
+  textKey: string;
+  nameKey: string;
+  placeKey: string;
+}
+
 const FEATURED_MAX = 4;
+
+/** The badge each featured card carries, in the order the cards appear. */
+const BADGE_TONE = ['amber', 'green', 'purple', 'plain'] as const;
 
 @Component({
   selector: 'pm-home-page',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, MoneyPipe, Rating, Icon],
+  imports: [RouterLink, FormsModule, TranslatePipe, MoneyPipe, Icon],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,8 +56,18 @@ export class HomePage implements OnInit {
   readonly featured = computed(() =>
     this.products()
       .slice(0, FEATURED_MAX)
-      .map((raw) => ({ raw, priceFrom: lowestPrice(raw) })),
+      .map((raw, index) => ({
+        raw,
+        priceFrom: lowestPrice(raw),
+        tone: BADGE_TONE[index] ?? 'plain',
+      })),
   );
+
+  /** What the reader typed into the newsletter box. */
+  readonly email = signal('');
+
+  /** Turns true once the box has been submitted, so the form can say thank you. */
+  readonly subscribed = signal(false);
 
   readonly points: SellingPoint[] = [
     { icon: 'image', nameKey: 'HOME.POINT.UPLOAD.NAME', textKey: 'HOME.POINT.UPLOAD.OVERLAY' },
@@ -56,10 +77,16 @@ export class HomePage implements OnInit {
   ];
 
   readonly steps: ProcessStep[] = [
-    { number: 1, nameKey: 'HOME.STEP.1.NAME', textKey: 'HOME.STEP.1.OVERLAY' },
-    { number: 2, nameKey: 'HOME.STEP.2.NAME', textKey: 'HOME.STEP.2.OVERLAY' },
-    { number: 3, nameKey: 'HOME.STEP.3.NAME', textKey: 'HOME.STEP.3.OVERLAY' },
-    { number: 4, nameKey: 'HOME.STEP.4.NAME', textKey: 'HOME.STEP.4.OVERLAY' },
+    { number: '01', tone: 'purple', nameKey: 'HOME.STEP.1.NAME', textKey: 'HOME.STEP.1.OVERLAY' },
+    { number: '02', tone: 'amber', nameKey: 'HOME.STEP.2.NAME', textKey: 'HOME.STEP.2.OVERLAY' },
+    { number: '03', tone: 'green', nameKey: 'HOME.STEP.3.NAME', textKey: 'HOME.STEP.3.OVERLAY' },
+    { number: '04', tone: 'soft', nameKey: 'HOME.STEP.4.NAME', textKey: 'HOME.STEP.4.OVERLAY' },
+  ];
+
+  readonly stories: Story[] = [
+    { textKey: 'HOME.STORY.1.TEXT', nameKey: 'HOME.STORY.1.NAME', placeKey: 'HOME.STORY.1.PLACE' },
+    { textKey: 'HOME.STORY.2.TEXT', nameKey: 'HOME.STORY.2.NAME', placeKey: 'HOME.STORY.2.PLACE' },
+    { textKey: 'HOME.STORY.3.TEXT', nameKey: 'HOME.STORY.3.NAME', placeKey: 'HOME.STORY.3.PLACE' },
   ];
 
   ngOnInit(): void {
@@ -67,6 +94,17 @@ export class HomePage implements OnInit {
       next: (list) => this.products.set(list),
       error: () => undefined,
     });
+  }
+
+  setEmail(value: string): void {
+    this.email.set(value);
+  }
+
+  subscribe(): void {
+    if (this.email().trim().length === 0) {
+      return;
+    }
+    this.subscribed.set(true);
   }
 }
 

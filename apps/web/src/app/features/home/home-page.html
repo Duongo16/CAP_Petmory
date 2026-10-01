@@ -1,32 +1,70 @@
-<div class="pm-page">
+<div class="home">
   <section class="hero">
-    <div class="hero-text">
-      <p class="label">{{ 'HOME.LABEL' | translate }}</p>
-      <h1 class="title">{{ 'HOME.TITLE' | translate }}</h1>
-      <p class="description">{{ 'HOME.DESCRIPTION' | translate }}</p>
+    <div class="hero-card">
+      <span class="glow glow-purple" aria-hidden="true"></span>
+      <span class="glow glow-amber" aria-hidden="true"></span>
 
-      <div class="buttons">
-        <a class="pm-button-primary" routerLink="/studio">
-          {{ 'HOME.CREATE_PET' | translate }}
-          <span aria-hidden="true">→</span>
-        </a>
-        <a class="pm-button-secondary" routerLink="/products">
-          {{ 'HOME.EXPLORE' | translate }}
-        </a>
+      <div class="hero-inner">
+        <div class="hero-text">
+          <p class="badge">
+            <span class="badge-dot" aria-hidden="true"><pm-icon name="star" [size]="11" /></span>
+            {{ 'HOME.BADGE' | translate }}
+          </p>
+
+          <h1 class="title">
+            {{ 'HOME.TITLE_LEAD' | translate }}
+            <em>{{ 'HOME.TITLE_ACCENT' | translate }}</em>
+          </h1>
+
+          <p class="description">{{ 'HOME.DESCRIPTION' | translate }}</p>
+
+          <div class="buttons">
+            <a class="button-amber" routerLink="/studio">
+              {{ 'HOME.CREATE_PET' | translate }}
+              <pm-icon name="chevron" [size]="14" />
+            </a>
+            <a class="button-plain" routerLink="/products">
+              <pm-icon name="search" [size]="16" />
+              {{ 'HOME.EXPLORE' | translate }}
+            </a>
+          </div>
+
+          <ul class="stats">
+            <li><pm-icon name="paw" [size]="14" /> {{ 'HOME.STAT_MADE' | translate }}</li>
+            <li><pm-icon name="star" [size]="14" /> {{ 'HOME.STAT_RATING' | translate }}</li>
+          </ul>
+        </div>
+
+        <div class="hero-art">
+          <article class="art-card">
+            <div class="art-photo">
+              <img src="/demo/hero.png" [alt]="'HOME.HERO_CARD.NAME' | translate" />
+              <span class="art-tag art-tag-left">{{ 'HOME.HERO_CARD.MATERIAL' | translate }}</span>
+              <span class="art-tag art-tag-right">{{ 'HOME.HERO_CARD.PET' | translate }}</span>
+            </div>
+            <div class="art-text">
+              <h2 class="art-name">{{ 'HOME.HERO_CARD.NAME' | translate }}</h2>
+              <p class="art-by">{{ 'HOME.HERO_CARD.BY' | translate }}</p>
+            </div>
+          </article>
+
+          <p class="art-unique">
+            <span class="dot" aria-hidden="true"></span>
+            {{ 'HOME.HERO_CARD.UNIQUE' | translate }}
+          </p>
+          <p class="art-warranty">
+            <pm-icon name="check" [size]="13" />
+            {{ 'HOME.HERO_CARD.WARRANTY' | translate }}
+          </p>
+        </div>
       </div>
-    </div>
-
-    <div class="hero-art" aria-hidden="true">
-      <span class="art-paw"><pm-icon name="paw" [size]="70" /></span>
-      <span class="art-heart"><pm-icon name="heart" [size]="26" /></span>
-      <span class="art-star"><pm-icon name="star" [size]="20" /></span>
     </div>
   </section>
 
   <section class="points">
     @for (point of points; track point.nameKey) {
       <article class="point-item">
-        <span class="point-icon"><pm-icon [name]="point.icon" [size]="20" /></span>
+        <span class="point-icon"><pm-icon [name]="point.icon" [size]="19" /></span>
         <div class="text">
           <h2 class="name">{{ point.nameKey | translate }}</h2>
           <p class="sub">{{ point.textKey | translate }}</p>
@@ -37,32 +75,45 @@
 
   @if (featured().length > 0) {
     <section class="featured">
-      <header class="featured-head">
-        <h2 class="pm-section-title">{{ 'HOME.FEATURED' | translate }}</h2>
-        <a class="see-all" routerLink="/products">
-          {{ 'HOME.SEE_ALL' | translate }} <span aria-hidden="true">→</span>
-        </a>
+      <header class="section-head">
+        <p class="eyebrow">{{ 'HOME.FEATURED_EYEBROW' | translate }}</p>
+        <div class="head-row">
+          <div>
+            <h2 class="section-title">{{ 'HOME.FEATURED' | translate }}</h2>
+            <p class="section-sub">{{ 'HOME.FEATURED_SUB' | translate }}</p>
+          </div>
+          <a class="see-all" routerLink="/products">
+            {{ 'HOME.SEE_ALL' | translate }}
+            <pm-icon name="chevron" [size]="14" />
+          </a>
+        </div>
       </header>
 
       <div class="grid">
         @for (card of featured(); track card.raw.code) {
-          <a class="product-card pm-card pm-card-interactive" [routerLink]="['/products', card.raw.code]">
+          <a class="product-card" [routerLink]="['/products', card.raw.code]">
             <div class="photo">
               @if (card.raw.imageUrl) {
                 <img [src]="card.raw.imageUrl" [alt]="card.raw.name" />
               } @else {
-                <span class="photo-blank"><pm-icon name="paw" [size]="30" /></span>
+                <span class="photo-blank" aria-hidden="true"><pm-icon name="paw" [size]="32" /></span>
               }
+              <span class="tag" [attr.data-tone]="card.tone">{{ card.raw.code }}</span>
+              <span class="like" aria-hidden="true"><pm-icon name="heart" [size]="15" /></span>
             </div>
             <div class="text">
+              <p class="score">
+                <pm-icon name="star" [size]="12" />
+                <strong>{{ card.raw.rating.average }}</strong>
+                <span>({{ card.raw.rating.count }})</span>
+              </p>
               <h3 class="name">{{ card.raw.name }}</h3>
-              <pm-rating
-                [value]="card.raw.rating.average"
-                [count]="card.raw.rating.count"
-                [label]="'PRODUCT.RATING' | translate"
-              />
+              <p class="sub">{{ card.raw.description }}</p>
               @if (card.priceFrom; as price) {
-                <p class="price">{{ price | amount }}</p>
+                <p class="price">
+                  <span>{{ 'HOME.PRICE_FROM' | translate }}</span>
+                  <strong>{{ price | amount }}</strong>
+                </p>
               }
             </div>
           </a>
@@ -71,16 +122,93 @@
     </section>
   }
 
+  <section class="studio-band">
+    <div class="band-text">
+      <p class="eyebrow-light">{{ 'HOME.STUDIO.EYEBROW' | translate }}</p>
+      <h2 class="band-title">{{ 'HOME.STUDIO.TITLE' | translate }}</h2>
+      <p class="band-sub">{{ 'HOME.STUDIO.OVERLAY' | translate }}</p>
+      <div class="buttons">
+        <a class="button-amber" routerLink="/studio">
+          <pm-icon name="star" [size]="15" />
+          {{ 'HOME.STUDIO.START' | translate }}
+        </a>
+      </div>
+    </div>
+    <div class="band-spin" aria-hidden="true">
+      <span class="spin-name">{{ 'HOME.STUDIO.SPIN' | translate }}</span>
+      <span class="spin-sub">{{ 'HOME.STUDIO.SPIN_SUB' | translate }}</span>
+    </div>
+  </section>
+
   <section class="process">
-    <h2 class="pm-section-title">{{ 'HOME.PROCESS' | translate }}</h2>
+    <header class="section-head centred">
+      <p class="eyebrow">{{ 'HOME.PROCESS_EYEBROW' | translate }}</p>
+      <h2 class="section-title">{{ 'HOME.PROCESS' | translate }}</h2>
+      <p class="section-sub">{{ 'HOME.PROCESS_SUB' | translate }}</p>
+    </header>
+
     <ol class="steps">
       @for (step of steps; track step.number) {
-        <li class="step-item pm-card">
-          <span class="count">{{ step.number }}</span>
+        <li class="step-item">
+          <span class="count" [attr.data-tone]="step.tone">{{ step.number }}</span>
           <h3 class="step-name">{{ step.nameKey | translate }}</h3>
           <p class="sub">{{ step.textKey | translate }}</p>
         </li>
       }
     </ol>
+  </section>
+
+  <section class="stories">
+    <header class="section-head centred">
+      <p class="eyebrow">{{ 'HOME.STORY_EYEBROW' | translate }}</p>
+      <h2 class="section-title">{{ 'HOME.STORY_TITLE' | translate }}</h2>
+    </header>
+
+    <div class="story-grid">
+      @for (story of stories; track story.nameKey) {
+        <blockquote class="story-card">
+          <p class="score" aria-hidden="true">
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+              <pm-icon name="star" [size]="13" />
+            }
+          </p>
+          <p class="quote">{{ story.textKey | translate }}</p>
+          <footer class="who">
+            <span class="face" aria-hidden="true"><pm-icon name="user" [size]="16" /></span>
+            <span class="who-text">
+              <strong>{{ story.nameKey | translate }}</strong>
+              <span>{{ story.placeKey | translate }}</span>
+            </span>
+          </footer>
+        </blockquote>
+      }
+    </div>
+  </section>
+
+  <section class="newsletter">
+    <span class="letter-mark" aria-hidden="true"><pm-icon name="comment" [size]="20" /></span>
+    <h2 class="letter-title">{{ 'HOME.NEWSLETTER_TITLE' | translate }}</h2>
+    <p class="letter-sub">{{ 'HOME.NEWSLETTER_TEXT' | translate }}</p>
+
+    @if (subscribed()) {
+      <p class="letter-done" role="status">
+        <pm-icon name="check" [size]="16" />
+        {{ 'HOME.NEWSLETTER_DONE' | translate }}
+      </p>
+    } @else {
+      <form class="letter-form" (ngSubmit)="subscribe()">
+        <label class="sr-only" for="letter-email">{{ 'HOME.NEWSLETTER_PLACEHOLDER' | translate }}</label>
+        <input
+          id="letter-email"
+          type="email"
+          name="email"
+          required
+          [ngModel]="email()"
+          (ngModelChange)="setEmail($event)"
+          [placeholder]="'HOME.NEWSLETTER_PLACEHOLDER' | translate"
+        />
+        <button type="submit" class="button-purple">{{ 'HOME.NEWSLETTER_SUBMIT' | translate }}</button>
+      </form>
+    }
   </section>
 </div>

@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDateString,
   IsEnum,
+  IsIn,
   IsMongoId,
   IsOptional,
   IsString,
@@ -18,6 +19,18 @@ import { PreviewAngle } from '../schemas/design.schema';
 export const COUNT_FACE_MAX = 20000;
 export const COUNT_MESH_MAX = 30;
 export const COUNT_DESIGN_MAX = 30;
+
+/** Sau vung co ten cua mot mo hinh, dung nhu hop dong ghi. */
+export const ZONE_NAMES = ['MAIN_FUR', 'BELLY_FUR', 'EAR', 'TAIL', 'EYE', 'NOSE'];
+
+/** Mau cua mot vung co ten. */
+export class ZonePaintDto {
+  @IsIn(ZONE_NAMES)
+  zone!: string;
+
+  @Matches(/^[A-Z0-9-]{1,20}$/)
+  colorCode!: string;
+}
 
 export class MeshPaintDto {
   @IsString()
@@ -77,6 +90,13 @@ export class SaveDesignDto {
   @ArrayMaxSize(64)
   @Matches(/^[A-Z0-9-]{1,20}$/, { each: true })
   colorCodesUsed?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(12)
+  @ValidateNested({ each: true })
+  @Type(() => ZonePaintDto)
+  zonePaint?: ZonePaintDto[];
 
   @IsOptional()
   @Matches(/^[A-Za-z0-9-]{0,40}$/)

@@ -1,0 +1,89 @@
+:host {
+  display: block;
+}
+
+.kind-bar {
+  margin-bottom: var(--pm-space-4);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-space-2);
+  margin-top: var(--pm-space-3);
+
+  &.tight {
+    margin-top: var(--pm-space-2);
+  }
+}
+
+/* Ba cot dang nam ngang de nhin mot luot, xuong mot cot khi man hep. */
+.shape-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--pm-gap);
+  align-items: start;
+  margin-bottom: var(--pm-gap);
+}
+
+.shape-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-3);
+  min-inline-size: 0;
+}
+
+.shape-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-1);
+}
+
+.shape-note {
+  margin: 0;
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-xs);
+  line-height: 1.5;
+}
+
+.shape-view {
+  min-block-size: 320px;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--pm-space-1) var(--pm-space-3);
+  margin: 0;
+  font-size: var(--pm-text-sm);
+
+  dt {
+    color: var(--pm-text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  dd {
+    margin: 0;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.thin {
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-sm);
+}
+
+.none-yet,
+.table-note {
+  margin: var(--pm-space-3) 0 0;
+  font-size: var(--pm-text-sm);
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .shape-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

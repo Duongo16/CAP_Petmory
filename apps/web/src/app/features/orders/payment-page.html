@@ -1,67 +1,175 @@
-@switch (status()) {
-  @case ('LOADING') {
-    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
-  }
-  @case ('ERROR') {
-    <div class="pm-center pm-empty"><p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
-  }
-  @case ('READY') {
-    @if (maQr(); as qr) {
-      @if (isPaid()) {
-        <div class="done pm-card">
-          <span class="checkmark" aria-hidden="true">✓</span>
-          <h1 class="done-name">{{ 'PAYMENT.PAYMENT_RECEIVED' | translate }}</h1>
-          <p class="sub">{{ 'PAYMENT.PAYMENT_RECEIVED_TEXT' | translate: { orderCode: qr.orderCode } }}</p>
-          <a class="pm-button-primary" routerLink="/orders">{{ 'PAYMENT.VIEW_ORDER' | translate }}</a>
-        </div>
-      } @else {
-        <h1 class="pm-page-title">{{ 'PAYMENT.TITLE' | translate }}</h1>
-        <p class="pm-page-description">{{ 'PAYMENT.DESCRIPTION' | translate }}</p>
+<div class="paying tw-page flex flex-col gap-8 max-[600px]:px-4">
+  <pm-order-steps [active]="paid() ? 3 : 2" />
 
-        <div class="layout">
-          <section class="qr-frame pm-card">
-            <img class="qr-image" [src]="qr.qrImage" [alt]="'PAYMENT.QR_CODE' | translate" />
-            <p class="amount">{{ qr.amount | amount: qr.currency }}</p>
-            <p class="awaiting" role="status">{{ 'PAYMENT.WAITING' | translate }}</p>
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+    }
+    @case ('READY') {
+      @if (payment(); as qr) {
+        @if (paid()) {
+          <!-- ---------- Da nhan duoc tien ---------- -->
+          <section class="done tw-card flex flex-col items-center gap-4 w-full max-w-[640px] mx-auto px-8 py-12 max-[600px]:px-5 max-[600px]:py-8 text-center">
+            <span class="done-mark grid place-items-center w-[72px] h-[72px] rounded-full bg-success-soft text-success" aria-hidden="true"><pm-icon name="check" [size]="34" /></span>
+            <h1 class="done-title pm-page-title tw-page-title">{{ 'PAYMENT.PAYMENT_RECEIVED' | translate }}</h1>
+            <p class="done-text m-0 text-base leading-[1.65] text-body">
+              {{ 'PAYMENT.PAYMENT_RECEIVED_TEXT' | translate: { orderCode: qr.orderCode } }}
+            </p>
+
+            <div class="recap tw-panel w-full p-5 text-start">
+              <header class="recap-head flex items-center justify-between gap-4 mb-3">
+                <h2 class="m-0 text-xs font-semibold tracking-[0.04em] text-ink-muted">{{ 'PAYMENT.RECAP' | translate }}</h2>
+                <span class="recap-chip tw-badge tw-badge-success">{{ 'PAYMENT.RECAP_PAID' | translate }}</span>
+              </header>
+
+              <dl class="recap-rows flex flex-col gap-2 m-0">
+                <div>
+                  <dt>{{ 'PAYMENT.RECAP_CODE' | translate }}</dt>
+                  <dd>{{ qr.orderCode }}</dd>
+                </div>
+                @if (paidOrder(); as order) {
+                  <div>
+                    <dt>{{ 'PAYMENT.RECAP_ITEMS' | translate }}</dt>
+                    <dd>
+                      @for (row of order.rows; track row.productTypeCode + row.sizeCode) {
+                        <span class="recap-item block">{{ row.displayName }} ×{{ row.quantity }}</span>
+                      }
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'PAYMENT.RECAP_TOTAL' | translate }}</dt>
+                    <dd class="recap-money">
+                      {{ order.total.$numberDecimal | amount: order.currency }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'PAYMENT.RECAP_DELIVERY' | translate }}</dt>
+                    <dd class="recap-when">{{ order.estimatedDelivery | date: 'dd/MM/yyyy' }}</dd>
+                  </div>
+                }
+              </dl>
+            </div>
+
+            <div class="done-deeds flex flex-wrap justify-center gap-3">
+              <a class="solid tw-btn-primary" routerLink="/orders">{{ 'PAYMENT.VIEW_ORDER' | translate }}</a>
+              <a class="plain tw-btn-secondary" routerLink="/home">{{ 'PAYMENT.GO_HOME' | translate }}</a>
+            </div>
+
+            <p class="done-note tw-hint">{{ 'PAYMENT.DONE_NOTE' | translate }}</p>
           </section>
+        } @else {
+          <!-- ---------- Dang cho tien ve ---------- -->
+          <header class="head flex flex-col gap-1">
+            <h1 class="title pm-page-title tw-page-title">{{ 'PAYMENT.TITLE' | translate }}</h1>
+            <p class="sub flex items-center gap-2 m-0 text-sm text-body">
+              <span class="flex-none text-success"><pm-icon name="shield" [size]="15" /></span>
+              {{ 'PAYMENT.DESCRIPTION' | translate }}
+            </p>
+          </header>
 
-          <section class="info pm-card">
-            <h2 class="section-title">{{ 'PAYMENT.MANUAL_TRANSFER' | translate }}</h2>
+          <div class="grid grid-cols-1 nav:grid-cols-2 gap-8 items-start">
+            <!-- Cot trai: ma QR -->
+            <section class="qr-card tw-card flex flex-col items-center gap-2 p-8 max-[600px]:p-5">
+              <div class="qr-tags flex items-center justify-between gap-3 flex-wrap w-full pb-4 border-b border-edge">
+                <span class="tag-green tw-badge tw-badge-success">{{ 'PAYMENT.AUTO_GATE' | translate }}</span>
+                <span class="tag-pair inline-flex gap-2">
+                  <span class="tag-blue tw-badge tw-badge-accent">{{ 'PAYMENT.VIETQR' | translate }}</span>
+                  <span class="tag-amber tw-badge tw-badge-amber">{{ 'PAYMENT.NAPAS' | translate }}</span>
+                </span>
+              </div>
 
-            <dl class="lines">
-              <div class="line">
-                <dt>{{ 'PAYMENT.BANK' | translate }}</dt>
-                <dd>{{ qr.bankName }}</dd>
-              </div>
-              <div class="line">
-                <dt>{{ 'PAYMENT.TEXT_ACCOUNT' | translate }}</dt>
-                <dd>{{ qr.accountHolder }}</dd>
-              </div>
-              <div class="line copyable">
-                <dt>{{ 'PAYMENT.ACCOUNT_NUMBER' | translate }}</dt>
-                <dd>
-                  <code>{{ qr.accountNumber }}</code>
-                  <button type="button" class="copy-button" (click)="copy(qr.accountNumber, 'STK')">
-                    {{ copied() === 'STK' ? ('PAYMENT.COPIED' | translate) : ('PAYMENT.COPY' | translate) }}
-                  </button>
-                </dd>
-              </div>
-              <div class="line copyable">
-                <dt>{{ 'PAYMENT.CONTENT' | translate }}</dt>
-                <dd>
-                  <code>{{ qr.transferMessage }}</code>
-                  <button type="button" class="copy-button" (click)="copy(qr.transferMessage, 'ND')">
-                    {{ copied() === 'ND' ? ('PAYMENT.COPIED' | translate) : ('PAYMENT.COPY' | translate) }}
-                  </button>
-                </dd>
-              </div>
-            </dl>
+              <p class="due-name mt-4 mb-0 text-xs font-semibold tracking-[0.04em] text-ink-muted">{{ 'PAYMENT.DUE_LABEL' | translate }}</p>
+              <p class="due-money m-0 font-serif text-[2.25rem] max-[600px]:text-[1.875rem] font-bold leading-[1.15] text-accent">{{ qr.amount | amount: qr.currency }}</p>
 
-            <p class="warning">{{ 'PAYMENT.WARNING_CONTENT' | translate }}</p>
-            <p class="note">{{ 'PAYMENT.EXPIRY_NOTE' | translate }}</p>
-          </section>
-        </div>
+              <p class="clock inline-flex items-center gap-1 mt-2 mb-0 px-3 py-1 rounded-full bg-amber-soft text-xs text-on-amber" [class.is-out]="expired()">
+                {{ 'PAYMENT.VALID_FOR' | translate }}
+                <strong>{{ expired() ? ('PAYMENT.EXPIRED' | translate) : countdown() }}</strong>
+              </p>
+
+              <div class="qr-frame grid place-items-center mt-4 p-4 rounded-lg bg-card border border-edge">
+                <img [src]="qr.qrImage" [alt]="'PAYMENT.QR_CODE' | translate" />
+              </div>
+              <p class="qr-bank mt-2 mb-0 text-xs font-medium text-ink-muted">{{ qr.bankName }}</p>
+
+              <p class="waiting flex items-center gap-3 w-full mt-5 mb-0 px-4 py-3 rounded-md bg-accent-soft text-sm font-medium text-body" role="status">
+                <span class="waiting-dot" aria-hidden="true"></span>
+                {{ 'PAYMENT.WAITING' | translate }}
+              </p>
+            </section>
+
+            <!-- Cot phai: chuyen khoan thu cong -->
+            <section class="manual flex flex-col gap-4">
+              <div class="manual-card tw-card flex flex-col gap-4 p-8 max-[600px]:p-5">
+                <header class="manual-head flex items-center justify-between gap-4 flex-wrap pb-4 border-b border-edge">
+                  <h2 class="m-0 font-serif text-lg font-medium text-ink">{{ 'PAYMENT.MANUAL_TRANSFER' | translate }}</h2>
+                  <span class="manual-chip tw-badge tw-badge-muted">{{ 'PAYMENT.INTERNET_BANKING' | translate }}</span>
+                </header>
+
+                <dl class="manual-rows flex flex-col gap-3 m-0">
+                  <div class="flex items-baseline justify-between gap-4">
+                    <dt class="text-sm text-ink-muted">{{ 'PAYMENT.BANK' | translate }}</dt>
+                    <dd class="m-0 text-sm font-bold text-end text-ink">{{ qr.bankName }}</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-4">
+                    <dt class="text-sm text-ink-muted">{{ 'PAYMENT.TEXT_ACCOUNT' | translate }}</dt>
+                    <dd class="m-0 text-sm font-bold text-end text-ink">{{ qr.accountHolder }}</dd>
+                  </div>
+                </dl>
+
+                <div class="copy-box">
+                  <span class="copy-name">{{ 'PAYMENT.ACCOUNT_NUMBER' | translate }}</span>
+                  <span class="copy-row flex items-center justify-between gap-3">
+                    <code class="copy-big">{{ qr.accountNumber }}</code>
+                    <button type="button" class="copy-go tw-btn-secondary tw-btn-sm flex-none" (click)="copy(qr.accountNumber, 'STK')">
+                      {{ copied() === 'STK' ? ('PAYMENT.COPIED' | translate) : ('PAYMENT.COPY' | translate) }}
+                    </button>
+                  </span>
+                </div>
+
+                <div class="copy-box is-key">
+                  <span class="copy-head flex items-center justify-between gap-3">
+                    <span class="copy-name is-key">{{ 'PAYMENT.CONTENT' | translate }}</span>
+                    <span class="copy-must tw-badge tw-badge-amber">{{ 'PAYMENT.REQUIRED' | translate }}</span>
+                  </span>
+                  <span class="copy-row flex items-center justify-between gap-3">
+                    <code class="copy-big is-key">{{ qr.transferMessage }}</code>
+                    <button type="button" class="copy-go is-key tw-btn-primary tw-btn-sm flex-none" (click)="copy(qr.transferMessage, 'ND')">
+                      {{ copied() === 'ND' ? ('PAYMENT.COPIED' | translate) : ('PAYMENT.COPY' | translate) }}
+                    </button>
+                  </span>
+                </div>
+
+                <div class="copy-box">
+                  <span class="copy-name">{{ 'PAYMENT.EXACT_AMOUNT' | translate }}</span>
+                  <span class="copy-row flex items-center justify-between gap-3">
+                    <code class="copy-big">{{ qr.amount | amount: qr.currency }}</code>
+                    <button type="button" class="copy-go tw-btn-secondary tw-btn-sm flex-none" (click)="copy(qr.amount, 'ST')">
+                      {{ copied() === 'ST' ? ('PAYMENT.COPIED' | translate) : ('PAYMENT.COPY' | translate) }}
+                    </button>
+                  </span>
+                </div>
+
+                <aside class="warn p-4 rounded-lg bg-amber-soft">
+                  <strong class="block mb-1 text-xs font-bold text-on-amber">{{ 'PAYMENT.WARNING_TITLE' | translate }}</strong>
+                  <p class="m-0 text-xs leading-[1.6] text-on-amber">{{ 'PAYMENT.WARNING_CONTENT' | translate: { message: qr.transferMessage } }}</p>
+                </aside>
+              </div>
+
+              <div class="manual-deeds tw-card flex flex-col gap-3 p-5">
+                <button type="button" class="deeds-go tw-btn-primary tw-btn-lg tw-btn-block" [disabled]="checkingNow()" (click)="checkNow()">
+                  {{ 'PAYMENT.I_HAVE_PAID' | translate }}
+                </button>
+                <a class="deeds-back tw-btn-ghost tw-btn-block" routerLink="/orders">{{ 'PAYMENT.SEE_MY_ORDERS' | translate }}</a>
+              </div>
+
+              <p class="note tw-hint">{{ 'PAYMENT.EXPIRY_NOTE' | translate }}</p>
+            </section>
+          </div>
+        }
       }
     }
   }
-}
+</div>

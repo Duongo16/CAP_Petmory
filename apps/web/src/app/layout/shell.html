@@ -8,11 +8,8 @@
   <div class="flex items-center gap-4 max-w-[1180px] mx-auto px-6 py-3 box-border">
 
     <!-- Brand -->
-    <a class="inline-flex items-center gap-2.5 flex-shrink-0 no-underline text-ink" routerLink="/home">
-      <span class="grid place-items-center w-9 h-9 rounded-xl bg-accent text-on-accent" aria-hidden="true">
-        <pm-icon name="paw" [size]="19" />
-      </span>
-      <span class="font-serif text-[1.2rem] font-semibold">{{ 'COMMON.APP_NAME' | translate }}</span>
+    <a class="inline-flex items-center flex-shrink-0 no-underline" routerLink="/home">
+      <pm-brand size="md" />
     </a>
 
     <!-- Desktop nav -->
@@ -67,10 +64,7 @@
             aria-haspopup="true"
             (click)="toggleMenu()"
           >
-            <span
-              class="grid place-items-center w-8 h-8 rounded-full bg-accent text-on-accent text-sm font-bold flex-shrink-0"
-              aria-hidden="true"
-            >{{ initial() }}</span>
+            <pm-user-face [name]="u.fullName" [url]="u.avatarUrl" [size]="32" aria-hidden="true" />
             <span class="hidden nav:block text-sm font-semibold whitespace-nowrap max-w-28 truncate">{{ u.fullName }}</span>
             <pm-icon name="chevron" [size]="14" />
           </button>
@@ -155,45 +149,41 @@
 </main>
 
 <!-- ───── Footer ───── -->
-<footer class="mt-12 bg-muted border-t border-edge">
-  <!-- Tagline band -->
-  <div class="grid place-items-center px-4 py-10 bg-accent-soft text-center">
-    <p class="max-w-2xl m-0 text-base font-semibold italic text-accent-dark">
-      {{ 'FOOTER.TAGLINE' | translate }}
-    </p>
-  </div>
-
-  <!-- Link grid -->
-  <div class="grid gap-7 max-w-[1180px] mx-auto px-4 py-9 box-border [grid-template-columns:repeat(auto-fit,minmax(210px,1fr))]">
+<footer class="mt-16 bg-night text-on-night">
+  <div class="grid gap-10 max-w-[1180px] mx-auto px-6 pt-12 pb-8 box-border [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
 
     <!-- Brand column -->
-    <div class="flex flex-col items-start gap-1">
-      <img class="w-9 h-9 rounded-xl object-cover bg-accent-soft" src="img/logo-mark.png" alt="" width="36" height="36" />
-      <span class="text-lg font-extrabold tracking-wide text-ink">{{ 'COMMON.APP_NAME' | translate }}</span>
-      <p class="mt-1 m-0 text-sm italic text-ink-muted">{{ 'FOOTER.SLOGAN' | translate }}</p>
-      <p class="m-0 text-xs text-ink-muted">{{ 'FOOTER.RIGHTS' | translate }}</p>
+    <div class="flex flex-col items-start gap-3">
+      <pm-brand size="md" />
+      <p class="m-0 font-serif italic text-base leading-relaxed">{{ 'FOOTER.TAGLINE' | translate }}</p>
+      <p class="m-0 text-sm text-on-night/70">{{ 'FOOTER.SLOGAN' | translate }}</p>
     </div>
 
     <!-- Explore nav -->
-    <nav class="flex flex-col items-start gap-2" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
-      <h2 class="m-0 mb-3 text-xs font-bold tracking-[0.08em] uppercase text-ink-muted">
+    <nav class="flex flex-col items-start gap-2.5" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
+      <h2 class="m-0 mb-2 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
         {{ 'FOOTER.EXPLORE' | translate }}
       </h2>
-      @for (item of footerMenu; track item.path) {
-        <a
-          class="text-ink-muted no-underline text-sm transition-colors hover:text-accent-dark"
-          [routerLink]="item.path"
-        >{{ item.key | translate }}</a>
-      }
+      <div class="grid grid-cols-2 gap-x-8 gap-y-2.5">
+        @for (item of footerMenu; track item.path) {
+          <a
+            class="text-on-night/85 no-underline text-sm transition-colors hover:text-on-night hover:underline"
+            [routerLink]="item.path"
+          >{{ item.key | translate }}</a>
+        }
+      </div>
     </nav>
 
     <!-- Social links -->
-    <div class="footer-contact">
-      <h2 class="m-0 mb-3 text-xs font-bold tracking-[0.08em] uppercase text-ink-muted">
+    <div class="footer-contact flex flex-col items-start gap-3">
+      <h2 class="m-0 mb-1 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
         {{ 'FOOTER.FOLLOW' | translate }}
       </h2>
       <pm-social-links variant="full" />
     </div>
+  </div>
+  <div class="max-w-[1180px] mx-auto px-6 pb-8 box-border">
+    <p class="m-0 pt-5 border-t border-on-night/15 text-xs text-on-night/60">{{ 'FOOTER.RIGHTS' | translate }}</p>
   </div>
 </footer>
 

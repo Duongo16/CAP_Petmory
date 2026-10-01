@@ -1,0 +1,204 @@
+/* Khung dialog ho so khach hang. */
+
+:host {
+  display: block;
+}
+
+.dialog-shell {
+  display: flex;
+  flex-direction: column;
+  max-block-size: 90vh;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pm-space-3);
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--pm-border);
+  flex: none;
+}
+
+.dialog-title {
+  margin: 0;
+  font-family: var(--pm-font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--pm-text);
+}
+
+.dialog-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--pm-space-6);
+  background: var(--pm-bg);
+}
+
+.shut {
+  display: grid;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  padding: 0;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-card);
+  color: var(--pm-text-muted);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+
+  &:hover {
+    background: var(--pm-bg-muted);
+    color: var(--pm-text);
+  }
+}
+
+/* Overrides for the who-card inside dialog (less padding). */
+.who-card {
+  margin-bottom: var(--pm-space-4);
+  padding: var(--pm-space-4);
+}
+
+.card {
+  margin-bottom: var(--pm-space-4);
+  padding: var(--pm-space-5);
+  border: 1px solid var(--pm-border);
+  border-radius: 20px;
+  background: var(--pm-bg-card);
+
+  h2 {
+    margin: 0 0 var(--pm-space-3);
+    font-family: var(--pm-font-display);
+    font-size: var(--pm-text-lg);
+    font-weight: 500;
+  }
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pm-space-3);
+  margin-bottom: var(--pm-space-3);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.header-note {
+  font-size: var(--pm-text-xs);
+  color: var(--pm-text-muted);
+}
+
+.info-pair {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--pm-space-1) var(--pm-space-4);
+  margin: 0;
+
+  dt {
+    font-size: var(--pm-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--pm-text-muted);
+    white-space: nowrap;
+  }
+
+  dd {
+    margin: 0;
+    font-size: var(--pm-text-sm);
+  }
+}
+
+.note {
+  margin: 0;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}
+
+/* Table inside dialog */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-lg);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--pm-text-sm);
+
+  thead tr {
+    background: var(--pm-bg);
+  }
+
+  th,
+  td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--pm-info-soft);
+    vertical-align: middle;
+  }
+
+  th {
+    color: var(--pm-text-muted);
+    font-weight: 700;
+    font-size: var(--pm-text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.right {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.order-code {
+  color: var(--pm-accent);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--pm-bg-muted);
+  color: var(--pm-text-body);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  white-space: nowrap;
+
+  &[data-group='good'] {
+    background: var(--pm-success-soft);
+    color: var(--pm-on-success-soft);
+  }
+
+  &[data-group='in-progress'] {
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+
+  &[data-group='bad'] {
+    background: var(--pm-danger-soft);
+    color: var(--pm-on-danger-soft);
+  }
+}
+
+.sub {
+  display: block;
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-xs);
+}

@@ -1,29 +1,113 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
+import { LineKind } from '../../cart/schemas/cart.schema';
+import {
+  EngravingSchema,
+  MeshPaintSchema,
+  PreviewImageSchema,
+  ZonePaintSchema,
+  type Engraving,
+  type MeshPaint,
+  type Preview,
+  type ZonePaint,
+} from '../../designs/schemas/design.schema';
 
 export type OrderDocument = HydratedDocument<Order>;
 
 /** Order status. Only moves along the edges declared in the service. */
 export enum OrderStatus {
   AWAITING_PAYMENT = 'AWAITING_PAYMENT',
-  PAYMENT_EXPIRED = 'PAYMENT_EXPIRED',
   PAID = 'PAID',
   IN_PRODUCTION = 'IN_PRODUCTION',
-  QUALITY_CHECK = 'QUALITY_CHECK',
-  READY_TO_SHIP = 'READY_TO_SHIP',
   SHIPPING = 'SHIPPING',
-  DELIVERED = 'DELIVERED',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
 }
 
+/**
+ * The design as it stood at the moment of payment.
+ *
+ * This is a copy, not a link. The design it was copied from may be edited or
+ * removed afterwards and this copy stays exactly as it was.
+ */
+@Schema({ _id: false })
+export class DesignSnapshot {
+  @Prop({ required: true, trim: true })
+  modelCode!: string;
+
+  @Prop({ type: [MeshPaintSchema], default: [] })
+  paint!: MeshPaint[];
+
+  /** The wool colour codes used, so the workshop knows which rolls to pull. */
+  @Prop({ type: [String], default: [] })
+  colorCodesUsed!: string[];
+
+  /**
+   * Mau cua tung vung co ten, chep nguyen tu ban thiet ke luc dat hang.
+   *
+   * Ho so san xuat doc day de ghi ma mau theo vung. Rong voi don cu va voi
+   * mo hinh chua tach du vung, va luc do ho so quay ve liet ke chung.
+   */
+  @Prop({ type: [ZonePaintSchema], default: [] })
+  zonePaint!: ZonePaint[];
+
+  @Prop({ type: EngravingSchema, default: () => ({}) })
+  engraving!: Engraving;
+
+  /** The six preview pictures, kept by file name in the picture store. */
+  @Prop({ type: [PreviewImageSchema], default: [] })
+  preview!: Preview[];
+
+  /** The pet the design was made for, if one was attached. */
+  @Prop({ type: Types.ObjectId, ref: 'Pet', default: null })
+  pet!: Types.ObjectId | null;
+
+  /** The pet photographs the workshop should work from. */
+  @Prop({ type: [Types.ObjectId], ref: 'PetPhoto', default: [] })
+  petPhoto!: Types.ObjectId[];
+
+  @Prop({ type: Date, required: true })
+  takenAt!: Date;
+}
+
+export const DesignSnapshotSchema = SchemaFactory.createForClass(DesignSnapshot);
+
+/** Mot muc tren phieu kiem tra chat luong, va ai da tich no. */
+@Schema({ _id: false })
+export class QualityTick {
+  @Prop({ required: true, trim: true })
+  label!: string;
+
+  @Prop({ type: Boolean, default: false })
+  done!: boolean;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', default: null })
+  doneBy!: Types.ObjectId | null;
+
+  @Prop({ type: Date, default: null })
+  doneAt!: Date | null;
+}
+
+export const QualityTickSchema = SchemaFactory.createForClass(QualityTick);
+
 @Schema({ _id: false })
 export class OrderLine {
-  @Prop({ required: true, uppercase: true, trim: true })
+  /** Dong hang tuy bien hay dong hang co san. */
+  @Prop({ type: String, enum: LineKind, default: LineKind.MADE_TO_ORDER, index: true })
+  kind!: LineKind;
+
+  @Prop({ uppercase: true, trim: true, default: '' })
   productTypeCode!: string;
 
-  @Prop({ required: true, uppercase: true, trim: true })
+  @Prop({ uppercase: true, trim: true, default: '' })
   sizeCode!: string;
+
+  /** Ma mon hang co san, chot cung vao dong luc dat. Rong voi hang tuy bien. */
+  @Prop({ uppercase: true, trim: true, default: '' })
+  goodsCode!: string;
+
+  @Prop({ uppercase: true, trim: true, default: '' })
+  sku!: string;
 
   @Prop({ required: true, trim: true })
   displayName!: string;
@@ -38,15 +122,27 @@ export class OrderLine {
   @Prop({ trim: true, default: '' })
   displayBaseName!: string;
 
-  /** The design frozen at order time, so the workshop makes what the customer approved. */
+  /** Which design this line came from. Kept only so the two can be traced to each other. */
   @Prop({ type: Types.ObjectId, ref: 'Design', default: null })
   designId!: Types.ObjectId | null;
+
+  /**
+   * A copy of the design exactly as it stood when the order was placed.
+   *
+   * The line used to hold only the design's identifier. A customer who edited
+   * the design afterwards changed what the workshop would make, without paying
+   * for the change and without anyone being told. Since there is no separate
+   * approval step, this copy is the only record of what was actually agreed,
+   * so nothing may write to it once it exists.
+   */
+  @Prop({ type: DesignSnapshotSchema, default: null })
+  design!: DesignSnapshot | null;
 
   @Prop({ type: Number, required: true, min: 1 })
   quantity!: number;
 
   /** Unit price frozen at order time; later config changes do not affect it. */
-  @Prop({ type: Types.Decimal128, required: true })
+  @Prop({ type: MongooseSchema.Types.Decimal128, required: true })
   unitPrice!: Types.Decimal128;
 
   @Prop({ type: Number, required: true, min: 1 })
@@ -95,7 +191,7 @@ export class Order {
   delivery!: DeliveryInfo;
 
   /** Goods total. Excludes shipping, which the carrier collects on delivery. */
-  @Prop({ type: Types.Decimal128, required: true })
+  @Prop({ type: MongooseSchema.Types.Decimal128, required: true })
   total!: Types.Decimal128;
 
   @Prop({ required: true, default: 'VND', uppercase: true, trim: true })
@@ -115,6 +211,33 @@ export class Order {
 
   @Prop({ type: Date, default: null })
   paidAt!: Date | null;
+
+  /**
+   * Phieu kiem tra chat luong cua don nay.
+   *
+   * Duoc chep tu danh sach trong tham so nghiep vu vao luc don buoc vao khau
+   * kiem dinh. Chep chu khong tro, vi doi danh sach o tham so khong duoc phep
+   * lam doi phieu cua mot don dang lam do.
+   */
+  @Prop({ type: [QualityTickSchema], default: [] })
+  qualityCheck!: QualityTick[];
+
+  /**
+   * Don nay dang can nguoi that xu ly.
+   *
+   * Dat len khi mot dong hang co san khong tru duoc kho luc thanh toan: tien
+   * da nhan roi nen khong the tu choi don, nhung hang thi khong con. Nhom
+   * Cham soc khach hang phai lien lac voi khach de hoan tien hoac doi mon.
+   */
+  @Prop({ type: Boolean, default: false, index: true })
+  needsAttention!: boolean;
+
+  @Prop({ trim: true, default: '' })
+  attentionNote!: string;
+
+  /** Ton kho cua don nay da duoc tru chua, de khong tru hai lan. */
+  @Prop({ type: Boolean, default: false })
+  stockTaken!: boolean;
 
   @Prop({ trim: true, default: '' })
   reasonDestroy!: string;

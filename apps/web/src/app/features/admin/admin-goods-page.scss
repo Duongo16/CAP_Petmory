@@ -1,0 +1,14 @@
+/* Dong cua mon dang tat thi mo di, de nhin luot la thay. */
+tr.off {
+  opacity: 0.55;
+}
+
+.mono {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.thin {
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-sm);
+}

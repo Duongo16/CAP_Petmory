@@ -1,0 +1,30 @@
+/*
+ * O dan lien ket anh. O nhap va nut dung bo khoi chung cua Tailwind, nen
+ * nhin ra cung mot bo voi cac o nhap khac trong hop thoai bao quanh.
+ */
+
+:host {
+  display: block;
+}
+
+.link-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.link-box {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.link-add {
+  flex: 0 0 auto;
+}
+
+.field-error {
+  margin: 6px 0 0;
+  color: var(--pm-danger);
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+}

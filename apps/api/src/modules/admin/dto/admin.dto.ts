@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsInt,
   IsOptional,
@@ -66,4 +67,10 @@ export class CustomerSearchDto {
   @Min(1)
   @Max(PAGE_SIZE_MAX)
   pageSize?: number;
+}
+
+/** Mot muc tren phieu kiem tra chat luong duoc tich hay bo tich. */
+export class QualityTickDto {
+  @IsBoolean()
+  done!: boolean;
 }

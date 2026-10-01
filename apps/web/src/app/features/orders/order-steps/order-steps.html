@@ -1,0 +1,17 @@
+<ol class="steps">
+  <span class="rail" aria-hidden="true">
+    <span class="rail-done" [style.inline-size.%]="fill()"></span>
+  </span>
+
+  @for (stop of stops; track stop.number) {
+    <li
+      class="stop"
+      [class.is-here]="stop.number === active()"
+      [class.is-done]="stop.number < active()"
+      [attr.aria-current]="stop.number === active() ? 'step' : null"
+    >
+      <span class="stop-number">{{ stop.number }}</span>
+      <span class="stop-name">{{ stop.key | translate }}</span>
+    </li>
+  }
+</ol>

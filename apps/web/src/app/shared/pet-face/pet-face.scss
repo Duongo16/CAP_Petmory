@@ -1,0 +1,23 @@
+:host {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.face {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 30%;
+  background: var(--pm-paper-bloom);
+  line-height: 0;
+
+  &.round {
+    border-radius: 50%;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}

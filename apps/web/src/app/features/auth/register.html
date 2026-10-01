@@ -5,7 +5,7 @@
     <span class="ap-blob ap-blob-a"></span>
     <span class="ap-blob ap-blob-b"></span>
 
-    <div class="ap-illustration"><pm-pet-art kind="cat" [width]="220" /></div>
+    <div class="ap-illustration"><pm-diary-scene [width]="420" [onColor]="true" /></div>
 
     <h2 class="ap-visual-title">{{ 'AUTH.SIDE_UP_TITLE' | translate }}</h2>
     <p class="ap-visual-sub">{{ 'AUTH.SIDE_UP_TEXT' | translate }}</p>
@@ -31,12 +31,22 @@
 
       <a class="ap-back" routerLink="/landing"><pm-icon name="back" [size]="16" />{{ 'AUTH.BACK_HOME' | translate }}</a>
 
-      <span class="ap-logo-icon" aria-hidden="true"><pm-icon name="paw" [size]="26" /></span>
+      <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" /></a>
 
       <div class="ap-head">
         <h1 class="ap-title">{{ 'AUTH.REGISTER_TITLE' | translate }}</h1>
         <p class="ap-sub">{{ 'AUTH.REGISTER_SUB' | translate }}</p>
       </div>
+
+      @if (draft(); as pet) {
+        <div class="ap-draft" role="status">
+          <span class="ap-draft-photo" aria-hidden="true"><pm-pet-art [kind]="draftArt()" [face]="true" [width]="40" /></span>
+          <span class="ap-draft-text">
+            <strong>{{ 'AUTH.DRAFT_TITLE' | translate: { name: pet.name } }}</strong>
+            <span>{{ 'AUTH.DRAFT_REGISTER' | translate }}</span>
+          </span>
+        </div>
+      }
 
       <!-- Social buttons -->
       <div class="ap-social-row">
@@ -94,43 +104,25 @@
           </div>
         </div>
 
-        <div class="ap-fields-2">
-          <div class="ap-field">
-            <label class="ap-label" for="up-phone">
-              {{ 'AUTH.PHONE' | translate }}
-              <span class="font-normal text-ink-muted">({{ 'AUTH.PHONE_NOTE' | translate }})</span>
-            </label>
-            <div class="ap-input-wrap">
-              <input
-                class="ap-input"
-                id="up-phone"
-                type="tel"
-                formControlName="phone"
-                autocomplete="tel"
-                [placeholder]="'AUTH.PHONE_PLACEHOLDER' | translate"
-              />
-              <span class="ap-input-icon" aria-hidden="true"><pm-icon name="comment" [size]="15" /></span>
-            </div>
-            @if (form.controls.phone.touched && form.controls.phone.invalid) {
-              <p class="ap-error-msg">{{ 'AUTH.PHONE_ERROR' | translate }}</p>
-            }
+        <div class="ap-field">
+          <label class="ap-label" for="up-phone">
+            {{ 'AUTH.PHONE' | translate }}
+            <span class="font-normal text-ink-muted">({{ 'AUTH.PHONE_NOTE' | translate }})</span>
+          </label>
+          <div class="ap-input-wrap">
+            <input
+              class="ap-input"
+              id="up-phone"
+              type="tel"
+              formControlName="phone"
+              autocomplete="tel"
+              [placeholder]="'AUTH.PHONE_PLACEHOLDER' | translate"
+            />
+            <span class="ap-input-icon" aria-hidden="true"><pm-icon name="comment" [size]="15" /></span>
           </div>
-
-          <div class="ap-field">
-            <label class="ap-label" for="up-pet">
-              <pm-icon name="paw" [size]="12" /> {{ 'AUTH.PET_NAME' | translate }}
-            </label>
-            <div class="ap-input-wrap">
-              <input
-                class="ap-input"
-                id="up-pet"
-                type="text"
-                formControlName="petName"
-                [placeholder]="'AUTH.PET_NAME_PLACEHOLDER' | translate"
-              />
-              <span class="ap-input-icon" aria-hidden="true"><pm-icon name="heart" [size]="15" /></span>
-            </div>
-          </div>
+          @if (form.controls.phone.touched && form.controls.phone.invalid) {
+            <p class="ap-error-msg">{{ 'AUTH.PHONE_ERROR' | translate }}</p>
+          }
         </div>
 
         <div class="ap-field">

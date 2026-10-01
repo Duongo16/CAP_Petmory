@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { ChangeQuantityDto, AddToCartDto } from './dto/cart.dto';
+import { AddGoodsDto, ChangeQuantityDto, AddToCartDto } from './dto/cart.dto';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @Controller('cart')
@@ -15,6 +15,12 @@ export class CartController {
   @Post('items')
   add(@Body() dto: AddToCartDto, @CurrentUser() user: AuthUser) {
     return this.service.add(user.userId, dto);
+  }
+
+  /** Them mot mon hang co san. Duong rieng vi hai dong hang khac du lieu. */
+  @Post('goods')
+  addGoods(@Body() dto: AddGoodsDto, @CurrentUser() user: AuthUser) {
+    return this.service.addGoods(user.userId, dto);
   }
 
   @Patch('items/:id')

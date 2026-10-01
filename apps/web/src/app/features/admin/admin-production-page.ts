@@ -37,6 +37,18 @@ const KEY_ANGLE: Record<string, string> = {
   ISO: 'VIEWER.ANGLE.ISO',
 };
 
+/** Ten hien cua sau vung co ten, viet san de khong bao gio ghep chuoi. */
+const ZONE_KEY: Record<string, string> = {
+  MAIN_FUR: 'PET.ZONE.MAIN_FUR',
+  BELLY_FUR: 'PET.ZONE.BELLY_FUR',
+  EAR: 'PET.ZONE.EARS',
+  TAIL: 'PET.ZONE.TAIL',
+  EYE: 'PET.ZONE.EYES',
+  NOSE: 'PET.ZONE.NOSE',
+};
+
+const ZONE_KEY_OTHER = 'ADMIN.PROFILE.ZONE_OTHER';
+
 @Component({
   selector: 'pm-admin-production-page',
   standalone: true,
@@ -46,6 +58,16 @@ const KEY_ANGLE: Record<string, string> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminProductionPage implements OnInit {
+  /**
+   * Ten hien cua mot vung co ten.
+   *
+   * Vung la mot danh sach dong sau muc, nen bang tra duoc viet san va khoa
+   * khong bao gio duoc ghep tu chuoi.
+   */
+  zoneKeyOf(zone: string): string {
+    return ZONE_KEY[zone] ?? ZONE_KEY_OTHER;
+  }
+
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(AdminService);
   private readonly http = inject(HttpClient);

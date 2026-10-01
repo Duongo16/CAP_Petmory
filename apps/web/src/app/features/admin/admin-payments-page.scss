@@ -1,0 +1,57 @@
+/* Rieng cho man nhat ky chuyen khoan. */
+
+/* --- Money summary above the reconciliation log --- */
+.money-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--pm-space-3);
+  margin-bottom: var(--pm-space-5);
+}
+
+.money-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-1);
+  padding: 18px 20px;
+  border: 1px solid var(--pm-border);
+  border-radius: 18px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+}
+
+.money-name {
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pm-text-muted);
+}
+
+.money-figure {
+  font-family: var(--pm-font-display);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--pm-text);
+}
+
+.money-figure.amber {
+  color: var(--pm-amber);
+}
+
+.money-figure.danger {
+  color: var(--pm-danger);
+}
+
+.money-note {
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}
+
+/* --- Filter pills above a log: the pill look itself comes from the shared chip --- */
+.log-filters {
+  display: flex;
+  gap: var(--pm-space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--pm-gap);
+}

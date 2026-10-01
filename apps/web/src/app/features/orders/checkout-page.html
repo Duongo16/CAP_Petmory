@@ -1,88 +1,202 @@
-<h1 class="pm-page-title">{{ 'CHECKOUT.TITLE' | translate }}</h1>
-<p class="pm-page-description">{{ 'CHECKOUT.DESCRIPTION' | translate }}</p>
+<div class="checkout tw-page flex flex-col gap-8 max-[600px]:px-4">
+  <pm-order-steps [active]="1" />
 
-@switch (status()) {
-  @case ('LOADING') {
-    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
-  }
-  @case ('ERROR') {
-    <div class="pm-center pm-empty"><p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
-  }
-  @case ('READY') {
-    @if (cart().items.length === 0) {
-      <div class="pm-center pm-empty"><p>{{ 'CART.EMPTY' | translate }}</p></div>
-    } @else {
-      <div class="layout">
-        <form class="form pm-card" [formGroup]="form" (ngSubmit)="send()">
-          <h2 class="section-title">{{ 'CHECKOUT.INFO_LABEL' | translate }}</h2>
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+    }
+    @case ('READY') {
+      @if (cart().items.length === 0) {
+        <div class="pm-center blank tw-empty">
+          <h1 class="pm-page-title tw-page-title">{{ 'CHECKOUT.TITLE' | translate }}</h1>
+          <p class="pm-empty m-0">{{ 'CART.EMPTY' | translate }}</p>
+          <a class="pm-button-primary" routerLink="/shop">{{ 'CART.VIEW_PRODUCTS' | translate }}</a>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 nav:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] gap-8 items-start">
+          <!-- ---------- Cot trai: bieu mau ---------- -->
+          <section class="panel flex flex-col gap-6">
+            <header class="panel-head flex items-end justify-between gap-4 flex-wrap">
+              <div class="flex flex-col gap-1">
+                <p class="eyebrow tw-eyebrow m-0">{{ 'CHECKOUT.OF_THREE' | translate }}</p>
+                <h1 class="panel-title pm-page-title tw-page-title">{{ 'CHECKOUT.TITLE' | translate }}</h1>
+              </div>
+              <span class="safe-chip tw-badge tw-badge-success">
+                <pm-icon name="shield" [size]="13" />
+                {{ 'CHECKOUT.SAFE' | translate }}
+              </span>
+            </header>
 
-          <label class="field">
-            <span class="label">{{ 'CHECKOUT.FULL_NAME' | translate }}</span>
-            <input type="text" formControlName="fullName" autocomplete="name" />
-            @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
-              <span class="field-error">{{ 'CHECKOUT.FULL_NAME_ERROR' | translate }}</span>
-            }
-          </label>
+            <form id="checkout-form" class="form tw-form" [formGroup]="form" (ngSubmit)="send()">
+              <div class="tw-card tw-card-pad flex flex-col gap-5 max-[600px]:p-5">
+                <div class="tw-form-grid">
+                  <div class="field tw-field">
+                    <label class="field-name tw-label" for="checkout-name">
+                      {{ 'CHECKOUT.FULL_NAME' | translate }} <span class="star text-danger">*</span>
+                    </label>
+                    <input id="checkout-name" class="tw-input" type="text" formControlName="fullName" autocomplete="name" />
+                    @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+                      <p class="field-error tw-error">{{ 'CHECKOUT.FULL_NAME_ERROR' | translate }}</p>
+                    }
+                  </div>
 
-          <label class="field">
-            <span class="label">{{ 'CHECKOUT.PHONE' | translate }}</span>
-            <input type="tel" formControlName="phone" autocomplete="tel" inputmode="numeric" />
-            @if (form.controls.phone.touched && form.controls.phone.invalid) {
-              <span class="field-error">{{ 'CHECKOUT.ERROR_PHONE' | translate }}</span>
-            }
-          </label>
+                  <div class="field tw-field">
+                    <label class="field-name tw-label" for="checkout-phone">
+                      {{ 'CHECKOUT.PHONE' | translate }} <span class="star text-danger">*</span>
+                    </label>
+                    <input
+                      id="checkout-phone"
+                      class="tw-input"
+                      type="tel"
+                      formControlName="phone"
+                      autocomplete="tel"
+                      inputmode="numeric"
+                    />
+                    @if (form.controls.phone.touched && form.controls.phone.invalid) {
+                      <p class="field-error tw-error">{{ 'CHECKOUT.ERROR_PHONE' | translate }}</p>
+                    }
+                  </div>
+                </div>
 
-          <label class="field">
-            <span class="label">{{ 'CHECKOUT.ADDRESS' | translate }}</span>
-            <input type="text" formControlName="address" autocomplete="street-address" />
-            @if (form.controls.address.touched && form.controls.address.invalid) {
-              <span class="field-error">{{ 'CHECKOUT.ERROR_ADDRESS' | translate }}</span>
-            }
-          </label>
+                <div class="field tw-field">
+                  <label class="field-name tw-label" for="checkout-address">
+                    {{ 'CHECKOUT.ADDRESS' | translate }} <span class="star text-danger">*</span>
+                  </label>
+                  <input
+                    id="checkout-address"
+                    class="tw-input"
+                    type="text"
+                    formControlName="address"
+                    autocomplete="street-address"
+                  />
+                  @if (form.controls.address.touched && form.controls.address.invalid) {
+                    <p class="field-error tw-error">{{ 'CHECKOUT.ERROR_ADDRESS' | translate }}</p>
+                  }
+                </div>
 
-          <label class="field">
-            <span class="label">{{ 'CHECKOUT.PROVINCE' | translate }}</span>
-            <input type="text" formControlName="province" autocomplete="address-level1" />
-            @if (form.controls.province.touched && form.controls.province.invalid) {
-              <span class="field-error">{{ 'CHECKOUT.ERROR_PROVINCE' | translate }}</span>
-            }
-          </label>
+                <div class="field tw-field">
+                  <label class="field-name tw-label" for="checkout-province">
+                    {{ 'CHECKOUT.PROVINCE' | translate }} <span class="star text-danger">*</span>
+                  </label>
+                  <input
+                    id="checkout-province"
+                    class="tw-input"
+                    type="text"
+                    formControlName="province"
+                    autocomplete="address-level1"
+                    list="checkout-provinces"
+                  />
+                  <datalist id="checkout-provinces">
+                    @for (one of provinces; track one) {
+                      <option [value]="one"></option>
+                    }
+                  </datalist>
+                  @if (form.controls.province.touched && form.controls.province.invalid) {
+                    <p class="field-error tw-error">{{ 'CHECKOUT.ERROR_PROVINCE' | translate }}</p>
+                  }
+                </div>
+              </div>
 
-          <label class="field">
-            <span class="label">{{ 'CHECKOUT.NOTE' | translate }}</span>
-            <textarea rows="3" formControlName="note"></textarea>
-          </label>
+              <div class="tw-card tw-card-pad flex flex-col gap-5 max-[600px]:p-5">
+                <div class="field tw-field">
+                  <div class="field-head flex items-baseline justify-between gap-3">
+                    <label class="field-name tw-label" for="checkout-note">{{ 'CHECKOUT.NOTE' | translate }}</label>
+                    <span class="field-hint tw-hint">{{ 'CHECKOUT.OPTIONAL' | translate }}</span>
+                  </div>
+                  <textarea
+                    id="checkout-note"
+                    class="tw-textarea"
+                    rows="3"
+                    formControlName="note"
+                    [placeholder]="'CHECKOUT.NOTE_HINT' | translate"
+                  ></textarea>
+                </div>
 
-          @if (error(); as codeError) {
-            <p class="generic-error" role="alert">{{ codeError | translate }}</p>
-          }
+                <article class="care flex gap-3 p-4 rounded-lg bg-accent-soft">
+                  <span class="care-mark grid place-items-center flex-none w-9 h-9 rounded-full bg-card text-accent" aria-hidden="true"><pm-icon name="heart" [size]="16" /></span>
+                  <div>
+                    <h2 class="m-0 mb-1 text-sm font-bold text-accent-dark">{{ 'CHECKOUT.CARE_TITLE' | translate }}</h2>
+                    <p class="m-0 text-xs leading-[1.6] text-body">{{ 'CHECKOUT.CARE_TEXT' | translate }}</p>
+                  </div>
+                </article>
+              </div>
 
-          <button type="submit" class="pm-button-primary wide" [disabled]="pendingSend()">
-            {{ 'CHECKOUT.CONFIRM' | translate }}
-          </button>
-        </form>
+              @if (error(); as codeError) {
+                <p class="form-error m-0 px-4 py-3 rounded-md bg-danger-soft text-on-danger-soft text-sm font-medium" role="alert">{{ codeError | translate }}</p>
+              }
+            </form>
+          </section>
 
-        <aside class="summary pm-card">
-          <h2 class="section-title">{{ 'CHECKOUT.ORDER_OF_VERSION' | translate }}</h2>
-          <ul class="list">
-            @for (item of cart().items; track item.id) {
-              <li class="line-item">
-                <span class="name">{{ item.displayName }}</span>
-                <span class="quantity">×{{ item.quantity }}</span>
+          <!-- ---------- Cot phai: tom tat don ---------- -->
+          <aside class="bill tw-card flex flex-col gap-4 p-6 max-[600px]:p-5">
+            <header class="bill-head flex items-center justify-between gap-4 pb-4 border-b border-edge">
+              <h2 class="bill-title m-0 font-serif text-lg font-medium text-ink">{{ 'CHECKOUT.ORDER_OF_VERSION' | translate }}</h2>
+              <span class="count-chip tw-badge tw-badge-accent">
+                {{ 'CHECKOUT.COUNT_ITEM' | translate: { count: cart().countItem } }}
+              </span>
+            </header>
+
+            <ul class="bill-list flex flex-col gap-4 m-0 p-0 list-none">
+              @for (line of lines(); track line.raw.id) {
+                <li class="bill-item flex gap-4">
+                  <span class="bill-thumb relative grid place-items-center flex-none w-20 h-20 rounded-lg bg-muted border border-edge text-edge-strong">
+                    @if (line.imageUrl) {
+                      <img class="absolute inset-0 w-full h-full rounded-lg object-cover" [src]="line.imageUrl" alt="" />
+                    } @else {
+                      <pm-icon name="paw" [size]="26" />
+                    }
+                    <span class="bill-times absolute -top-1.5 -right-1.5 px-2 py-0.5 rounded-full bg-accent text-on-accent text-[0.625rem] font-bold">×{{ line.raw.quantity }}</span>
+                  </span>
+                  <span class="bill-what flex flex-col gap-1 min-w-0">
+                    <strong class="text-sm font-bold text-ink">{{ line.raw.displayName }}</strong>
+                    <span class="bill-note text-xs text-ink-muted">{{ 'CHECKOUT.ITEM_NOTE' | translate }}</span>
+                    <span class="bill-price self-start tw-badge tw-badge-amber">{{ line.raw.unitPrice | amount: line.raw.currency }}</span>
+                  </span>
+                </li>
+              }
+            </ul>
+
+            <dl class="bill-rows flex flex-col gap-3 m-0 py-4 border-y border-edge">
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-sm text-body">{{ 'CART.SUBTOTAL' | translate }}</dt>
+                <dd class="m-0 text-sm font-semibold text-ink">{{ cart().total | amount: cart().currency }}</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-sm text-body">
+                  {{ 'CHECKOUT.SHIPPING' | translate }}
+                  <span class="bill-later block mt-0.5 text-xs text-amber">{{ 'CHECKOUT.SHIPPING_ON_DELIVERY' | translate }}</span>
+                </dt>
+                <dd class="bill-later-value m-0 flex-none text-xs font-medium text-ink-muted">{{ 'CHECKOUT.SHIPPING_SELF' | translate }}</dd>
+              </div>
+            </dl>
+
+            <div class="bill-total flex items-center justify-between flex-wrap gap-x-4 gap-y-1 text-base font-bold text-ink">
+              <span>{{ 'CHECKOUT.TOTAL' | translate }}</span>
+              <strong class="ml-auto font-serif text-2xl font-bold whitespace-nowrap text-accent-dark">{{ cart().total | amount: cart().currency }}</strong>
+            </div>
+            <p class="bill-total-note tw-hint -mt-2">{{ 'CART.SHIPPING_FEE_NOTE' | translate }}</p>
+
+            <button type="submit" form="checkout-form" class="send tw-btn-primary tw-btn-lg tw-btn-block" [disabled]="pendingSend()">
+              {{ 'CHECKOUT.CONFIRM' | translate }}
+              <pm-icon name="chevron" [size]="14" />
+            </button>
+
+            <ul class="pledges flex flex-wrap gap-3 m-0 p-0 list-none">
+              <li class="inline-flex items-center gap-2 text-xs font-medium text-ink-muted">
+                <span class="text-success"><pm-icon name="check" [size]="13" /></span>
+                {{ 'CHECKOUT.PLEDGE_WARRANTY' | translate }}
               </li>
-            }
-          </ul>
-          <div class="line">
-            <span>{{ 'CART.LEAD_TIME' | translate }}</span>
-            <strong>{{ 'PRODUCT.DAYS' | translate: { count: cart().productionDaysMax } }}</strong>
-          </div>
-          <div class="line total">
-            <span>{{ 'PRODUCT.TOTAL' | translate }}</span>
-            <strong class="amount">{{ cart().total | amount: cart().currency }}</strong>
-          </div>
-          <p class="note">{{ 'CART.SHIPPING_FEE_NOTE' | translate }}</p>
-        </aside>
-      </div>
+              <li class="inline-flex items-center gap-2 text-xs font-medium text-ink-muted">
+                <span class="text-success"><pm-icon name="check" [size]="13" /></span>
+                {{ 'CHECKOUT.PLEDGE_PREVIEW' | translate }}
+              </li>
+            </ul>
+          </aside>
+        </div>
+      }
     }
   }
-}
+</div>

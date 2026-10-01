@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import configuration from './config/configuration';
+import { StorageModule } from './common/storage/storage.module';
 import { CommonModule } from './common/common.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -11,9 +12,13 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { PetsModule } from './modules/pets/pets.module';
+import { MemoriesModule } from './modules/memories/memories.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { BusinessConfigModule } from './modules/business-config/business-config.module';
 import { CartModule } from './modules/cart/cart.module';
+import { GoodsModule } from './modules/goods/goods.module';
+import { AiModule } from './modules/ai/ai.module';
+import { ReportsModule } from './modules/reports/reports.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { PhotosModule } from './modules/photos/photos.module';
@@ -42,15 +47,24 @@ import { CommunityModule } from './modules/community/community.module';
         socketTimeoutMS: 45000,
         maxPoolSize: 20,
         minPoolSize: 2,
+        // Thu hoi ket noi de khong qua mot phut. Ben dich vu dam may cat am cac
+        // ket noi nhan roi, neu giu lai thi yeu cau sau do se cho rat lau roi hong.
+        maxIdleTimeMS: 60000,
+        heartbeatFrequencyMS: 10000,
       }),
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 120 }]),
     CommonModule,
+    StorageModule,
     AuthModule,
     UsersModule,
     PetsModule,
+    MemoriesModule,
     CatalogModule,
     BusinessConfigModule,
+    AiModule,
+    ReportsModule,
+    GoodsModule,
     CartModule,
     OrdersModule,
     PaymentsModule,

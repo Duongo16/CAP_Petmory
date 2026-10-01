@@ -1,0 +1,176 @@
+@use '../../../shared/paper';
+
+/* Hop bay tri mot trang so. */
+
+:host {
+  display: block;
+}
+
+/* Tieu de hop bay tri; viet o day vi lop chu kieu sach ben duoi trung ten voi lop tien ich. */
+.editor-head h2 {
+  margin: 0;
+  font-family: var(--pm-font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+/*
+ * The page is drawn at the very size and margins it has in the open book, so
+ * words wrap and photos sit exactly where they will be read.
+ */
+.surface {
+  position: relative;
+  box-sizing: border-box;
+  width: 470px;
+  max-width: 100%;
+  aspect-ratio: 4 / 5;
+  padding: var(--pm-space-6) var(--pm-space-6) var(--pm-space-8);
+  overflow: hidden;
+  border-radius: var(--pm-radius-lg);
+  box-shadow: 0 0 0 1px var(--pm-border), var(--pm-shadow);
+  color: var(--pm-ink);
+  touch-action: none;
+}
+
+/*
+ * Trong luc keo, cac mon do khong nhan chuot nua, de moi chuyen dong deu roi
+ * xuong chinh to giay. Nho vay toa do doc duoc luon la toa do tren to giay,
+ * khong phai toa do ben trong mon dang keo.
+ */
+.canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.surface.holding .item {
+  pointer-events: none;
+}
+
+.item {
+  position: absolute;
+  transform-origin: center;
+  cursor: grab;
+
+  &.on {
+    outline: 2px dashed var(--pm-accent);
+    outline-offset: 3px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pm-accent);
+    outline-offset: 3px;
+  }
+}
+
+.text {
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.font-hand {
+  font-family: var(--pm-font-hand);
+  font-size: var(--pm-text-xl);
+}
+
+.font-body {
+  font-family: var(--pm-font);
+  font-size: var(--pm-text-md);
+}
+
+.font-serif {
+  font-family: var(--pm-font-display);
+  font-size: var(--pm-text-base);
+}
+
+.shot {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  box-sizing: border-box;
+  object-fit: cover;
+  padding: var(--pm-space-1) var(--pm-space-1) var(--pm-space-4);
+  background: #fff;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 20%);
+}
+
+.sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hint {
+  position: absolute;
+  inset: auto 16px 16px;
+  margin: 0;
+  text-align: center;
+  font-size: var(--pm-text-sm);
+  opacity: 0.6;
+}
+
+/* O tren cung hien chu viet tay, nhu chinh dong chu se nam tren trang. */
+.knob textarea.font-hand {
+  font-size: var(--pm-text-lg);
+}
+
+.knob input[type='range'] {
+  accent-color: var(--pm-accent);
+}
+
+/* O nhan mau trong hai khay do ve hinh vuong, anh va hinh dan lap day o. */
+.shot-tray,
+.sticker-tray {
+  button {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    padding: var(--pm-space-1);
+    overflow: hidden;
+    border: 1px solid var(--pm-border);
+    border-radius: var(--pm-radius-sm);
+    background: var(--pm-bg-card);
+    color: var(--pm-accent);
+    cursor: pointer;
+    transition: border-color 140ms ease, transform 140ms ease;
+  }
+
+  button:hover:not(:disabled) {
+    border-color: var(--pm-accent);
+    transform: translate3d(0, -1px, 0);
+  }
+
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  img,
+  svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.swatch {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-pill);
+  cursor: pointer;
+  transition: transform 140ms ease;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  &.on {
+    box-shadow:
+      0 0 0 2px var(--pm-bg-card),
+      0 0 0 4px var(--pm-text);
+  }
+}

@@ -1,15 +1,15 @@
-<div class="relative flex flex-col gap-8 w-full max-w-[1180px] mx-auto px-6 pt-7 pb-16 box-border">
+<div class="tw-page relative flex flex-col gap-8 max-[600px]:px-4">
   <span class="glow glow-purple" aria-hidden="true"></span>
   <span class="glow glow-amber" aria-hidden="true"></span>
 
   <header class="relative flex items-start justify-between gap-8 flex-wrap max-[600px]:flex-col max-[600px]:items-stretch">
     <div class="max-w-[42rem]">
-      <p class="m-0 text-xs font-bold tracking-[0.08em] text-accent">{{ 'PRODUCT.EYEBROW' | translate }}</p>
-      <h1 class="mt-2 font-medium leading-[1.25] text-ink pm-page-title">{{ 'PRODUCT.TITLE' | translate }}</h1>
-      <p class="mt-2 text-lg leading-[1.6] text-ink-muted">{{ 'PRODUCT.SUB' | translate }}</p>
+      <p class="tw-eyebrow m-0">{{ 'PRODUCT.EYEBROW' | translate }}</p>
+      <h1 class="tw-page-title mt-2 pm-page-title">{{ 'PRODUCT.TITLE' | translate }}</h1>
+      <p class="tw-page-sub mt-2">{{ 'PRODUCT.SUB' | translate }}</p>
     </div>
 
-    <dl class="flex gap-6 m-0 px-5 py-4 rounded-md bg-card border border-edge shadow-card">
+    <dl class="tw-card flex gap-8 m-0 px-6 py-4">
       <div>
         <dd class="m-0 text-2xl font-bold text-accent">{{ reviewTotal() }}</dd>
         <dt class="mt-0.5 text-sm text-ink-muted">{{ 'PRODUCT.COUNTER_REVIEWS' | translate }}</dt>
@@ -21,22 +21,22 @@
     </dl>
   </header>
 
-  <section class="relative p-5 rounded-md bg-card border border-edge">
+  <section class="tw-card relative p-4">
     <form class="flex items-center gap-4 flex-wrap" (ngSubmit)="submitSearch()">
-      <div class="search relative flex items-center gap-2 flex-1 min-w-64 px-3 rounded-full bg-muted text-ink-muted">
+      <div class="search relative flex items-center gap-2 flex-1 min-w-64 max-[600px]:min-w-full min-h-11 px-4 rounded-md border-[1.5px] border-edge bg-card text-ink-muted transition-[border-color,box-shadow] duration-150 focus-within:border-accent focus-within:shadow-[0_0_0_4px_var(--color-accent-soft)]">
         <pm-icon name="search" [size]="16" />
         <label class="sr-only" for="catalogue-search">{{ 'PRODUCT.SEARCH' | translate }}</label>
         <input
           id="catalogue-search"
           type="search"
           name="keyword"
-          class="flex-1 min-w-0 py-3 border-0 bg-transparent text-ink font-[inherit] text-base focus-visible:outline-none"
+          class="flex-1 min-w-0 py-2.5 border-0 bg-transparent text-ink font-[inherit] text-sm focus-visible:outline-none"
           [ngModel]="keyword()"
           (ngModelChange)="setKeyword($event)"
           [placeholder]="'PRODUCT.SEARCH' | translate"
         />
         @if (searching()) {
-          <button type="button" class="grid place-items-center w-6 h-6 border-0 rounded-full bg-card text-ink-muted cursor-pointer" (click)="clearSearch()">
+          <button type="button" class="grid place-items-center w-7 h-7 border-0 rounded-full bg-muted text-ink-muted cursor-pointer hover:text-ink" (click)="clearSearch()">
             <pm-icon name="close" [size]="14" />
             <span class="sr-only">{{ 'COMMON.CLEAR' | translate }}</span>
           </button>
@@ -44,11 +44,11 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <label class="text-base font-medium text-ink-muted" for="catalogue-sort">{{ 'PRODUCT.SORT_BY' | translate }}</label>
+        <label class="tw-label whitespace-nowrap text-ink-muted" for="catalogue-sort">{{ 'PRODUCT.SORT_BY' | translate }}</label>
         <select
           id="catalogue-sort"
           name="ordering"
-          class="py-2 px-3 rounded-sm border border-edge-strong bg-card text-ink font-[inherit] text-base font-medium"
+          class="tw-select w-auto min-w-48 font-medium"
           [ngModel]="ordering()"
           (ngModelChange)="setOrdering($event)"
         >
@@ -62,21 +62,21 @@
 
   @switch (status()) {
     @case ('LOADING') {
-      <p class="flex flex-col items-center gap-3 py-12 px-5 text-ink-muted text-center">{{ 'COMMON.LOADING' | translate }}</p>
+      <p class="tw-empty m-0">{{ 'COMMON.LOADING' | translate }}</p>
     }
     @case ('ERROR') {
-      <div class="flex flex-col items-center gap-3 py-12 px-5 text-ink-muted text-center">
-        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+      <div class="tw-empty">
+        <p class="m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
         <button type="button" class="tw-btn-secondary" (click)="load()">{{ 'COMMON.RETRY' | translate }}</button>
       </div>
     }
     @default {
       @if (empty()) {
-        <div class="flex flex-col items-center gap-3 py-12 px-5 text-ink-muted text-center rounded-lg bg-muted">
-          <span class="grid place-items-center w-[60px] h-[60px] rounded-full bg-card text-accent" aria-hidden="true">
+        <div class="tw-empty">
+          <span class="grid place-items-center w-[60px] h-[60px] rounded-full bg-accent-soft text-accent" aria-hidden="true">
             <pm-icon name="search" [size]="30" />
           </span>
-          <p>{{ 'PRODUCT.NONE_FOUND' | translate }}</p>
+          <p class="m-0">{{ 'PRODUCT.NONE_FOUND' | translate }}</p>
           @if (searching()) {
             <button type="button" class="tw-btn-secondary" (click)="clearSearch()">
               {{ 'PRODUCT.CLEAR_SEARCH' | translate }}
@@ -84,37 +84,37 @@
           }
         </div>
       } @else {
-        <ul class="relative grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 m-0 p-0 list-none">
+        <ul class="relative grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-6 m-0 p-0 list-none">
           @for (card of cards(); track card.raw.code) {
-            <li class="relative flex flex-col p-4 rounded-md bg-card border border-edge shadow-card transition-all duration-150 hover:-translate-y-0.5 hover:shadow-elevated">
-              <a class="flex flex-col no-underline text-[inherit]" [routerLink]="['/products', card.raw.code]">
-                <div class="relative grid place-items-center overflow-hidden aspect-[4/3] rounded-sm bg-muted text-edge-strong">
+            <li class="card tw-card-interactive relative flex flex-col gap-4 p-4">
+              <a class="card-link flex flex-col gap-4 no-underline text-[inherit]" routerLink="/shop" [queryParams]="{ tab: 'custom', product: card.raw.code }">
+                <div class="relative grid place-items-center overflow-hidden aspect-[4/3] rounded-lg bg-muted text-edge-strong">
                   @if (card.raw.imageUrl) {
                     <img class="absolute inset-0 w-full h-full object-cover" [src]="card.raw.imageUrl" [alt]="card.raw.name" />
                   } @else {
                     <span aria-hidden="true"><pm-icon name="paw" [size]="34" /></span>
                   }
                   <span class="absolute top-[10px] left-[10px] flex gap-1">
-                    <span class="badge px-2 py-1 rounded-full bg-accent text-on-accent text-xs font-bold" [attr.data-tone]="card.badgeTone">
+                    <span class="badge tw-badge bg-accent text-on-accent" [attr.data-tone]="card.badgeTone">
                       {{ card.badgeKey | translate }}
                     </span>
                   </span>
                 </div>
 
-                <div class="flex flex-col gap-2 pt-4">
+                <div class="flex flex-col gap-2">
                   <div class="flex items-center justify-between gap-3">
                     <span class="inline-flex items-center gap-1 text-sm text-ink-muted">
                       <span class="text-amber"><pm-icon name="star" [size]="13" /></span>
                       <strong class="text-base text-ink">{{ card.raw.rating.average || '—' }}</strong>
                       <span>({{ card.raw.rating.count }})</span>
                     </span>
-                    <span class="px-2 py-1 rounded-sm bg-sunken text-xs font-medium text-ink-muted">
+                    <span class="tw-badge tw-badge-muted font-semibold">
                       {{ 'PRODUCT.SIZE_COUNT' | translate: { count: card.sizeCount } }}
                     </span>
                   </div>
 
-                  <h2 class="m-0 text-lg font-semibold text-ink">{{ card.raw.name }}</h2>
-                  <p class="line-clamp-2 m-0 text-base leading-[1.5] text-ink-muted">{{ card.raw.description }}</p>
+                  <h2 class="m-0 text-lg font-bold text-ink">{{ card.raw.name }}</h2>
+                  <p class="line-clamp-2 m-0 text-sm leading-[1.6] text-ink-muted">{{ card.raw.description }}</p>
                 </div>
               </a>
 
@@ -131,14 +131,14 @@
                 </button>
               }
 
-              <div class="flex items-center justify-between gap-3 mt-auto p-3 rounded-sm bg-muted">
-                <span class="flex flex-col">
-                  <span class="text-sm text-ink-muted">{{ 'PRODUCT.PRICE_LABEL' | translate }}</span>
+              <div class="flex items-center justify-between gap-3 mt-auto pt-4 border-t border-edge">
+                <span class="buy-price flex flex-col items-start gap-1">
+                  <span class="text-xs font-semibold text-ink-muted">{{ 'PRODUCT.PRICE_LABEL' | translate }}</span>
                   @if (card.priceFrom; as price) {
-                    <strong class="text-xl font-bold text-amber">{{ 'PRODUCT.PRICE_FROM' | translate }} {{ price | amount }}</strong>
+                    <strong class="inline-flex items-center px-3 py-1 rounded-full bg-amber-soft text-on-amber text-base font-bold">{{ 'PRODUCT.PRICE_FROM' | translate }} {{ price | amount }}</strong>
                   }
                 </span>
-                <a class="inline-flex items-center gap-1 flex-none px-4 py-2 rounded-full bg-accent text-on-accent text-base font-semibold no-underline transition-colors duration-150" [routerLink]="['/products', card.raw.code]">
+                <a class="tw-btn-primary tw-btn-sm flex-none rounded-full" routerLink="/shop" [queryParams]="{ tab: 'custom', product: card.raw.code }">
                   {{ 'PRODUCT.CUSTOMISE' | translate }}
                   <pm-icon name="chevron" [size]="13" />
                 </a>
@@ -150,15 +150,15 @@
     }
   }
 
-  <section class="relative flex items-center justify-between gap-8 flex-wrap overflow-hidden p-10 rounded-lg bg-muted max-[600px]:flex-col max-[600px]:items-stretch">
+  <section class="tw-card relative flex items-center justify-between gap-8 flex-wrap overflow-hidden p-10 max-[600px]:p-6 max-[600px]:flex-col max-[600px]:items-stretch">
     <span class="absolute w-64 h-64 -top-20 -right-10 rounded-full bg-accent-soft blur-[50px] pointer-events-none" aria-hidden="true"></span>
     <div class="relative max-w-[36rem]">
-      <p class="m-0 text-xs font-bold tracking-[0.08em] text-accent">{{ 'PRODUCT.CRAFT_EYEBROW' | translate }}</p>
-      <h2 class="mt-2 text-2xl font-semibold text-ink">{{ 'PRODUCT.CRAFT_TITLE' | translate }}</h2>
+      <p class="tw-eyebrow m-0">{{ 'PRODUCT.CRAFT_EYEBROW' | translate }}</p>
+      <h2 class="mt-2 font-serif text-2xl font-medium text-ink">{{ 'PRODUCT.CRAFT_TITLE' | translate }}</h2>
       <p class="mt-2 text-base leading-[1.6] text-ink-muted">{{ 'PRODUCT.CRAFT_SUB' | translate }}</p>
     </div>
     <div class="relative flex gap-3 flex-wrap">
-      <a class="tw-btn-primary inline-flex items-center gap-2" routerLink="/studio">
+      <a class="tw-btn-primary" routerLink="/studio">
         {{ 'PRODUCT.CRAFT_START' | translate }}
         <pm-icon name="chevron" [size]="14" />
       </a>

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AdminOrderDetailFacade } from './admin-order-detail-facade';
+import { AdminOrderDetailFacade, DESK_STAGE_KEYS } from './admin-order-detail-facade';
 import { AuthService } from '../../core/services/auth.service';
 import { MoneyPipe } from '../../shared/money.pipe';
 
@@ -27,7 +27,13 @@ import { MoneyPipe } from '../../shared/money.pipe';
 export class AdminOrderDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   readonly facade = inject(AdminOrderDetailFacade);
-  readonly isOperations = inject(AuthService).isOperations;
+  readonly stageKeys = DESK_STAGE_KEYS;
+  readonly isManager = inject(AuthService).isManager;
+
+  /** Tich hoac bo tich mot muc tren phieu kiem tra chat luong. */
+  tickChanged(at: number, event: Event): void {
+    this.facade.setQualityTick(at, (event.target as HTMLInputElement).checked);
+  }
 
   ngOnInit(): void {
     this.facade.start(this.route.snapshot.paramMap.get('orderCode') ?? '');

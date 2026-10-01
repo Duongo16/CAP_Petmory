@@ -99,7 +99,7 @@ export class CatalogController {
     return after;
   }
 
-  @Roles(Role.MANAGER, Role.ADMIN)
+  @Roles(Role.MANAGER)
   @Patch('colors/:code')
   async toggleColor(
     @Param('code') code: string,

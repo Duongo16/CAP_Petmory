@@ -1,0 +1,167 @@
+:host {
+  display: contents;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow-y: auto;
+  background: var(--pm-shade-crop);
+  backdrop-filter: blur(5px);
+}
+
+.sheet-box {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  padding: 28px;
+  border-radius: 24px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow-lifted);
+  animation: starter-pop 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-muted);
+}
+
+.bar-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--pm-accent);
+  transform-origin: left;
+  transition: transform 320ms ease;
+}
+
+/* The radio-like cards for picking the kind of pet. */
+.kind {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 92px;
+  padding: 10px 6px;
+  border: 1.5px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  background: var(--pm-bg-card);
+  color: var(--pm-text-body);
+  font-family: inherit;
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+
+  &:hover {
+    border-color: var(--pm-border-strong);
+    transform: translate3d(0, -2px, 0);
+  }
+
+  &.on {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+}
+
+.kind-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 37px;
+  color: var(--pm-accent);
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--pm-border);
+  background: var(--pm-paper-bloom);
+}
+
+.preview-photo {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 76px;
+  height: 76px;
+  border-radius: 20px;
+  border: 2px solid var(--pm-bg-card);
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+}
+
+@keyframes starter-pop {
+  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-box { animation: none; }
+}
+
+@media (max-width: 480px) {
+  .sheet-box { padding: 22px 18px; }
+}
+
+.drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 20px;
+  border: 1.5px dashed var(--pm-border-strong);
+  border-radius: 20px;
+  background: var(--pm-bg);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+
+  &:hover {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+  }
+}
+
+/* The file input is hidden but still takes keyboard focus, so its label shows it. */
+.photo-step:has(#starter-photo:focus-visible) :is(.drop, label.tw-btn-secondary) {
+  outline: 2px solid var(--pm-accent);
+  outline-offset: 2px;
+}
+
+.photo-frame {
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  border: 1px solid var(--pm-border);
+  background: var(--pm-bg-muted);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.preview-photo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  object-fit: cover;
+}

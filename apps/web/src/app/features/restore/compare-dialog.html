@@ -1,0 +1,138 @@
+<div class="sheet">
+  <header class="sheet-head">
+    <div class="head-text">
+      <span class="chip tw-badge tw-badge-accent">
+        <pm-icon name="bulb" [size]="12" />
+        {{ 'RESTORE.ENGINE' | translate }}
+      </span>
+      <h2 class="sheet-title">{{ 'RESTORE.COMPARE_TITLE' | translate }}</h2>
+      <p class="sheet-sub">{{ 'RESTORE.COMPARE_SUB' | translate }}</p>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="bar">
+    <div class="modes tw-tabs" role="group" [attr.aria-label]="'RESTORE.LAYOUT' | translate">
+      <button
+        type="button"
+        class="tw-tab"
+        [class.on]="layout() === 'SLIDER'"
+        [attr.aria-pressed]="layout() === 'SLIDER'"
+        (click)="setLayout('SLIDER')"
+      >
+        {{ 'RESTORE.LAYOUT_SLIDER' | translate }}
+      </button>
+      <button
+        type="button"
+        class="tw-tab"
+        [class.on]="layout() === 'SIDE'"
+        [attr.aria-pressed]="layout() === 'SIDE'"
+        (click)="setLayout('SIDE')"
+      >
+        {{ 'RESTORE.LAYOUT_SIDE' | translate }}
+      </button>
+    </div>
+    <p class="sizes">
+      <span><b class="dot dot-before"></b>{{ 'RESTORE.SIZE_BEFORE' | translate }} {{ sizeBefore() }}</span>
+      <span><b class="dot dot-after"></b>{{ 'RESTORE.SIZE_AFTER' | translate }} {{ sizeAfter() }}</span>
+    </p>
+  </div>
+
+  @if (layout() === 'SLIDER') {
+    <div class="stage" [style.--split.%]="split()">
+      <img class="shot shot-before" [src]="data.beforeUrl" [alt]="'RESTORE.BEFORE' | translate" />
+      <img class="shot shot-after" [src]="data.afterUrl" [alt]="'RESTORE.AFTER' | translate" />
+      <span class="seam" aria-hidden="true"></span>
+      <span class="label label-before">{{ 'RESTORE.BEFORE' | translate }}</span>
+      <span class="label label-after">{{ 'RESTORE.AFTER' | translate }}</span>
+
+      <label class="sr-only" for="split-range">{{ 'RESTORE.DRAG_HINT' | translate }}</label>
+      <input
+        id="split-range"
+        class="range"
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        [ngModel]="split()"
+        (ngModelChange)="setSplit($event)"
+      />
+    </div>
+    <p class="hint">
+      <pm-icon name="chevron" [size]="13" />
+      {{ 'RESTORE.DRAG_HINT' | translate }}
+    </p>
+  } @else {
+    <div class="pair">
+      <figure>
+        <img [src]="data.beforeUrl" [alt]="'RESTORE.BEFORE' | translate" />
+        <figcaption>{{ 'RESTORE.BEFORE' | translate }}</figcaption>
+      </figure>
+      <figure>
+        <img [src]="data.afterUrl" [alt]="'RESTORE.AFTER' | translate" />
+        <figcaption>{{ 'RESTORE.AFTER' | translate }}</figcaption>
+      </figure>
+    </div>
+  }
+
+  <section class="numbers">
+    <div class="lead">
+      <span class="lead-mark" aria-hidden="true"><pm-icon name="check" [size]="15" /></span>
+      <span class="lead-text">
+        <b>{{ 'RESTORE.MEASURED' | translate }}</b>
+        <span>{{ 'RESTORE.MEASURED_SUB' | translate }}</span>
+      </span>
+    </div>
+
+    <dl class="tiles">
+      <div class="tile">
+        <dt>{{ 'RESTORE.RESEMBLANCE' | translate }}</dt>
+        <dd>{{ data.restored.resemblance ?? '—' }}%</dd>
+        <p>{{ 'RESTORE.RESEMBLANCE_SUB' | translate }}</p>
+      </div>
+      <div class="tile">
+        <dt>{{ 'RESTORE.BIGGER' | translate }}</dt>
+        <dd>{{ biggerBy() }}</dd>
+        <p>{{ 'RESTORE.BIGGER_SUB' | translate }}</p>
+      </div>
+      <div class="tile">
+        <dt>{{ 'RESTORE.VERDICT' | translate }}</dt>
+        <dd class="verdict">
+          <span class="was">{{ labelBefore() | translate }}</span>
+          <pm-icon name="chevron" [size]="13" />
+          <span>{{ labelAfter() | translate }}</span>
+        </dd>
+        <p>{{ 'RESTORE.VERDICT_SUB' | translate }}</p>
+      </div>
+    </dl>
+  </section>
+
+  <footer class="sheet-foot">
+    <div class="pick field">
+      <label class="pick-name field-name" for="attach-pet">{{ 'RESTORE.ATTACH_TO' | translate }}</label>
+      <select id="attach-pet" [ngModel]="chosenPet()" (ngModelChange)="setPet($event)">
+        <option value="">{{ 'RESTORE.PICK_PET' | translate }}</option>
+        @for (pet of data.pets; track pet._id) {
+          <option [value]="pet._id">{{ pet.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="deeds">
+      <button type="button" class="plain" (click)="discard()">
+        {{ 'RESTORE.KEEP_ORIGINAL' | translate }}
+      </button>
+      <!-- Mot lien ket that, de trinh duyet tu lo viec tai ve. -->
+      <a class="plain" [href]="data.afterUrl" [attr.download]="fileName()">
+        <pm-icon name="image" [size]="15" />
+        {{ 'RESTORE.DOWNLOAD' | translate }}
+      </a>
+      <button type="button" class="strong" [disabled]="!chosenPet()" (click)="attach()">
+        {{ 'RESTORE.USE_IT' | translate }}
+        <pm-icon name="chevron" [size]="14" />
+      </button>
+    </div>
+  </footer>
+</div>

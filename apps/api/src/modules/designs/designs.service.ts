@@ -1,10 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ConfigService } from '@nestjs/config';
 import { Model, Types } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { promises as fs } from 'fs';
-import * as path from 'path';
 import sharp from 'sharp';
 import {
   ANGLES_PREVIEW,
@@ -15,6 +12,7 @@ import {
 import { SaveDesignDto, COUNT_DESIGN_MAX } from './dto/design.dto';
 import { CatalogService } from '../catalog/catalog.service';
 import { MSG } from '../../common/constants/messages';
+import { StorageFolder, StorageService } from '../../common/storage/storage.service';
 
 /** Preview images are drawn by the browser, always in a lossless raster format. */
 const TYPE_PREVIEW = 'png';
@@ -23,15 +21,12 @@ const FILE_SIZE_MAX = 4 * 1024 * 1024;
 
 @Injectable()
 export class DesignsService {
-  private readonly dir: string;
 
   constructor(
     @InjectModel(Design.name) private readonly model: Model<DesignDocument>,
     private readonly catalog: CatalogService,
-    config: ConfigService,
-  ) {
-    this.dir = path.resolve(config.getOrThrow<string>('upload.dir'));
-  }
+    private readonly storage: StorageService,
+  ) {}
 
   listMine(owner: string) {
     return this.model
@@ -131,8 +126,7 @@ export class DesignsService {
     }
 
     const fileName = `tk-${randomUUID()}.png`;
-    await fs.mkdir(this.dir, { recursive: true });
-    await fs.writeFile(path.join(this.dir, fileName), file.buffer);
+    await this.storage.save(StorageFolder.DESIGN, fileName, file.buffer, 'image/png');
 
         // Only one image is kept per angle.
     tk.preview = tk.preview.filter((a) => a.angle !== angle);
@@ -175,7 +169,7 @@ export class DesignsService {
     if (!photo) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
-    return fs.readFile(path.join(this.dir, photo.fileName));
+    return this.storage.read(StorageFolder.DESIGN, photo.fileName);
   }
 
   /** If a product type and size are given, they must exist and be on sale. */

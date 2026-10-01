@@ -38,10 +38,13 @@ const ACCOUNT_STOPS: Stop[] = [
  * the screen itself. The rail only hides what an account may not open. The
  * server checks permission again on every request.
  */
+import { Brand } from '../../../shared/brand/brand';
+import { UserFace } from '../../../shared/user-face/user-face';
+
 @Component({
   selector: 'pm-admin-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, Icon],
+  imports: [UserFace, Brand, RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, Icon],
   templateUrl: './admin-shell.html',
   styleUrl: './admin-shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,5 +65,5 @@ export class AdminShell {
   readonly workshopStops = computed(() => (this.isManager() ? WORKSHOP_STOPS : []));
   readonly accountStops = computed(() => (this.isAccountAdmin() ? ACCOUNT_STOPS : []));
   readonly who = computed(() => this.auth.user()?.fullName ?? '');
-  readonly initial = computed(() => this.who().trim().charAt(0).toUpperCase() || '?');
+  readonly avatar = computed(() => this.auth.user()?.avatarUrl ?? null);
 }

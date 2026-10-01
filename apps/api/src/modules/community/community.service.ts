@@ -26,12 +26,32 @@ const PHOTO_MAX = 5;
 const PHOTO_MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const NOT_AN_IMAGE = 'Chi nhan anh JPG, PNG hoac WEBP';
+const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
+/** Only names this service made itself: the owner id, a random id, a picture ending. */
+const AVATAR_FILE = /^avatar-[a-f0-9]{24}-[0-9a-f-]{36}\.(jpg|png)$/;
 
 /** The author details every card and comment needs. */
 export interface AuthorView {
   id: string;
   fullName: string;
   initial: string;
+  avatarUrl: string | null;
+}
+
+/** What is read about each author before a card or comment is drawn. */
+interface AuthorInfo {
+  fullName: string;
+  avatarUrl: string | null;
+}
+
+function authorView(id: string, info: AuthorInfo | undefined): AuthorView {
+  const fullName = info?.fullName ?? '';
+  return {
+    id,
+    fullName,
+    initial: fullName.trim().charAt(0).toUpperCase() || '?',
+    avatarUrl: info?.avatarUrl ?? null,
+  };
 }
 
 export interface PostView {
@@ -144,9 +164,11 @@ export class CommunityService {
     const authorIds = [...new Set(rows.map((r) => r.author.toString()))];
     const users = await this.userModel
       .find({ _id: { $in: authorIds.map((id) => new Types.ObjectId(id)) } })
-      .select('fullName')
+      .select('fullName avatarUrl')
       .exec();
-    const byId = new Map(users.map((u) => [u._id.toString(), u.fullName]));
+    const byId = new Map<string, AuthorInfo>(
+      users.map((u) => [u._id.toString(), { fullName: u.fullName, avatarUrl: u.avatarUrl ?? null }]),
+    );
 
     const postIds = rows.map((r) => r._id);
     const [liked, saved] = viewer
@@ -169,13 +191,12 @@ export class CommunityService {
 
   private toView(
     row: PostDocument,
-    nameById: Map<string, string>,
+    authorById: Map<string, AuthorInfo>,
     likedSet: Set<string>,
     savedSet: Set<string>,
     viewer: string | null,
   ): PostView {
     const authorId = row.author.toString();
-    const fullName = nameById.get(authorId) ?? '';
     return {
       id: row._id.toString(),
       topic: row.topic,
@@ -187,7 +208,7 @@ export class CommunityService {
       commentCount: row.commentCount,
       viewCount: row.viewCount,
       createdAt: (row as unknown as { createdAt: Date }).createdAt,
-      author: { id: authorId, fullName, initial: fullName.trim().charAt(0).toUpperCase() || '?' },
+      author: authorView(authorId, authorById.get(authorId)),
       likedByMe: likedSet.has(row._id.toString()),
       savedByMe: savedSet.has(row._id.toString()),
       mine: viewer === authorId,
@@ -342,22 +363,17 @@ export class CommunityService {
     const authorIds = [...new Set(rows.map((r) => r.author.toString()))];
     const users = await this.userModel
       .find({ _id: { $in: authorIds.map((x) => new Types.ObjectId(x)) } })
-      .select('fullName')
+      .select('fullName avatarUrl')
       .exec();
-    const byId = new Map(users.map((u) => [u._id.toString(), u.fullName]));
-    return rows.map((r) => {
-      const fullName = byId.get(r.author.toString()) ?? '';
-      return {
-        id: r._id.toString(),
-        content: r.content,
-        createdAt: (r as unknown as { createdAt: Date }).createdAt,
-        author: {
-          id: r.author.toString(),
-          fullName,
-          initial: fullName.trim().charAt(0).toUpperCase() || '?',
-        },
-      };
-    });
+    const byId = new Map<string, AuthorInfo>(
+      users.map((u) => [u._id.toString(), { fullName: u.fullName, avatarUrl: u.avatarUrl ?? null }]),
+    );
+    return rows.map((r) => ({
+      id: r._id.toString(),
+      content: r.content,
+      createdAt: (r as unknown as { createdAt: Date }).createdAt,
+      author: authorView(r.author.toString(), byId.get(r.author.toString())),
+    }));
   }
 
   async comment(postId: string, author: string, dto: WriteCommentDto) {
@@ -471,7 +487,7 @@ export class CommunityService {
       this.postModel.countDocuments({ author: id, isHidden: false }).exec(),
       this.followModel.countDocuments({ following: id }).exec(),
       this.followModel.countDocuments({ follower: id }).exec(),
-      this.petModel.find({ owner: id, isHidden: false }).select('name kind breed').limit(6).exec(),
+      this.petModel.find({ owner: id, isHidden: false }).select('name kind breed avatarUrl').limit(6).exec(),
     ]);
     const followedByMe = viewer
       ? (await this.followModel
@@ -497,6 +513,7 @@ export class CommunityService {
         name: p.name,
         kind: p.kind,
         breed: p.breed,
+        avatarUrl: p.avatarUrl || null,
       })),
     };
   }
@@ -515,6 +532,35 @@ export class CommunityService {
     }
     await this.userModel.findByIdAndUpdate(id, { $set: update }).exec();
     return { ok: true };
+  }
+
+  /**
+   * Stores a profile picture. The file name carries the owner's id, so the
+   * picture can only ever be served under that person's own profile.
+   */
+  async saveAvatar(userId: string, file?: Express.Multer.File): Promise<{ fileName: string }> {
+    if (!file) {
+      throw new BadRequestException('Chua chon tep anh nao');
+    }
+    if (!ALLOWED_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException(NOT_AN_IMAGE);
+    }
+    if (file.size > AVATAR_MAX_BYTES) {
+      throw new BadRequestException('Anh dai dien vuot qua 5 MB');
+    }
+    const owner = this.toId(userId).toString();
+    const fileName = `avatar-${owner}-${randomUUID()}.${file.mimetype === 'image/png' ? 'png' : 'jpg'}`;
+    await this.storage.save(StorageFolder.COMMUNITY, fileName, file.buffer, file.mimetype);
+    return { fileName };
+  }
+
+  /** Reads a profile picture back, refusing any name that is not this person's. */
+  async readAvatar(userId: string, fileName: string): Promise<Buffer> {
+    const owner = this.toId(userId).toString();
+    if (!AVATAR_FILE.test(fileName) || !fileName.startsWith(`avatar-${owner}-`)) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    return this.storage.read(StorageFolder.COMMUNITY, fileName);
   }
 
   /** The posts written by one person, for their profile page. */

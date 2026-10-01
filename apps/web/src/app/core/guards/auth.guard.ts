@@ -29,12 +29,22 @@ export const internalGuard: CanActivateFn = () => {
   return auth.isInternal() ? true : router.createUrlTree(['/home']);
 };
 
-/** The business settings page is open to the two operations groups only. */
-export const operationsGuard: CanActivateFn = () => {
+/** Cac man hinh van hanh chi mo cho nhom Quan ly. */
+export const managerGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
   if (!auth.isSignedIn()) {
     return router.createUrlTree(['/login']);
   }
-  return auth.isOperations() ? true : router.createUrlTree(['/home']);
+  return auth.isManager() ? true : router.createUrlTree(['/home']);
+};
+
+/** Man hinh quan ly tai khoan chi mo cho nhom Quan tri vien. */
+export const accountAdminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  if (!auth.isSignedIn()) {
+    return router.createUrlTree(['/login']);
+  }
+  return auth.isAccountAdmin() ? true : router.createUrlTree(['/home']);
 };

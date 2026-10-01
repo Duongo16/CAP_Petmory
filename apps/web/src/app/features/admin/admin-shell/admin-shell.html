@@ -2,7 +2,7 @@
   <aside class="rail">
     <div class="rail-inner">
       <div class="rail-head">
-        <span class="rail-mark" aria-hidden="true"><pm-icon name="paw" [size]="20" /></span>
+        <pm-brand size="md" [markOnly]="true" />
         <span class="rail-title">
           <strong>{{ 'ADMIN.DESK' | translate }}</strong>
           <span>{{ 'ADMIN.DESK_SUB' | translate }}</span>
@@ -42,7 +42,7 @@
       </nav>
 
       <div class="rail-foot">
-        <span class="rail-face" aria-hidden="true">{{ initial() }}</span>
+        <pm-user-face [name]="who()" [url]="avatar()" [size]="36" aria-hidden="true" />
         <span class="rail-who">
           <strong>{{ who() }}</strong>
           <span>{{ 'ADMIN.DESK_ROLE' | translate }}</span>

@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Cart, CartDocument } from './schemas/cart.schema';
-import { AddToCartDto } from './dto/cart.dto';
+import { BadRequestException } from '@nestjs/common';
+import { Cart, CartDocument, LineKind } from './schemas/cart.schema';
+import { AddGoodsDto, AddToCartDto } from './dto/cart.dto';
 import { CatalogService } from '../catalog/catalog.service';
 import { DesignsService } from '../designs/designs.service';
+import { GoodsService } from '../goods/goods.service';
 import { MSG } from '../../common/constants/messages';
 
 export interface CartView {
@@ -20,6 +22,14 @@ export interface CartView {
  * only ever deals in whole dong, so the sum is done on integers and never on a
  * floating point number.
  */
+/** The code the database answers with when a unique index is already taken. */
+const DUPLICATE_KEY = 11000;
+
+/** True when the failure is the database refusing a second row for one owner. */
+function isDuplicate(trouble: unknown): boolean {
+  return (trouble as { code?: number } | null)?.code === DUPLICATE_KEY;
+}
+
 function addMoney(price: Types.Decimal128, delta?: Types.Decimal128 | null): Types.Decimal128 {
   const total =
     BigInt(price.toString().split('.')[0]) +
@@ -33,6 +43,7 @@ export class CartService {
     @InjectModel(Cart.name) private readonly model: Model<CartDocument>,
     private readonly catalog: CatalogService,
     private readonly designs: DesignsService,
+    private readonly goods: GoodsService,
   ) {}
 
   async get(owner: string): Promise<CartView> {
@@ -41,14 +52,14 @@ export class CartService {
   }
 
   async add(owner: string, dto: AddToCartDto): Promise<CartView> {
-        // Price and lead time always come from the server; numbers sent by the browser are ignored.
+    // Gia va thoi gian lam deu lay tu may chu, khong tin so lieu do trinh duyet gui len.
     const kind = await this.catalog.detailProductType(dto.productTypeCode);
     const size = kind.sizes.find((s) => s.code === dto.sizeCode.toUpperCase() && s.enabled);
     if (!size) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
 
-    // The design must belong to the person adding it; another user's id is rejected.
+    // Ban thiet ke phai thuoc ve chinh nguoi dang them, cua nguoi khac thi bi tu choi.
     const design = dto.designId
       ? await this.designs.findOwned(dto.designId, owner)
       : null;
@@ -76,6 +87,10 @@ export class CartService {
     } else {
       cart.items.push({
         _id: new Types.ObjectId(),
+        kind: LineKind.MADE_TO_ORDER,
+        goodsCode: '',
+        sku: '',
+        imageUrl: '',
         productTypeCode: kind.code,
         sizeCode: size.code,
         displayName: `${kind.name} — ${size.displayName}`,
@@ -87,6 +102,64 @@ export class CartService {
         unitPrice,
         currency: size.currency,
         productionDays: size.productionDays,
+      });
+    }
+
+    await cart.save();
+    return this.format(cart);
+  }
+
+  /**
+   * Them mot mon hang co san vao gio.
+   *
+   * Ton kho khong bi tru o day: muc 23 khoan 7 ghi ro chi tru khi don da
+   * thanh toan. O day chi chan viec them mot mon dang het hang vao gio, de
+   * khach khong di den tan buoc tra tien roi moi biet.
+   */
+  async addGoods(owner: string, dto: AddGoodsDto): Promise<CartView> {
+    const found = await this.goods.findVariant(dto.goodsCode, dto.sku);
+    if (found.variant.stock <= 0) {
+      throw new BadRequestException('Mon nay dang het hang');
+    }
+
+    const cart = await this.getOrCreate(owner);
+    const already = cart.items.find(
+      (one) =>
+        one.kind === LineKind.READY_MADE &&
+        one.goodsCode === found.goods.code &&
+        one.sku === found.variant.sku,
+    );
+
+    /*
+     * Khong cho dat qua so hang dang co trong kho. Day chi la mot loi nhac
+     * som cho khach; cho chan that su van la luc tru kho o buoc thanh toan.
+     */
+    const wanted = (already?.quantity ?? 0) + dto.quantity;
+    if (wanted > found.variant.stock) {
+      throw new BadRequestException(`Chi con ${found.variant.stock} mon trong kho`);
+    }
+
+    if (already) {
+      already.quantity = Math.min(99, wanted);
+    } else {
+      const label = found.variant.optionValues.filter(Boolean).join(' · ');
+      cart.items.push({
+        _id: new Types.ObjectId(),
+        kind: LineKind.READY_MADE,
+        productTypeCode: '',
+        sizeCode: '',
+        goodsCode: found.goods.code,
+        sku: found.variant.sku,
+        imageUrl: found.goods.images[0] ?? '',
+        displayName: label ? `${found.goods.name} — ${label}` : found.goods.name,
+        petName: '',
+        displayBaseCode: '',
+        displayBaseName: '',
+        designId: null,
+        quantity: dto.quantity,
+        unitPrice: found.variant.price,
+        currency: 'VND',
+        productionDays: found.goods.deliveryDays,
       });
     }
 
@@ -123,10 +196,36 @@ export class CartService {
     return this.format(cart);
   }
 
+  /**
+   * The one basket belonging to this account, made on first use.
+   *
+   * A fresh page asks for the basket more than once at the same moment, so
+   * looking first and then creating let both calls find nothing and both try
+   * to write, and the second was refused by the database. The write itself now
+   * decides: either it makes the row or it hands back the one already there.
+   * The refusal is still caught, because two writes arriving together can each
+   * be told the row is taken, and in that case the row is simply read back.
+   */
   private async getOrCreate(owner: string): Promise<CartDocument> {
     const id = new Types.ObjectId(owner);
-    const existing = await this.model.findOne({ owner: id }).exec();
-    return existing ?? this.model.create({ owner: id, items: [] });
+    try {
+      return await this.model
+        .findOneAndUpdate(
+          { owner: id },
+          { $setOnInsert: { owner: id, items: [] } },
+          { upsert: true, new: true, setDefaultsOnInsert: true },
+        )
+        .exec();
+    } catch (trouble) {
+      if (!isDuplicate(trouble)) {
+        throw trouble;
+      }
+      const made = await this.model.findOne({ owner: id }).exec();
+      if (!made) {
+        throw trouble;
+      }
+      return made;
+    }
   }
 
   /**
@@ -143,6 +242,10 @@ export class CartService {
     return {
       items: cart.items.map((m) => ({
         id: m._id.toString(),
+        kind: m.kind,
+        goodsCode: m.goodsCode,
+        sku: m.sku,
+        imageUrl: m.imageUrl,
         productTypeCode: m.productTypeCode,
         sizeCode: m.sizeCode,
         displayName: m.displayName,

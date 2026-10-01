@@ -1,0 +1,199 @@
+<div class="admin-page">
+  <header class="page-head tw-page-head">
+    <div>
+      <h1 class="pm-page-title">{{ 'ADMIN.REPORT.TITLE' | translate }}</h1>
+      <p class="page-sub tw-page-sub">{{ 'ADMIN.REPORT.SUB' | translate }}</p>
+    </div>
+  </header>
+
+  <form class="period" [formGroup]="form" (ngSubmit)="read()">
+    <label>
+      <span>{{ 'ADMIN.REPORT.FROM' | translate }}</span>
+      <input id="report-from" type="date" formControlName="from" />
+    </label>
+    <label>
+      <span>{{ 'ADMIN.REPORT.TO' | translate }}</span>
+      <input id="report-to" type="date" formControlName="to" />
+    </label>
+    <button class="pm-button-primary" type="submit">{{ 'ADMIN.REPORT.SHOW' | translate }}</button>
+  </form>
+
+  @if (fileLink(); as link) {
+    <p class="ready-file">
+      <a [href]="link" [download]="fileName()">
+        {{ 'ADMIN.REPORT.SAVE_FILE' | translate: { name: fileName() } }}
+      </a>
+    </p>
+  }
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="note">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <div class="note">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="plain" (click)="read()">{{ 'COMMON.RETRY' | translate }}</button>
+      </div>
+    }
+    @case ('READY') {
+      @if (!seesMoney()) {
+        <p class="note">{{ 'ADMIN.REPORT.MONEY_HIDDEN' | translate }}</p>
+      }
+
+      @if (revenue(); as money) {
+        <section class="card" id="report-revenue">
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.REPORT.REVENUE' | translate }}</h2>
+              <p class="card-note">{{ 'ADMIN.REPORT.REVENUE_NOTE' | translate }}</p>
+            </div>
+            <button type="button" class="plain" (click)="fetchFile('revenue')">
+              {{ 'ADMIN.REPORT.CSV' | translate }}
+            </button>
+          </div>
+
+          <dl class="info-pair">
+            <dt>{{ 'ADMIN.REPORT.ORDER_COUNT' | translate }}</dt>
+            <dd>{{ money.orderCount }}</dd>
+            <dt>{{ 'ADMIN.REPORT.TOTAL' | translate }}</dt>
+            <dd class="accent big-number">{{ money.total | amount }}</dd>
+          </dl>
+
+          <h3>{{ 'ADMIN.REPORT.BY_KIND' | translate }}</h3>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'ADMIN.REPORT.NAME' | translate }}</th>
+                  <th>{{ 'ADMIN.REPORT.QUANTITY' | translate }}</th>
+                  <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (one of kindRows(); track one.raw.name) {
+                  <tr>
+                    <td>{{ one.key | translate }}</td>
+                    <td>{{ one.raw.count }}</td>
+                    <td>{{ one.raw.amount | amount }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h3>{{ 'ADMIN.REPORT.BY_PRODUCT' | translate }}</h3>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'ADMIN.REPORT.NAME' | translate }}</th>
+                  <th>{{ 'ADMIN.REPORT.QUANTITY' | translate }}</th>
+                  <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (one of money.byProduct; track one.name) {
+                  <tr>
+                    <td>{{ one.name }}</td>
+                    <td>{{ one.count }}</td>
+                    <td>{{ one.amount | amount }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+
+      @if (aiCost(); as cost) {
+        <section class="card" id="report-ai">
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.REPORT.AI_COST' | translate }}</h2>
+              <p class="card-note">{{ 'ADMIN.REPORT.AI_NOTE' | translate }}</p>
+            </div>
+            <button type="button" class="plain" (click)="fetchFile('ai-cost')">
+              {{ 'ADMIN.REPORT.CSV' | translate }}
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'ADMIN.REPORT.AI_KIND' | translate }}</th>
+                  <th>{{ 'ADMIN.REPORT.USES' | translate }}</th>
+                  <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (one of aiRows(); track one.raw.kind) {
+                  <tr>
+                    <td>{{ one.key | translate }}</td>
+                    <td>{{ one.raw.count }}</td>
+                    <td>{{ one.raw.cost | amount }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <dl class="info-pair">
+            <dt>{{ 'ADMIN.REPORT.TOTAL' | translate }}</dt>
+            <dd class="accent big-number">{{ cost.total | amount }}</dd>
+          </dl>
+        </section>
+      }
+
+      @if (progress(); as made) {
+        <section class="card" id="report-progress">
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.REPORT.PROGRESS' | translate }}</h2>
+              <p class="card-note">{{ 'ADMIN.REPORT.PROGRESS_NOTE' | translate }}</p>
+            </div>
+            <button type="button" class="plain" (click)="fetchFile('progress')">
+              {{ 'ADMIN.REPORT.CSV' | translate }}
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'ADMIN.REPORT.STATUS' | translate }}</th>
+                  <th>{{ 'ADMIN.REPORT.ORDER_COUNT' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (one of statusRows(); track one.raw.status) {
+                  <tr>
+                    <td>{{ one.key | translate }}</td>
+                    <td>{{ one.raw.count }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="late-name">
+            {{ 'ADMIN.REPORT.LATE' | translate: { count: made.lateCount } }}
+          </h3>
+          @if (made.late.length === 0) {
+            <p class="note">{{ 'ADMIN.REPORT.NO_LATE' | translate }}</p>
+          } @else {
+            <ul class="late-list">
+              @for (one of made.late; track one.orderCode) {
+                <li>
+                  <strong>{{ one.orderCode }}</strong>
+                  <span>{{ one.status }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    }
+  }
+</div>

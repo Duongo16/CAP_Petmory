@@ -1,0 +1,184 @@
+<div class="detail flex flex-col gap-5">
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="tw-empty"><p class="pm-empty m-0">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="tw-empty"><p class="pm-empty m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+    }
+    @case ('DONE') {
+      @if (pet(); as pet) {
+
+        <button type="button" class="detail-close tw-btn-icon" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+          <pm-icon name="close" [size]="16" />
+        </button>
+
+        <header class="tw-card flex items-center gap-5 flex-wrap p-6">
+          <span class="grid place-items-center overflow-hidden flex-none w-20 h-20 rounded-[22px] border-2 border-accent-soft">
+            <pm-pet-face [petId]="pet._id" [avatarUrl]="pet.avatarUrl" [kind]="pet.kind" [name]="pet.name" [size]="76" />
+          </span>
+
+          <div class="flex-1 min-w-[10rem] flex flex-col gap-1">
+            <h1 class="who-name pm-page-title" id="pet-detail-name">{{ pet.name }}</h1>
+            @if (pet.tagline) {
+              <p class="who-line m-0 text-sm text-ink-muted">{{ pet.tagline }}</p>
+            }
+            @if (pet.status === 'PASSED_AWAY') {
+              <span class="chip-soft tw-badge self-start">{{ 'PET.PASSED_AWAY' | translate }}</span>
+            }
+          </div>
+
+          <dl class="flex flex-wrap gap-3 m-0">
+            @if (ageMonths(); as months) {
+              <div class="flex flex-col-reverse gap-0.5 min-w-[96px] px-4 py-3 rounded-lg bg-accent-soft">
+                <dd class="m-0 text-lg font-bold text-accent-dark">{{ 'PET.AGE_MONTHS' | translate: { count: months } }}</dd>
+                <dt class="text-xs font-semibold text-ink-muted">{{ 'PET.AGE' | translate }}</dt>
+              </div>
+            }
+            @if (daysTogether(); as days) {
+              <div class="flex flex-col-reverse gap-0.5 min-w-[96px] px-4 py-3 rounded-lg bg-amber-soft">
+                <dd class="m-0 text-lg font-bold text-on-amber">{{ 'PET.DAYS_TOGETHER' | translate: { count: days } }}</dd>
+                <dt class="text-xs font-semibold text-ink-muted">{{ 'PET.TOGETHER_LABEL' | translate }}</dt>
+              </div>
+            }
+            <div class="flex flex-col-reverse gap-0.5 min-w-[96px] px-4 py-3 rounded-lg bg-success-soft">
+              <dd class="m-0 text-lg font-bold text-on-success-soft">{{ memoryCount() }}</dd>
+              <dt class="text-xs font-semibold text-ink-muted">{{ 'MEMORY.NAV' | translate }}</dt>
+            </div>
+          </dl>
+        </header>
+
+        <section class="tw-card tw-card-pad flex flex-col gap-4">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <h2 class="tw-section-title m-0">{{ 'PET.DETAILS' | translate }}</h2>
+            @if (pet.microchip) {
+              <span class="tw-badge tw-badge-success">{{ 'PET.HAS_CHIP' | translate }}</span>
+            }
+          </div>
+
+          <dl class="facts grid grid-cols-[repeat(auto-fit,minmax(min(180px,100%),1fr))] gap-3 m-0">
+            <div class="px-4 py-3 rounded-lg bg-surface border border-edge-soft">
+              <dt class="text-xs font-semibold text-ink-muted">{{ 'PET.KIND_LABEL' | translate }}</dt>
+              <dd class="flex items-baseline gap-2 flex-wrap m-0 mt-1 text-sm font-semibold text-ink">{{ pet.breed || (kindKey() | translate) }}</dd>
+            </div>
+            <div class="px-4 py-3 rounded-lg bg-surface border border-edge-soft">
+              <dt class="text-xs font-semibold text-ink-muted">{{ 'PET.GENDER_LABEL' | translate }}</dt>
+              <dd class="flex items-baseline gap-2 flex-wrap m-0 mt-1 text-sm font-semibold text-ink">
+                {{ genderKey() | translate }}
+                @if (pet.neutered) {
+                  <span class="fact-note tw-badge tw-badge-success">{{ 'PET.NEUTERED' | translate }}</span>
+                }
+              </dd>
+            </div>
+            @if (pet.birthDate) {
+              <div class="px-4 py-3 rounded-lg bg-surface border border-edge-soft">
+                <dt class="text-xs font-semibold text-ink-muted">{{ 'PET.BIRTHDAY' | translate }}</dt>
+                <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ pet.birthDate | date: 'dd/MM/yyyy' }}</dd>
+              </div>
+            }
+            @if (pet.adoptionDate) {
+              <div class="px-4 py-3 rounded-lg bg-surface border border-edge-soft">
+                <dt class="text-xs font-semibold text-ink-muted">{{ 'PET.CAME_HOME' | translate }}</dt>
+                <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ pet.adoptionDate | date: 'dd/MM/yyyy' }}</dd>
+              </div>
+            }
+            @if (pet.passedAwayDate) {
+              <div class="px-4 py-3 rounded-lg bg-surface border border-edge-soft">
+                <dt class="text-xs font-semibold text-ink-muted">{{ 'PET.GONE_DATE' | translate }}</dt>
+                <dd class="m-0 mt-1 text-sm font-semibold text-ink">{{ pet.passedAwayDate | date: 'dd/MM/yyyy' }}</dd>
+              </div>
+            }
+            @if (pet.microchip) {
+              <div class="px-4 py-3 rounded-lg bg-surface border border-edge-soft">
+                <dt class="text-xs font-semibold text-ink-muted">{{ 'PET.MICROCHIP' | translate }}</dt>
+                <dd class="fact-code m-0 mt-1 text-sm font-semibold text-ink tabular-nums tracking-[0.02em]">{{ pet.microchip }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+
+        @if (pet.trait.length > 0) {
+          <section class="tw-card tw-card-pad flex flex-col gap-4">
+            <h2 class="tw-section-title m-0">{{ 'PET.TRAITS' | translate }}</h2>
+            <ul class="traits flex gap-2 flex-wrap m-0 p-0 list-none">
+              @for (one of pet.trait; track one) {
+                <li class="inline-flex items-center min-h-9 px-4 rounded-full bg-accent-soft text-sm font-semibold text-accent-dark">{{ one }}</li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (pet.carer.length > 0) {
+          <section class="tw-card tw-card-pad flex flex-col gap-4">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <h2 class="tw-section-title m-0">{{ 'PET.FAMILY' | translate: { name: pet.name } }}</h2>
+              <span class="tw-badge tw-badge-muted">
+                {{ 'PET.CARER_COUNT' | translate: { count: pet.carer.length } }}
+              </span>
+            </div>
+            <ul class="carers grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-3 m-0 p-0 list-none">
+              @for (one of pet.carer; track one.name) {
+                <li class="flex items-center gap-3 p-3 rounded-lg bg-surface border border-edge-soft">
+                  <span class="tw-avatar w-10 h-10 bg-accent-soft text-accent" aria-hidden="true"><pm-icon name="user" [size]="17" /></span>
+                  <span class="carer-text flex flex-col min-w-0">
+                    <strong class="text-sm font-bold text-ink">{{ one.name }}</strong>
+                    @if (one.role) {
+                      <span class="text-xs text-ink-muted">{{ one.role }}</span>
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <section class="treasure flex flex-col gap-3 p-6 rounded-xl bg-night text-on-night">
+          <p class="m-0 text-xs font-bold tracking-[0.1em] uppercase treasure-eyebrow">{{ 'PET.TREASURE_EYEBROW' | translate }}</p>
+          <h2 class="m-0 font-serif text-2xl font-medium leading-tight">{{ 'PET.TREASURE_TITLE' | translate }}</h2>
+          <p class="m-0 max-w-[62ch] text-sm leading-relaxed opacity-80">{{ 'PET.TREASURE_SUB' | translate }}</p>
+
+          <dl class="treasure-figures flex flex-wrap gap-3 m-0 mt-1">
+            <div class="flex flex-col-reverse gap-0.5 min-w-[96px] px-4 py-3 rounded-lg bg-on-night/10">
+              <dd class="m-0 text-2xl font-bold">{{ photoCount() }}</dd>
+              <dt class="text-xs font-semibold opacity-80">{{ 'PET.TREASURE_PHOTOS' | translate }}</dt>
+            </div>
+            <div class="flex flex-col-reverse gap-0.5 min-w-[96px] px-4 py-3 rounded-lg bg-on-night/10">
+              <dd class="m-0 text-2xl font-bold">{{ memoryCount() }}</dd>
+              <dt class="text-xs font-semibold opacity-80">{{ 'PET.TREASURE_PAGES' | translate }}</dt>
+            </div>
+            <div class="flex flex-col-reverse gap-0.5 min-w-[96px] px-4 py-3 rounded-lg bg-on-night/10">
+              <dd class="m-0 text-2xl font-bold">{{ milestoneCount() }}</dd>
+              <dt class="text-xs font-semibold opacity-80">{{ 'PET.TREASURE_MILESTONES' | translate }}</dt>
+            </div>
+          </dl>
+
+          <div class="flex gap-2 flex-wrap mt-2">
+            <button type="button" class="treasure-go inline-flex items-center gap-2 min-h-11 px-5 rounded-md border-0 text-sm font-bold cursor-pointer" (click)="openBook()">
+              <pm-icon name="book" [size]="16" />
+              {{ 'PET.OPEN_BOOK' | translate }}
+            </button>
+            <button type="button" class="inline-flex items-center gap-2 min-h-11 px-5 rounded-md bg-transparent text-sm font-semibold border border-on-night/30 text-on-night cursor-pointer hover:bg-on-night/10" (click)="openAlbum()">
+              <pm-icon name="image" [size]="16" />
+              {{ 'PET.OPEN_ALBUM' | translate }}
+            </button>
+          </div>
+        </section>
+
+        <section class="flex items-center justify-between gap-4 flex-wrap p-6 rounded-xl bg-amber-soft text-on-amber">
+          <div class="flex items-center gap-4 min-w-0">
+            <span class="tw-icon-tile bg-card text-amber" aria-hidden="true"><pm-icon name="sparkle" [size]="20" /></span>
+            <div class="min-w-0">
+              <p class="m-0 text-xs font-bold tracking-[0.1em] uppercase">{{ 'PET.KEEPSAKE_EYEBROW' | translate }}</p>
+              <h2 class="m-0 mt-1 font-serif text-xl font-medium">{{ 'PET.KEEPSAKE_TITLE' | translate }}</h2>
+              <p class="m-0 mt-1 text-sm opacity-85">{{ 'PET.KEEPSAKE_SUB' | translate }}</p>
+            </div>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <button type="button" class="tw-btn-secondary" (click)="go(['/suggest'])">{{ 'NAV.SUGGEST' | translate }}</button>
+            <button type="button" class="keepsake-go inline-flex items-center min-h-11 px-5 rounded-md border-0 text-sm font-bold cursor-pointer" (click)="go(['/studio'])">{{ 'PET.KEEPSAKE_GO' | translate }}</button>
+          </div>
+        </section>
+      }
+    }
+  }
+</div>

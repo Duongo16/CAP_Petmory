@@ -176,6 +176,31 @@ export class CommunityController {
     return this.service.updateProfile(user.userId, dto);
   }
 
+  /**
+   * Keeps a profile picture sent from the device. The answer names the stored
+   * file; the profile itself only changes when the person saves the form.
+   */
+  @HttpPost('users/me/avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  saveAvatar(@UploadedFile() file: Express.Multer.File, @CurrentUser() user: AuthUser) {
+    return this.service.saveAvatar(user.userId, file);
+  }
+
+  /** Serves a profile picture. Profiles are public, so the picture is too. */
+  @Public()
+  @Get('users/:id/avatar/:fileName')
+  async readAvatar(
+    @Param('id') id: string,
+    @Param('fileName') fileName: string,
+    @Res() res: Response,
+  ) {
+    const data = await this.service.readAvatar(id, fileName);
+    res.setHeader('Content-Type', fileName.endsWith('.png') ? 'image/png' : 'image/jpeg');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(data);
+  }
+
   @HttpPost('users/:id/follow')
   toggleFollow(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     return this.service.toggleFollow(id, user.userId);

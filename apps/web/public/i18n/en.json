@@ -8,6 +8,7 @@
     "SAVE": "Lưu",
     "ADD": "Thêm",
     "REMOVE": "Xóa",
+    "IMAGE_BROKEN": "This picture could not be loaded",
     "CLOSE": "Close",
     "GENERIC_ERROR": "Đã xảy ra lỗi. Vui lòng thử lại.",
     "NO_DATA": "Chưa có dữ liệu",
@@ -49,9 +50,10 @@
     "RESTORE": "Restore a photo",
     "CHAT_DESK": "Chat desk",
     "SUGGEST": "Design suggestions",
-    "STORY": "Write a story",
     "ACCOUNTS": "Accounts",
-    "MODELS": "3D models"
+    "MODELS": "3D models",
+    "JOURNALS": "Diaries",
+    "SHOP": "Shop"
   },
   "AUTH": {
     "QUICK": {
@@ -107,8 +109,6 @@
     "PHONE_NOTE": "for workshop updates",
     "PHONE_PLACEHOLDER": "090xxxxxxx",
     "PHONE_ERROR": "A phone number is 10 digits starting with 0",
-    "PET_NAME": "The name of your first pet",
-    "PET_NAME_PLACEHOLDER": "For example: Mun, Bo, Miu...",
     "PASSWORD_PLACEHOLDER": "At least 8 characters",
     "CONFIRM": "Confirm password",
     "CONFIRM_PLACEHOLDER": "Type the password again",
@@ -153,7 +153,10 @@
     "VISUAL_TITLE": "Keep the memories, keep the love",
     "VISUAL_SUB": "A digital memory book for you and your pet.",
     "VISUAL_QUOTE": "“Open the book and last summer is right there.”",
-    "VISUAL_QUOTE_BY": "— A note from Petmory"
+    "VISUAL_QUOTE_BY": "— A note from Petmory",
+    "DRAFT_TITLE": "{{name}}’s profile is ready",
+    "DRAFT_REGISTER": "As soon as your account is created, the profile is saved to it.",
+    "DRAFT_LOGIN": "As soon as you sign in, the profile is added to your account."
   },
   "PET": {
     "TAGLINE": "A line about them",
@@ -248,7 +251,8 @@
       "MALE": "Male",
       "FEMALE": "Female",
       "UNKNOWN": "Not known"
-    }
+    },
+    "VIEW_PROFILE": "View profile"
   },
   "PALETTE": {
     "TITLE": "Bảng mã màu len",
@@ -852,6 +856,32 @@
       "HAND": "Handwritten",
       "BODY": "Plain",
       "SERIF": "Classic"
+    },
+    "LAYOUT": {
+      "HERO": {
+        "NAME": "One big photo",
+        "TEXT": "One standout moment with a few lines below."
+      },
+      "DUO": {
+        "NAME": "Two tilted photos",
+        "TEXT": "Two photos taped across each other like a notebook."
+      },
+      "TRIO": {
+        "NAME": "Three-photo collage",
+        "TEXT": "Three photos layered on kraft paper."
+      },
+      "GRID": {
+        "NAME": "Four-photo grid",
+        "TEXT": "Four tidy squares for a day full of things."
+      },
+      "STORY": {
+        "NAME": "Words first",
+        "TEXT": "The story first, one photo underneath."
+      },
+      "NOTE": {
+        "NAME": "Words only",
+        "TEXT": "A handwritten letter page, no photo needed."
+      }
     }
   },
   "GOODS": {
@@ -977,7 +1007,25 @@
       "FUNNY": "Funny",
       "LEARNING": "Learning something",
       "EVERYDAY": "Everyday"
-    }
+    },
+    "STEP": "Step {{step}} of {{total}}",
+    "STEP_LAYOUT": "Pick a layout for the page",
+    "STEP_PHOTOS": "Pick photos for the page",
+    "STEP_WRITE": "Write the moment",
+    "STEP_LAYOUT_SHORT": "Layout",
+    "STEP_PHOTOS_SHORT": "Photos",
+    "STEP_WRITE_SHORT": "Story",
+    "PHOTO_SLOTS": "{{count}}/{{limit}} photos picked. Tap them in the order they go on the page.",
+    "UPLOAD": "Upload from device",
+    "UPLOADING": "Uploading…",
+    "UPLOAD_TYPE_ERROR": "Only JPG, PNG or WEBP photos are accepted.",
+    "UPLOAD_FAILED": "That photo could not be uploaded. Please try again.",
+    "BODY_ON_PAGE": "The page shows about the first {{limit}} characters; the whole story is still kept.",
+    "PREVIEW": "How the page will look",
+    "BACK": "Back",
+    "NEXT": "Continue",
+    "SKIP_PHOTOS": "Skip photos",
+    "MAP_START": "The day {{name}} came home — where the journey began"
   },
   "TODAY": {
     "GREET_MORNING": "Good morning, {{name}}!",
@@ -1006,8 +1054,6 @@
     "DIARY_PRIVATE": "Private diary",
     "STUDIO_PROMO": "Turn a favourite photo into a keepsake",
     "STUDIO_OPEN": "Open Studio",
-    "STORY": "Their story",
-    "STORY_SUB": "Petmory retells the journey",
     "ORDERS": "Your orders",
     "ORDERS_SUB": "Follow the keepsakes being made"
   },
@@ -1545,6 +1591,7 @@
   },
   "COMMUNITY": {
     "TITLE": "PETMORY community",
+    "FILTER_LABEL": "Filter by topic",
     "SUBTITLE": "Where pet lovers share, connect and pass on a little warmth",
     "EMPTY": "No posts here yet",
     "SIGN_IN_TO_POST": "Sign in to share a post",
@@ -1635,7 +1682,20 @@
       "FULL_NAME": "Full name",
       "PHONE": "Phone number",
       "AVATAR_URL": "Avatar (image URL)",
-      "SAVE": "Save changes"
+      "SAVE": "Save changes",
+      "EDIT_EYEBROW": "Your profile",
+      "AVATAR": "Profile picture",
+      "FROM_DEVICE": "From device",
+      "FROM_LINK": "Paste a link",
+      "CHOOSE_FILE": "Choose a photo",
+      "UPLOADING": "Uploading…",
+      "REMOVE_AVATAR": "Remove photo",
+      "FILE_RULE": "JPG, PNG or WEBP, up to 5 MB.",
+      "LINK_ERROR": "The link must start with http:// or https://",
+      "NAME_ERROR": "Please enter a display name.",
+      "AVATAR_TYPE_ERROR": "Only JPG, PNG or WEBP photos are accepted.",
+      "AVATAR_SIZE_ERROR": "The photo is over 5 MB, please pick a smaller one.",
+      "AVATAR_UPLOAD_FAILED": "The photo could not be uploaded. Please try again."
     },
     "DISCOVER": {
       "TITLE": "Explore the community",
@@ -1732,46 +1792,6 @@
     },
     "ZONE_NOT_DRAWN": "A * marks a zone this model file does not separate yet, so it cannot be shown on the preview. The colour code still reaches the production sheet."
   },
-  "STORY": {
-    "TITLE": "Write a story",
-    "LEAD": "Write a story about {{name}} from the profile and the details you want included.",
-    "GO_JOURNAL": "Back to the journal",
-    "PICK_TONE": "Tone",
-    "NOTES": "What you want included",
-    "NOTES_HINT": "For example: naps by the window every afternoon, and hides the slippers.",
-    "WRITE": "Write it for me",
-    "WRITING": "Writing...",
-    "REWRITE": "Write another version",
-    "EDIT": "Edit this version",
-    "EDIT_TITLE": "Title",
-    "EDIT_CONTENT": "Text",
-    "VERSION": "Version {{number}}",
-    "BY_PERSON": "you edited it",
-    "BY_SAMPLE_SHORT": "prepared version",
-    "BY_SAMPLE": "This version was assembled from the pet profile. Once a service key is configured, the story will be written in full.",
-    "QUOTA_LEFT": "You have {{count}} writes left.",
-    "NONE_YET": "No versions yet. Pick a tone and press write.",
-    "SAVED": "Your edit has been saved.",
-    "ATTACHED": "The story has been attached to the moment.",
-    "ATTACH_TITLE": "Attach to the journal",
-    "ATTACH_PICK": "Pick a moment",
-    "ATTACH": "Attach",
-    "ALREADY_ATTACHED": "This version is already attached to a moment.",
-    "NO_MOMENT": "This pet has no moments to attach to yet. Write one first.",
-    "ERROR_PET": "The pet profile could not be read.",
-    "ERROR_TONES": "The tone list could not be read.",
-    "ERROR_LIST": "The saved versions could not be read.",
-    "ERROR_WRITE": "Nothing could be written. Try again in a few minutes.",
-    "ERROR_QUOTA": "You have used all your writes for this period.",
-    "ERROR_SAVE": "Your edit could not be saved.",
-    "ERROR_ATTACH": "The story could not be attached.",
-    "TONE": {
-      "WARM": "Warm",
-      "PLAYFUL": "Playful",
-      "TENDER": "Tender",
-      "SHORT": "Short"
-    }
-  },
   "LANDING": {
     "NAV_DIARY": "Diary",
     "NAV_MEMORY": "Memories",
@@ -1840,21 +1860,59 @@
     "CTA_LOGIN": "I already have an account",
     "FOOTER_SLOGAN": "Keep the memories, keep the love.",
     "FOOTER_COPY": "© 2026 Petmory",
-    "MODAL": {
-      "STEP": "Step {{step}} of 2",
-      "TITLE_1": "Let’s make a profile for your pet",
-      "SUB_1": "A small profile that keeps their whole journey.",
-      "PREVIEW_NAME": "Your pet’s name",
-      "PREVIEW_SUB": "Breed · Birthday",
+    "STARTER": {
+      "STEP": "Step {{step}} of {{total}}",
+      "TITLE_1": "Who is your pet?",
+      "TITLE_2": "Tell us a little more about {{name}}",
+      "TITLE_3": "Add a photo of {{name}}",
+      "KIND": "Your pet is a",
+      "NAME": "Pet’s name",
+      "NAME_HINT": "For example: Mochi, Bong, Mun…",
+      "NAME_ERROR": "Please tell Petmory your pet’s name.",
+      "BREED": "Breed",
+      "BREED_HINT": "For example: Corgi, domestic cat…",
+      "GENDER": "Sex",
+      "BIRTH": "Birthday",
+      "BIRTH_ERROR": "A birthday cannot be in the future.",
+      "OPTIONAL": "Optional, you can add it later.",
+      "TAGLINE": "A line about them",
+      "TAGLINE_HINT": "For example: A clingy four-legged royal",
+      "BORN": "Born {{date}}",
+      "SAVE_NOTE": "Create a free account to keep this profile. As soon as you sign up, your pet will be in your account.",
+      "REGISTER": "Create account and save",
+      "LOGIN": "I already have an account",
       "NEXT": "Continue",
-      "TITLE_2": "Create an account to save the profile",
-      "SUB_2": "It takes less than a minute and it is free.",
-      "PERK_1": "A private pet profile",
-      "PERK_2": "Photo and video diary",
-      "PERK_3": "Memories on the right day",
-      "PERK_4": "Keepsakes made from their photos",
-      "REGISTER": "Sign up free",
-      "LOGIN": "I already have an account"
+      "BACK": "Back",
+      "EDIT": "Edit the details",
+      "TITLE_4": "{{name}}’s profile is ready",
+      "PHOTO_PICK": "Choose a photo",
+      "PHOTO_RULE": "JPG, PNG or WEBP, up to 10 MB",
+      "PHOTO_NOTE": "Optional. The photo is saved to their album once you sign up.",
+      "PHOTO_CHANGE": "Change photo",
+      "PHOTO_REMOVE": "Remove photo",
+      "PHOTO_ALT": "Photo of {{name}}",
+      "PHOTO_TYPE_ERROR": "Only JPG, PNG or WEBP photos are accepted.",
+      "PHOTO_SIZE_ERROR": "The photo is over 10 MB, please pick a smaller one.",
+      "SKIP": "Skip"
     }
+  },
+  "SHELF": {
+    "EYEBROW": "Memory bookcase",
+    "TITLE": "Diary bookcase",
+    "SUB": "Every pet has a book of their own. Pick one to open it and read on.",
+    "EMPTY": "No books yet. Create a pet profile to start the first one.",
+    "LABEL": "DIARY",
+    "PAGES": "{{count}} pages",
+    "HINT": "Click a book to take it down and open it.",
+    "OPENING": "Opening {{name}}’s diary",
+    "BACK": "Back to the bookcase",
+    "WRITE_FOR": "Write for"
+  },
+  "SHOP": {
+    "EYEBROW": "Petmory shop",
+    "TITLE": "Shop",
+    "SUB": "Keepsakes made from your pet’s photos, and ready-made pieces to take home now.",
+    "CUSTOM": "Made from your photos",
+    "READY": "Ready-made"
   }
 }

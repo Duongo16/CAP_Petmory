@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type ProductTypeDocument = HydratedDocument<ProductType>;
 export type ProductSizeDocument = HydratedDocument<ProductSize>;
@@ -25,7 +25,7 @@ export class ProductSize {
    * Selling price. Must use the database's exact decimal type; a floating point
    * number would drift once amounts are added or subtracted.
    */
-  @Prop({ type: Types.Decimal128, required: true })
+  @Prop({ type: MongooseSchema.Types.Decimal128, required: true })
   price!: Types.Decimal128;
 
   @Prop({ required: true, default: 'VND', uppercase: true, trim: true })

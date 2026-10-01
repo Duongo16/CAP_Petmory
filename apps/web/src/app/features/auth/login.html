@@ -6,12 +6,22 @@
 
       <a class="ap-back" routerLink="/landing"><pm-icon name="back" [size]="16" />{{ 'AUTH.BACK_HOME' | translate }}</a>
 
-      <span class="ap-logo-icon" aria-hidden="true"><pm-icon name="paw" [size]="26" /></span>
+      <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" /></a>
 
       <div class="ap-head">
         <h1 class="ap-title">{{ 'AUTH.LOGIN_TITLE' | translate }}</h1>
         <p class="ap-sub">{{ 'AUTH.LOGIN_SUB' | translate }}</p>
       </div>
+
+      @if (draft(); as pet) {
+        <div class="ap-draft" role="status">
+          <span class="ap-draft-photo" aria-hidden="true"><pm-pet-art [kind]="draftArt()" [face]="true" [width]="40" /></span>
+          <span class="ap-draft-text">
+            <strong>{{ 'AUTH.DRAFT_TITLE' | translate: { name: pet.name } }}</strong>
+            <span>{{ 'AUTH.DRAFT_LOGIN' | translate }}</span>
+          </span>
+        </div>
+      }
 
       <!-- Social buttons -->
       <div class="ap-social-row">
@@ -134,7 +144,7 @@
     <span class="ap-blob ap-blob-a"></span>
     <span class="ap-blob ap-blob-b"></span>
 
-    <div class="ap-illustration"><pm-pet-art kind="dog" [width]="240" /></div>
+    <div class="ap-illustration"><pm-diary-scene [width]="420" [onColor]="true" /></div>
 
     <h2 class="ap-visual-title">{{ 'AUTH.VISUAL_TITLE' | translate }}</h2>
     <p class="ap-visual-sub">{{ 'AUTH.VISUAL_SUB' | translate }}</p>

@@ -86,7 +86,7 @@ async function run() {
   const pet = await call('/pets', {
     method: 'POST',
     headers: auth,
-    body: JSON.stringify({ name: 'Milo', kind: 'Awaiting', breed: 'Corgi' }),
+    body: JSON.stringify({ name: 'Milo', kind: 'DOG', breed: 'Corgi' }),
   });
   const petId = pet.body._id;
   check('Create a pet profile', pet.status === 201);
@@ -218,7 +218,7 @@ async function run() {
   const auth3 = { Authorization: `Bearer ${tok3}`, 'Content-Type': 'application/json' };
   const pet3 = await call('/pets', {
     method: 'POST', headers: auth3,
-    body: JSON.stringify({ name: 'Bin', kind: 'Meo' }),
+    body: JSON.stringify({ name: 'Bin', kind: 'CAT' }),
   });
   const a1 = await upload(tok3, pet3.body._id, 'FRONT', await photoOpen(), 'frame-1.png');
   const a2 = await upload(tok3, pet3.body._id, 'LEFT_SIDE', await photoOpen(), 'frame-2.png');

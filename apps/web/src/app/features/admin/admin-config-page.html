@@ -1,6 +1,7 @@
 <div class="pm-page">
   <header class="page-header">
-    <h1 class="title">{{ 'ADMIN.CONFIG.TITLE' | translate }}</h1>
+    <p class="board-eyebrow">{{ 'ADMIN.CONFIG.EYEBROW' | translate }}</p>
+    <h1 class="title pm-page-title">{{ 'ADMIN.CONFIG.TITLE' | translate }}</h1>
     <p class="description">{{ 'ADMIN.CONFIG.DESCRIPTION' | translate }}</p>
   </header>
 
@@ -30,7 +31,13 @@
 
       <form [formGroup]="form" (ngSubmit)="save()">
         <section class="card">
-          <h2>{{ 'ADMIN.CONFIG.ORDERS_GROUP' | translate }}</h2>
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.CONFIG.ORDERS_GROUP' | translate }}</h2>
+              <p class="group-sub">{{ 'ADMIN.CONFIG.ORDERS_GROUP_SUB' | translate }}</p>
+            </div>
+            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 3 } }}</span>
+          </div>
           <div class="field-grid">
             <label>
               <span>{{ 'ADMIN.CONFIG.PET_LIMIT' | translate }}</span>
@@ -51,7 +58,13 @@
         </section>
 
         <section class="card">
-          <h2>{{ 'ADMIN.CONFIG.PHOTOS_GROUP' | translate }}</h2>
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.CONFIG.PHOTOS_GROUP' | translate }}</h2>
+              <p class="group-sub">{{ 'ADMIN.CONFIG.PHOTOS_GROUP_SUB' | translate }}</p>
+            </div>
+            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 3 } }}</span>
+          </div>
           <div class="field-grid">
             <label>
               <span>{{ 'ADMIN.CONFIG.GOOD_THRESHOLD' | translate }}</span>
@@ -72,8 +85,15 @@
         </section>
 
         <section class="card">
-          <h2>{{ 'ADMIN.CONFIG.QUOTA_GROUP' | translate }}</h2>
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.CONFIG.QUOTA_GROUP' | translate }}</h2>
+            </div>
+            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 12 } }}</span>
+          </div>
           <p class="note">{{ 'ADMIN.CONFIG.QUOTA_HINT' | translate }}</p>
+
+          <h3 class="sub-head">{{ 'ADMIN.CONFIG.PRICE_RESTORE_PHOTO' | translate }}</h3>
           <div class="field-grid">
             <label>
               <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
@@ -88,10 +108,105 @@
               <input type="number" formControlName="quotaYear" min="0" />
             </label>
           </div>
+
+          <h3 class="sub-head">{{ 'ADMIN.CONFIG.PRICE_DESIGN_SUGGESTION' | translate }}</h3>
+          <div class="field-grid">
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
+              <input type="number" id="quota-suggest-day" formControlName="suggestDay" min="0" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</span>
+              <input type="number" formControlName="suggestMonth" min="0" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</span>
+              <input type="number" formControlName="suggestYear" min="0" />
+            </label>
+          </div>
+
+          <h3 class="sub-head">{{ 'ADMIN.CONFIG.PRICE_STORY_WRITING' | translate }}</h3>
+          <div class="field-grid">
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
+              <input type="number" id="quota-story-day" formControlName="storyDay" min="0" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</span>
+              <input type="number" formControlName="storyMonth" min="0" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</span>
+              <input type="number" formControlName="storyYear" min="0" />
+            </label>
+          </div>
+
+          <h3 class="sub-head">{{ 'ADMIN.CONFIG.PRICE_CHAT_REPLY' | translate }}</h3>
+          <div class="field-grid">
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
+              <input type="number" id="quota-chat-day" formControlName="chatDay" min="0" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</span>
+              <input type="number" formControlName="chatMonth" min="0" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</span>
+              <input type="number" formControlName="chatYear" min="0" />
+            </label>
+          </div>
         </section>
 
         <section class="card">
-          <h2>{{ 'ADMIN.CONFIG.BANK_GROUP' | translate }}</h2>
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.CONFIG.AI_PRICE_GROUP' | translate }}</h2>
+              <p class="card-note">{{ 'ADMIN.CONFIG.AI_PRICE_NOTE' | translate }}</p>
+            </div>
+            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 4 } }}</span>
+          </div>
+          <div class="field-grid">
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PRICE_RESTORE_PHOTO' | translate }}</span>
+              <input type="text" formControlName="priceRestorePhoto" inputmode="decimal" maxlength="15" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PRICE_DESIGN_SUGGESTION' | translate }}</span>
+              <input type="text" formControlName="priceDesignSuggestion" inputmode="decimal" maxlength="15" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PRICE_STORY_WRITING' | translate }}</span>
+              <input type="text" formControlName="priceStoryWriting" inputmode="decimal" maxlength="15" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.CONFIG.PRICE_CHAT_REPLY' | translate }}</span>
+              <input type="text" formControlName="priceChatReply" inputmode="decimal" maxlength="15" />
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.CONFIG.QC_GROUP' | translate }}</h2>
+              <p class="card-note">{{ 'ADMIN.CONFIG.QC_NOTE' | translate }}</p>
+            </div>
+          </div>
+          <label class="wide">
+            <span>{{ 'ADMIN.CONFIG.QC_LIST' | translate }}</span>
+            <textarea formControlName="qcChecklist" rows="8" maxlength="4000"></textarea>
+            <small>{{ 'ADMIN.CONFIG.QC_HINT' | translate }}</small>
+          </label>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>{{ 'ADMIN.CONFIG.BANK_GROUP' | translate }}</h2>
+            </div>
+            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 4 } }}</span>
+          </div>
           <p class="note warn">{{ 'ADMIN.CONFIG.BANK_WARNING' | translate }}</p>
           <div class="field-grid">
             <label>

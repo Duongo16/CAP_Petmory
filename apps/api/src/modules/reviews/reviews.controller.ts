@@ -56,7 +56,7 @@ export class ReviewsController {
   }
 
   /** Internal staff can take down a review that breaks the house rules. */
-  @Roles(Role.MANAGER, Role.ADMIN)
+  @Roles(Role.MANAGER)
   @Delete(':id/moderate')
   async moderate(@Param('id') id: string, @CurrentUser() user: AuthUser) {
     const review = await this.service.hide(id, null);

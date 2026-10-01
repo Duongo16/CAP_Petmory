@@ -38,35 +38,6 @@
   text-decoration: none;
 }
 
-.lp-mark {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: var(--pm-accent);
-  color: var(--pm-on-accent);
-}
-
-.lp-brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-
-  strong {
-    font-family: var(--pm-font-display);
-    font-size: 20px;
-    font-weight: 600;
-  }
-
-  span {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    color: var(--pm-text-muted);
-  }
-}
-
 .lp-nav {
   display: flex;
   gap: 28px;
@@ -289,83 +260,20 @@
 /* Anh minh hoa kieu so luu niem */
 .lp-art {
   position: relative;
-  height: 540px;
+  display: grid;
+  place-items: center;
+  min-height: 500px;
   animation: lp-rise 600ms ease-out 150ms both;
 }
 
-.lp-art-back {
-  position: absolute;
-  inset: 40px 30px 30px 50px;
-  border-radius: 20px;
-  background: var(--pm-art-tan);
-  transform: rotate(-5deg);
-  box-shadow: var(--pm-shadow-lifted);
-}
-
-.lp-art-card {
-  position: absolute;
-  inset: 20px 40px 50px 70px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 18px 18px 22px;
-  border-radius: 18px;
-  background: var(--pm-bg-card);
-  transform: rotate(2.5deg);
-  box-shadow: var(--pm-shadow-lifted);
-  animation: lp-bob 7s ease-in-out infinite;
-}
-
-.lp-tape {
-  position: absolute;
-  top: -14px;
-  left: 50%;
-  width: 120px;
-  height: 28px;
-  margin-left: -60px;
-  border-radius: 3px;
-  background: var(--pm-tape);
-  transform: rotate(-3deg);
-}
-
-.lp-art-photo {
-  position: relative;
-  flex-grow: 1;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  border-radius: 12px;
-  background: var(--pm-paper-bloom);
-}
-
-.lp-art-halo {
-  position: absolute;
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  background: var(--pm-amber-soft);
-  opacity: 0.7;
-}
-
-.lp-art-photo pm-pet-art {
-  position: relative;
-}
-
-.lp-art-caption {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+.lp-scene {
+  max-width: 100%;
 }
 
 .lp-hand {
   font-family: var(--pm-font-hand);
   font-size: 24px;
   color: var(--pm-ink);
-}
-
-.lp-art-date {
-  font-size: 12px;
-  color: var(--pm-text-muted);
 }
 
 .lp-chip {
@@ -417,8 +325,8 @@
 }
 
 .lp-chip-status {
-  right: 0;
-  top: 70px;
+  left: 0;
+  top: 56px;
   padding: 10px 14px;
   border-radius: var(--pm-radius-pill);
   font-size: 13px;
@@ -791,172 +699,6 @@
   color: var(--pm-on-night-muted);
 }
 
-/* ---------- Hop dan duong 2 buoc ---------- */
-
-.lp-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: grid;
-  place-items: center;
-  padding: 16px;
-  background: var(--pm-shade-crop);
-  backdrop-filter: blur(5px);
-}
-
-.lp-modal {
-  position: relative;
-  width: 100%;
-  max-width: 460px;
-  box-sizing: border-box;
-  padding: 40px 36px 32px;
-  border-radius: 24px;
-  background: var(--pm-bg-card);
-  box-shadow: var(--pm-shadow-lifted);
-  animation: lp-pop 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.lp-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--pm-bg-muted);
-  color: var(--pm-text-muted);
-  cursor: pointer;
-
-  &:hover { color: var(--pm-danger); }
-}
-
-.lp-progress {
-  height: 6px;
-  margin: 8px 44px 8px 0;
-  overflow: hidden;
-  border-radius: var(--pm-radius-pill);
-  background: var(--pm-bg-muted);
-}
-
-.lp-progress-bar {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--pm-accent);
-  transform: scaleX(0.5);
-  transform-origin: left;
-  transition: transform 320ms ease;
-
-  &.full { transform: scaleX(1); }
-}
-
-.lp-step-label {
-  margin: 0 0 18px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--pm-text-muted);
-}
-
-.lp-modal-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  text-align: center;
-}
-
-.lp-modal-mark {
-  display: grid;
-  place-items: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 18px;
-  background: var(--pm-accent-soft);
-  color: var(--pm-accent);
-}
-
-.lp-modal-title {
-  margin: 0;
-  font-family: var(--pm-font-display);
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-.lp-modal-sub {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--pm-text-muted);
-}
-
-.lp-preview {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px;
-  border: 1.5px dashed var(--pm-border-strong);
-  border-radius: 16px;
-  background: var(--pm-bg-muted);
-  text-align: left;
-}
-
-.lp-preview-photo {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  flex-shrink: 0;
-  border-radius: 16px;
-  background: var(--pm-bg-card);
-}
-
-.lp-preview-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-
-  strong {
-    font-size: 15px;
-    color: var(--pm-text-body);
-  }
-
-  span {
-    font-size: 13px;
-    color: var(--pm-text-muted);
-  }
-}
-
-.lp-perks {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 0;
-  padding: 16px;
-  border-radius: 14px;
-  background: var(--pm-bg-muted);
-  list-style: none;
-  text-align: left;
-
-  li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    color: var(--pm-text-body);
-  }
-
-  pm-icon { color: var(--pm-success); }
-}
-
 /* ---------- Chuyen dong ---------- */
 
 @keyframes lp-rise {
@@ -969,24 +711,18 @@
   50% { translate: 0 -8px; }
 }
 
-@keyframes lp-pop {
-  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.96); }
-  to { opacity: 1; transform: none; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .lp-hero-text,
   .lp-art,
-  .lp-art-card,
-  .lp-chip,
-  .lp-modal {
+  .lp-chip {
     animation: none;
   }
 }
 
 @media (max-width: 900px) {
   .lp-nav { display: none; }
-  .lp-art { height: 440px; }
+  .lp-art { min-height: 420px; }
   .lp-hero-inner { padding: 48px 20px 64px; }
   .lp-section { padding: 64px 20px; }
 }
@@ -994,6 +730,5 @@
 @media (max-width: 520px) {
   .lp-art { display: none; }
   .lp-link-btn { display: none; }
-  .lp-modal { padding: 36px 20px 24px; }
   .lp-cta { padding: 48px 20px; }
 }

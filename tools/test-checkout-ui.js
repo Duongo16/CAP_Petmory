@@ -8,10 +8,21 @@ const fs = require('fs');
 
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
-const WEBHOOK_KEY = 'change-this-key-before-running';
+const WEBHOOK_KEY = process.env.SEPAY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const OUT = path.join(__dirname, '..', 'test-screenshots');
 const EMAIL = `dh.${Date.now()}@petmory.local`;
 const PASSWORD = 'Password@123';
+
+/** Waits until the development server has finished compiling. */
+async function settle(page) {
+  for (let i = 0; i < 90; i += 1) {
+    if ((await page.locator('vite-error-overlay').count()) === 0) {
+      return;
+    }
+    await page.waitForTimeout(1000);
+  }
+  throw new Error('may chu phat trien van dang bao loi sau 90 giay');
+}
 
 function check(name, passed, note = '') {
   console.log(`  ${passed ? 'PASS  ' : 'FAIL  '} ${name}${note ? '  ' + note : ''}`);
@@ -35,6 +46,7 @@ async function run() {
       data: { email: EMAIL, password: PASSWORD, fullName: 'Checkout test' },
     });
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
+    await settle(page);
     await page.fill('input[formcontrolname="email"]', EMAIL);
     await page.fill('input[formcontrolname="password"]', PASSWORD);
     await page.click('button[type="submit"]');
@@ -42,7 +54,8 @@ async function run() {
 
                 // Add a product to the cart
     await page.goto(`${WEB}/products/PT-02`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('.product-name', { timeout: 15000 });
+    await settle(page);
+    await page.waitForSelector('.picker .name', { timeout: 15000 });
     await page.locator('button:has-text("Thêm vào giỏ hàng")').click();
     await page.waitForTimeout(1200);
     res.push(check('A product can be added to the cart', (await page.locator('.badge').innerText()) === '1'));
@@ -66,7 +79,7 @@ async function run() {
     await page.fill('input[formcontrolname="province"]', 'Ha Noi');
     await page.locator('button:has-text("Xác nhận và thanh toán")').click();
     await page.waitForTimeout(600);
-    res.push(check('Chan count dien thoai sai vertex pending', page.url().includes('checkout')));
+    res.push(check('A badly formed telephone number is refused', page.url().includes('checkout')));
     await page.screenshot({ path: path.join(OUT, 'checkout-1-details-form.png') });
 
                 // Fill it in correctly, then submit
@@ -76,41 +89,67 @@ async function run() {
     const orderCode = page.url().split('/').pop();
     res.push(check('The order is created and the payment page opens', Boolean(orderCode), orderCode));
 
-    await page.waitForSelector('.qr-image', { timeout: 15000 });
-    const srcQr = await page.locator('.qr-image').getAttribute('src');
-    res.push(check('Show code QR', Boolean(srcQr && srcQr.startsWith('data:image/png'))));
+    await page.waitForSelector('.qr-frame img', { timeout: 15000 });
+    const srcQr = await page.locator('.qr-frame img').getAttribute('src');
+    res.push(check('The payment code is drawn', Boolean(srcQr && srcQr.startsWith('data:image/png'))));
 
-    const content = await page.locator('.copyable').nth(1).locator('code').innerText();
-    res.push(check('Show noi build transition khoan', content === orderCode, content));
+    const content = await page.locator('.copy-box.is-key code').innerText();
+    res.push(check('The transfer message is the order code', content === orderCode, content));
 
-    const amount = await page.locator('.amount').innerText();
-    res.push(check('Show count money right return', amount.includes('250.000'), amount));
+    const amount = await page.locator('.due-money').innerText();
+    res.push(check('The amount due is right', amount.includes('250.000'), amount));
+
+    const steps = await page.locator('.stop.is-here .stop-name').innerText();
+    res.push(check('The stepper marks the payment step', steps.includes('Thanh toán'), steps));
+
+    const clock = await page.locator('.clock strong').innerText();
+    res.push(check('The code shows how long it is good for',
+      /^\d+:\d{2}(:\d{2})?$/.test(clock.trim()), clock));
     await page.screenshot({ path: path.join(OUT, 'checkout-2-payment.png') });
 
     // The cart must be empty once the order has been placed
-    res.push(check('Huy hieu gio ve wide', (await page.locator('.badge').count()) === 0));
+    res.push(check('The cart badge is gone once the order is placed',
+      (await page.locator('.badge').count()) === 0));
 
     // Send a transfer notification exactly as the real service would
     const bao1 = await page.request.post(`${API}/payments/webhook`, {
       headers: { Authorization: `Apikey ${WEBHOOK_KEY}` },
       data: { id: `web-${Date.now()}`, transferAmount: 250000, content: `CT DEN ${orderCode}` },
     });
-    res.push(check('Dich vu bao da label money', (await bao1.json()).result === 'MATCHED'));
+    res.push(check('The transfer notice is matched to the order',
+      (await bao1.json()).result === 'MATCHED'));
 
     // The page updates itself; nothing is refreshed by hand
-    await page.waitForSelector('.checkmark', { timeout: 20000 });
-    res.push(check('Page word pair best when money ve', true));
+    await page.waitForSelector('.done-mark', { timeout: 20000 });
+    res.push(check('The page turns itself over when the money lands', true));
+    res.push(check('The recap shows the order code',
+      (await page.locator('.recap-rows dd').first().innerText()) === orderCode));
     await page.screenshot({ path: path.join(OUT, 'checkout-3-paid.png') });
 
     // Order list
     await page.locator('a:has-text("Xem đơn hàng")').click();
     await page.waitForURL('**/orders', { timeout: 15000 });
-    await page.waitForSelector('.order-row', { timeout: 15000 });
-    res.push(check('The order appears in the list', (await page.locator('.order-row').count()) === 1));
+    await page.waitForSelector('.order', { timeout: 15000 });
+    res.push(check('The order appears in the list', (await page.locator('.order').count()) === 1));
 
-    const status = await page.locator('.status-chip').innerText();
+    const status = await page.locator('.chip-status').innerText();
     res.push(check('The order shows as paid', status.includes('Đã thanh toán'), status));
-    res.push(check('A paid order no longer offers a pay button', (await page.locator('.small').count()) === 0));
+
+    res.push(check('A paid order no longer offers a pay button',
+      (await page.locator('.deed-solid:has-text("Thanh toán")').count()) === 0));
+
+    const done = await page.locator('.track-step.done').count();
+    res.push(check('The workshop progress marks the paid stage', done === 2, `${done} stages`));
+
+    await page.locator('.filter:has-text("Chờ thanh toán")').click();
+    await page.waitForTimeout(400);
+    res.push(check('Filtering by awaiting payment hides a paid order',
+      (await page.locator('.order').count()) === 0));
+
+    await page.locator('.filter:has-text("Tất cả")').click();
+    await page.waitForTimeout(400);
+    res.push(check('Clearing the filter brings the order back',
+      (await page.locator('.order').count()) === 1));
     await page.screenshot({ path: path.join(OUT, 'checkout-4-order-list.png') });
 
     const realErrors = error.filter((l) => !/favicon/i.test(l));

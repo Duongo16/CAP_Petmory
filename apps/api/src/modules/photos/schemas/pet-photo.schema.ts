@@ -5,6 +5,14 @@ export type PetPhotoDocument = HydratedDocument<PetPhoto>;
 
 /** Six upload slots by camera angle; the first four are required for a 3D product. */
 export enum PhotoAngle {
+  /**
+   * A picture sent without saying which way the pet was facing.
+   *
+   * Asking a customer to supply six named angles turned out to be the wrong
+   * shape for what people actually do, which is send the photographs they
+   * happen to love. This is the value everything sent that way carries.
+   */
+  GENERAL = 'GENERAL',
   FRONT = 'FRONT',
   LEFT_SIDE = 'LEFT_SIDE',
   RIGHT_SIDE = 'RIGHT_SIDE',
@@ -58,8 +66,13 @@ export const QualityScoreSchema = SchemaFactory.createForClass(QualityScore);
 
 @Schema({ timestamps: true, collection: 'pet_photos' })
 export class PetPhoto {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Pet', required: true, index: true })
-  pet!: Types.ObjectId;
+  /*
+   * Mot anh co the chua thuoc ve be nao.
+   * Nguoi dung co the phuc hoi mot tam anh roi moi quyet dinh gan no vao ho so
+   * nao, hoac chi tai ve va khong gan vao dau ca.
+   */
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Pet', default: null, index: true })
+  pet!: Types.ObjectId | null;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, index: true })
   owner!: Types.ObjectId;

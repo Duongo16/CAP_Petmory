@@ -1,0 +1,230 @@
+<div class="backdrop" (click)="close()" (keydown.escape)="close()">
+  <form
+    class="sheet-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="starter-title"
+    cdkTrapFocus
+    [cdkTrapFocusAutoCapture]="true"
+    [formGroup]="form"
+    (ngSubmit)="next()"
+    (click)="$event.stopPropagation()"
+    (keydown)="$event.stopPropagation()"
+  >
+    <header class="flex items-start justify-between gap-4">
+      <div class="flex flex-col gap-1">
+        <span class="tw-eyebrow">{{ 'LANDING.STARTER.STEP' | translate: { step: step(), total: stepCount } }}</span>
+        <h2 class="m-0 font-serif text-2xl font-medium leading-tight text-ink" id="starter-title">
+          @switch (step()) {
+            @case (1) { {{ 'LANDING.STARTER.TITLE_1' | translate }} }
+            @case (2) { {{ 'LANDING.STARTER.TITLE_2' | translate: { name: preview().name } }} }
+            @case (3) { {{ 'LANDING.STARTER.TITLE_3' | translate: { name: preview().name } }} }
+            @default { {{ 'LANDING.STARTER.TITLE_4' | translate: { name: preview().name } }} }
+          }
+        </h2>
+      </div>
+      <button type="button" class="tw-btn-icon shrink-0" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+        <pm-icon name="close" [size]="16" />
+      </button>
+    </header>
+
+    <div class="bar" aria-hidden="true"><span class="bar-fill" [style.transform]="progressScale()"></span></div>
+
+    @switch (step()) {
+      @case (1) {
+        <div class="tw-form">
+          <fieldset class="m-0 p-0 border-0 flex flex-col gap-2">
+            <legend class="tw-label mb-2">{{ 'LANDING.STARTER.KIND' | translate }}</legend>
+            <div class="grid grid-cols-3 gap-2.5">
+              @for (kind of kinds; track kind.value) {
+                <button
+                  type="button"
+                  class="kind"
+                  [class.on]="pickedKind() === kind.value"
+                  [attr.aria-pressed]="pickedKind() === kind.value"
+                  (click)="pickKind(kind.value)"
+                >
+                  @if (kind.art; as art) {
+                    <pm-pet-art [kind]="art" [face]="true" [width]="40" />
+                  } @else {
+                    <span class="kind-icon"><pm-icon name="paw" [size]="22" /></span>
+                  }
+                  <span>{{ kind.key | translate }}</span>
+                </button>
+              }
+            </div>
+          </fieldset>
+
+          <div class="tw-field">
+            <label class="tw-label" for="starter-name">{{ 'LANDING.STARTER.NAME' | translate }} *</label>
+            <input
+              id="starter-name"
+              class="tw-input"
+              type="text"
+              formControlName="name"
+              maxlength="100"
+              autocomplete="off"
+              cdkFocusInitial
+              [placeholder]="'LANDING.STARTER.NAME_HINT' | translate"
+            />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <p class="tw-error">{{ 'LANDING.STARTER.NAME_ERROR' | translate }}</p>
+            }
+          </div>
+        </div>
+      }
+
+      @case (2) {
+        <div class="tw-form">
+          <div class="tw-field">
+            <label class="tw-label" for="starter-breed">{{ 'LANDING.STARTER.BREED' | translate }}</label>
+            <input
+              id="starter-breed"
+              class="tw-input"
+              type="text"
+              formControlName="breed"
+              maxlength="100"
+              [placeholder]="'LANDING.STARTER.BREED_HINT' | translate"
+            />
+          </div>
+
+          <fieldset class="m-0 p-0 border-0 flex flex-col gap-2">
+            <legend class="tw-label mb-2">{{ 'LANDING.STARTER.GENDER' | translate }}</legend>
+            <div class="flex flex-wrap gap-2">
+              @for (gender of genders; track gender.value) {
+                <button
+                  type="button"
+                  class="tw-chip"
+                  [attr.aria-pressed]="pickedGender() === gender.value"
+                  (click)="pickGender(gender.value)"
+                >{{ gender.key | translate }}</button>
+              }
+            </div>
+          </fieldset>
+
+          <div class="tw-field">
+            <label class="tw-label" for="starter-birth">{{ 'LANDING.STARTER.BIRTH' | translate }}</label>
+            <input id="starter-birth" class="tw-input" type="date" formControlName="birthDate" [max]="today" />
+            @if (birthInFuture()) {
+              <p class="tw-error">{{ 'LANDING.STARTER.BIRTH_ERROR' | translate }}</p>
+            } @else {
+              <p class="tw-hint">{{ 'LANDING.STARTER.OPTIONAL' | translate }}</p>
+            }
+          </div>
+
+          <div class="tw-field">
+            <label class="tw-label" for="starter-tagline">{{ 'LANDING.STARTER.TAGLINE' | translate }}</label>
+            <input
+              id="starter-tagline"
+              class="tw-input"
+              type="text"
+              formControlName="tagline"
+              maxlength="200"
+              [placeholder]="'LANDING.STARTER.TAGLINE_HINT' | translate"
+            />
+          </div>
+        </div>
+      }
+
+      @case (3) {
+        <div class="photo-step flex flex-col gap-3">
+          @if (photoUrl(); as url) {
+            <figure class="m-0 photo-frame">
+              <img [src]="url" [alt]="'LANDING.STARTER.PHOTO_ALT' | translate: { name: preview().name }" />
+            </figure>
+            <div class="flex flex-wrap gap-2">
+              <label class="tw-btn-secondary tw-btn-sm cursor-pointer" for="starter-photo">
+                <pm-icon name="camera" [size]="15" />
+                {{ 'LANDING.STARTER.PHOTO_CHANGE' | translate }}
+              </label>
+              <button type="button" class="tw-btn-ghost tw-btn-sm" (click)="removePhoto()">
+                <pm-icon name="trash" [size]="15" />
+                {{ 'LANDING.STARTER.PHOTO_REMOVE' | translate }}
+              </button>
+            </div>
+          } @else {
+            <label class="drop" for="starter-photo">
+              <span class="tw-icon-tile w-14 h-14"><pm-icon name="camera" [size]="26" /></span>
+              <strong class="text-base text-ink">{{ 'LANDING.STARTER.PHOTO_PICK' | translate }}</strong>
+              <span class="text-sm text-ink-muted">{{ 'LANDING.STARTER.PHOTO_RULE' | translate }}</span>
+            </label>
+          }
+          <input
+            id="starter-photo"
+            class="sr-only"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            (change)="choosePhoto($event)"
+          />
+          @switch (photoProblem()) {
+            @case ('TYPE') { <p class="tw-error">{{ 'LANDING.STARTER.PHOTO_TYPE_ERROR' | translate }}</p> }
+            @case ('SIZE') { <p class="tw-error">{{ 'LANDING.STARTER.PHOTO_SIZE_ERROR' | translate }}</p> }
+            @default { <p class="tw-hint">{{ 'LANDING.STARTER.PHOTO_NOTE' | translate }}</p> }
+          }
+        </div>
+      }
+
+      @default {
+        <div class="flex flex-col gap-4">
+          <article class="preview">
+            <span class="preview-photo">
+              @if (photoUrl(); as url) {
+                <img [src]="url" alt="" />
+              } @else {
+                <pm-pet-art [kind]="preview().art" [face]="true" [width]="60" />
+              }
+            </span>
+            <div class="flex flex-col gap-1 min-w-0">
+              <strong class="text-lg text-ink">{{ preview().name }}</strong>
+              <span class="text-sm text-ink-muted">
+                {{ preview().kindKey | translate }}
+                @if (preview().breed) { · {{ preview().breed }} }
+                · {{ preview().genderKey | translate }}
+              </span>
+              @if (preview().birthDate; as birth) {
+                <span class="text-sm text-ink-muted">{{ 'LANDING.STARTER.BORN' | translate: { date: (birth | date: 'dd/MM/yyyy') } }}</span>
+              }
+              @if (preview().tagline) {
+                <span class="font-hand text-lg text-body">“{{ preview().tagline }}”</span>
+              }
+            </div>
+          </article>
+
+          <p class="m-0 text-sm leading-relaxed text-body">{{ 'LANDING.STARTER.SAVE_NOTE' | translate }}</p>
+
+          <div class="flex flex-col gap-2.5">
+            <a class="tw-btn-primary tw-btn-block tw-btn-lg" routerLink="/register" (click)="close()">
+              {{ 'LANDING.STARTER.REGISTER' | translate }}
+              <pm-icon name="arrow" [size]="16" />
+            </a>
+            <a class="tw-btn-secondary tw-btn-block" routerLink="/login" (click)="close()">
+              {{ 'LANDING.STARTER.LOGIN' | translate }}
+            </a>
+          </div>
+        </div>
+      }
+    }
+
+    @if (step() < 4) {
+      <footer class="flex items-center justify-between gap-3 pt-2">
+        @if (step() > 1) {
+          <button type="button" class="tw-btn-ghost" (click)="back()">
+            <pm-icon name="back" [size]="16" />
+            {{ 'LANDING.STARTER.BACK' | translate }}
+          </button>
+        } @else {
+          <span></span>
+        }
+        <button type="submit" class="tw-btn-primary">
+          {{ (step() === 3 && !photo() ? 'LANDING.STARTER.SKIP' : 'LANDING.STARTER.NEXT') | translate }}
+          <pm-icon name="arrow" [size]="16" />
+        </button>
+      </footer>
+    } @else {
+      <button type="button" class="tw-btn-ghost self-start" (click)="back()">
+        <pm-icon name="back" [size]="16" />
+        {{ 'LANDING.STARTER.EDIT' | translate }}
+      </button>
+    }
+  </form>
+</div>

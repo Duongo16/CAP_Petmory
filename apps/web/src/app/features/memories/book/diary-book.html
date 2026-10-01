@@ -1,0 +1,118 @@
+<div class="book-wrap grid justify-items-center gap-4">
+  @if (narrow()) {
+    <!--
+      Man hinh hep thi mo tung trang mot. Moi lan doi trang la mot to giay
+      moi, nho vay chuyen dong lat van chay lai tu dau.
+    -->
+    <div
+      class="book one-page"
+      (pointerdown)="grab($event)"
+      (pointerup)="letGo($event)"
+      (pointercancel)="letGo($event)"
+    >
+      <div class="half leaves">
+        @for (face of onePage() ? [onePage()] : []; track pageAt()) {
+          <div class="leaf single">
+            <div class="face front">
+              <pm-page-face [face]="face!" [sourceOf]="sourceOf()" />
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div
+      class="book"
+      [class.holding]="drag()"
+      (pointerdown)="grab($event)"
+      (pointermove)="move($event)"
+      (pointerup)="letGo($event)"
+      (pointercancel)="letGo($event)"
+    >
+      <div class="half back-left" aria-hidden="true"></div>
+
+      <div class="half leaves">
+        @for (leaf of leaves(); track leaf.at) {
+          <div
+            class="leaf"
+            [class.turned]="isTurned(leaf.at)"
+            [class.held]="dragStyle()?.leaf === leaf.at"
+            [style.transform]="dragStyle()?.leaf === leaf.at ? dragStyle()?.transform : null"
+            [style.--lift]="dragStyle()?.leaf === leaf.at ? dragStyle()?.lift : 0"
+            [style.z-index]="dragStyle()?.leaf === leaf.at ? 999 : depthOf(leaf.at)"
+          >
+            <div class="face front">
+              <pm-page-face [face]="leaf.front" [sourceOf]="sourceOf()" />
+            </div>
+            <div class="face back">
+              @if (leaf.back) {
+                <pm-page-face [face]="leaf.back" [sourceOf]="sourceOf()" />
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <span class="spine" aria-hidden="true"></span>
+      @if (!atEnd()) {
+        <span class="corner corner-next" aria-hidden="true"></span>
+      }
+      @if (!atStart()) {
+        <span class="corner corner-back" aria-hidden="true"></span>
+      }
+    </div>
+  }
+
+  <nav class="turner tw-card flex items-center gap-2 rounded-full p-1.5" [attr.aria-label]="'BOOK.TURN_LABEL' | translate">
+    <button
+      type="button"
+      class="turn tw-btn-ghost rounded-full px-4 text-ink"
+      [disabled]="atStart()"
+      (click)="previous()"
+    >
+      <pm-icon name="chevron" [size]="15" />
+      {{ 'BOOK.BACK' | translate }}
+    </button>
+
+    <span class="where min-w-24 px-2 text-center text-sm font-semibold text-ink-muted tabular-nums">
+      @if (narrow()) {
+        {{ 'BOOK.PAGE_OF' | translate: { at: whereAt(), total: whereTotal() } }}
+      } @else {
+        {{ 'BOOK.LEAF_OF' | translate: { at: whereAt(), total: whereTotal() } }}
+      }
+    </span>
+
+    <button
+      type="button"
+      class="turn tw-btn-ghost rounded-full px-4 text-ink"
+      [disabled]="atEnd()"
+      (click)="next()"
+    >
+      {{ 'BOOK.FORWARD' | translate }}
+      <pm-icon name="chevron" [size]="15" />
+    </button>
+  </nav>
+
+  @if (canEdit()) {
+    <div class="decorate flex flex-wrap justify-center gap-2">
+      @if (narrow()) {
+        @if (onePage()?.kind === 'MOMENT') {
+          <button type="button" class="decorate-button tw-btn-secondary tw-btn-sm" (click)="editRight()">
+            {{ 'BOOK.DECORATE_THIS' | translate }}
+          </button>
+        }
+      } @else {
+        @if (leftFace()?.kind === 'MOMENT') {
+          <button type="button" class="decorate-button tw-btn-secondary tw-btn-sm" (click)="editLeft()">
+            {{ 'BOOK.DECORATE_LEFT' | translate }}
+          </button>
+        }
+        @if (rightFace()?.kind === 'MOMENT') {
+          <button type="button" class="decorate-button tw-btn-secondary tw-btn-sm" (click)="editRight()">
+            {{ 'BOOK.DECORATE_RIGHT' | translate }}
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

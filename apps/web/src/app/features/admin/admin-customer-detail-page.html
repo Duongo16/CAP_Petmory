@@ -17,12 +17,36 @@
     }
     @case ('READY') {
       @if (customer(); as k) {
-        <header class="page-header">
-          <h1 class="title">{{ k.fullName }}</h1>
-          <p class="description">{{ k.email }}</p>
-        </header>
+        <section class="who-card">
+          <span class="who-mark" aria-hidden="true">{{ initials() }}</span>
+          <div class="who-text">
+            <h1 class="who-name pm-page-title">{{ k.fullName }}</h1>
+            <p class="who-lines">
+              <span>{{ k.email }}</span>
+              @if (phone(); as number) {
+                <span class="who-dot" aria-hidden="true">•</span>
+                <span class="who-phone">{{ number }}</span>
+              }
+            </p>
+          </div>
+          <dl class="who-figures">
+            <div>
+              <dd>{{ orderCount() }}</dd>
+              <dt>{{ 'ADMIN.RECIPIENT.COUNT_ORDER' | translate }}</dt>
+            </div>
+            <div>
+              <dd class="amber">{{ spentText() | amount }}</dd>
+              <dt>{{ 'ADMIN.RECIPIENT.SPENT' | translate }}</dt>
+            </div>
+            <div>
+              <dd class="green">{{ petCount() }}</dd>
+              <dt>{{ 'ADMIN.RECIPIENT.PET' | translate }}</dt>
+            </div>
+          </dl>
+        </section>
 
         <section class="card">
+          <h2>{{ 'ADMIN.RECIPIENT.ACCOUNT_INFO' | translate }}</h2>
           <dl class="info-pair">
             <dt>{{ 'ADMIN.RECIPIENT.CREATED_DATE' | translate }}</dt>
             <dd>{{ k.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
@@ -34,20 +58,44 @@
                   : ('ADMIN.NONE_YET' | translate)
               }}
             </dd>
+            <dt>{{ 'ADMIN.RECIPIENT.SPENT' | translate }}</dt>
+            <dd class="spend-figure">{{ spentText() | amount }}</dd>
+            <dt>{{ 'ADMIN.RECIPIENT.DONE_COUNT' | translate }}</dt>
+            <dd>{{ 'ADMIN.RECIPIENT.DONE_VALUE' | translate: { count: doneCount() } }}</dd>
           </dl>
+
+          <div class="tier">
+            <p class="tier-head">
+              <span>{{ 'ADMIN.RECIPIENT.TIER_NEXT' | translate }}</span>
+              <strong>{{ tierShare() }}%</strong>
+            </p>
+            <span class="tier-rail" aria-hidden="true">
+              <span class="tier-done" [style.inline-size.%]="tierShare()"></span>
+            </span>
+          </div>
         </section>
 
         <section class="card">
-          <h2>{{ 'ADMIN.RECIPIENT.PET' | translate }}</h2>
+          <div class="card-head">
+            <h2>{{ 'ADMIN.RECIPIENT.PET' | translate }}</h2>
+            <span class="header-note">{{ 'ADMIN.RECIPIENT.PET_NOTE' | translate }}</span>
+          </div>
           @if (pets().length === 0) {
             <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
           } @else {
-            <ul class="mini-card">
+            <ul class="pet-grid">
               @for (t of pets(); track t.raw._id) {
-                <li>
-                  <strong>{{ t.raw.name }}</strong>
-                  <span class="sub">{{ t.raw.kind }} {{ t.raw.breed }}</span>
-                  <span class="sub">{{ t.keyStatus | translate }}</span>
+                <li class="pet-card">
+                  <span class="pet-photo">
+                    @if (t.raw.avatarUrl) {
+                      <img [src]="t.raw.avatarUrl" alt="" />
+                    }
+                  </span>
+                  <span class="pet-text">
+                    <strong>{{ t.raw.name }}</strong>
+                    <span class="pet-chip">{{ t.raw.breed || (t.keyKind | translate) }}</span>
+                    <span class="sub">{{ t.keyStatus | translate }}</span>
+                  </span>
                 </li>
               }
             </ul>

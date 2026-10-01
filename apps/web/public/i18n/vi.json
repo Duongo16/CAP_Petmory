@@ -8,6 +8,7 @@
     "SAVE": "Lưu",
     "ADD": "Thêm",
     "REMOVE": "Xóa",
+    "IMAGE_BROKEN": "Không tải được ảnh này",
     "CLOSE": "Đóng",
     "GENERIC_ERROR": "Đã xảy ra lỗi. Vui lòng thử lại.",
     "NO_DATA": "Chưa có dữ liệu",
@@ -49,9 +50,10 @@
     "RESTORE": "Phục hồi ảnh",
     "CHAT_DESK": "Trực hội thoại",
     "SUGGEST": "Gợi ý thiết kế",
-    "STORY": "Viết câu chuyện",
     "ACCOUNTS": "Tài khoản",
-    "MODELS": "Mẫu 3D"
+    "MODELS": "Mẫu 3D",
+    "JOURNALS": "Nhật ký",
+    "SHOP": "Cửa hàng"
   },
   "AUTH": {
     "QUICK": {
@@ -107,8 +109,6 @@
     "PHONE_NOTE": "nhận tin xưởng thợ",
     "PHONE_PLACEHOLDER": "090xxxxxxx",
     "PHONE_ERROR": "Số điện thoại gồm 10 chữ số, bắt đầu bằng 0",
-    "PET_NAME": "Tên bé cưng đầu tiên của bạn",
-    "PET_NAME_PLACEHOLDER": "Ví dụ: Mun, Bơ, Miu...",
     "PASSWORD_PLACEHOLDER": "Tối thiểu 8 ký tự",
     "CONFIRM": "Xác nhận mật khẩu",
     "CONFIRM_PLACEHOLDER": "Nhập lại mật khẩu vừa tạo",
@@ -153,7 +153,10 @@
     "VISUAL_TITLE": "Ghi lại ký ức, giữ mãi yêu thương",
     "VISUAL_SUB": "Cuốn sổ kỷ niệm số cho bạn và thú cưng.",
     "VISUAL_QUOTE": "“Mở sổ ra là thấy cả mùa hè năm ngoái của bé.”",
-    "VISUAL_QUOTE_BY": "— Lời nhắn từ Petmory"
+    "VISUAL_QUOTE_BY": "— Lời nhắn từ Petmory",
+    "DRAFT_TITLE": "Hồ sơ của bé {{name}} đã sẵn sàng",
+    "DRAFT_REGISTER": "Tạo tài khoản xong là hồ sơ của bé được lưu ngay vào tài khoản của bạn.",
+    "DRAFT_LOGIN": "Đăng nhập xong là hồ sơ của bé được thêm vào tài khoản của bạn."
   },
   "PET": {
     "TAGLINE": "Một câu về bé",
@@ -248,7 +251,8 @@
       "MALE": "Đực",
       "FEMALE": "Cái",
       "UNKNOWN": "Chưa rõ"
-    }
+    },
+    "VIEW_PROFILE": "Xem hồ sơ"
   },
   "PALETTE": {
     "TITLE": "Bảng mã màu len",
@@ -852,6 +856,32 @@
       "HAND": "Viết tay",
       "BODY": "Chữ thường",
       "SERIF": "Chữ cổ"
+    },
+    "LAYOUT": {
+      "HERO": {
+        "NAME": "Một ảnh lớn",
+        "TEXT": "Một khoảnh khắc thật nổi bật, kèm vài dòng bên dưới."
+      },
+      "DUO": {
+        "NAME": "Hai ảnh so le",
+        "TEXT": "Hai tấm ảnh dán chéo nhau như trong sổ tay."
+      },
+      "TRIO": {
+        "NAME": "Ba ảnh cắt dán",
+        "TEXT": "Ba tấm ảnh xếp chồng trên nền giấy kraft."
+      },
+      "GRID": {
+        "NAME": "Lưới bốn ảnh",
+        "TEXT": "Bốn ô ảnh ngay ngắn cho một ngày nhiều chuyện."
+      },
+      "STORY": {
+        "NAME": "Chữ trước, ảnh sau",
+        "TEXT": "Kể chuyện trước, một tấm ảnh minh hoạ phía dưới."
+      },
+      "NOTE": {
+        "NAME": "Chỉ có chữ",
+        "TEXT": "Một trang thư tay, không cần ảnh."
+      }
     }
   },
   "GOODS": {
@@ -977,7 +1007,25 @@
       "FUNNY": "Hài hước",
       "LEARNING": "Học điều mới",
       "EVERYDAY": "Thường ngày"
-    }
+    },
+    "STEP": "Bước {{step}} / {{total}}",
+    "STEP_LAYOUT": "Chọn mẫu cho trang nhật ký",
+    "STEP_PHOTOS": "Chọn ảnh cho trang",
+    "STEP_WRITE": "Viết lại khoảnh khắc",
+    "STEP_LAYOUT_SHORT": "Mẫu trang",
+    "STEP_PHOTOS_SHORT": "Ảnh",
+    "STEP_WRITE_SHORT": "Lời kể",
+    "PHOTO_SLOTS": "Đã chọn {{count}}/{{limit}} ảnh. Bấm theo thứ tự muốn đặt lên trang.",
+    "UPLOAD": "Tải ảnh từ máy",
+    "UPLOADING": "Đang tải ảnh lên…",
+    "UPLOAD_TYPE_ERROR": "Chỉ nhận ảnh JPG, PNG hoặc WEBP.",
+    "UPLOAD_FAILED": "Không tải được ảnh này. Vui lòng thử lại.",
+    "BODY_ON_PAGE": "Trang sổ hiện khoảng {{limit}} ký tự đầu, toàn bộ lời kể vẫn được lưu.",
+    "PREVIEW": "Trang sổ sẽ trông như thế này",
+    "BACK": "Quay lại",
+    "NEXT": "Tiếp tục",
+    "SKIP_PHOTOS": "Bỏ qua ảnh",
+    "MAP_START": "Ngày {{name}} về nhà — nơi hành trình bắt đầu"
   },
   "TODAY": {
     "GREET_MORNING": "Chào buổi sáng, {{name}} ơi!",
@@ -1006,8 +1054,6 @@
     "DIARY_PRIVATE": "Nhật ký riêng tư",
     "STUDIO_PROMO": "Biến ảnh của bé thành kỷ vật cầm tay",
     "STUDIO_OPEN": "Mở Studio",
-    "STORY": "Câu chuyện của bé",
-    "STORY_SUB": "Petmory kể lại hành trình",
     "ORDERS": "Đơn hàng của bạn",
     "ORDERS_SUB": "Theo dõi kỷ vật đang chế tác"
   },
@@ -1545,6 +1591,7 @@
   },
   "COMMUNITY": {
     "TITLE": "Cộng đồng PETMORY",
+    "FILTER_LABEL": "Lọc theo chủ đề",
     "SUBTITLE": "Nơi những người yêu thú cưng cùng chia sẻ, kết nối và lan tỏa yêu thương",
     "EMPTY": "Chưa có bài viết nào ở mục này",
     "SIGN_IN_TO_POST": "Đăng nhập để chia sẻ bài viết",
@@ -1635,7 +1682,20 @@
       "FULL_NAME": "Họ và tên",
       "PHONE": "Số điện thoại",
       "AVATAR_URL": "Ảnh đại diện (URL ảnh)",
-      "SAVE": "Lưu thay đổi"
+      "SAVE": "Lưu thay đổi",
+      "EDIT_EYEBROW": "Trang cá nhân",
+      "AVATAR": "Ảnh đại diện",
+      "FROM_DEVICE": "Tải từ máy",
+      "FROM_LINK": "Dán đường dẫn",
+      "CHOOSE_FILE": "Chọn ảnh",
+      "UPLOADING": "Đang tải lên…",
+      "REMOVE_AVATAR": "Bỏ ảnh",
+      "FILE_RULE": "JPG, PNG hoặc WEBP, tối đa 5 MB.",
+      "LINK_ERROR": "Đường dẫn phải bắt đầu bằng http:// hoặc https://",
+      "NAME_ERROR": "Hãy nhập tên hiển thị.",
+      "AVATAR_TYPE_ERROR": "Chỉ nhận ảnh JPG, PNG hoặc WEBP.",
+      "AVATAR_SIZE_ERROR": "Ảnh lớn hơn 5 MB, bạn chọn ảnh nhỏ hơn nhé.",
+      "AVATAR_UPLOAD_FAILED": "Không tải được ảnh lên. Vui lòng thử lại."
     },
     "DISCOVER": {
       "TITLE": "Khám phá cộng đồng",
@@ -1732,46 +1792,6 @@
     },
     "ZONE_NOT_DRAWN": "Dấu * là vùng tệp mô hình hiện tại chưa tách riêng, nên chưa tô lên bản xem trước được. Mã màu vẫn được ghi vào hồ sơ sản xuất."
   },
-  "STORY": {
-    "TITLE": "Viết câu chuyện",
-    "LEAD": "Viết một câu chuyện về {{name}} từ hồ sơ của bé và những ý bạn muốn kể.",
-    "GO_JOURNAL": "Về nhật ký",
-    "PICK_TONE": "Giọng văn",
-    "NOTES": "Những ý bạn muốn kể",
-    "NOTES_HINT": "Ví dụ: bé thích nằm cạnh cửa sổ buổi chiều, hay giấu dép của cả nhà.",
-    "WRITE": "Viết cho tôi",
-    "WRITING": "Đang viết...",
-    "REWRITE": "Viết lại bản khác",
-    "EDIT": "Sửa bản này",
-    "EDIT_TITLE": "Tựa đề",
-    "EDIT_CONTENT": "Nội dung",
-    "VERSION": "Bản {{number}}",
-    "BY_PERSON": "bạn đã sửa",
-    "BY_SAMPLE_SHORT": "bản dựng sẵn",
-    "BY_SAMPLE": "Bản này được ghép từ chính hồ sơ của bé. Khi hệ thống được cấp khóa dịch vụ, câu chuyện sẽ được viết đầy đủ hơn.",
-    "QUOTA_LEFT": "Bạn còn {{count}} lượt viết.",
-    "NONE_YET": "Chưa có bản nào. Bạn chọn giọng văn rồi bấm viết.",
-    "SAVED": "Đã lưu bản vừa sửa.",
-    "ATTACHED": "Đã gắn câu chuyện vào kỷ niệm.",
-    "ATTACH_TITLE": "Gắn vào nhật ký",
-    "ATTACH_PICK": "Chọn một kỷ niệm",
-    "ATTACH": "Gắn vào",
-    "ALREADY_ATTACHED": "Bản này đã được gắn vào một kỷ niệm.",
-    "NO_MOMENT": "Bé chưa có kỷ niệm nào để gắn. Bạn ghi một kỷ niệm trước.",
-    "ERROR_PET": "Không đọc được hồ sơ bé.",
-    "ERROR_TONES": "Không đọc được danh sách giọng văn.",
-    "ERROR_LIST": "Không đọc được các bản đã lưu.",
-    "ERROR_WRITE": "Chưa viết được. Bạn thử lại sau ít phút.",
-    "ERROR_QUOTA": "Bạn đã dùng hết lượt viết cho kỳ này.",
-    "ERROR_SAVE": "Chưa lưu được bản vừa sửa.",
-    "ERROR_ATTACH": "Chưa gắn được vào kỷ niệm.",
-    "TONE": {
-      "WARM": "Ấm áp",
-      "PLAYFUL": "Vui tươi",
-      "TENDER": "Lắng đọng",
-      "SHORT": "Ngắn gọn"
-    }
-  },
   "LANDING": {
     "NAV_DIARY": "Nhật ký",
     "NAV_MEMORY": "Kỷ niệm",
@@ -1840,21 +1860,59 @@
     "CTA_LOGIN": "Tôi đã có tài khoản",
     "FOOTER_SLOGAN": "Ghi lại ký ức, giữ mãi yêu thương.",
     "FOOTER_COPY": "© 2026 Petmory",
-    "MODAL": {
-      "STEP": "Bước {{step}} / 2",
-      "TITLE_1": "Cùng tạo hồ sơ cho thú cưng của bạn",
-      "SUB_1": "Một hồ sơ nhỏ xinh để ghi lại trọn vẹn hành trình của bé.",
-      "PREVIEW_NAME": "Tên thú cưng của bạn",
-      "PREVIEW_SUB": "Giống · Ngày sinh",
+    "STARTER": {
+      "STEP": "Bước {{step}} / {{total}}",
+      "TITLE_1": "Bé nhà bạn là ai?",
+      "TITLE_2": "Kể thêm một chút về {{name}}",
+      "TITLE_3": "Thêm một tấm ảnh của {{name}}",
+      "KIND": "Bé là",
+      "NAME": "Tên của bé",
+      "NAME_HINT": "Ví dụ: Mochi, Bông, Mun…",
+      "NAME_ERROR": "Hãy cho Petmory biết tên của bé nhé.",
+      "BREED": "Giống",
+      "BREED_HINT": "Ví dụ: Corgi, mèo ta…",
+      "GENDER": "Giới tính",
+      "BIRTH": "Ngày sinh",
+      "BIRTH_ERROR": "Ngày sinh không thể ở tương lai.",
+      "OPTIONAL": "Không bắt buộc, có thể bổ sung sau.",
+      "TAGLINE": "Một câu về bé",
+      "TAGLINE_HINT": "Ví dụ: Hoàng thượng bốn chân siêu quấn chủ",
+      "BORN": "Sinh ngày {{date}}",
+      "SAVE_NOTE": "Tạo tài khoản miễn phí để lưu hồ sơ này. Ngay khi đăng ký xong, bé sẽ có mặt trong tài khoản của bạn.",
+      "REGISTER": "Tạo tài khoản và lưu hồ sơ",
+      "LOGIN": "Tôi đã có tài khoản",
       "NEXT": "Tiếp tục",
-      "TITLE_2": "Tạo tài khoản để lưu hồ sơ của bé",
-      "SUB_2": "Chỉ mất chưa tới một phút, hoàn toàn miễn phí.",
-      "PERK_1": "Hồ sơ thú cưng riêng tư",
-      "PERK_2": "Nhật ký ảnh và video",
-      "PERK_3": "Nhắc lại kỷ niệm đúng ngày",
-      "PERK_4": "Đặt làm kỷ vật từ ảnh của bé",
-      "REGISTER": "Đăng ký miễn phí",
-      "LOGIN": "Tôi đã có tài khoản"
+      "BACK": "Quay lại",
+      "EDIT": "Chỉnh lại thông tin",
+      "TITLE_4": "Hồ sơ của {{name}} đã sẵn sàng",
+      "PHOTO_PICK": "Chọn ảnh từ máy",
+      "PHOTO_RULE": "JPG, PNG hoặc WEBP, tối đa 10 MB",
+      "PHOTO_NOTE": "Không bắt buộc. Ảnh sẽ được lưu vào album của bé sau khi bạn đăng ký.",
+      "PHOTO_CHANGE": "Đổi ảnh",
+      "PHOTO_REMOVE": "Bỏ ảnh",
+      "PHOTO_ALT": "Ảnh của {{name}}",
+      "PHOTO_TYPE_ERROR": "Chỉ nhận ảnh JPG, PNG hoặc WEBP.",
+      "PHOTO_SIZE_ERROR": "Ảnh lớn hơn 10 MB, bạn chọn ảnh nhỏ hơn nhé.",
+      "SKIP": "Bỏ qua"
     }
+  },
+  "SHELF": {
+    "EYEBROW": "Tủ sách kỷ niệm",
+    "TITLE": "Tủ sách nhật ký",
+    "SUB": "Mỗi bé có một cuốn sổ riêng. Chọn một cuốn để mở ra đọc tiếp.",
+    "EMPTY": "Chưa có cuốn sổ nào. Tạo hồ sơ cho bé để bắt đầu cuốn đầu tiên.",
+    "LABEL": "NHẬT KÝ",
+    "PAGES": "{{count}} trang",
+    "HINT": "Bấm vào một cuốn sổ để lấy xuống và mở ra.",
+    "OPENING": "Đang mở cuốn nhật ký của {{name}}",
+    "BACK": "Về tủ sách",
+    "WRITE_FOR": "Viết cho bé"
+  },
+  "SHOP": {
+    "EYEBROW": "Cửa hàng Petmory",
+    "TITLE": "Cửa hàng",
+    "SUB": "Kỷ vật làm riêng theo ảnh của bé, và những món có sẵn để mang về ngay.",
+    "CUSTOM": "Kỷ vật làm theo ảnh",
+    "READY": "Hàng có sẵn"
   }
 }

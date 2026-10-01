@@ -1,146 +1,148 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  ANGLE_REQUIRED,
-  ANGLE_ADD,
-  PhotosService,
-} from '../../core/services/photos.service';
-import {
-  PetPhoto,
-  PhotoAngle,
-  QualityLabel,
-  RestoreOperation,
-} from '../../core/models/api.model';
+import { forkJoin, of, switchMap } from 'rxjs';
+import { PetPhoto, PhotoRules, QualityLabel } from '../../core/models/api.model';
+import { PetsService } from '../../core/services/pets.service';
+import { PhotosService } from '../../core/services/photos.service';
 
-export type ScreenState = 'LOADING' | 'ERROR' | 'READY';
+type ScreenState = 'LOADING' | 'ERROR' | 'EMPTY' | 'HAS_DATA';
 
 /**
- * Translation key lookup. Declared explicitly so every key can be found in the
- * source. Keys are never built by joining strings.
+ * How each verdict reads and which colour it takes. Every key is written out
+ * in full so it stays searchable, and keys are never built by joining strings.
  */
-const KEY_ANGLE: Record<PhotoAngle, string> = {
-  FRONT: 'PHOTO.ANGLE.FRONT',
-  LEFT_SIDE: 'PHOTO.ANGLE.LEFT_SIDE',
-  RIGHT_SIDE: 'PHOTO.ANGLE.RIGHT_SIDE',
-  BACK: 'PHOTO.ANGLE.BACK',
-  FACE_CLOSEUP: 'PHOTO.ANGLE.FACE_CLOSEUP',
-  FAVOURITE_POSE: 'PHOTO.ANGLE.FAVOURITE_POSE',
+const QUALITY_KEY: Record<QualityLabel, string> = {
+  GOOD: 'PHOTO.GRADE.GOOD',
+  ACCEPTABLE: 'PHOTO.GRADE.ACCEPTABLE',
+  SHOULD_RESTORE: 'PHOTO.GRADE.SHOULD_RESTORE',
+  UNUSABLE: 'PHOTO.GRADE.UNUSABLE',
 };
 
-const KEY_LABEL: Record<QualityLabel, string> = {
-  GOOD: 'PHOTO.LABEL.GOOD',
-  ACCEPTABLE: 'PHOTO.LABEL.ACCEPTABLE',
-  SHOULD_RESTORE: 'PHOTO.LABEL.SHOULD_RESTORE',
-  UNUSABLE: 'PHOTO.LABEL.UNUSABLE',
+const QUALITY_TONE: Record<QualityLabel, string> = {
+  GOOD: 'good',
+  ACCEPTABLE: 'fair',
+  SHOULD_RESTORE: 'weak',
+  UNUSABLE: 'bad',
 };
 
-const KEY_WARNING: Record<string, string> = {
-  RESOLUTION_TOO_LOW: 'PHOTO.WARNING.RESOLUTION_TOO_LOW',
-  RESOLUTION_LOW: 'PHOTO.WARNING.RESOLUTION_LOW',
-  TOO_BLURRY: 'PHOTO.WARNING.TOO_BLURRY',
-  SLIGHTLY_BLURRY: 'PHOTO.WARNING.SLIGHTLY_BLURRY',
-  UNDEREXPOSED: 'PHOTO.WARNING.UNDEREXPOSED',
-  OVEREXPOSED: 'PHOTO.WARNING.OVEREXPOSED',
+/** What each finding from the check means, in words a customer can act on. */
+const WARNING_KEY: Record<string, string> = {
+  RESOLUTION_TOO_LOW: 'PHOTO.WARN.RESOLUTION_TOO_LOW',
+  RESOLUTION_LOW: 'PHOTO.WARN.RESOLUTION_LOW',
+  TOO_BLURRY: 'PHOTO.WARN.TOO_BLURRY',
+  SLIGHTLY_BLURRY: 'PHOTO.WARN.SLIGHTLY_BLURRY',
+  UNDEREXPOSED: 'PHOTO.WARN.UNDEREXPOSED',
+  OVEREXPOSED: 'PHOTO.WARN.OVEREXPOSED',
 };
 
-const KEY_WARNING_OTHER = 'PHOTO.WARNING.OTHER';
+const WARNING_KEY_OTHER = 'PHOTO.WARN.OTHER';
 
-/** One photo carrying everything the view needs, so nothing is recomputed there. */
-export interface PhotoView {
-  raw: PetPhoto;
-  keyLabel: string;
-  warningKeys: string[];
-  shouldRestore: boolean;
-  /** True when a restored version no longer resembles the original closely enough. */
-  resemblanceLow: boolean;
+/** Verdicts that mean the picture is ready to work from. */
+const READY_LABELS: QualityLabel[] = ['GOOD', 'ACCEPTABLE'];
+
+/** One picture ready to show, with a viewable address and its restored version. */
+export interface PhotoTile {
+  photo: PetPhoto;
+  source: string;
+  restored: PetPhoto | null;
+  restoredSource: string;
+  /** How the check read this picture, ready for the view. */
+  gradeKey: string;
+  gradeTone: string;
+  findingKeys: string[];
+  wantsRestoring: boolean;
 }
 
-/** One upload slot for a camera angle, with its restored version if there is one. */
-export interface AngleSlot {
-  angle: PhotoAngle;
-  keyAngle: string;
-  slotId: string;
-  required: boolean;
-  photo: PhotoView | null;
-  versionRestore: PhotoView | null;
-}
+const ACCEPTED = ['image/png', 'image/jpeg'];
+const PHOTO_MAX = 20;
 
 /**
- * Below this the customer is warned that the restoration may have moved the
- * pet's features. The server decides with the Manager's own figure. This is only
- * the fallback used until the settings have been read.
- */
-const RESEMBLANCE_FALLBACK = 90;
-
-/** The one message every failed call on this screen falls back to. */
-const KEY_GENERIC_ERROR = 'COMMON.GENERIC_ERROR';
-
-function wrap(photo: PetPhoto | null, minResemblance = RESEMBLANCE_FALLBACK): PhotoView | null {
-  if (!photo) {
-    return null;
-  }
-  return {
-    raw: photo,
-    keyLabel: KEY_LABEL[photo.quality.label],
-    warningKeys: photo.quality.warning.map((c) => KEY_WARNING[c] ?? KEY_WARNING_OTHER),
-    shouldRestore: photo.quality.label !== 'GOOD',
-    resemblanceLow: photo.resemblance !== null && photo.resemblance < minResemblance,
-  };
-}
-
-/**
- * Holds all state and server calls for the pet photos screen.
- * The component only reads signals and issues commands, keeping no state itself.
+ * Holds the album of one pet.
+ *
+ * It used to lay out six fixed slots and ask the customer to fill each named
+ * angle. That was the wrong shape for what people do, which is send the
+ * photographs they already love, so this is simply an album now.
  */
 @Injectable()
 export class PhotosFacade {
   private readonly service = inject(PhotosService);
+  private readonly pets = inject(PetsService);
   private readonly destroyRef = inject(DestroyRef);
-
-  private readonly list = signal<PetPhoto[]>([]);
-
-  /** Temporary URL for showing the image in the browser, made from the fetched bytes. */
-  readonly sourcePhoto = signal<Record<string, string>>({});
 
   readonly status = signal<ScreenState>('LOADING');
   readonly error = signal<string | null>(null);
-  readonly uploading = signal<PhotoAngle | null>(null);
-  readonly pendingRestore = signal<string | null>(null);
+  readonly uploading = signal(false);
+  readonly petName = signal('');
 
-  /** The photo whose before/after comparison is currently open. */
-  readonly pendingCompare = signal<string | null>(null);
+  /** Gioi han kich thuoc anh, de hop sua anh canh bao dung nguong. */
+  readonly rules = signal<PhotoRules | null>(null);
+
+  private readonly rows = signal<PetPhoto[]>([]);
+
+  /** Addresses of the fetched bytes, keyed by picture. */
+  private readonly source = signal<Record<string, string>>({});
 
   private petId = '';
 
   private readonly cleanup = this.destroyRef.onDestroy(() => this.releaseSource());
 
-  readonly tiles = computed<AngleSlot[]>(() => {
-    const ds = this.list();
-    const angle = ds.filter((a) => !a.isRestored);
-    const restore = ds.filter((a) => a.isRestored);
-    const allAngle: PhotoAngle[] = [...ANGLE_REQUIRED, ...ANGLE_ADD];
-    return allAngle.map((g) => {
-      const photo = angle.find((a) => a.angle === g) ?? null;
-      const version = photo ? (restore.find((p) => p.originalPhoto === photo._id) ?? null) : null;
-      return {
-        angle: g,
-        keyAngle: KEY_ANGLE[g],
-        slotId: `file-${g}`,
-        required: ANGLE_REQUIRED.includes(g),
-        photo: wrap(photo),
-        versionRestore: wrap(version),
-      };
-    });
+  /** The originals, each carrying its restored version when there is one. */
+  readonly tiles = computed<PhotoTile[]>(() => {
+    const all = this.rows();
+    const seen = this.source();
+    const restored = all.filter((p) => p.isRestored);
+    return all
+      .filter((p) => !p.isRestored)
+      .map((photo) => {
+        const version = restored.find((r) => r.originalPhoto === photo._id) ?? null;
+        const label = photo.quality.label;
+        return {
+          photo,
+          source: seen[photo._id] ?? '',
+          restored: version,
+          restoredSource: version ? (seen[version._id] ?? '') : '',
+          gradeKey: QUALITY_KEY[label],
+          gradeTone: QUALITY_TONE[label],
+          findingKeys: photo.quality.warning.map((one) => WARNING_KEY[one] ?? WARNING_KEY_OTHER),
+          wantsRestoring: !READY_LABELS.includes(label) && version === null,
+        };
+      });
   });
 
-  readonly anglesFilled = computed(
-    () => this.tiles().filter((o) => o.required && o.photo !== null).length,
+  readonly count = computed(() => this.tiles().length);
+  readonly full = computed(() => this.count() >= PHOTO_MAX);
+  readonly limit = PHOTO_MAX;
+
+  /** How many pictures the workshop can already work from. */
+  readonly readyCount = computed(
+    () => this.tiles().filter((t) => READY_LABELS.includes(t.photo.quality.label)).length,
   );
-  readonly requiredAngleCount = ANGLE_REQUIRED.length;
-  readonly rawAngle = computed(() => this.anglesFilled() === this.requiredAngleCount);
+
+  /** How many would be better for a pass through restoration first. */
+  readonly weakCount = computed(() => this.tiles().filter((t) => t.wantsRestoring).length);
+
+  /** The share of the album the workshop can use, as a whole percentage. */
+  readonly readyShare = computed(() => {
+    const all = this.count();
+    return all === 0 ? 0 : Math.round((this.readyCount() / all) * 100);
+  });
 
   start(petId: string): void {
     this.petId = petId;
+    this.service
+      .rules()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (limit) => this.rules.set(limit),
+        error: () => undefined,
+      });
+    this.pets
+      .byId(petId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (pet) => this.petName.set(pet.name),
+        error: () => undefined,
+      });
     this.reload();
   }
 
@@ -150,106 +152,108 @@ export class PhotosFacade {
       .list(this.petId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (ds) => {
-          this.list.set(ds);
-          this.status.set('READY');
-          ds.forEach((a) => this.loadSource(a._id));
+        next: (rows) => {
+          this.rows.set(rows);
+          this.status.set(rows.length === 0 ? 'EMPTY' : 'HAS_DATA');
+          this.fetchSources(rows);
         },
         error: () => this.status.set('ERROR'),
       });
   }
 
-  load(angle: PhotoAngle, file: File): void {
+  /** Sends every chosen picture, then reloads once they have all landed. */
+  add(files: File[]): void {
+    const wrong = files.filter((f) => !ACCEPTED.includes(f.type));
+    if (wrong.length > 0) {
+      this.error.set('PET.PHOTO_WRONG_TYPE');
+      return;
+    }
+    if (this.count() + files.length > PHOTO_MAX) {
+      this.error.set('PHOTO.TOO_MANY');
+      return;
+    }
+    this.uploading.set(true);
     this.error.set(null);
-    this.uploading.set(angle);
-    this.service
-      .load(this.petId, angle, file)
+    forkJoin(files.map((file) => this.service.loadGeneral(this.petId, file)))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (next) => {
-          this.uploading.set(null);
-          this.list.update((ds) => [...ds.filter((a) => a._id !== next._id), next]);
-          this.loadSource(next._id);
+        next: () => {
+          this.uploading.set(false);
+          this.reload();
         },
-        error: (e: { status?: number }) => {
-          this.uploading.set(null);
-          this.error.set(e.status === 400 ? 'PHOTO.ERROR_FILE' : KEY_GENERIC_ERROR);
+        error: () => {
+          this.uploading.set(false);
+          this.error.set('COMMON.GENERIC_ERROR');
         },
       });
   }
 
-  restore(codePhoto: string, operation: RestoreOperation[]): void {
+  /** Nho may chu tai buc anh o duong dan tren mang ve va them vao album. */
+  addLink(url: string): void {
+    if (this.full()) {
+      this.error.set('PHOTO.TOO_MANY');
+      return;
+    }
+    this.uploading.set(true);
     this.error.set(null);
-    this.pendingRestore.set(codePhoto);
     this.service
-      .restore(codePhoto, operation)
+      .loadByLink(this.petId, url)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (version) => {
-          this.pendingRestore.set(null);
-          this.list.update((ds) => [...ds.filter((a) => a.originalPhoto !== codePhoto), version]);
-          this.loadSource(version._id);
-          this.pendingCompare.set(codePhoto);
+        next: () => {
+          this.uploading.set(false);
+          this.reload();
         },
-        error: (e: { status?: number }) => {
-          this.pendingRestore.set(null);
-          this.error.set(e.status === 429 ? 'PHOTO.QUOTA_REACHED' : KEY_GENERIC_ERROR);
+        error: () => {
+          this.uploading.set(false);
+          this.error.set('PHOTO.LINK_FAILED');
         },
-      });
-  }
-
-  /** The customer decides whether to use the restored version or keep the original. */
-  decide(versionRestore: PetPhoto, accept: boolean): void {
-    this.service
-      .confirm(versionRestore._id, accept)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (version) => {
-          this.pendingCompare.set(null);
-          this.list.update((ds) =>
-            accept
-              ? ds.map((a) => (a._id === version._id ? version : a))
-              : ds.filter((a) => a._id !== version._id),
-          );
-        },
-        error: () => this.error.set(KEY_GENERIC_ERROR),
       });
   }
 
   remove(photo: PetPhoto): void {
     this.service
       .hide(photo._id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        switchMap(() => {
+          // Ban phuc hoi gan voi anh nay cung phai bien mat cung no.
+          const version = this.rows().find((r) => r.originalPhoto === photo._id);
+          return version ? this.service.hide(version._id) : of(null);
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
-        next: () =>
-          this.list.update((ds) =>
-            ds.filter((a) => a._id !== photo._id && a.originalPhoto !== photo._id),
-          ),
-        error: () => this.error.set(KEY_GENERIC_ERROR),
+        next: () => this.reload(),
+        error: () => this.error.set('COMMON.GENERIC_ERROR'),
       });
   }
 
-  openCompare(codePhoto: string | null): void {
-    this.pendingCompare.set(codePhoto);
-  }
-
-  private loadSource(codePhoto: string): void {
-    if (this.sourcePhoto()[codePhoto]) {
+  /** Fetches the bytes of every picture through the permission-checked path. */
+  private fetchSources(rows: PetPhoto[]): void {
+    if (rows.length === 0) {
+      this.releaseSource();
+      this.source.set({});
       return;
     }
-    this.service
-      .content(codePhoto)
+    forkJoin(rows.map((row) => this.service.content(row._id)))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (blob) => {
-          const path = URL.createObjectURL(blob);
-          this.sourcePhoto.update((old) => ({ ...old, [codePhoto]: path }));
+        next: (blobs) => {
+          this.releaseSource();
+          const next: Record<string, string> = {};
+          rows.forEach((row, i) => {
+            next[row._id] = URL.createObjectURL(blobs[i]);
+          });
+          this.source.set(next);
         },
-        error: () => undefined,
+        error: () => this.error.set('COMMON.GENERIC_ERROR'),
       });
   }
 
+  /** Hands back the memory held by the temporary addresses. */
   private releaseSource(): void {
-    Object.values(this.sourcePhoto()).forEach((d) => URL.revokeObjectURL(d));
+    for (const address of Object.values(this.source())) {
+      URL.revokeObjectURL(address);
+    }
   }
 }

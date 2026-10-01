@@ -19,6 +19,9 @@ const SCENARIOS = [
   './it-06-community-journey',
 ];
 
+/** Tach noi dung tep thanh tung dong, chap ca kieu xuong dong cua Windows. */
+const SPLIT_LINES = new RegExp(String.fromCharCode(13) + '?' + String.fromCharCode(10));
+
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
 
 /** Waits for the API to answer, so a cold start does not look like a failure. */
@@ -37,7 +40,34 @@ async function waitForApi() {
   return false;
 }
 
+/**
+ * Warns when a run would write to the real picture service.
+ *
+ * These scenarios upload real photographs. Pointed at the picture service they
+ * cost allowance and leave files behind that nothing will ever clean up, so a
+ * run is meant to happen against the disk.
+ */
+function warnAboutPictureStore() {
+  const fs = require('fs');
+  const file = path.join(__dirname, '..', '..', '.env');
+  if (!fs.existsSync(file)) {
+    return;
+  }
+  const line = fs
+    .readFileSync(file, 'utf8')
+    .split(SPLIT_LINES)
+    .find((l) => l.trim().startsWith('STORAGE_DRIVER='));
+  const driver = line ? line.slice(line.indexOf('=') + 1).trim() : 'disk';
+  if (driver === 'cloudinary') {
+    console.log('');
+    console.log('  NOTE  Pictures are set to go to the picture service, not the disk.');
+    console.log('        Every run will upload real files there and they are never removed.');
+    console.log('        Set STORAGE_DRIVER=disk in .env before a long series of runs.');
+  }
+}
+
 async function run() {
+  warnAboutPictureStore();
   if (!(await waitForApi())) {
     console.log(`The API did not answer at ${API}. Start it first.`);
     process.exit(1);

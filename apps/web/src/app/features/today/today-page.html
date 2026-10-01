@@ -19,10 +19,6 @@
               <pm-icon name="camera" [size]="17" />
               {{ 'TODAY.UPLOAD' | translate }}
             </a>
-            <a class="btn-solid" [routerLink]="['/pets', pet._id, 'journal']">
-              <pm-icon name="plus" [size]="17" />
-              {{ 'TODAY.WRITE' | translate }}
-            </a>
           </div>
         }
       </header>
@@ -68,13 +64,9 @@
               </header>
               <div class="pets">
                 @for (card of petCards(); track card.pet._id; let first = $first) {
-                  <a class="pet" [routerLink]="['/pets', card.pet._id]">
+                  <a class="pet" routerLink="/pets" [queryParams]="{ open: card.pet._id }">
                     <span class="pet-photo">
-                      @if (card.pet.avatarUrl) {
-                        <img [src]="card.pet.avatarUrl" alt="" />
-                      } @else {
-                        <pm-pet-art [kind]="card.art" [face]="true" [width]="44" />
-                      }
+                      <pm-pet-face [petId]="card.pet._id" [avatarUrl]="card.pet.avatarUrl" [kind]="card.pet.kind" [name]="card.pet.name" [size]="52" />
                     </span>
                     <span class="pet-text">
                       <strong>{{ card.pet.name }}</strong>
@@ -145,14 +137,6 @@
                 <span class="side-text">
                   <strong>{{ 'TODAY.ALBUM' | translate }}</strong>
                   <span>{{ 'TODAY.ALBUM_SUB' | translate }}</span>
-                </span>
-                <pm-icon name="chevron" [size]="16" />
-              </a>
-              <a class="side-tile" [routerLink]="['/pets', pet._id, 'story']">
-                <span class="side-icon" data-tone="memorial"><pm-icon name="sparkle" [size]="20" /></span>
-                <span class="side-text">
-                  <strong>{{ 'TODAY.STORY' | translate }}</strong>
-                  <span>{{ 'TODAY.STORY_SUB' | translate }}</span>
                 </span>
                 <pm-icon name="chevron" [size]="16" />
               </a>

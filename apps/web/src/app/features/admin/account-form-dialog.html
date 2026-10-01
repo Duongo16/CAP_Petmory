@@ -1,0 +1,67 @@
+<form class="sheet" [formGroup]="form" (ngSubmit)="save()">
+  <header class="sheet-head">
+    <div>
+      <p class="eyebrow">{{ 'ADMIN.ACCOUNT.TITLE' | translate }}</p>
+      <h2 class="sheet-title">
+        {{ (editing ? 'ADMIN.ACCOUNT.EDIT_TITLE' : 'ADMIN.ACCOUNT.NEW') | translate }}
+      </h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="sheet-body">
+    <div class="field">
+      <label class="field-name" for="account-email">{{ 'ADMIN.ACCOUNT.EMAIL' | translate }}</label>
+      <input id="account-email" type="email" autocomplete="off" formControlName="email" />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <p class="field-error">{{ 'ADMIN.ACCOUNT.EMAIL_BAD' | translate }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="account-name">{{ 'ADMIN.ACCOUNT.FULL_NAME' | translate }}</label>
+      <input id="account-name" type="text" formControlName="fullName" />
+    </div>
+
+    @if (!editing) {
+      <div class="field">
+        <label class="field-name" for="account-password">{{ 'ADMIN.ACCOUNT.PASSWORD' | translate }}</label>
+        <input
+          id="account-password"
+          type="password"
+          autocomplete="new-password"
+          formControlName="password"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p class="field-error">{{ 'ADMIN.ACCOUNT.PASSWORD_SHORT' | translate }}</p>
+        }
+      </div>
+    }
+
+    <div class="field">
+      <label class="field-name" for="account-role">{{ 'ADMIN.ACCOUNT.ROLE' | translate }}</label>
+      <select id="account-role" formControlName="role">
+        @for (one of roleChoices; track one.value) {
+          <option [value]="one.value">{{ one.key | translate }}</option>
+        }
+      </select>
+    </div>
+
+    @if (editing) {
+      <label class="tick">
+        <input id="account-active" type="checkbox" formControlName="active" />
+        <span>{{ 'ADMIN.ACCOUNT.ACTIVE_LABEL' | translate }}</span>
+      </label>
+    }
+  </div>
+
+  <footer class="sheet-foot">
+    <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button type="submit" class="strong" id="account-save">
+      {{ (editing ? 'COMMON.SAVE' : 'ADMIN.ACCOUNT.CREATE') | translate }}
+      <pm-icon name="check" [size]="15" />
+    </button>
+  </footer>
+</form>

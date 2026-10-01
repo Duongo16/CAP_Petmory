@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,11 +9,12 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { DatePipe, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { take } from 'rxjs';
 import { CatalogService } from '../../core/services/catalog.service';
 import { CartService } from '../../core/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -27,12 +29,23 @@ import { MoneyPipe } from '../../shared/money.pipe';
 import { Rating } from '../../shared/rating/rating';
 import { Icon } from '../../shared/icon/icon';
 
+/** The four panels of detail below the configurator. */
+export type DetailTab = 'STORY' | 'PROCESS' | 'CARE' | 'REVIEWS';
+
+/** Each panel with its label, written out so every key stays searchable. */
+const TABS: { value: DetailTab; key: string }[] = [
+  { value: 'STORY', key: 'PRODUCT.TAB_STORY' },
+  { value: 'PROCESS', key: 'PRODUCT.TAB_PROCESS' },
+  { value: 'CARE', key: 'PRODUCT.TAB_CARE' },
+  { value: 'REVIEWS', key: 'PRODUCT.TAB_REVIEWS' },
+];
+
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
 @Component({
   selector: 'pm-product-detail-page',
   standalone: true,
-  imports: [FormsModule, DatePipe, TranslatePipe, MoneyPipe, Rating, Icon],
+  imports: [RouterLink, FormsModule, TranslatePipe, MoneyPipe, Rating, Icon],
   templateUrl: './product-detail-page.html',
   styleUrl: './product-detail-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,11 +54,15 @@ export class ProductDetailPage implements OnInit {
   /** Product type code from the URL, via the router's parameter binding. */
   readonly code = input.required<string>();
 
+  /** Shown inside the shop popup, where the breadcrumb bar has nowhere to lead. */
+  readonly inPopup = input(false);
+
   private readonly catalog = inject(CatalogService);
   private readonly cart = inject(CartService);
   private readonly auth = inject(AuthService);
   private readonly location = inject(Location);
   private readonly notification = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly user = this.auth.user;
@@ -56,6 +73,10 @@ export class ProductDetailPage implements OnInit {
   readonly pendingAdd = signal(false);
   readonly favourite = signal(false);
   readonly descriptionOpen = signal(false);
+
+  /** Which of the four panels below the configurator is open. */
+  readonly tab = signal<DetailTab>('STORY');
+  readonly tabs = TABS;
 
   readonly bases = signal<DisplayBase[]>([]);
   readonly baseSelected = signal<DisplayBase | null>(null);
@@ -144,6 +165,10 @@ export class ProductDetailPage implements OnInit {
     this.baseSelected.set(base);
   }
 
+  setTab(value: DetailTab): void {
+    this.tab.set(value);
+  }
+
   toggleDescription(): void {
     this.descriptionOpen.update((open) => !open);
   }
@@ -212,8 +237,15 @@ export class ProductDetailPage implements OnInit {
       });
   }
 
+  /**
+   * Shows a short message. The wording is looked up first, otherwise the bar
+   * would print the naming of the phrase instead of the phrase itself.
+   */
   private openNotification(key: string): void {
-    this.notification.open(key, undefined, { duration: 2600 });
+    this.translate
+      .get(key)
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe((words) => this.notification.open(words, undefined, { duration: 2600 }));
   }
 
   private loadProduct(): void {

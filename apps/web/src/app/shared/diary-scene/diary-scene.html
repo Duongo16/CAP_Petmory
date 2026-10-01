@@ -1,0 +1,152 @@
+<svg
+  class="scene"
+  [class.on-color]="onColor()"
+  viewBox="0 0 560 520"
+  [attr.width]="width()"
+  [attr.height]="width() * 0.93"
+  aria-hidden="true"
+  focusable="false"
+>
+  <!-- Halo behind everything -->
+  <circle class="halo" cx="280" cy="250" r="210" />
+  <circle class="halo-inner" cx="280" cy="270" r="140" />
+
+  <!-- Magic trails rising from the spine -->
+  <path class="trail t1" d="M280 330 C238 284 330 252 300 200 C272 152 322 112 300 58" />
+  <path class="trail t2" d="M268 334 C206 310 168 270 158 214" />
+  <path class="trail t3" d="M292 334 C356 312 398 274 414 206" />
+
+  <!-- Cat polaroid, drifting up on the left -->
+  <g transform="translate(70 128) rotate(-11)">
+    <g class="float f1">
+      <rect class="polaroid" x="0" y="0" width="136" height="156" rx="10" />
+      <rect class="photo photo-a" x="11" y="11" width="114" height="104" rx="6" />
+      <svg x="18" y="18" width="100" height="92" viewBox="0 0 240 220">
+        <path class="fur" d="M70 70 L62 20 L110 46 Z" />
+        <path class="fur" d="M170 70 L178 20 L130 46 Z" />
+        <path class="blush" d="M76 60 L70 34 L100 50 Z" />
+        <path class="blush" d="M164 60 L170 34 L140 50 Z" />
+        <circle class="fur" cx="120" cy="104" r="72" />
+        <path class="stripe" d="M104 50 q16 12 32 0" />
+        <ellipse class="cream" cx="120" cy="126" rx="30" ry="21" />
+        <circle class="blush soft" cx="78" cy="122" r="11" />
+        <circle class="blush soft" cx="162" cy="122" r="11" />
+        <path class="eye-line" d="M84 98 q10 -10 20 0 M136 98 q10 -10 20 0" />
+        <path class="eye" d="M113 116 h14 l-7 8 z" />
+        <path class="mouth" d="M120 124 q-7 8 -14 4 M120 124 q7 8 14 4" />
+      </svg>
+      <rect class="caption" x="22" y="128" width="64" height="5" rx="2.5" />
+      <rect class="caption" x="22" y="138" width="40" height="5" rx="2.5" />
+      <rect class="tape" x="44" y="-9" width="48" height="18" rx="2" transform="rotate(-6 68 0)" />
+    </g>
+  </g>
+
+  <!-- Dog polaroid, floating highest on the right -->
+  <g transform="translate(332 54) rotate(9)">
+    <g class="float f2">
+      <rect class="polaroid" x="0" y="0" width="150" height="172" rx="10" />
+      <rect class="photo photo-b" x="12" y="12" width="126" height="116" rx="6" />
+      <svg x="20" y="20" width="110" height="101" viewBox="0 0 240 220">
+        <path class="dark" d="M66 64 C38 76 40 142 70 142 C82 120 84 88 66 64 Z" />
+        <path class="dark" d="M174 64 C202 76 200 142 170 142 C158 120 156 88 174 64 Z" />
+        <circle class="tan" cx="120" cy="100" r="60" />
+        <ellipse class="fur" cx="143" cy="88" rx="17" ry="15" />
+        <ellipse class="cream" cx="120" cy="126" rx="32" ry="24" />
+        <path class="eye-line" d="M88 94 q10 -10 20 0 M132 92 q10 -10 20 0" />
+        <ellipse class="eye" cx="120" cy="116" rx="10" ry="7" />
+        <path class="mouth" d="M120 123 v8 M120 131 q-8 7 -15 2 M120 131 q8 7 15 2" />
+        <path class="tongue" d="M114 136 q6 14 12 0 z" />
+        <circle class="blush soft" cx="84" cy="118" r="10" />
+        <circle class="blush soft" cx="156" cy="118" r="10" />
+      </svg>
+      <rect class="caption" x="24" y="142" width="72" height="5" rx="2.5" />
+      <rect class="caption" x="24" y="152" width="46" height="5" rx="2.5" />
+      <rect class="tape" x="52" y="-9" width="50" height="18" rx="2" transform="rotate(5 77 0)" />
+    </g>
+  </g>
+
+  <!-- A bird flying out to the right -->
+  <g transform="translate(436 262)">
+    <g class="float f3">
+      <ellipse class="bird" cx="30" cy="26" rx="24" ry="17" />
+      <circle class="bird" cx="50" cy="16" r="12" />
+      <path class="beak" d="M60 15 L72 18 L60 21 Z" />
+      <circle class="eye" cx="53" cy="13" r="2.4" />
+      <path class="bird-tail" d="M8 22 L-8 14 L-4 28 Z" />
+      <g class="wing">
+        <path class="bird-wing" d="M22 22 C14 2 36 -6 42 16 Z" />
+      </g>
+    </g>
+  </g>
+
+  <!-- Floating hearts, paws and sparkles -->
+  <g transform="translate(232 120)"><g class="float f4"><path class="heart" d="M0 -6 C-6 -15 -19 -6 -10 5 L0 14 L10 5 C19 -6 6 -15 0 -6 Z" /></g></g>
+  <g transform="translate(470 168) scale(0.7)"><g class="float f5"><path class="heart alt" d="M0 -6 C-6 -15 -19 -6 -10 5 L0 14 L10 5 C19 -6 6 -15 0 -6 Z" /></g></g>
+  <g transform="translate(60 330) scale(0.8)"><g class="float f3"><path class="heart" d="M0 -6 C-6 -15 -19 -6 -10 5 L0 14 L10 5 C19 -6 6 -15 0 -6 Z" /></g></g>
+
+  <g transform="translate(206 250) rotate(-20)">
+    <g class="float f5">
+      <ellipse class="paw" cx="0" cy="6" rx="8" ry="7" />
+      <circle class="paw" cx="-9" cy="-4" r="3.4" />
+      <circle class="paw" cx="-3" cy="-10" r="3.4" />
+      <circle class="paw" cx="4" cy="-10" r="3.4" />
+      <circle class="paw" cx="10" cy="-4" r="3.4" />
+    </g>
+  </g>
+  <g transform="translate(372 300) rotate(18) scale(0.75)">
+    <g class="float f4">
+      <ellipse class="paw" cx="0" cy="6" rx="8" ry="7" />
+      <circle class="paw" cx="-9" cy="-4" r="3.4" />
+      <circle class="paw" cx="-3" cy="-10" r="3.4" />
+      <circle class="paw" cx="4" cy="-10" r="3.4" />
+      <circle class="paw" cx="10" cy="-4" r="3.4" />
+    </g>
+  </g>
+
+  <g transform="translate(300 52)"><path class="spark s1" d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" /></g>
+  <g transform="translate(150 96) scale(0.7)"><path class="spark s2" d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" /></g>
+  <g transform="translate(420 236) scale(0.6)"><path class="spark s3" d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" /></g>
+  <g transform="translate(256 210) scale(0.55)"><path class="spark s2" d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" /></g>
+  <g transform="translate(330 250) scale(0.5)"><path class="spark s1" d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" /></g>
+  <circle class="dot s3" cx="190" cy="168" r="3" />
+  <circle class="dot s1" cx="400" cy="250" r="2.5" />
+  <circle class="dot s2" cx="246" cy="292" r="2.5" />
+
+  <!-- Glow pouring out of the open pages -->
+  <ellipse class="spine-glow" cx="280" cy="322" rx="96" ry="26" />
+
+  <!-- The diary -->
+  <path class="cover" d="M70 330 C140 304 214 300 280 318 C346 300 420 304 490 330 L490 436 C420 412 346 410 280 430 C214 410 140 412 70 436 Z" />
+  <path class="cover-edge" d="M70 436 C140 412 214 410 280 430 C346 410 420 412 490 436 L490 446 C420 422 346 420 280 440 C214 420 140 422 70 446 Z" />
+  <path class="page" d="M280 312 C220 294 146 298 84 324 L84 424 C146 400 220 398 280 418 Z" />
+
+  <!-- A rabbit peeking over the right page -->
+  <g transform="translate(366 216)">
+    <g class="peek">
+      <ellipse class="rabbit" cx="26" cy="34" rx="10" ry="32" transform="rotate(-10 26 34)" />
+      <ellipse class="rabbit" cx="58" cy="32" rx="10" ry="32" transform="rotate(12 58 32)" />
+      <ellipse class="blush" cx="26" cy="36" rx="4.5" ry="22" transform="rotate(-10 26 36)" />
+      <ellipse class="blush" cx="58" cy="34" rx="4.5" ry="22" transform="rotate(12 58 34)" />
+      <circle class="rabbit" cx="42" cy="88" r="32" />
+      <path class="eye-line" d="M26 84 q6 -6 12 0 M46 84 q6 -6 12 0" />
+      <ellipse class="nose" cx="42" cy="96" rx="4" ry="3" />
+      <circle class="blush soft" cx="22" cy="98" r="6" />
+      <circle class="blush soft" cx="62" cy="98" r="6" />
+    </g>
+  </g>
+
+  <path class="page" d="M280 312 C340 294 414 298 476 324 L476 424 C414 400 340 398 280 418 Z" />
+  <path class="spine" d="M280 312 L280 418" />
+
+  <!-- Handwriting and a tiny photo on the left page -->
+  <path class="ink" d="M108 344 Q170 330 230 334" />
+  <path class="ink" d="M108 360 Q166 347 236 350" />
+  <path class="ink" d="M108 376 Q150 366 200 368" />
+  <rect class="mini-photo" x="198" y="370" width="46" height="38" rx="4" transform="rotate(6 221 389)" />
+  <!-- and on the right page -->
+  <path class="ink" d="M302 394 Q370 382 450 390" />
+  <path class="ink" d="M302 408 Q356 398 420 404" />
+
+  <!-- Ribbon bookmark -->
+  <path class="ribbon" d="M300 418 L300 470 L311 460 L322 470 L322 414 Z" />
+</svg>

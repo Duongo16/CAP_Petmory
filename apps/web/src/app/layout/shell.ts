@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -14,11 +14,14 @@ interface MenuItem {
   path: string;
   key: string;
 }
+import { Brand } from '../shared/brand/brand';
+import { UserFace } from '../shared/user-face/user-face';
 
 @Component({
   selector: 'pm-shell',
   standalone: true,
-  imports: [
+  imports: [UserFace, 
+    Brand,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
@@ -44,18 +47,15 @@ export class Shell implements OnInit {
   readonly isManager = this.auth.isManager;
   readonly isAccountAdmin = this.auth.isAccountAdmin;
 
-  /** First letter of the display name, used as a stand-in avatar. */
-  readonly initial = computed(() => this.user()?.fullName?.trim().charAt(0).toUpperCase() ?? '?');
 
   /** Whether the account menu is open. */
   readonly menuOpen = signal(false);
 
   /** The shop destinations that stay visible in the bar. */
   readonly menu: MenuItem[] = [
-    { path: '/today', key: 'NAV.TODAY' },
     { path: '/home', key: 'NAV.HOME' },
-    { path: '/products', key: 'NAV.PRODUCT' },
-    { path: '/goods', key: 'NAV.GOODS' },
+    { path: '/journals', key: 'NAV.JOURNALS' },
+    { path: '/shop', key: 'NAV.SHOP' },
     { path: '/studio', key: 'NAV.STUDIO' },
     { path: '/community', key: 'NAV.COMMUNITY' },
   ];

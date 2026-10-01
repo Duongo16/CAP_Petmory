@@ -1,0 +1,69 @@
+<div class="sheet">
+  <header class="sheet-head">
+    <div>
+      <h2 class="sheet-title">{{ 'MEMORY.SHARE_TITLE' | translate }}</h2>
+      <p class="sheet-sub">{{ 'MEMORY.SHARE_SUB' | translate }}</p>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="16" />
+    </button>
+  </header>
+
+  <div class="tw-panel flex flex-col gap-1 p-4">
+    <label class="mode tw-check font-semibold">
+      <input type="checkbox" [checked]="facade.isPublic()" (change)="changePublic($event)" />
+      <span>{{ 'MEMORY.PUBLIC_MODE' | translate }}</span>
+    </label>
+    <span class="mode-note text-xs text-ink-muted">
+      {{ (facade.isPublic() ? 'MEMORY.PUBLIC_ON' : 'MEMORY.PUBLIC_OFF') | translate }}
+    </span>
+  </div>
+
+  @if (!facade.isPublic()) {
+    <p class="warn m-0 rounded-md bg-amber-soft px-4 py-3 text-sm text-on-amber" role="alert">{{ 'MEMORY.SHARE_NEEDS_PUBLIC' | translate }}</p>
+  }
+
+  <form class="make tw-panel flex flex-col gap-2 p-4" [formGroup]="form" (ngSubmit)="make()">
+    <label class="field-name tw-label" for="share-until">{{ 'MEMORY.SHARE_UNTIL' | translate }}</label>
+    <div class="make-row flex flex-wrap gap-2">
+      <input id="share-until" class="tw-input min-w-0 flex-1 basis-40" type="date" formControlName="expiresAt" />
+      <button type="submit" class="solid strong" [disabled]="!facade.isPublic()">
+        {{ 'MEMORY.SHARE_MAKE' | translate }}
+      </button>
+    </div>
+    <p class="field-hint tw-hint">{{ 'MEMORY.SHARE_UNTIL_HINT' | translate }}</p>
+  </form>
+
+  @if (freshLink(); as link) {
+    <div class="fresh flex flex-col gap-2 rounded-lg border-[1.5px] border-dashed border-accent bg-accent-soft p-4">
+      <p class="fresh-name m-0 text-xs font-bold text-accent-dark">{{ 'MEMORY.SHARE_ONCE' | translate }}</p>
+      <input class="fresh-link tw-input text-xs" type="text" readonly [value]="link" />
+    </div>
+  }
+
+  <h3 class="list-name tw-section-title mb-0 mt-1 text-base">{{ 'MEMORY.SHARE_OPEN' | translate }}</h3>
+  @if (facade.shares().length === 0) {
+    <p class="field-hint tw-hint">{{ 'MEMORY.SHARE_NONE' | translate }}</p>
+  } @else {
+    <ul class="share-list m-0 grid list-none gap-2 p-0">
+      @for (one of facade.shares(); track one._id) {
+        <li class="tw-card flex flex-wrap items-center justify-between gap-3 px-4 py-3 shadow-none">
+          <div class="share-text flex flex-wrap gap-x-3 gap-y-1 text-sm text-ink-muted">
+            <span class="share-when font-semibold text-ink">{{ one.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+            <span class="share-count">
+              {{ 'MEMORY.SHARE_VIEWS' | translate: { count: one.viewCount } }}
+            </span>
+            @if (one.expiresAt) {
+              <span class="share-until">
+                {{ 'MEMORY.SHARE_ENDS' | translate: { day: (one.expiresAt | date: 'dd/MM/yyyy') } }}
+              </span>
+            }
+          </div>
+          <button type="button" class="drop tw-btn-ghost tw-btn-sm text-danger hover:bg-danger-soft" (click)="revoke(one._id)">
+            {{ 'MEMORY.SHARE_REVOKE' | translate }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

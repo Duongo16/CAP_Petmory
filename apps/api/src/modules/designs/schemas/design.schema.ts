@@ -40,6 +40,26 @@ export class MeshPaint {
 
 export const MeshPaintSchema = SchemaFactory.createForClass(MeshPaint);
 
+/**
+ * Mau cua mot vung co ten tren mo hinh.
+ *
+ * Khach to tu do tung mat luoi, nhung xuong pha len theo vung: long chu dao
+ * mot mau, long bung mot mau, tai mot mau. Lop nay la cai noi giua hai cach
+ * nhin do, va la thu ho so san xuat doc de ghi ma mau tung vung.
+ */
+@Schema({ _id: false })
+export class ZonePaint {
+  /** Ten vung, lay tu danh sach sau vung co ten cua ban khai mo hinh. */
+  @Prop({ required: true, trim: true, maxlength: 30 })
+  zone!: string;
+
+  /** Ma mau trong bang mau len. */
+  @Prop({ required: true, trim: true, maxlength: 30 })
+  colorCode!: string;
+}
+
+export const ZonePaintSchema = SchemaFactory.createForClass(ZonePaint);
+
 /** Text engraved on the product. */
 @Schema({ _id: false })
 export class Engraving {
@@ -88,6 +108,16 @@ export class Design {
   /** The wool colour codes the customer used, so the workshop knows which rolls to pull. */
   @Prop({ type: [String], default: [] })
   colorCodesUsed!: string[];
+
+  /**
+   * Mau cua tung vung co ten.
+   *
+   * Rong voi cac ban thiet ke cu, va voi nhung mo hinh chua tach du vung.
+   * Ho so san xuat doc day truoc, chi khi khong co gi moi quay ve liet ke
+   * theo bang ma mau chung.
+   */
+  @Prop({ type: [ZonePaintSchema], default: [] })
+  zonePaint!: ZonePaint[];
 
   @Prop({ trim: true, uppercase: true, default: '' })
   productTypeCode!: string;

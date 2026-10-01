@@ -46,6 +46,19 @@ export class CartService {
       .pipe(tap((g) => this.state.set(g)));
   }
 
+  /**
+   * Them mot to hop hang co san vao gio.
+   *
+   * Duong rieng voi hang tuy bien, vi hai dong hang can hai bo du lieu khac
+   * han nhau. Ket qua van la ca gio, nen bo dem tren thanh dieu huong doi
+   * theo ngay giong nhu khi them hang tuy bien.
+   */
+  addGoods(goodsCode: string, sku: string, quantity: number) {
+    return this.http
+      .post<Cart>(`${this.base}/cart/goods`, { goodsCode, sku, quantity })
+      .pipe(tap((g) => this.state.set(g)));
+  }
+
   changeQuantity(id: string, quantity: number) {
     return this.http
       .patch<Cart>(`${this.base}/cart/items/${id}`, { quantity })

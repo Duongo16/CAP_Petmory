@@ -1,0 +1,13 @@
+/* Trang trinh chieu quyen nhat ky cua chinh chu. */
+
+/* Mui ten quay lai dung chung bieu tuong mui ten phai, nen xoay nguoc. */
+.back pm-icon {
+  transform: rotate(180deg);
+}
+
+/* Tieu de mang ca hai lop dung chung; giu co chu cua tieu de trang. */
+.head .pm-page-title {
+  margin: 0;
+  font-size: clamp(1.625rem, 2.6vw, 2.125rem);
+  font-weight: 500;
+}

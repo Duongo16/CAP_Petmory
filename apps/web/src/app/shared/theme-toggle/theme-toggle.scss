@@ -1,0 +1,12 @@
+:host {
+  display: inline-flex;
+}
+
+.theme-button {
+  color: var(--pm-text-body);
+  transition: color 120ms ease;
+
+  &:hover {
+    color: var(--pm-accent);
+  }
+}

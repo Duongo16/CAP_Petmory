@@ -1,0 +1,539 @@
+/*
+ * Quyen ky niem cua mot be. Bo cuc va kieu dang nam o lop Tailwind trong mau;
+ * o day chi con nhung chi tiet lop tien ich khong dien ta gon duoc.
+ */
+
+:host {
+  display: block;
+}
+
+/* Mui ten quay lai dung chung bieu tuong mui ten phai, nen xoay nguoc. */
+.back pm-icon {
+  transform: rotate(180deg);
+}
+
+/* Mau nhan chu de theo tong mau cua tung chu de. */
+.chip[data-tone='purple'] {
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+}
+
+.chip[data-tone='green'] {
+  background: var(--pm-success-soft);
+  color: var(--pm-on-success-soft);
+}
+
+.chip[data-tone='amber'] {
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+}
+
+/* Khoanh khac quan trong duoc vien mau ho phach. */
+.moment.milestone {
+  border-color: var(--pm-amber-bright);
+}
+
+/* Trang thai trong: khung net dut nhe tren nen the. */
+.blank {
+  gap: var(--pm-space-3);
+  padding: 48px 20px;
+  border: 1.5px dashed var(--pm-border);
+  border-radius: 20px;
+  background: var(--pm-bg-card);
+}
+
+/* Khi dang doc theo quyen so thi bo loc chu de thu nho lai cho do chiem cho. */
+.filters.tucked {
+  opacity: 0.85;
+}
+
+.title {
+  margin: 0;
+}
+
+/* =====================================================================
+   Ban do hanh trinh: mot con duong uon luon, moi thang la mot tam bien,
+   moi khoanh khac la mot diem dung voi tam buu thiep ben canh.
+   ===================================================================== */
+
+.map {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 36px 20px 28px;
+  border: 1px solid var(--pm-border);
+  border-radius: 28px;
+  background-color: var(--pm-paper-cream);
+  background-image: radial-gradient(var(--pm-paper-mark) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  overflow: hidden;
+}
+
+.compass {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 64px;
+  height: 64px;
+  opacity: 0.8;
+  animation: map-sway 9s ease-in-out infinite;
+}
+
+.compass-ring { fill: var(--pm-bg-card); stroke: var(--pm-border-strong); stroke-width: 2; stroke-dasharray: 3 4; }
+.compass-needle { fill: var(--pm-border-strong); }
+.compass-north { fill: var(--pm-danger); }
+.compass-hub { fill: var(--pm-night); }
+
+.month {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr);
+  align-items: center;
+}
+
+.map-stops {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Con duong ---------- */
+.road {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: stretch;
+  min-height: 72px;
+
+  > svg:not(.scenery) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+}
+
+.road-bed {
+  fill: none;
+  stroke: var(--pm-paper-kraft);
+  stroke-width: 24;
+  stroke-linecap: round;
+}
+
+.road-line {
+  fill: none;
+  stroke: var(--pm-bg-card);
+  stroke-width: 2.5;
+  stroke-dasharray: 7 9;
+  stroke-linecap: round;
+}
+
+.stop[data-side="left"] .road-r,
+.stop[data-side="right"] .road-l {
+  display: none;
+}
+
+/* ---------- Ghim diem dung ---------- */
+.pin {
+  position: absolute;
+  top: 50%;
+  left: 16%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 3px solid var(--pm-bg-card);
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  box-shadow: var(--pm-shadow-lifted);
+  transform: translate(-50%, -50%);
+}
+
+.stop[data-side="right"] .pin {
+  left: 84%;
+}
+
+.pin-star {
+  width: 46px;
+  height: 46px;
+  background: var(--pm-amber-bright);
+  color: var(--pm-on-amber);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid var(--pm-amber-bright);
+    animation: map-ping 2.4s ease-out infinite;
+  }
+}
+
+/* ---------- Canh vat ben duong ---------- */
+.scenery {
+  position: absolute;
+  top: 8%;
+  left: calc(100% + 18px);
+  width: 34px;
+  height: 40px;
+  opacity: 0.9;
+}
+
+.stop[data-side="right"] .scenery {
+  left: auto;
+  right: calc(100% + 18px);
+}
+
+/* Ngay viet tay o khoang trong ben kia con duong. */
+.stop-date {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 16px);
+  font-family: var(--pm-font-hand);
+  font-size: var(--pm-text-xl);
+  line-height: 1.1;
+  color: var(--pm-text-body);
+  white-space: nowrap;
+  transform: translateY(-50%) rotate(-4deg);
+}
+
+.stop[data-side="right"] .stop-date {
+  left: auto;
+  right: calc(100% + 16px);
+  transform: translateY(-50%) rotate(4deg);
+}
+
+.trunk { fill: var(--pm-art-dark); }
+.leaf { fill: var(--pm-memorial); }
+.leaf.light { fill: var(--pm-memorial-soft); opacity: 0.6; }
+.stem { stroke: var(--pm-memorial); stroke-width: 3; }
+.petal { fill: var(--pm-art-blush); }
+.bud { fill: var(--pm-amber-bright); }
+
+/* ---------- Bien thang ---------- */
+.month-head {
+  min-height: 96px;
+}
+
+.sign {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  justify-self: center;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sign-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 22px;
+  border-radius: 14px;
+  background: var(--pm-night);
+  color: var(--pm-on-night);
+  box-shadow: var(--pm-shadow-lifted);
+  transform: rotate(-2deg);
+}
+
+.month-name {
+  font-size: var(--pm-text-xl);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.month-count {
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+  color: var(--pm-on-night-muted);
+}
+
+.sign-post {
+  width: 6px;
+  height: 18px;
+  border-radius: 0 0 3px 3px;
+  background: var(--pm-art-dark);
+}
+
+/* ---------- Buu thiep ---------- */
+.stop .postcard {
+  margin-block: 14px;
+}
+
+.postcard {
+  position: relative;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.postcard {
+  width: 100%;
+  max-width: 400px;
+}
+
+.stop[data-side="left"] .postcard {
+  grid-column: 1;
+  justify-self: end;
+  transform: rotate(-0.8deg);
+}
+
+.stop[data-side="right"] .postcard {
+  grid-column: 3;
+  justify-self: start;
+  transform: rotate(0.8deg);
+}
+
+.stop .postcard:hover,
+.stop .postcard:focus-within {
+  transform: translate3d(0, -4px, 0) rotate(0deg);
+  box-shadow: var(--pm-shadow-lifted);
+}
+
+.stop.milestone .postcard {
+  border-color: var(--pm-amber-bright);
+  box-shadow: 0 0 0 3px var(--pm-amber-soft), var(--pm-shadow);
+}
+
+.postcard-photo {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 16 / 9;
+  background: var(--pm-bg-muted);
+
+  img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.photo-count {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-glass-card);
+  color: var(--pm-text);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+}
+
+.stamp {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 52px;
+  padding: 6px 6px 5px;
+  border: 2px dashed var(--pm-border-strong);
+  border-radius: 6px;
+  background: var(--pm-bg-card);
+  color: var(--pm-accent-dark);
+  box-shadow: var(--pm-shadow);
+  transform: rotate(6deg);
+}
+
+.stamp-day {
+  font-family: var(--pm-font-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.stamp-month {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--pm-text-muted);
+}
+
+.postcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px 20px;
+}
+
+.postcard:not(:has(.postcard-photo)) .postcard-body {
+  padding-right: 80px;
+}
+
+.moment-marks {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.moment-title {
+  margin: 0;
+  font-family: var(--pm-font-display);
+  font-size: var(--pm-text-lg);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--pm-text);
+}
+
+.moment-when {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--pm-text-xs);
+  color: var(--pm-text-muted);
+  text-transform: capitalize;
+}
+
+.moment-body {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-family: var(--pm-font-hand);
+  font-size: var(--pm-text-lg);
+  line-height: 1.4;
+  color: var(--pm-text-body);
+}
+
+.moment-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 0;
+}
+
+.moment-drop {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.postcard:hover .moment-drop,
+.moment-drop:focus-visible {
+  opacity: 1;
+}
+
+/* ---------- Diem khoi dau ---------- */
+.map-start {
+  min-height: 120px;
+
+  .road {
+    display: grid;
+    place-items: start center;
+    background: linear-gradient(var(--pm-paper-kraft), var(--pm-paper-kraft)) center top / 24px 50% no-repeat;
+  }
+}
+
+.start-flag {
+  position: relative;
+  top: 50px;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 4px solid var(--pm-bg-card);
+  background: var(--pm-memorial);
+  color: var(--pm-on-accent);
+  box-shadow: var(--pm-shadow-lifted);
+}
+
+.start-text {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: end;
+  margin: 0 0 18px;
+  font-family: var(--pm-font-hand);
+  font-size: var(--pm-text-xl);
+  color: var(--pm-text-body);
+}
+
+@keyframes map-ping {
+  0% { opacity: 0.8; transform: scale(0.8); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes map-sway {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compass,
+  .pin-star::after {
+    animation: none;
+  }
+}
+
+/* Tren dien thoai con duong chay sat le trai, buu thiep nam het ben phai. */
+@media (max-width: 720px) {
+  .map {
+    padding: 28px 10px 20px;
+  }
+
+  .compass {
+    width: 44px;
+    height: 44px;
+  }
+
+  .map-row {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .road {
+    grid-column: 1;
+  }
+
+  .stop[data-side] .road-l { display: none; }
+  .stop[data-side] .road-r { display: inline; }
+  .stop .pin,
+  .stop[data-side="left"] .pin { left: 84%; }
+  .scenery,
+  .stop-date { display: none; }
+
+  .stop[data-side="left"] .postcard,
+  .stop[data-side="right"] .postcard {
+    grid-column: 2;
+    justify-self: stretch;
+    max-width: none;
+    transform: none;
+  }
+
+  .sign {
+    justify-self: start;
+  }
+
+  .start-text {
+    grid-column: 2;
+  }
+
+  .moment-drop {
+    opacity: 1;
+  }
+}

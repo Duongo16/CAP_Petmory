@@ -1,0 +1,31 @@
+:host {
+  display: inline-flex;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  flex-shrink: 0;
+  border-radius: 30%;
+  object-fit: cover;
+  background: var(--pm-paper-cream);
+  box-shadow: 0 0 0 2px var(--pm-bg-card), var(--pm-shadow);
+}
+
+.brand-word {
+  display: block;
+  object-fit: contain;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

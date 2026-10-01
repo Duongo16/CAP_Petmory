@@ -1,0 +1,21 @@
+<div class="link-row">
+  <input
+    class="link-box tw-input"
+    type="url"
+    inputmode="url"
+    [id]="boxId()"
+    [value]="typed()"
+    [disabled]="disabled()"
+    [placeholder]="'COMMON.IMAGE_LINK_HINT' | translate"
+    [attr.aria-label]="'COMMON.IMAGE_LINK' | translate"
+    (input)="write($any($event.target).value)"
+    (keydown.enter)="$event.preventDefault(); add()"
+  />
+  <button type="button" class="link-add tw-btn-secondary" [disabled]="!ready() || busy()" (click)="add()">
+    {{ 'COMMON.IMAGE_LINK_ADD' | translate }}
+  </button>
+</div>
+
+@if (wrong()) {
+  <p class="field-error">{{ 'COMMON.IMAGE_LINK_BAD' | translate }}</p>
+}

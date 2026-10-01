@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type DisplayBaseDocument = HydratedDocument<DisplayBase>;
 
@@ -22,7 +22,7 @@ export class DisplayBase {
    * Amount added to the size price, as an exact decimal. Zero means the base
    * costs nothing extra; there is no negative option.
    */
-  @Prop({ type: Types.Decimal128, required: true })
+  @Prop({ type: MongooseSchema.Types.Decimal128, required: true })
   priceDelta!: Types.Decimal128;
 
   @Prop({ required: true, default: 'VND', uppercase: true, trim: true })

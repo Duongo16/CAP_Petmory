@@ -27,7 +27,7 @@ import { CommunityController } from './community.controller';
       { name: User.name, schema: UserSchema },
       { name: Pet.name, schema: PetSchema },
     ]),
-    MulterModule.register({ limits: { fileSize: 12 * 1024 * 1024 } }),
+    MulterModule.register({ limits: { fileSize: 20 * 1024 * 1024 } }),
   ],
   controllers: [CommunityController],
   providers: [CommunityService],

@@ -1,66 +1,40 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  OnInit,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { OrdersService } from '../../core/services/orders.service';
-import { Order, OrderStatus } from '../../core/models/api.model';
+import { OrderGroup, OrdersFacade, STAGE_KEYS } from './orders-facade';
 import { MoneyPipe } from '../../shared/money.pipe';
-import { KEY_STATUS_ORDER } from '../../shared/order-status';
-
-type ScreenState = 'LOADING' | 'ERROR' | 'EMPTY' | 'HAS_DATA';
-
-/** Statuses that still need action from the customer. */
-const NEEDS_PAYMENT: OrderStatus[] = ['AWAITING_PAYMENT', 'PAYMENT_EXPIRED'];
+import { Icon } from '../../shared/icon/icon';
 
 @Component({
   selector: 'pm-orders-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, TranslatePipe, MoneyPipe],
+  imports: [RouterLink, DatePipe, TranslatePipe, MoneyPipe, Icon],
   templateUrl: './orders-page.html',
   styleUrl: './orders-page.scss',
+  providers: [OrdersFacade],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdersPage implements OnInit {
-  private readonly service = inject(OrdersService);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly facade = inject(OrdersFacade);
 
-  readonly status = signal<ScreenState>('LOADING');
-  readonly list = signal<Order[]>([]);
+  readonly status = this.facade.status;
+  readonly chips = this.facade.chips;
+  readonly chosen = this.facade.chosen;
+  readonly cards = this.facade.cards;
+  readonly emptyGroup = this.facade.emptyGroup;
 
-  /** Precomputes translation keys and button visibility so the view calls no functions. */
-  readonly rows = computed(() =>
-    this.list().map((raw) => ({
-      raw,
-      keyStatus: KEY_STATUS_ORDER[raw.status],
-      needsPayment: NEEDS_PAYMENT.includes(raw.status),
-    })),
-  );
+  readonly stageKeys = STAGE_KEYS;
 
   ngOnInit(): void {
-    this.reload();
+    this.facade.load();
   }
 
   reload(): void {
-    this.status.set('LOADING');
-    this.service
-      .list()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (ds) => {
-          this.list.set(ds);
-          this.status.set(ds.length === 0 ? 'EMPTY' : 'HAS_DATA');
-        },
-        error: () => this.status.set('ERROR'),
-      });
+    this.facade.load();
   }
 
+  choose(group: OrderGroup): void {
+    this.facade.choose(group);
+  }
 }

@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+/* Lua chon dang bat, gan bang lop rang buoc trong mau. */
+.style-chip {
+  &.on {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+
+  &:focus-within {
+    outline: 2px solid var(--pm-accent);
+    outline-offset: 2px;
+  }
+}
+
+.option-card.on {
+  border-color: var(--pm-accent);
+  background: var(--pm-accent-soft);
+  box-shadow: 0 0 0 3px var(--pm-accent-soft);
+}
+
+.swatch {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--pm-border);
+  border-radius: 6px;
+}
+
+.zone-list li.not-drawn {
+  opacity: 0.62;
+}

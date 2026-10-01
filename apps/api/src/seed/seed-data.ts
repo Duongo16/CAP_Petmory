@@ -12,7 +12,7 @@ export interface ColorInit {
 export const LIST_COLOR: ColorInit[] = [
   { code: 'WOOL-W01', displayName: 'Trắng tuyết', swatch: '#FFFFFF', group: ColorGroup.FUR, note: 'Poodle trắng, mèo trắng, vùng bụng và ức' },
   { code: 'WOOL-W02', displayName: 'Trắng ngà', swatch: '#F7F3E8', group: ColorGroup.FUR, note: 'Lông trắng ngả vàng theo tuổi' },
-  { code: 'WOOL-W03', displayName: 'With', swatch: '#F2E3C6', group: ColorGroup.FUR, note: 'Golden nhạt, mèo Ba Tư kem' },
+  { code: 'WOOL-W03', displayName: 'Kem nhạt', swatch: '#F2E3C6', group: ColorGroup.FUR, note: 'Golden nhạt, mèo Ba Tư kem' },
   { code: 'WOOL-W04', displayName: 'Be nhạt', swatch: '#E8D6B8', group: ColorGroup.FUR, note: 'Vùng chuyển màu, lòng bàn chân' },
 
   { code: 'WOOL-Y01', displayName: 'Vàng bơ', swatch: '#E5B95C', group: ColorGroup.FUR, note: 'Golden Retriever' },

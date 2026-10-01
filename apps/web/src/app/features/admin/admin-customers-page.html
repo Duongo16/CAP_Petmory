@@ -1,7 +1,6 @@
 <div class="pm-page">
   <header class="page-header">
-    <h1 class="title">{{ 'ADMIN.RECIPIENT.TITLE' | translate }}</h1>
-    <p class="description">{{ 'ADMIN.RECIPIENT.DESCRIPTION' | translate }}</p>
+    <h1 class="title pm-page-title">{{ 'ADMIN.RECIPIENT.TITLE' | translate }}</h1>
   </header>
 
   <form class="search-row" (ngSubmit)="search(searchInput.value)">
@@ -43,19 +42,20 @@
           <table class="table">
             <thead>
               <tr>
+                <th scope="col" class="num-col">#</th>
                 <th scope="col">{{ 'ADMIN.RECIPIENT.FULL_NAME' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.RECIPIENT.EMAIL' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.RECIPIENT.COUNT_ORDER' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.RECIPIENT.CREATED_DATE' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.RECIPIENT.LOGIN_LAST' | translate }}</th>
+                <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
-              @for (k of rows(); track k._id) {
+              @for (k of rows(); track k._id; let i = $index) {
                 <tr>
-                  <td>
-                    <a [routerLink]="['/admin/customers', k._id]">{{ k.fullName }}</a>
-                  </td>
+                  <td class="num-col muted">{{ (page() - 1) * 20 + i + 1 }}</td>
+                  <td>{{ k.fullName }}</td>
                   <td>{{ k.email }}</td>
                   <td class="right">{{ k.countOrder }}</td>
                   <td>{{ k.createdAt | date: 'dd/MM/yyyy' }}</td>
@@ -66,26 +66,50 @@
                         : ('ADMIN.NONE_YET' | translate)
                     }}
                   </td>
+                  <td class="row-tools">
+                    <button type="button" class="plain" (click)="openDetail(k._id)">
+                      {{ 'ADMIN.RECIPIENT.DETAIL' | translate }}
+                    </button>
+                  </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
 
-        <nav class="paging" [attr.aria-label]="'ADMIN.PAGING' | translate">
-          <button class="pm-button-secondary" type="button" [disabled]="page() <= 1" (click)="changePage(-1)">
-            {{ 'ADMIN.PREV_PAGE' | translate }}
-          </button>
-          <span>{{ page() }} / {{ pageCount() }}</span>
-          <button
-            class="pm-button-secondary"
-            type="button"
-            [disabled]="page() >= pageCount()"
-            (click)="changePage(1)"
-          >
-            {{ 'ADMIN.NEXT_PAGE' | translate }}
-          </button>
-        </nav>
+        @if (pageCount() > 1) {
+          <nav class="paging" [attr.aria-label]="'ADMIN.PAGING' | translate">
+            <button
+              class="pager-btn"
+              type="button"
+              [disabled]="page() <= 1"
+              (click)="changePage(-1)"
+              [attr.aria-label]="'ADMIN.PREV_PAGE' | translate"
+            >&lsaquo;</button>
+
+            @for (p of pageRange(); track $index) {
+              @if (p === null) {
+                <span class="pager-gap">…</span>
+              } @else {
+                <button
+                  class="pager-btn"
+                  type="button"
+                  [class.active]="p === page()"
+                  [attr.aria-current]="p === page() ? 'page' : null"
+                  (click)="goToPage(p)"
+                >{{ p }}</button>
+              }
+            }
+
+            <button
+              class="pager-btn"
+              type="button"
+              [disabled]="page() >= pageCount()"
+              (click)="changePage(1)"
+              [attr.aria-label]="'ADMIN.NEXT_PAGE' | translate"
+            >&rsaquo;</button>
+          </nav>
+        }
       }
     }
   }

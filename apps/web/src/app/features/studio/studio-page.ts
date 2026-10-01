@@ -17,14 +17,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSliderModule } from '@angular/material/slider';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Icon } from '../../shared/icon/icon';
 import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { StudioFacade } from './studio-facade';
 import { StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
 import { PaintMode } from '../../shared/viewer-3d/painter';
 import { CatalogService } from '../../core/services/catalog.service';
-import { PreviewAngle, ColorCode } from '../../core/models/api.model';
-import { BaseModel, ModelLibrary, DeclaredZone } from './model-manifest';
+import { PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
+import { BaseModel, ModelLibrary, DeclaredZone, ZoneName } from './model-manifest';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
@@ -74,6 +75,7 @@ export interface ZoneView {
   selector: 'pm-studio-page',
   standalone: true,
   imports: [
+    Icon,
     Viewer3d,
     RouterLink,
     ReactiveFormsModule,
@@ -117,6 +119,44 @@ export class StudioPage implements OnInit {
 
   private declaredZones: DeclaredZone[] = [];
 
+  /** Ban do ten mang vat lieu sang vung co ten, tra theo ten tep mo hinh. */
+  private zoneByFile: Record<string, Record<string, ZoneName>> = {};
+
+  /**
+   * Mau tung vung cua ban thiet ke vua mo, khi ban do chua co mau tung mat luoi.
+   *
+   * Ban thiet ke sinh tu mot phuong an goi y chi ghi mau theo vung chu chua to
+   * tung mat luoi. Neu khong doc cho nay thi mo ra se thay mo hinh mau goc, va
+   * nguoi dung tuong phuong an ho vua chon da bi mat.
+   */
+  private readonly zonePaintOpened = signal<ZonePaint[]>([]);
+
+  /**
+   * Mau gan cho tung mang vat lieu cua mo hinh dang xem.
+   *
+   * Doi chieu nguoc: tu vung co ten ra ma mau, roi tu ma mau ra mau hien tren
+   * man hinh, cuoi cung tu vung co ten ra ten mang vat lieu cua chinh tep dang
+   * mo. Rong khi ban thiet ke da co mau tung mat luoi.
+   */
+  readonly colorByZone = computed<Record<string, string>>(() => {
+    const painted = this.zonePaintOpened();
+    const model = this.baseModelSelected();
+    if (painted.length === 0 || !model) {
+      return {};
+    }
+    const swatchOf = new Map(this.palette().map((one) => [one.code, one.swatch]));
+    const zoneOf = this.zoneByFile[model.file] ?? {};
+    const out: Record<string, string> = {};
+    for (const [material, zone] of Object.entries(zoneOf)) {
+      const found = painted.find((one) => one.zone === zone);
+      const swatch = found ? swatchOf.get(found.colorCode) : undefined;
+      if (swatch) {
+        out[material] = swatch;
+      }
+    }
+    return out;
+  });
+
   readonly pathModel = computed(() => {
     const color = this.baseModelSelected();
     return color ? `/models/${color.file}` : '';
@@ -127,12 +167,18 @@ export class StudioPage implements OnInit {
   readonly colorCodePendingPaint = computed(() => this.colorPendingPaint()?.swatch ?? null);
 
   /** Groups base models by style so the user can compare them side by side. */
+  readonly colorFelted = computed(() =>
+    this.modelsShown().filter((m) => m.styleGroup === 'FELTED'),
+  );
   readonly colorRealistic = computed(() =>
     this.modelsShown().filter((m) => m.styleGroup === 'REALISTIC'),
   );
   readonly colorBlocky = computed(() =>
-    this.modelsShown().filter((m) => m.styleGroup !== 'REALISTIC'),
+    this.modelsShown().filter((m) => m.styleGroup === 'BLOCKY' || !m.styleGroup),
   );
+
+  /** Ten dang than cua mo hinh dang chon, rong neu no giu nguyen dang goc. */
+  readonly bodyShapeSelected = computed(() => this.baseModelSelected()?.bodyShape ?? '');
 
   /** The species tabs, built from the models that are actually available. */
   readonly kindTabs = computed(() => {
@@ -191,6 +237,7 @@ export class StudioPage implements OnInit {
       .subscribe({
         next: (library) => {
           this.declaredZones = library.zoneMaterial;
+          this.zoneByFile = library.zoneByFile ?? {};
           const ready = library.baseModel.filter((m) => m.ready);
           this.baseModel.set(ready);
           this.status.set(ready.length > 0 ? 'READY' : 'ERROR');
@@ -198,6 +245,7 @@ export class StudioPage implements OnInit {
             this.facade.openDraft(codeDraft, (tk) => {
               this.baseModelSelected.set(ready.find((m) => m.code === tk.modelCode) ?? ready[0] ?? null);
               this.colorCodesUsed.set([...tk.colorCodesUsed]);
+              this.zonePaintOpened.set(tk.paint.length === 0 ? (tk.zonePaint ?? []) : []);
             });
             return;
           }
@@ -271,8 +319,33 @@ export class StudioPage implements OnInit {
       model.code,
       this.viewer()?.readStatusPaint() ?? [],
       this.colorCodesUsed(),
+      this.zonePaintOf(model),
       this.preview().map((m) => ({ angle: m.angle as PreviewAngle, photo: m.photo })),
     );
+  }
+
+  /**
+   * Mau cua tung vung co ten tren mo hinh dang dung.
+   *
+   * Xuong pha len theo vung chu khong theo tung mat luoi, nen ho so san xuat
+   * can bang nay. Vung nao tep mo hinh chua tach rieng thi khong co dong nao
+   * o day, va ho so se noi ro la chua tach.
+   */
+  private zonePaintOf(model: BaseModel): { zone: string; colorCode: string }[] {
+    const map = this.zoneByFile[model.file] ?? {};
+    const codeOf = new Map(
+      this.palette().map((one) => [one.swatch.toLowerCase(), one.code]),
+    );
+    const out = new Map<string, string>();
+    for (const one of this.zoneDisplay()) {
+      const zone = map[one.name];
+      const code = codeOf.get(`#${one.colorSelected}`.toLowerCase())
+        ?? codeOf.get(one.colorSelected.toLowerCase());
+      if (zone && code && !out.has(zone)) {
+        out.set(zone, code);
+      }
+    }
+    return [...out].map(([zone, colorCode]) => ({ zone, colorCode }));
   }
 
   addToCart(): void {

@@ -1,0 +1,145 @@
+<div class="edit">
+  <header class="edit-head">
+    <div>
+      <h2 class="sheet-title">{{ 'PHOTO.EDIT.TITLE' | translate }}</h2>
+      <p class="which">
+        {{ 'PHOTO.EDIT.WHICH' | translate: { at: at() + 1, total: total } }} · {{ fileName() }}
+      </p>
+    </div>
+    <button type="button" class="shut" (click)="cancel()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  @if (!supported) {
+    <p class="warn" role="alert">{{ 'PHOTO.EDIT.NOT_SUPPORTED' | translate }}</p>
+    <footer class="edit-foot">
+      <button type="button" class="plain" (click)="cancel()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button type="button" class="strong" (click)="keepAsIs()">{{ 'PHOTO.EDIT.KEEP' | translate }}</button>
+    </footer>
+  } @else {
+    <div class="stage">
+      @if (loading()) {
+        <p class="centre">{{ 'COMMON.LOADING' | translate }}</p>
+      } @else {
+        <div class="frame">
+          <img [src]="preview()" [alt]="'PHOTO.EDIT.PREVIEW_ALT' | translate" />
+          <div
+            class="keep"
+            aria-hidden="true"
+            [style.left.%]="box().left"
+            [style.top.%]="box().top"
+            [style.width.%]="box().width"
+            [style.height.%]="box().height"
+          ></div>
+        </div>
+      }
+    </div>
+
+    <div class="tools">
+      <div class="row">
+        <span class="row-name">{{ 'PHOTO.EDIT.TURN' | translate }}</span>
+        <button type="button" class="plain" (click)="turnLeft()" [disabled]="working()">
+          {{ 'PHOTO.EDIT.TURN_LEFT' | translate }}
+        </button>
+        <button type="button" class="plain" (click)="turnRight()" [disabled]="working()">
+          {{ 'PHOTO.EDIT.TURN_RIGHT' | translate }}
+        </button>
+      </div>
+
+      <div class="row">
+        <span class="row-name">{{ 'PHOTO.EDIT.SHAPE' | translate }}</span>
+        @for (one of shapes; track one.value) {
+          <button
+            type="button"
+            class="chip tw-chip"
+            [class.on]="shape() === one.value"
+            [attr.aria-pressed]="shape() === one.value"
+            (click)="pickShape(one.value)"
+          >
+            {{ one.key | translate }}
+          </button>
+        }
+        <button type="button" class="plain" (click)="resetCut()">
+          {{ 'PHOTO.EDIT.RESET' | translate }}
+        </button>
+      </div>
+
+      <label class="slider" for="keep-width">
+        <span>{{ 'PHOTO.EDIT.KEEP_WIDTH' | translate }}</span>
+        <input
+          id="keep-width"
+          type="range"
+          min="20"
+          max="100"
+          step="1"
+          [value]="keepWidth()"
+          (input)="setWidth($event)"
+        />
+        <output>{{ keepWidth() }}%</output>
+      </label>
+
+      <label class="slider" for="keep-height">
+        <span>{{ 'PHOTO.EDIT.KEEP_HEIGHT' | translate }}</span>
+        <input
+          id="keep-height"
+          type="range"
+          min="20"
+          max="100"
+          step="1"
+          [value]="keepHeight()"
+          [disabled]="shape() !== 'FREE'"
+          (input)="setHeight($event)"
+        />
+        <output>{{ keepHeight() }}%</output>
+      </label>
+
+      <label class="slider" for="slide-x">
+        <span>{{ 'PHOTO.EDIT.SLIDE_X' | translate }}</span>
+        <input
+          id="slide-x"
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          [value]="slideX()"
+          [disabled]="keepWidth() === 100"
+          (input)="setSlideX($event)"
+        />
+        <output>{{ slideX() }}%</output>
+      </label>
+
+      <label class="slider" for="slide-y">
+        <span>{{ 'PHOTO.EDIT.SLIDE_Y' | translate }}</span>
+        <input
+          id="slide-y"
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          [value]="slideY()"
+          [disabled]="keepHeight() === 100"
+          (input)="setSlideY($event)"
+        />
+        <output>{{ slideY() }}%</output>
+      </label>
+
+      <p class="size" [class.warn]="tooSmall()" role="status">
+        {{ 'PHOTO.EDIT.RESULT_SIZE' | translate: { width: cutSize().width, height: cutSize().height } }}
+        @if (tooSmall()) {
+          · {{ 'PHOTO.EDIT.TOO_SMALL' | translate: { need: threshold } }}
+        }
+      </p>
+    </div>
+
+    <footer class="edit-foot">
+      <button type="button" class="plain" (click)="cancel()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button type="button" class="plain" (click)="keepAsIs()" [disabled]="working()">
+        {{ 'PHOTO.EDIT.KEEP' | translate }}
+      </button>
+      <button type="button" class="strong" (click)="useThis()" [disabled]="working() || loading()">
+        {{ (at() + 1 >= total ? 'PHOTO.EDIT.SEND' : 'PHOTO.EDIT.NEXT') | translate }}
+      </button>
+    </footer>
+  }
+</div>

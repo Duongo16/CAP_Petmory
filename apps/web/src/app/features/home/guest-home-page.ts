@@ -3,8 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Icon } from '../../shared/icon/icon';
 import { PetArt } from '../../shared/pet-art/pet-art';
-
-type OnboardingStep = 1 | 2 | null;
+import { PetStarter } from './pet-starter/pet-starter';
 
 /** A card in the features grid, with its keys written out in full. */
 interface Feature {
@@ -21,17 +20,19 @@ interface Step {
   nameKey: string;
   textKey: string;
 }
+import { DiaryScene } from '../../shared/diary-scene/diary-scene';
+import { Brand } from '../../shared/brand/brand';
 
 @Component({
   selector: 'pm-guest-home-page',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [Brand, DiaryScene, RouterLink, TranslatePipe, Icon, PetArt, PetStarter],
   templateUrl: './guest-home-page.html',
   styleUrl: './guest-home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GuestHomePage {
-  readonly onboardingStep = signal<OnboardingStep>(null);
+  readonly starterOpen = signal(false);
 
   readonly trust = ['LANDING.TRUST_FREE', 'LANDING.TRUST_PRIVATE', 'LANDING.TRUST_CARD'];
 
@@ -48,17 +49,11 @@ export class GuestHomePage {
     { number: '03', tone: 'success', nameKey: 'LANDING.STEP.3.NAME', textKey: 'LANDING.STEP.3.TEXT' },
   ];
 
-  readonly perks = ['LANDING.MODAL.PERK_1', 'LANDING.MODAL.PERK_2', 'LANDING.MODAL.PERK_3', 'LANDING.MODAL.PERK_4'];
-
   openOnboarding(): void {
-    this.onboardingStep.set(1);
-  }
-
-  nextOnboardingStep(): void {
-    this.onboardingStep.set(2);
+    this.starterOpen.set(true);
   }
 
   closeOnboarding(): void {
-    this.onboardingStep.set(null);
+    this.starterOpen.set(false);
   }
 }

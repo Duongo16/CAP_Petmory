@@ -1,0 +1,119 @@
+<div class="pm-page-head">
+  <div class="pm-page-head-text">
+    <p class="pm-page-eyebrow">{{ 'ADMIN.MODELS.EYEBROW' | translate }}</p>
+    <h1 class="title pm-page-title">{{ 'ADMIN.MODELS.TITLE' | translate }}</h1>
+    <p class="pm-page-description">{{ 'ADMIN.MODELS.SUB' | translate }}</p>
+  </div>
+</div>
+
+@switch (status()) {
+  @case ('LOADING') {
+    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+  }
+  @case ('ERROR') {
+    <div class="pm-center"><p class="pm-empty">{{ 'ADMIN.MODELS.ERROR' | translate }}</p></div>
+  }
+  @case ('READY') {
+    <section class="pm-card tw-card-pad kind-bar">
+      <h2 class="pm-section-title">{{ 'ADMIN.MODELS.PICK_KIND' | translate }}</h2>
+      <div class="chip-row">
+        @for (tab of kindTabs(); track tab.kind) {
+          <button
+            type="button"
+            class="pm-chip"
+            [attr.aria-pressed]="kindShown() === tab.kind"
+            [class.is-selected]="kindShown() === tab.kind"
+            (click)="pickKind(tab.kind)"
+          >
+            {{ tab.key | translate }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <div class="shape-row">
+      @for (one of columns(); track one.group) {
+        <section class="pm-card tw-card-pad shape-card">
+          <header class="shape-head">
+            <h2 class="pm-section-title">{{ one.key | translate }}</h2>
+            <p class="shape-note">{{ one.noteKey | translate }}</p>
+          </header>
+
+          @if (one.picked; as picked) {
+            <div class="shape-view">
+              <pm-viewer-3d
+                [pathModel]="one.path"
+                [bodyShape]="one.shape"
+                [compact]="true"
+                (zoneDetected)="noteZones(picked.code, $event)"
+              />
+            </div>
+
+            @if (one.choices.length > 1) {
+              <div class="chip-row tight">
+                @for (choice of one.choices; track choice.code) {
+                  <button
+                    type="button"
+                    class="pm-chip"
+                    [class.is-selected]="picked.code === choice.code"
+                    (click)="pickModel(one.group, choice.code)"
+                  >
+                    {{ choice.name }}
+                  </button>
+                }
+              </div>
+            }
+
+            <dl class="facts">
+              <dt>{{ 'ADMIN.MODELS.MODEL_NAME' | translate }}</dt>
+              <dd>{{ picked.name }}</dd>
+              <dt>{{ 'ADMIN.MODELS.FILE' | translate }}</dt>
+              <dd class="thin">{{ picked.file }}</dd>
+              <dt>{{ 'ADMIN.MODELS.ZONES' | translate }}</dt>
+              <dd>
+                @if (one.zoneCount > 0) {
+                  {{ one.zoneCount }} · <span class="thin">{{ one.zoneText }}</span>
+                } @else {
+                  {{ 'ADMIN.MODELS.ZONES_READING' | translate }}
+                }
+              </dd>
+            </dl>
+          } @else {
+            <p class="pm-empty none-yet">{{ 'ADMIN.MODELS.NONE_IN_GROUP' | translate }}</p>
+          }
+        </section>
+      }
+    </div>
+
+    <section class="pm-card tw-card-pad">
+      <h2 class="pm-section-title">{{ 'ADMIN.MODELS.ALL_TITLE' | translate }}</h2>
+      <div class="table-wrap">
+        <table class="table" id="model-table">
+          <thead>
+            <tr>
+              <th class="num-col">#</th>
+              <th>{{ 'ADMIN.MODELS.MODEL_NAME' | translate }}</th>
+              <th>{{ 'ADMIN.MODELS.KIND' | translate }}</th>
+              <th>{{ 'ADMIN.MODELS.GROUP' | translate }}</th>
+              <th>{{ 'ADMIN.MODELS.SHAPE' | translate }}</th>
+              <th>{{ 'ADMIN.MODELS.FILE' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of allRows(); track row.raw.code; let i = $index) {
+              <tr>
+                <td class="num-col muted">{{ i + 1 }}</td>
+                <td>{{ row.raw.name }}</td>
+                <td class="thin">{{ row.kindKey | translate }}</td>
+                <td class="thin">{{ row.group }}</td>
+                <td class="thin">{{ row.shape || '—' }}</td>
+                <td class="thin">{{ row.raw.file }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="pm-empty table-note">{{ 'ADMIN.MODELS.SHARED_FILE_NOTE' | translate }}</p>
+    </section>
+  }
+}

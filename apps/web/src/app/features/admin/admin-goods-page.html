@@ -1,0 +1,93 @@
+<div class="pm-page-head">
+  <div class="pm-page-head-text">
+    <h1 class="title pm-page-title">{{ 'ADMIN.GOODS.TITLE' | translate }}</h1>
+  </div>
+  @if (canEdit()) {
+    <div class="pm-page-head-actions">
+      <button
+        type="button"
+        class="pm-button-primary"
+        id="goods-new"
+        [disabled]="saving()"
+        (click)="add()"
+      >
+        {{ 'ADMIN.GOODS.NEW' | translate }}
+      </button>
+    </div>
+  }
+</div>
+
+@switch (status()) {
+  @case ('LOADING') {
+    <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+  }
+  @case ('ERROR') {
+    <div class="pm-center">
+      <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+      <button type="button" class="pm-button-secondary" (click)="reload()">
+        {{ 'COMMON.RETRY' | translate }}
+      </button>
+    </div>
+  }
+  @case ('READY') {
+    @if (!canEdit()) {
+      <p class="pm-status" data-tone="muted">{{ 'ADMIN.GOODS.READ_ONLY' | translate }}</p>
+    }
+    @if (problem(); as said) {
+      <p class="pm-status" data-tone="bad" role="alert">{{ said | translate }}</p>
+    }
+    @if (note(); as said) {
+      <p class="pm-status" data-tone="good" role="status">{{ said | translate }}</p>
+    }
+
+    <section class="pm-card tw-card-pad">
+      @if (view().length === 0) {
+        <p class="pm-empty">{{ 'ADMIN.GOODS.NONE_YET' | translate }}</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="table" id="goods-table">
+            <thead>
+              <tr>
+                <th class="num-col">#</th>
+                <th>{{ 'ADMIN.GOODS.CODE' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.NAME' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.GROUP' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.PRICE' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.STOCK' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.STATE' | translate }}</th>
+                @if (canEdit()) {
+                  <th></th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (one of view(); track one.raw.code; let i = $index) {
+                <tr [class.off]="!one.raw.enabled">
+                  <td class="num-col muted">{{ i + 1 }}</td>
+                  <td class="mono">{{ one.raw.code }}</td>
+                  <td>{{ one.raw.name }}</td>
+                  <td class="thin">{{ one.groupName }}</td>
+                  <td class="thin">{{ one.priceRange }}</td>
+                  <td>{{ one.stock }}</td>
+                  <td class="thin">
+                    {{ (one.raw.enabled ? 'ADMIN.GOODS.ON_SHOP' : 'ADMIN.GOODS.OFF_SHOP') | translate }}
+                  </td>
+                  @if (canEdit()) {
+                    <td class="row-tools">
+                      <button type="button" class="plain" [disabled]="saving()" (click)="edit(one.raw)">
+                        {{ 'COMMON.EDIT' | translate }}
+                      </button>
+                      <button type="button" class="plain danger" [disabled]="saving()" (click)="drop(one.raw)">
+                        {{ 'COMMON.REMOVE' | translate }}
+                      </button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+}

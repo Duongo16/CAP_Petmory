@@ -1,4 +1,7 @@
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
   IsInt,
   IsNotEmptyObject,
   IsOptional,
@@ -11,6 +14,10 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+
+/** So tien viet duoi dang chuoi chu so, khong dau cham dong. */
+const MONEY_PATTERN = /^\d{1,12}(\.\d{1,2})?$/;
+const MONEY_MESSAGE = 'Don gia phai la so khong am, toi da hai chu so thap phan';
 
 /** How many times a feature may be used within one period. */
 export class PeriodQuotaDto {
@@ -34,6 +41,45 @@ export class AiQuotaDto {
   @ValidateNested()
   @Type(() => PeriodQuotaDto)
   restorePhoto!: PeriodQuotaDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PeriodQuotaDto)
+  designSuggestion?: PeriodQuotaDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PeriodQuotaDto)
+  storyWriting?: PeriodQuotaDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PeriodQuotaDto)
+  chatReply?: PeriodQuotaDto;
+}
+
+/**
+ * Don gia moi luot dung tri tue nhan tao.
+ *
+ * Tien di qua duong truyen o dang chuoi chu khong phai so, de khong buc nao
+ * bi lam tron sai khi di qua tang chuyen doi cua trinh duyet.
+ */
+export class AiUnitPriceDto {
+  @IsOptional()
+  @Matches(MONEY_PATTERN, { message: MONEY_MESSAGE })
+  restorePhoto?: string;
+
+  @IsOptional()
+  @Matches(MONEY_PATTERN, { message: MONEY_MESSAGE })
+  designSuggestion?: string;
+
+  @IsOptional()
+  @Matches(MONEY_PATTERN, { message: MONEY_MESSAGE })
+  storyWriting?: string;
+
+  @IsOptional()
+  @Matches(MONEY_PATTERN, { message: MONEY_MESSAGE })
+  chatReply?: string;
 }
 
 /**
@@ -91,6 +137,42 @@ export class UpdateConfigDto {
   @ValidateNested()
   @Type(() => AiQuotaDto)
   aiQuota?: AiQuotaDto;
+
+  @IsOptional()
+  @IsNotEmptyObject()
+  @ValidateNested()
+  @Type(() => AiUnitPriceDto)
+  aiUnitPrice?: AiUnitPriceDto;
+
+  /**
+   * Cac muc tren phieu kiem tra chat luong, theo dung thu tu xuong lam.
+   */
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(30)
+  @IsString({ each: true })
+  @MinLength(2, { each: true })
+  @MaxLength(120, { each: true })
+  qcChecklist?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(720)
+  exportKeepHours?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(3650)
+  shareDefaultDays?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(3)
+  @Max(10)
+  slideSeconds?: number;
 
   /** Receiving bank identifier: exactly six digits, per the card scheme standard. */
   @IsOptional()

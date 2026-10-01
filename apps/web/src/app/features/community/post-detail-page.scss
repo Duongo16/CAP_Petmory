@@ -1,30 +1,25 @@
+/*
+ * Trang chi tiet bai viet cong dong.
+ *
+ * Duong quay lai, o nhap binh luan va nhan chu de lay tu bo khoi chung; o day
+ * con bo cuc hai cot, khung anh co nut chuyen va cot ben phai.
+ */
+
 :host {
   display: block;
-}
-
-.back-link {
-  display: inline-block;
-  margin-bottom: var(--pm-space-3);
-  color: var(--pm-text-muted);
-  text-decoration: none;
-  font-size: var(--pm-text-md);
-  font-weight: 600;
-  transition: color 130ms ease;
-
-  &:hover {
-    color: var(--pm-accent-dark);
-  }
 }
 
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
-  gap: var(--pm-gap);
+  gap: 24px;
   align-items: start;
 }
 
 .main-column {
-  padding: var(--pm-space-5);
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
   min-width: 0;
 }
 
@@ -33,37 +28,41 @@
   top: 88px;
   display: flex;
   flex-direction: column;
-  gap: var(--pm-gap);
+  gap: 16px;
 }
 
 .side-card {
-  padding: var(--pm-space-4);
+  padding: 20px;
 }
 
-/* ---- Author ---- */
+/* ---------- Tac gia ---------- */
 
 .author {
   display: flex;
   align-items: center;
-  gap: var(--pm-space-2);
+  gap: 12px;
   text-decoration: none;
   color: inherit;
+
+  &:hover .author-name {
+    color: var(--pm-accent);
+  }
 }
 
 .avatar {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
-  border-radius: 999px;
+  border-radius: var(--pm-radius-pill);
   background: var(--pm-accent);
   color: var(--pm-on-accent);
   font-weight: 700;
 
   &.sm {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     font-size: var(--pm-text-sm);
   }
 }
@@ -71,46 +70,68 @@
 .author-text {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
 .author-name {
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pm-text);
+  transition: color 130ms ease;
 }
 
 .post-meta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   font-size: var(--pm-text-xs);
   color: var(--pm-text-muted);
 }
 
-.follow {
-  margin-top: var(--pm-space-3);
+.meta-dot {
+  color: var(--pm-border-strong);
 }
 
-/* ---- Post body ---- */
+.follow {
+  margin-top: 14px;
+}
+
+/* ---------- Than bai viet ---------- */
+
+.topic-chip {
+  align-self: flex-start;
+  margin-top: 20px;
+}
 
 .post-title {
-  margin: var(--pm-space-4) 0 var(--pm-space-2);
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  margin: 10px 0 0;
+  font-family: var(--pm-font-display);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--pm-text);
 }
 
 .post-text {
-  margin: 0;
+  margin: 14px 0 0;
   white-space: pre-line;
-  line-height: 1.65;
-  color: var(--pm-text);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--pm-text-body);
 }
 
 .gallery {
   position: relative;
-  margin: var(--pm-space-4) 0 0;
+  margin: 20px 0 0;
 
   img {
+    display: block;
     width: 100%;
     max-height: 460px;
     object-fit: cover;
-    border-radius: var(--pm-radius);
+    border-radius: 16px;
     background: var(--pm-bg-muted);
   }
 }
@@ -120,10 +141,10 @@
   top: 50%;
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--pm-radius-pill);
   background: var(--pm-bg-card);
   color: var(--pm-text);
   font-size: var(--pm-text-xl);
@@ -152,8 +173,8 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  padding: var(--pm-space-1) var(--pm-space-3);
-  border-radius: 999px;
+  padding: 4px 12px;
+  border-radius: var(--pm-radius-pill);
   background: var(--pm-bg-card);
   font-size: var(--pm-text-xs);
   font-weight: 700;
@@ -161,15 +182,16 @@
 
 .thumbs {
   display: flex;
-  gap: var(--pm-space-2);
-  margin: var(--pm-space-2) 0 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
   padding: 0;
   list-style: none;
 
   button {
     padding: 0;
     border: 2px solid transparent;
-    border-radius: var(--pm-radius-sm);
+    border-radius: 12px;
     background: none;
     cursor: pointer;
     overflow: hidden;
@@ -181,17 +203,55 @@
   }
 
   img {
-    width: 62px;
-    height: 62px;
+    width: 64px;
+    height: 64px;
     object-fit: cover;
+  }
+}
+
+/* Loi moi bien mot khoanh khac thanh ky vat that. */
+.turn-into {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-block-start: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+}
+
+.turn-text {
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+}
+
+.turn-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: var(--pm-night);
+  color: var(--pm-on-night);
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 130ms ease;
+
+  &:hover {
+    transform: translate3d(0, -1px, 0);
   }
 }
 
 .tag-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--pm-space-1);
-  margin: var(--pm-space-3) 0 0;
+  gap: 6px;
+  margin: 16px 0 0;
   padding: 0;
   list-style: none;
   font-size: var(--pm-text-xs);
@@ -200,23 +260,24 @@
 .post-foot {
   display: flex;
   align-items: center;
-  gap: var(--pm-space-2);
-  margin-top: var(--pm-space-4);
-  padding-top: var(--pm-space-3);
-  border-top: 1px solid var(--pm-border);
+  gap: 4px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pm-info-soft);
 }
 
 .react {
   display: inline-flex;
   align-items: center;
-  gap: var(--pm-space-1);
-  padding: var(--pm-space-2) var(--pm-space-3);
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--pm-radius-pill);
   background: transparent;
   color: var(--pm-text-muted);
   font: inherit;
-  font-size: var(--pm-text-md);
+  font-size: var(--pm-text-sm);
   font-weight: 600;
   cursor: pointer;
 
@@ -235,80 +296,73 @@
   }
 }
 
-/* ---- Comments ---- */
+/* ---------- Binh luan ---------- */
 
 .comments {
-  margin-top: var(--pm-space-6);
-  padding-top: var(--pm-space-4);
+  margin-top: 28px;
+  padding-top: 20px;
   border-top: 1px solid var(--pm-border);
 }
 
 .comment-form {
   display: flex;
-  gap: var(--pm-space-2);
-  margin-bottom: var(--pm-space-4);
+  gap: 10px;
+  margin-bottom: 20px;
 
   input {
     flex: 1 1 auto;
     min-width: 0;
-    padding: var(--pm-space-3) var(--pm-space-4);
-    border: 1px solid var(--pm-border-strong);
-    border-radius: 999px;
-    background: var(--pm-bg-muted);
-    color: var(--pm-text);
-    font: inherit;
-    font-size: var(--pm-text-md);
-
-    &:focus {
-      border-color: var(--pm-accent);
-      background: var(--pm-bg-card);
-      outline: none;
-    }
   }
 }
 
 .comment-list {
   display: flex;
   flex-direction: column;
-  gap: var(--pm-space-4);
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 
   li {
     display: flex;
-    gap: var(--pm-space-2);
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: var(--pm-bg);
+    border: 1px solid var(--pm-info-soft);
   }
 }
 
 .comment-head {
   display: flex;
   align-items: baseline;
-  gap: var(--pm-space-2);
-  margin: 0 0 var(--pm-space-1);
-  font-size: var(--pm-text-sm);
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: var(--pm-text-xs);
   color: var(--pm-text-muted);
 
   strong {
     color: var(--pm-text);
-    font-size: var(--pm-text-md);
+    font-size: var(--pm-text-sm);
   }
 }
 
 .comment-text {
   margin: 0;
-  font-size: var(--pm-text-md);
-  line-height: 1.5;
+  font-size: var(--pm-text-sm);
+  line-height: 1.6;
+  color: var(--pm-text-body);
 }
 
-/* ---- Side rail ---- */
+/* ---------- Cot ben phai ---------- */
 
 .info-list {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: var(--pm-space-2) var(--pm-space-3);
+  gap: 10px 12px;
   margin: 0;
-  font-size: var(--pm-text-md);
+  font-size: var(--pm-text-sm);
 
   dt {
     color: var(--pm-text-muted);
@@ -316,7 +370,7 @@
 
   dd {
     margin: 0;
-    font-weight: 600;
+    font-weight: 700;
     text-align: right;
   }
 }
@@ -324,7 +378,7 @@
 .related-list {
   display: flex;
   flex-direction: column;
-  gap: var(--pm-space-3);
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -332,7 +386,7 @@
   a {
     display: flex;
     align-items: center;
-    gap: var(--pm-space-2);
+    gap: 12px;
     text-decoration: none;
     color: inherit;
     transition: color 130ms ease;
@@ -347,27 +401,28 @@
     width: 52px;
     height: 52px;
     flex-shrink: 0;
-    border-radius: var(--pm-radius-sm);
+    border-radius: 14px;
     object-fit: cover;
-    background: var(--pm-bg-muted);
+    background: var(--pm-paper-bloom);
   }
 
   .thumb-blank {
     display: grid;
     place-items: center;
+    color: var(--pm-accent);
   }
 }
 
 .related-text {
   display: flex;
   flex-direction: column;
-  gap: var(--pm-space-1);
+  gap: 2px;
   min-width: 0;
   font-size: var(--pm-text-xs);
   color: var(--pm-text-muted);
 
   strong {
-    font-size: var(--pm-text-md);
+    font-size: var(--pm-text-sm);
     color: var(--pm-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -385,73 +440,16 @@
   }
 }
 
-/* ---- Bo sung theo thiet ke ---- */
+@media (max-width: 600px) {
+  .main-column {
+    padding: 20px;
+  }
 
-.meta-dot {
-  color: var(--pm-border-strong);
-}
+  .comment-form {
+    flex-wrap: wrap;
 
-.topic-chip {
-  display: inline-flex;
-  align-self: flex-start;
-  padding: var(--pm-space-1) var(--pm-space-3);
-  border-radius: var(--pm-radius-pill);
-  background: var(--pm-accent-soft);
-  color: var(--pm-accent);
-  font-size: var(--pm-text-sm);
-  font-weight: 500;
-}
-
-.post-title {
-  margin: var(--pm-space-2) 0 0;
-  font-family: var(--pm-font-display);
-  font-size: 2.25rem;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--pm-text);
-}
-
-.post-text {
-  font-size: var(--pm-text-lg);
-  line-height: 1.7;
-  color: var(--pm-text-body);
-}
-
-/* Loi moi bien mot khoanh khac thanh ky vat that. */
-.turn-into {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--pm-space-3);
-  flex-wrap: wrap;
-  margin-block-start: 14px;
-  padding: var(--pm-space-3) var(--pm-space-4);
-  border-radius: var(--pm-radius);
-  background: var(--pm-bg-muted);
-}
-
-.turn-text {
-  font-size: var(--pm-text-sm);
-  color: var(--pm-text);
-}
-
-.turn-go {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--pm-space-1);
-  padding: var(--pm-space-2) var(--pm-space-4);
-  border-radius: var(--pm-radius-pill);
-  background: var(--pm-accent);
-  color: var(--pm-on-accent);
-  font-size: var(--pm-text-xs);
-  font-weight: 600;
-  text-decoration: none;
-  transition:
-    background 130ms ease,
-    transform 130ms ease;
-
-  &:hover {
-    background: var(--pm-accent-dark);
-    transform: translateY(-1px);
+    input {
+      flex-basis: 100%;
+    }
   }
 }

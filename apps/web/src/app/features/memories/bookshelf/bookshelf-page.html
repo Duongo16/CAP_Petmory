@@ -1,0 +1,113 @@
+<div class="tw-page flex flex-col gap-6">
+  <header class="tw-page-head mb-0">
+    <div>
+      <span class="tw-eyebrow">{{ 'SHELF.EYEBROW' | translate }}</span>
+      <h1 class="tw-page-title">{{ 'SHELF.TITLE' | translate }}</h1>
+      <p class="tw-page-sub">{{ 'SHELF.SUB' | translate }}</p>
+    </div>
+    @if (books().length > 0) {
+      <div class="write-wrap">
+        <button
+          type="button"
+          class="write tw-btn-primary"
+          [attr.aria-expanded]="choosing()"
+          aria-haspopup="true"
+          (click)="write()"
+          (keydown.escape)="choosing.set(false)"
+        >
+          <pm-icon name="plus" [size]="16" />
+          {{ 'TODAY.WRITE' | translate }}
+        </button>
+        @if (choosing()) {
+          <div class="write-menu tw-card" role="menu" (keydown.escape)="choosing.set(false)">
+            <p class="m-0 px-3 pt-2 pb-1 text-xs font-bold tracking-[0.06em] uppercase text-ink-muted">{{ 'SHELF.WRITE_FOR' | translate }}</p>
+            @for (book of books(); track book.id) {
+              <a class="write-pick" role="menuitem" [routerLink]="['/pets', book.id, 'journal']" [queryParams]="{ write: 1 }">
+                <pm-pet-face [petId]="book.id" [avatarUrl]="book.avatarUrl" [kind]="book.kind" [size]="32" [round]="true" />
+                {{ book.name }}
+              </a>
+            }
+          </div>
+        }
+      </div>
+    }
+  </header>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="tw-empty"><p class="pm-empty m-0">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="tw-empty"><p class="pm-empty m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+    }
+    @case ('EMPTY') {
+      <div class="tw-empty">
+        <pm-pet-art kind="cat" [width]="140" />
+        <p class="m-0">{{ 'SHELF.EMPTY' | translate }}</p>
+        <a class="tw-btn-primary" routerLink="/pets">{{ 'TODAY.ADD_PET' | translate }}</a>
+      </div>
+    }
+    @default {
+      <div class="cabinet">
+        <ul class="shelf" [attr.aria-label]="'SHELF.TITLE' | translate">
+          @for (book of books(); track book.id) {
+            <li class="slot">
+              <button
+                #bookButton
+                type="button"
+                class="book"
+                [attr.data-pet]="book.id"
+                [attr.data-tone]="book.tone"
+                [class.taken]="flight()?.book?.id === book.id"
+                (click)="pick(book, $event)"
+              >
+                <span class="book-spine" aria-hidden="true"></span>
+                <span class="book-cover">
+                  <span class="book-label">{{ 'SHELF.LABEL' | translate }}</span>
+                  <span class="book-face">
+                    <pm-pet-face [petId]="book.id" [avatarUrl]="book.avatarUrl" [kind]="book.kind" [size]="68" [round]="true" />
+                  </span>
+                  <span class="book-name">{{ book.name }}</span>
+                  <span class="book-count">{{ 'SHELF.PAGES' | translate: { count: book.pages } }}</span>
+                </span>
+                <span class="book-edge" aria-hidden="true"></span>
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+      <p class="hint m-0 text-sm text-ink-muted">{{ 'SHELF.HINT' | translate }}</p>
+    }
+  }
+</div>
+
+@if (flight(); as f) {
+  <div class="flight-backdrop" aria-hidden="true"></div>
+  <div
+    class="flight"
+    [attr.data-tone]="f.book.tone"
+    [style.--dx.px]="f.dx"
+    [style.--dy.px]="f.dy"
+    [style.--s]="f.scale"
+    role="status"
+  >
+    <span class="sr-only">{{ 'SHELF.OPENING' | translate: { name: f.book.name } }}</span>
+    <div class="flight-book" aria-hidden="true">
+      <div class="flight-pages">
+        <span class="flight-line"></span>
+        <span class="flight-line"></span>
+        <span class="flight-line short"></span>
+      </div>
+      <div class="flight-cover" (animationend)="arrived($event)">
+        <span class="book-label">{{ 'SHELF.LABEL' | translate }}</span>
+        <span class="book-face big">
+          <pm-pet-face [petId]="f.book.id" [avatarUrl]="f.book.avatarUrl" [kind]="f.book.kind" [size]="140" [round]="true" />
+        </span>
+        <span class="book-name">{{ f.book.name }}</span>
+        @if (f.book.tagline) {
+          <span class="book-tagline">{{ f.book.tagline }}</span>
+        }
+      </div>
+    </div>
+  </div>
+}

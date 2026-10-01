@@ -36,6 +36,14 @@ interface MeshPaint {
   adjacentFaces: number[][];
   /** The centre of each face in local coordinates, used by the brush. */
   faceCenters: THREE.Vector3[];
+  /**
+   * Ten mang vat lieu goc cua tung mat.
+   *
+   * Sau khi mau chuyen vao tung dinh, ten mang vat lieu khong con dieu khien
+   * mau nua. Giu lai o day de van to duoc ca mot vung mot luc, vi dong nay la
+   * thu noi mot phuong an goi y voi hinh nguoi dung nhin thay.
+   */
+  faceMaterial: string[];
 }
 
 const UNDO_LIMIT = 30;
@@ -195,6 +203,44 @@ export class Painter {
     }
   }
 
+  /**
+   * To mau ca mot hoac nhieu vung cung luc.
+   *
+   * Nhan ban do tu ten mang vat lieu sang mau. Tra ve so mat da to, de ben goi
+   * biet ban do co khop voi tep mo hinh dang mo hay khong thay vi doan.
+   *
+   * To ca cum trong mot buoc, nen bam hoan tac mot lan la ve nguyen trang thai
+   * truoc do chu khong phai bam sau lan cho sau vung.
+   */
+  paintZones(colorByZone: Record<string, string>): number {
+    const colorOf = new Map<string, THREE.Color>();
+    for (const [zone, hex] of Object.entries(colorByZone)) {
+      colorOf.set(zone, new THREE.Color(hex));
+    }
+    if (colorOf.size === 0) {
+      return 0;
+    }
+
+    this.pushUndo();
+    let painted = 0;
+    for (const item of this.meshes) {
+      let touched = false;
+      for (let face = 0; face < item.faceCenters.length; face += 1) {
+        const color = colorOf.get(item.faceMaterial[face]);
+        if (!color) {
+          continue;
+        }
+        this.writeColorFace(item, face, color);
+        painted += 1;
+        touched = true;
+      }
+      if (touched) {
+        item.colorAttribute.needsUpdate = true;
+      }
+    }
+    return painted;
+  }
+
   private pushUndo(): void {
     const step = new Map<THREE.Mesh, Float32Array>();
     for (const item of this.meshes) {
@@ -279,11 +325,14 @@ export class Painter {
         ? geometry.groups
         : [{ start: 0, count: countVertex, materialIndex: 0 }];
 
+    const faceMaterial: string[] = new Array(Math.floor(countVertex / 3)).fill('');
+
     for (const g of group) {
       const material = materials[g.materialIndex ?? 0] as THREE.MeshStandardMaterial | undefined;
       const faceFirst = Math.floor(g.start / 3);
       const faceLast = Math.floor((g.start + g.count) / 3);
       for (let face = faceFirst; face < faceLast; face += 1) {
+        faceMaterial[face] = material?.name || 'unnamed';
         const c = photo
           ? this.readSourceColor(photo, uv, face)
           : (material?.color.clone() ?? new THREE.Color('#dddddd'));
@@ -313,6 +362,7 @@ export class Painter {
       colorAttribute,
       adjacentFaces: this.buildAdjacentFaces(position),
       faceCenters: this.computeFaceCenters(position),
+      faceMaterial,
     });
   }
 

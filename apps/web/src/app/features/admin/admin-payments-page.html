@@ -1,32 +1,88 @@
 <div class="pm-page">
   <header class="page-header">
-    <h1 class="title">{{ 'ADMIN.LOG.TITLE' | translate }}</h1>
+    <p class="board-eyebrow">{{ 'ADMIN.LOG.EYEBROW' | translate }}</p>
+    <h1 class="title pm-page-title">{{ 'ADMIN.LOG.TITLE' | translate }}</h1>
     <p class="description">{{ 'ADMIN.LOG.DESCRIPTION' | translate }}</p>
-    <button class="pm-button-secondary" type="button" (click)="reload()">
+    <button class="pm-button-secondary" type="button" (click)="facade.reload()">
       {{ 'ADMIN.REFRESH' | translate }}
     </button>
   </header>
 
-  @switch (status()) {
+  @switch (facade.status()) {
     @case ('LOADING') {
       <div class="pm-center"><mat-spinner diameter="40" /></div>
     }
     @case ('ERROR') {
       <div class="pm-center">
         <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
-        <button class="pm-button-secondary" type="button" (click)="reload()">
+        <button class="pm-button-secondary" type="button" (click)="facade.reload()">
           {{ 'COMMON.RETRY' | translate }}
         </button>
       </div>
     }
     @case ('READY') {
-      @if (rows().length === 0) {
+      <section class="money-board" [attr.aria-label]="'ADMIN.LOG.SUMMARY' | translate">
+        <article class="money-tile">
+          <span class="money-name">{{ 'ADMIN.LOG.TAKEN_TODAY' | translate }}</span>
+          <strong class="money-figure">{{ facade.takenToday() | amount }}</strong>
+        </article>
+        <article class="money-tile">
+          <span class="money-name">{{ 'ADMIN.LOG.MATCHED_FULLY' | translate }}</span>
+          <strong class="money-figure amber">{{ facade.matchedCount() }}</strong>
+          <span class="money-note">
+            {{ 'ADMIN.LOG.AUTO_SHARE' | translate: { share: facade.matchedShare() } }}
+          </span>
+        </article>
+        <article class="money-tile">
+          <span class="money-name">{{ 'ADMIN.LOG.SHORT' | translate }}</span>
+          <strong class="money-figure danger">{{ facade.shortCount() }}</strong>
+          <span class="money-note">{{ 'ADMIN.LOG.SHORT_NOTE' | translate }}</span>
+        </article>
+        <article class="money-tile">
+          <span class="money-name">{{ 'ADMIN.LOG.LOOSE' | translate }}</span>
+          <strong class="money-figure">{{ facade.looseCount() }}</strong>
+          <span class="money-note">{{ 'ADMIN.LOG.LOOSE_NOTE' | translate }}</span>
+        </article>
+      </section>
+
+      <nav class="log-filters" [attr.aria-label]="'ADMIN.LOG.FILTER_LABEL' | translate">
+        @for (chip of facade.chips(); track chip.group) {
+          <button
+            type="button"
+            class="filter tw-chip"
+            [class.on]="facade.chosen() === chip.group"
+            [attr.aria-pressed]="facade.chosen() === chip.group"
+            (click)="choose(chip.group)"
+          >
+            {{ chip.key | translate }} ({{ chip.count }})
+          </button>
+        }
+      </nav>
+
+      <form class="search-row" (ngSubmit)="$event.preventDefault()">
+        <label class="sr-only" for="search-log">{{ 'ADMIN.LOG.SEARCH_INPUT' | translate }}</label>
+        <input
+          id="search-log"
+          name="keyword"
+          type="search"
+          autocomplete="off"
+          [ngModel]="facade.keyword()"
+          (ngModelChange)="facade.setKeyword($event)"
+          [placeholder]="'ADMIN.LOG.SEARCH_INPUT' | translate"
+        />
+        <span class="result-count">
+          {{ 'ADMIN.RESULT_COUNT' | translate: { count: facade.total() } }}
+        </span>
+      </form>
+
+      @if (facade.rows().length === 0) {
         <div class="pm-center pm-empty"><p>{{ 'ADMIN.LOG.EMPTY' | translate }}</p></div>
       } @else {
         <div class="table-wrap">
           <table class="table">
             <thead>
               <tr>
+                <th scope="col" class="num-col">#</th>
                 <th scope="col">{{ 'ADMIN.LOG.AT' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.LOG.TRANSACTION_ID' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.LOG.AMOUNT' | translate }}</th>
@@ -36,8 +92,9 @@
               </tr>
             </thead>
             <tbody>
-              @for (t of rows(); track t.raw._id) {
+              @for (t of facade.rows(); track t.raw._id; let i = $index) {
                 <tr>
+                  <td class="num-col muted">{{ i + 1 }}</td>
                   <td>{{ t.raw.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
                   <td class="small-code">{{ t.raw.transactionId }}</td>
                   <td class="right">{{ t.raw.amount | amount }}</td>
@@ -52,7 +109,7 @@
                     }
                   </td>
                   <td>
-                    <span class="status-chip" [attr.data-group]="t.match ? 'good' : 'bad'">
+                    <span class="status-chip" [attr.data-group]="t.tone">
                       {{ t.keyResult | translate }}
                     </span>
                   </td>
@@ -61,6 +118,26 @@
             </tbody>
           </table>
         </div>
+
+        <nav class="paging" [attr.aria-label]="'ADMIN.PAGING' | translate">
+          <button
+            class="pm-button-secondary"
+            type="button"
+            [disabled]="!facade.remainingPrevPage()"
+            (click)="facade.changePage(-1)"
+          >
+            {{ 'ADMIN.PREV_PAGE' | translate }}
+          </button>
+          <span>{{ facade.pageNow() }} / {{ facade.pageCount() }}</span>
+          <button
+            class="pm-button-secondary"
+            type="button"
+            [disabled]="!facade.remainingNextPage()"
+            (click)="facade.changePage(1)"
+          >
+            {{ 'ADMIN.NEXT_PAGE' | translate }}
+          </button>
+        </nav>
       }
     }
   }

@@ -1,0 +1,37 @@
+<div class="shop">
+  <header class="shop-head tw-page pb-0">
+    <div class="flex flex-col gap-1">
+      <span class="tw-eyebrow">{{ 'SHOP.EYEBROW' | translate }}</span>
+      <h1 class="tw-page-title">{{ 'SHOP.TITLE' | translate }}</h1>
+      <p class="tw-page-sub">{{ 'SHOP.SUB' | translate }}</p>
+    </div>
+    <nav class="shop-tabs tw-tabs mt-5" [attr.aria-label]="'SHOP.TITLE' | translate">
+      <button
+        type="button"
+        class="tw-tab"
+        [class.active]="shelf() === 'custom'"
+        [attr.aria-pressed]="shelf() === 'custom'"
+        (click)="pickShelf('custom')"
+      >
+        <pm-icon name="sparkle" [size]="15" />
+        {{ 'SHOP.CUSTOM' | translate }}
+      </button>
+      <button
+        type="button"
+        class="tw-tab"
+        [class.active]="shelf() === 'ready'"
+        [attr.aria-pressed]="shelf() === 'ready'"
+        (click)="pickShelf('ready')"
+      >
+        <pm-icon name="gift" [size]="15" />
+        {{ 'SHOP.READY' | translate }}
+      </button>
+    </nav>
+  </header>
+
+  @if (shelf() === 'custom') {
+    <pm-products-page />
+  } @else {
+    <pm-goods-list-page />
+  }
+</div>

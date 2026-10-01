@@ -6,13 +6,9 @@ import { OrderStatus } from '../core/models/api.model';
  */
 export const KEY_STATUS_ORDER: Record<OrderStatus, string> = {
   AWAITING_PAYMENT: 'ORDER.STATUS.AWAITING_PAYMENT',
-  PAYMENT_EXPIRED: 'ORDER.STATUS.PAYMENT_EXPIRED',
   PAID: 'ORDER.STATUS.PAID',
   IN_PRODUCTION: 'ORDER.STATUS.IN_PRODUCTION',
-  QUALITY_CHECK: 'ORDER.STATUS.QUALITY_CHECK',
-  READY_TO_SHIP: 'ORDER.STATUS.READY_TO_SHIP',
   SHIPPING: 'ORDER.STATUS.SHIPPING',
-  DELIVERED: 'ORDER.STATUS.DELIVERED',
   COMPLETED: 'ORDER.STATUS.COMPLETED',
   CANCELLED: 'ORDER.STATUS.CANCELLED',
 };
@@ -22,12 +18,8 @@ export const SORT_ORDER_STATUS: OrderStatus[] = [
   'AWAITING_PAYMENT',
   'PAID',
   'IN_PRODUCTION',
-  'QUALITY_CHECK',
-  'READY_TO_SHIP',
   'SHIPPING',
-  'DELIVERED',
   'COMPLETED',
-  'PAYMENT_EXPIRED',
   'CANCELLED',
 ];
 
@@ -37,13 +29,9 @@ export const SORT_ORDER_STATUS: OrderStatus[] = [
  */
 export const GROUP_COLOR_STATUS: Record<OrderStatus, string> = {
   AWAITING_PAYMENT: 'awaiting',
-  PAYMENT_EXPIRED: 'bad',
   PAID: 'good',
   IN_PRODUCTION: 'in-progress',
-  QUALITY_CHECK: 'in-progress',
-  READY_TO_SHIP: 'in-progress',
   SHIPPING: 'in-progress',
-  DELIVERED: 'good',
   COMPLETED: 'good',
   CANCELLED: 'bad',
 };

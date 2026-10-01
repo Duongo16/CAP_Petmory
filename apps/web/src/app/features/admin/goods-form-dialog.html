@@ -1,0 +1,147 @@
+<form class="sheet" [formGroup]="form" (ngSubmit)="save()">
+  <header class="sheet-head">
+    <div>
+      <p class="eyebrow">{{ 'ADMIN.GOODS.TITLE' | translate }}</p>
+      <h2 class="sheet-title">
+        {{ (editing ? 'ADMIN.GOODS.EDIT_TITLE' : 'ADMIN.GOODS.NEW') | translate }}
+      </h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="sheet-body">
+    <!-- Code + Name + Group + Days ghep 2 hang -->
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="goods-code">{{ 'ADMIN.GOODS.CODE' | translate }}</label>
+        <input id="goods-code" type="text" formControlName="code" />
+        @if (editing) {
+          <p class="field-note">{{ 'ADMIN.GOODS.CODE_LOCKED' | translate }}</p>
+        }
+      </div>
+      <div class="field">
+        <label class="field-name" for="goods-name">{{ 'ADMIN.GOODS.NAME' | translate }}</label>
+        <input id="goods-name" type="text" formControlName="name" />
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="goods-group">{{ 'ADMIN.GOODS.GROUP' | translate }}</label>
+        <select id="goods-group" formControlName="category">
+          @for (one of groups; track one._id) {
+            <option [value]="one._id">{{ one.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-name" for="goods-days">{{ 'ADMIN.GOODS.DELIVERY_DAYS' | translate }}</label>
+        <input id="goods-days" type="number" min="1" max="60" formControlName="deliveryDays" />
+      </div>
+    </div>
+
+    <!-- Mo ta + checkbox "hien tren shop" cung hang -->
+    <div class="pair-desc">
+      <div class="field">
+        <label class="field-name" for="goods-note">{{ 'ADMIN.GOODS.DESCRIPTION' | translate }}</label>
+        <textarea id="goods-note" rows="2" formControlName="description"></textarea>
+      </div>
+      <label class="tick">
+        <input type="checkbox" formControlName="enabled" />
+        <span>{{ 'ADMIN.GOODS.SHOW_ON_SHOP' | translate }}</span>
+      </label>
+    </div>
+
+    <!-- Anh san pham: luoi xem truoc -->
+    <div class="field">
+      <div class="shot-head">
+        <label class="field-name">{{ 'ADMIN.GOODS.IMAGES' | translate }}</label>
+        <span class="shot-count">{{ images().length }}/{{ imageMax }}</span>
+      </div>
+      <pm-image-link boxId="goods-image" [disabled]="imageFull()" (picked)="addImage($event)" />
+      @if (images().length > 0) {
+        <div class="shot-grid">
+          @for (one of images(); track one; let i = $index) {
+            <div class="shot-item" [class.is-main]="i === 0">
+              <img [src]="one" alt="" loading="lazy" />
+              @if (i === 0) {
+                <span class="shot-lead">{{ 'ADMIN.GOODS.IMAGE_MAIN' | translate }}</span>
+              }
+              <button
+                type="button"
+                class="shot-drop"
+                (click)="dropImage(i)"
+                [attr.aria-label]="'COMMON.REMOVE' | translate"
+              >
+                <pm-icon name="close" [size]="11" />
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Bien the -->
+    <h3 class="sub-head">{{ 'ADMIN.GOODS.VARIANT' | translate }}</h3>
+    <div class="variant-head">
+      <span>{{ 'ADMIN.GOODS.VARIANT_NAME' | translate }}</span>
+      <span>{{ 'ADMIN.GOODS.SKU' | translate }}</span>
+      <span>{{ 'ADMIN.GOODS.PRICE' | translate }}</span>
+      <span>{{ 'ADMIN.GOODS.STOCK' | translate }}</span>
+      <span>{{ 'ADMIN.GOODS.ON_SHOP' | translate }}</span>
+      <span></span>
+    </div>
+
+    <div formArrayName="variant">
+      @for (row of variants().controls; track $index) {
+        <div class="variant-row" [formGroupName]="$index">
+          <label class="cell">
+            <span class="cell-name">{{ 'ADMIN.GOODS.VARIANT_NAME' | translate }}</span>
+            <input type="text" formControlName="label" />
+          </label>
+          <label class="cell">
+            <span class="cell-name">{{ 'ADMIN.GOODS.SKU' | translate }}</span>
+            <input type="text" formControlName="sku" />
+          </label>
+          <label class="cell">
+            <span class="cell-name">{{ 'ADMIN.GOODS.PRICE' | translate }}</span>
+            <input type="text" inputmode="numeric" formControlName="price" />
+          </label>
+          <label class="cell">
+            <span class="cell-name">{{ 'ADMIN.GOODS.STOCK' | translate }}</span>
+            <input type="number" min="0" formControlName="stock" />
+          </label>
+          <label class="cell tick-cell">
+            <span class="cell-name">{{ 'ADMIN.GOODS.ON_SHOP' | translate }}</span>
+            <input class="variant-tick" type="checkbox" formControlName="enabled" />
+          </label>
+          <button
+            type="button"
+            class="drop-variant"
+            [disabled]="variants().length <= 1"
+            (click)="dropVariant($index)"
+            [attr.aria-label]="'ADMIN.GOODS.DROP_VARIANT' | translate"
+          >
+            <pm-icon name="close" [size]="13" />
+          </button>
+        </div>
+      }
+    </div>
+
+    <button type="button" class="plain add-variant" (click)="addVariant()">
+      {{ 'ADMIN.GOODS.ADD_VARIANT' | translate }}
+    </button>
+
+    <p class="field-note">{{ 'ADMIN.GOODS.STOCK_HINT' | translate }}</p>
+  </div>
+
+  <footer class="sheet-foot">
+    <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button type="submit" class="strong" id="goods-save">
+      {{ 'ADMIN.GOODS.SAVE' | translate }}
+      <pm-icon name="check" [size]="15" />
+    </button>
+  </footer>
+</form>

@@ -16,6 +16,7 @@ import { AdminService } from '../../core/services/admin.service';
 import { CustomerProfile } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { KEY_STATUS_ORDER, GROUP_COLOR_STATUS } from '../../shared/order-status';
+import { kindKeyOf } from '../../shared/pet-labels';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
@@ -23,6 +24,26 @@ const KEY_STATUS_PET: Record<string, string> = {
   TOGETHER: 'PET.TOGETHER',
   PASSED_AWAY: 'PET.PASSED_AWAY',
 };
+
+/** Statuses that mean the money has actually been taken. */
+const COUNTS_AS_SPENT: string[] = ['PAID', 'IN_PRODUCTION', 'SHIPPING', 'COMPLETED'];
+
+/** Orders that reached the customer's hands. */
+const COUNTS_AS_DONE: string[] = ['COMPLETED'];
+
+/** What a customer must have spent to reach the next tier, in dong. */
+const NEXT_TIER_AT = 1_000_000n;
+
+/** The first letters of a name, for the round mark beside it. */
+function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return '?';
+  }
+  const first = parts[0][0];
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+  return (first + last).toUpperCase();
+}
 
 @Component({
   selector: 'pm-admin-customer-detail-page',
@@ -35,7 +56,7 @@ const KEY_STATUS_PET: Record<string, string> = {
     MoneyPipe,
   ],
   templateUrl: './admin-customer-detail-page.html',
-  styleUrl: './admin-shared.scss',
+  styleUrls: ['./admin-shared.scss', './admin-customer-detail-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminCustomerDetailPage implements OnInit {
@@ -52,6 +73,7 @@ export class AdminCustomerDetailPage implements OnInit {
     (this.data()?.pet ?? []).map((t) => ({
       raw: t,
       keyStatus: KEY_STATUS_PET[t.status] ?? 'PET.TOGETHER',
+      keyKind: kindKeyOf(t.kind),
     })),
   );
 
@@ -62,6 +84,32 @@ export class AdminCustomerDetailPage implements OnInit {
       groupColor: GROUP_COLOR_STATUS[d.status],
     })),
   );
+
+  readonly initials = computed(() => initialsOf(this.customer()?.fullName ?? ''));
+
+  /** What the customer has actually paid, as an integer string in dong. */
+  private readonly spent = computed(() =>
+    (this.data()?.orders ?? [])
+      .filter((d) => COUNTS_AS_SPENT.includes(d.status))
+      .reduce((total, d) => total + BigInt(d.total.$numberDecimal), 0n),
+  );
+
+  readonly spentText = computed(() => this.spent().toString());
+  readonly orderCount = computed(() => (this.data()?.orders ?? []).length);
+  readonly petCount = computed(() => (this.data()?.pet ?? []).length);
+
+  readonly doneCount = computed(
+    () => (this.data()?.orders ?? []).filter((d) => COUNTS_AS_DONE.includes(d.status)).length,
+  );
+
+  /** How far along the way to the next tier the customer is, as a percentage. */
+  readonly tierShare = computed(() => {
+    const share = (this.spent() * 100n) / NEXT_TIER_AT;
+    return Number(share > 100n ? 100n : share);
+  });
+
+  /** A phone number the customer has given on an order, if any. */
+  readonly phone = computed(() => (this.data()?.orders ?? [])[0]?.delivery.phone ?? '');
 
   ngOnInit(): void {
     this.reload();

@@ -42,40 +42,44 @@ async function run() {
 
                 // --- Home page ---
     await page.waitForSelector('.hero', { timeout: 15000 });
-    res.push(check('The home page has two calls to action', (await page.locator('.buttons a').count()) === 2));
+    res.push(check('The home page has two calls to action',
+      (await page.locator('.hero .buttons a').count()) === 2));
     res.push(check('The home page has four selling points', (await page.locator('.point-item').count()) === 4));
     res.push(check('The home page has four process steps', (await page.locator('.step-item').count()) === 4));
+    res.push(check('The home page shows the stories strip',
+      (await page.locator('.story-card').count()) === 3));
     await page.screenshot({ path: path.join(OUT, 'shopping-1-home.png') });
 
                 // --- Product list ---
     await page.locator('a:has-text("Khám phá")').click();
     await page.waitForURL('**/products', { timeout: 15000 });
-    await page.waitForSelector('.product-card', { timeout: 15000 });
-    const productCount = await page.locator('.product-card').count();
+    await page.waitForSelector('.card', { timeout: 15000 });
+    const productCount = await page.locator('.card').count();
     res.push(check('The list shows every product type', productCount === 5, `${productCount} loai`));
-    res.push(check('Every card carries a from price', (await page.locator('.price strong').count()) === productCount));
+    res.push(check('Every card carries a from price',
+      (await page.locator('.buy-price strong').count()) === productCount));
     await page.screenshot({ path: path.join(OUT, 'shopping-2-product-list.png') });
 
                 // --- Product detail ---
-    await page.locator('.product-card').first().click();
-    await page.waitForSelector('.product-name', { timeout: 15000 });
-    res.push(check('The detail page opens', true, await page.locator('.product-name').innerText()));
+    await page.locator('.card .card-link').first().click();
+    await page.waitForSelector('.picker .name', { timeout: 15000 });
+    res.push(check('The detail page opens', true, await page.locator('.picker .name').innerText()));
 
-    const countSize = await page.locator('.size-chip').count();
+    const countSize = await page.locator('.step').first().locator('.option').count();
     res.push(check('The sizes are shown', countSize === 3, `${countSize} sizes`));
 
-    const material = await page.locator('.spec .line').first().locator('dd').innerText();
+    const material = await page.locator('.specs div').first().locator('dd').innerText();
     res.push(check('The material comes from the server', material.includes('tái chế'), material));
 
-    const priceFirst = await page.locator('.headline-price').innerText();
-    await page.locator('.size-chip').nth(2).click();
+    const priceFirst = await page.locator('.price strong').innerText();
+    await page.locator('.step').first().locator('.option').nth(2).click();
     await page.waitForTimeout(400);
-    const priceAfter = await page.locator('.headline-price').innerText();
+    const priceAfter = await page.locator('.price strong').innerText();
     res.push(check('Changing the size changes the price', priceFirst !== priceAfter, `${priceFirst} -> ${priceAfter}`));
 
-    await page.locator('.stepper button').nth(1).click();
+    await page.locator('.counter button').nth(1).click();
     await page.waitForTimeout(300);
-    const priceOfTwo = await page.locator('.headline-price').innerText();
+    const priceOfTwo = await page.locator('.price strong').innerText();
     res.push(check('Raising the quantity changes the total', priceOfTwo !== priceAfter, `${priceAfter} -> ${priceOfTwo}`));
     await page.screenshot({ path: path.join(OUT, 'shopping-3-detail.png') });
 
@@ -88,18 +92,19 @@ async function run() {
                 // --- Cart ---
     await page.locator('.cart-button').click();
     await page.waitForURL('**/cart', { timeout: 15000 });
-    await page.waitForSelector('.line-item', { timeout: 15000 });
-    res.push(check('The cart holds the item just added', (await page.locator('.line-item').count()) === 1));
+    await page.waitForSelector('.line', { timeout: 15000 });
+    res.push(check('The cart holds the item just added', (await page.locator('.line').count()) === 1));
 
-    const cartTotal = await page.locator('.summary .amount').innerText();
+    const cartTotal = await page.locator('.bill-total strong').innerText();
     res.push(check('The cart totals correctly', cartTotal === priceOfTwo, `${cartTotal}`));
     await page.screenshot({ path: path.join(OUT, 'shopping-4-cart.png') });
 
-    await page.locator('.line-item .stepper button').first().click();
+    await page.locator('.line .counter button').first().click();
     await page.waitForTimeout(900);
-    res.push(check('A quantity can be lowered in the cart', (await page.locator('.summary .amount').innerText()) !== cartTotal));
+    res.push(check('A quantity can be lowered in the cart',
+      (await page.locator('.bill-total strong').innerText()) !== cartTotal));
 
-    await page.locator('.remove-button').click();
+    await page.locator('.line-drop').click();
     await page.waitForTimeout(900);
     res.push(check('Removing the item empties the cart', (await page.locator('.pm-center').count()) > 0));
 

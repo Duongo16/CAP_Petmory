@@ -5,7 +5,7 @@
 .layout {
   display: grid;
   grid-template-columns: minmax(230px, 1fr) minmax(0, 2.2fr) minmax(160px, 0.9fr);
-  gap: var(--pm-gap);
+  gap: 24px;
   align-items: start;
 }
 
@@ -23,6 +23,11 @@
   font: inherit;
 }
 
+.step-count {
+  background: var(--pm-bg-sunken);
+  color: var(--pm-text-body);
+}
+
 .step-button:hover,
 .step-button:focus-visible {
   background: var(--pm-bg-muted);
@@ -34,20 +39,15 @@
   font-weight: 600;
 }
 
-.step-count {
-  background: var(--pm-bg-sunken);
-  color: var(--pm-text-body);
-}
-
 .step-current .step-count {
   background: var(--pm-amber-bright);
   color: var(--pm-on-amber);
 }
 
 .model-btn--on {
-  border-color: var(--pm-accent);
-  border-width: 2px;
-  font-weight: 600;
+  border-color: var(--pm-night);
+  background: var(--pm-night);
+  color: var(--pm-on-night);
 }
 
 .choice-on {

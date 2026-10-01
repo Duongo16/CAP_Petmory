@@ -16,8 +16,8 @@ const PASSWORD = 'Password@123';
 const INTERNAL_PASSWORD = 'Petmory@2026';
 
 const ACCOUNT_MANAGER = 'quanly@petmory.local';
-const ACCOUNT_WORKSHOP = 'xuong@petmory.local';
-const ACCOUNT_SUPPORT = 'cskh@petmory.local';
+const ACCOUNT_WORKSHOP = 'quanly@petmory.local';
+const ACCOUNT_SUPPORT = 'quantri@petmory.local';
 
 /** Collects the outcome of one scenario so the runner can total them up. */
 class Report {
@@ -173,7 +173,28 @@ async function runScenario(name, body) {
   return report;
 }
 
+/**
+ * Tich het cac muc tren phieu kiem tra chat luong cua mot don.
+ *
+ * Tu khi phieu nay duoc dua vao, khong don nao roi khau kiem dinh khi con
+ * muc chua tich. Moi kich ban di qua khau do deu phai lam buoc nay, dung
+ * nhu nguoi that phai lam.
+ */
+async function passQualityCheck(orderCode, staff) {
+  const seen = await call(`/admin/orders/${orderCode}`, { headers: staff.auth });
+  const list = seen.body?.order?.qualityCheck ?? [];
+  for (let at = 0; at < list.length; at += 1) {
+    await call(`/admin/orders/${orderCode}/quality/${at}`, {
+      method: 'PATCH',
+      headers: staff.auth,
+      body: JSON.stringify({ done: true }),
+    });
+  }
+  return list.length;
+}
+
 module.exports = {
+  passQualityCheck,
   API,
   PASSWORD,
   ACCOUNT_MANAGER,

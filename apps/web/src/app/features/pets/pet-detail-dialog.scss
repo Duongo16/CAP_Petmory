@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.detail {
+  position: relative;
+  padding: 64px 24px 24px;
+  max-height: 88vh;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background: var(--pm-bg);
+}
+
+.detail-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  box-shadow: var(--pm-shadow);
+}
+
+@media (max-width: 600px) {
+  .detail {
+    padding: 60px 14px 14px;
+  }
+}
+
+/* Nhan va nut mau rieng tren nen toi, Tailwind khong co san mau nay. */
+.chip-soft {
+  background: var(--pm-memorial);
+  color: var(--pm-on-accent);
+}
+
+.treasure-eyebrow {
+  color: var(--pm-amber-soft);
+}
+
+.treasure-go,
+.keepsake-go {
+  transition: transform 140ms ease;
+
+  &:hover {
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+.treasure-go {
+  background: var(--pm-amber-bright);
+  color: var(--pm-on-amber);
+}
+
+.keepsake-go {
+  background: var(--pm-night);
+  color: var(--pm-on-night);
+}

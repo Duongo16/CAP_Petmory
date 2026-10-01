@@ -1,0 +1,257 @@
+<div class="book tw-page flex flex-col gap-6">
+  @switch (facade.status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+    }
+    @case ('DONE') {
+      <header class="head flex flex-col gap-2">
+        <a class="back tw-back self-start" routerLink="/journals">
+          <pm-icon name="chevron" [size]="13" />
+          {{ 'SHELF.BACK' | translate }}
+        </a>
+
+        <div class="head-row flex flex-wrap items-center gap-3">
+          <h1 class="title pm-page-title">
+            {{ 'MEMORY.BOOK_OF' | translate: { name: facade.pet()?.name } }}
+          </h1>
+          <span class="count-chip tw-badge tw-badge-accent">
+            {{ 'MEMORY.COUNT_MOMENT' | translate: { count: facade.total() } }}
+          </span>
+          <div class="book-tools flex flex-wrap items-center gap-2 ms-auto max-nav:ms-0 max-nav:w-full">
+            <button type="button" class="tool tw-btn-secondary" (click)="openShares()">
+              <pm-icon name="users" [size]="15" />
+              {{ 'MEMORY.SHARE_MANAGE' | translate }}
+            </button>
+            <button type="button" class="tool tw-btn-secondary" (click)="openExport()">
+              <pm-icon name="book" [size]="15" />
+              {{ 'MEMORY.EXPORT' | translate }}
+            </button>
+            <a class="tool tw-btn-secondary" [routerLink]="['/pets', facade.pet()?._id, 'slideshow']">
+              <pm-icon name="image" [size]="15" />
+              {{ 'MEMORY.SLIDESHOW' | translate }}
+            </a>
+            <button type="button" class="write tw-btn-primary" [disabled]="facade.pending()" (click)="openWriter()">
+              <pm-icon name="bookmark" [size]="16" />
+              {{ 'MEMORY.ADD' | translate }}
+            </button>
+          </div>
+        </div>
+        <p class="sub tw-page-sub">{{ 'MEMORY.BOOK_SUB' | translate }}</p>
+
+        @if (facade.blocked()) {
+          <p class="blocked mt-2 mb-0 rounded-md bg-danger-soft px-4 py-3 text-sm text-on-danger-soft" role="alert">
+            {{ 'MEMORY.BLOCKED' | translate }}
+            <span class="blocked-why mt-1 block italic">{{ facade.blockReason() }}</span>
+          </p>
+        }
+
+      </header>
+
+      <nav class="view-switch tw-tabs self-start" [attr.aria-label]="'BOOK.VIEW_LABEL' | translate">
+        <button
+          type="button"
+          class="tw-tab"
+          [class.on]="asBook()"
+          [attr.aria-pressed]="asBook()"
+          (click)="showBook(true)"
+        >
+          {{ 'BOOK.AS_BOOK' | translate }}
+        </button>
+        <button
+          type="button"
+          class="tw-tab"
+          [class.on]="!asBook()"
+          [attr.aria-pressed]="!asBook()"
+          (click)="showBook(false)"
+        >
+          {{ 'BOOK.AS_LIST' | translate }}
+        </button>
+      </nav>
+
+      @if (facade.pageProblem(); as trouble) {
+        <p class="note m-0 rounded-md bg-amber-soft px-4 py-3 text-sm text-on-amber" role="alert">{{ trouble | translate }}</p>
+      }
+
+      @if (asBook()) {
+        <pm-diary-book
+          [faces]="faces()"
+          [sourceOf]="facade.shotSource()"
+          [canEdit]="true"
+          (editWanted)="decorate($event)"
+        />
+      }
+
+      <div class="filters flex flex-wrap items-center gap-2" [class.tucked]="asBook()">
+        <label class="tw-label" for="memory-topic-filter">{{ 'MEMORY.FILTER_LABEL' | translate }}</label>
+        <select id="memory-topic-filter" class="filter-select tw-select w-auto min-w-56" (change)="chooseFrom($event)">
+          @for (chip of facade.chips(); track chip.key) {
+            <option [value]="chip.topic ?? ''" [selected]="facade.chosen() === chip.topic">
+              {{ chip.key | translate }} ({{ chip.count }})
+            </option>
+          }
+        </select>
+      </div>
+
+      @if (facade.empty()) {
+        <div class="pm-center blank">
+          <span class="blank-mark tw-icon-tile" aria-hidden="true"><pm-icon name="bookmark" [size]="26" /></span>
+          <p class="pm-empty">{{ 'MEMORY.EMPTY' | translate }}</p>
+          <button type="button" class="solid tw-btn-primary" (click)="openWriter()">
+            <pm-icon name="plus" [size]="16" />
+            {{ 'MEMORY.ADD' | translate }}
+          </button>
+        </div>
+      } @else if (!asBook()) {
+        <div class="map">
+          <svg class="compass" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="44" class="compass-ring" />
+            <path d="M50 10 L58 50 L50 90 L42 50 Z" class="compass-needle" />
+            <path d="M50 10 L58 50 L42 50 Z" class="compass-north" />
+            <circle cx="50" cy="50" r="5" class="compass-hub" />
+          </svg>
+
+          @for (month of facade.months(); track month.startedAt; let monthAt = $index) {
+            <section class="month">
+              <header class="month-head map-row">
+                <span class="road" aria-hidden="true">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path class="road-bed" d="M50 0 L50 100" vector-effect="non-scaling-stroke" />
+                    <path class="road-line" d="M50 0 L50 100" vector-effect="non-scaling-stroke" />
+                  </svg>
+                </span>
+                <span class="sign">
+                  <span class="sign-board">
+                    <span class="month-name font-serif capitalize">{{ month.startedAt | date: 'MMMM, y' }}</span>
+                    <span class="month-count">{{ 'MEMORY.COUNT_IN_MONTH' | translate: { count: month.cards.length } }}</span>
+                  </span>
+                  <span class="sign-post" aria-hidden="true"></span>
+                </span>
+              </header>
+
+              <ol class="moments map-stops">
+                @for (card of month.cards; track card.raw._id; let at = $index) {
+                  <li class="moment map-row stop" [class.milestone]="card.raw.isMilestone" [attr.data-side]="card.side">
+                    <span class="road" aria-hidden="true">
+                      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path class="road-bed road-l" d="M50 0 C50 28 16 26 16 50 C16 74 50 72 50 100" vector-effect="non-scaling-stroke" />
+                        <path class="road-line road-l" d="M50 0 C50 28 16 26 16 50 C16 74 50 72 50 100" vector-effect="non-scaling-stroke" />
+                        <path class="road-bed road-r" d="M50 0 C50 28 84 26 84 50 C84 74 50 72 50 100" vector-effect="non-scaling-stroke" />
+                        <path class="road-line road-r" d="M50 0 C50 28 84 26 84 50 C84 74 50 72 50 100" vector-effect="non-scaling-stroke" />
+                      </svg>
+                      <span class="pin" [class.pin-star]="card.raw.isMilestone">
+                        <pm-icon [name]="card.raw.isMilestone ? 'star' : 'paw'" [size]="16" [filled]="card.raw.isMilestone" />
+                      </span>
+                      <span class="stop-date">{{ card.raw.happenedAt | date: 'd/M' }}</span>
+                      @if ((monthAt + at) % 3 !== 1) {
+                        <svg class="scenery" [class.flower]="(monthAt + at) % 3 === 2" viewBox="0 0 40 48">
+                          @if ((monthAt + at) % 3 === 2) {
+                            <path class="stem" d="M20 46 L20 24" />
+                            <circle class="petal" cx="20" cy="14" r="6" />
+                            <circle class="petal" cx="12" cy="20" r="6" />
+                            <circle class="petal" cx="28" cy="20" r="6" />
+                            <circle class="petal" cx="15" cy="28" r="6" />
+                            <circle class="petal" cx="25" cy="28" r="6" />
+                            <circle class="bud" cx="20" cy="22" r="5" />
+                          } @else {
+                            <rect class="trunk" x="17" y="30" width="6" height="16" rx="2" />
+                            <circle class="leaf" cx="20" cy="20" r="14" />
+                            <circle class="leaf light" cx="14" cy="14" r="7" />
+                          }
+                        </svg>
+                      }
+                    </span>
+
+                    <article class="postcard tw-card">
+                      @if (card.cover) {
+                        <figure class="postcard-photo">
+                          <img [src]="card.cover" [alt]="card.raw.title" />
+                          @if (card.photoCount > 1) {
+                            <span class="photo-count"><pm-icon name="image" [size]="12" /> {{ card.photoCount }}</span>
+                          }
+                        </figure>
+                      }
+                      <span class="stamp" aria-hidden="true">
+                        <span class="stamp-day">{{ card.raw.happenedAt | date: 'dd' }}</span>
+                        <span class="stamp-month">{{ card.raw.happenedAt | date: 'MM/yy' }}</span>
+                      </span>
+                      <div class="postcard-body">
+                        <div class="moment-top">
+                          <span class="moment-marks">
+                            @if (card.raw.isMilestone) {
+                              <span class="chip chip-amber tw-badge tw-badge-amber">{{ 'MEMORY.MILESTONE' | translate }}</span>
+                            }
+                            <span class="chip tw-badge" [attr.data-tone]="card.topicTone">{{ card.topicKey | translate }}</span>
+                          </span>
+                        </div>
+                        <h3 class="moment-title">{{ card.raw.title }}</h3>
+                        <p class="moment-when">
+                          <pm-icon name="calendar" [size]="13" />
+                          {{ card.raw.happenedAt | date: 'EEEE, d MMMM · HH:mm' }}
+                          @if (card.raw.place) {
+                            <span class="moment-place"><span aria-hidden="true">·</span> {{ card.raw.place }}</span>
+                          }
+                        </p>
+                        @if (card.raw.body) {
+                          <p class="moment-body">{{ card.raw.body }}</p>
+                        }
+                        @if (card.raw.tag.length > 0) {
+                          <p class="moment-tags">
+                            @for (word of card.raw.tag; track word) {
+                              <span class="tag tw-badge tw-badge-accent">#{{ word }}</span>
+                            }
+                          </p>
+                        }
+                      </div>
+                      <button
+                        type="button"
+                        class="moment-drop tw-btn-icon"
+                        (click)="remove(card.raw)"
+                        [attr.aria-label]="'COMMON.REMOVE' | translate"
+                      >
+                        <pm-icon name="trash" [size]="15" />
+                      </button>
+                    </article>
+                  </li>
+                }
+              </ol>
+            </section>
+          }
+
+          @if (facade.page() >= facade.pageCount()) {
+            <div class="map-row map-start">
+              <span class="road" aria-hidden="true">
+                <span class="start-flag"><pm-icon name="home" [size]="20" /></span>
+              </span>
+              <p class="start-text">{{ 'MEMORY.MAP_START' | translate: { name: facade.pet()?.name } }}</p>
+            </div>
+          }
+        </div>
+
+        @if (facade.pageCount() > 1) {
+          <nav class="paging flex items-center justify-center gap-3 text-sm text-ink-muted" [attr.aria-label]="'MEMORY.PAGING' | translate">
+            <button
+              type="button"
+              class="plain tw-btn-secondary"
+              [disabled]="facade.page() <= 1"
+              (click)="facade.changePage(-1)"
+            >
+              {{ 'MEMORY.NEWER' | translate }}
+            </button>
+            <span>{{ facade.page() }} / {{ facade.pageCount() }}</span>
+            <button
+              type="button"
+              class="plain tw-btn-secondary"
+              [disabled]="facade.page() >= facade.pageCount()"
+              (click)="facade.changePage(1)"
+            >
+              {{ 'MEMORY.OLDER' | translate }}
+            </button>
+          </nav>
+        }
+      }
+    }
+  }
+</div>

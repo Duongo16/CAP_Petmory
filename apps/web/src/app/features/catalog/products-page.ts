@@ -15,23 +15,51 @@ import { CatalogService } from '../../core/services/catalog.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ProductType } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
-import { Rating } from '../../shared/rating/rating';
 import { Icon } from '../../shared/icon/icon';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
+
+/** How the grid may be ordered. */
+type Ordering = 'POPULAR' | 'CHEAP' | 'DEAR';
 
 /** One card in the grid, with everything the view needs already worked out. */
 interface ProductCard {
   raw: ProductType;
   priceFrom: string | null;
+  priceValue: bigint;
   sizeCount: number;
   favourite: boolean;
+  badgeKey: string;
+  badgeTone: string;
 }
+
+/**
+ * The badge each card carries, in the order the cards appear.
+ *
+ * The design gives every product a short marketing badge. They belong to the
+ * presentation rather than the catalogue, so they live here beside the tone
+ * that colours them, with every key written out in full.
+ */
+const BADGES: { key: string; tone: string }[] = [
+  { key: 'PRODUCT.BADGE.FLAGSHIP', tone: 'purple' },
+  { key: 'PRODUCT.BADGE.POCKET', tone: 'green' },
+  { key: 'PRODUCT.BADGE.DESK', tone: 'amber' },
+  { key: 'PRODUCT.BADGE.FAMILY', tone: 'soft' },
+  { key: 'PRODUCT.BADGE.KEEPSAKE', tone: 'purple' },
+  { key: 'PRODUCT.BADGE.WEARABLE', tone: 'amber' },
+];
+
+/** The orderings offered, with their labels written out. */
+const ORDERINGS: { value: Ordering; key: string }[] = [
+  { value: 'POPULAR', key: 'PRODUCT.SORT.POPULAR' },
+  { value: 'CHEAP', key: 'PRODUCT.SORT.CHEAP' },
+  { value: 'DEAR', key: 'PRODUCT.SORT.DEAR' },
+];
 
 @Component({
   selector: 'pm-products-page',
   standalone: true,
-  imports: [RouterLink, FormsModule, TranslatePipe, MoneyPipe, Rating, Icon],
+  imports: [RouterLink, FormsModule, TranslatePipe, MoneyPipe, Icon],
   templateUrl: './products-page.html',
   styleUrl: './products-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +74,8 @@ export class ProductsPage implements OnInit {
   readonly user = this.auth.user;
   readonly status = signal<ScreenState>('LOADING');
   readonly keyword = signal('');
+  readonly ordering = signal<Ordering>('POPULAR');
+  readonly orderings = ORDERINGS;
 
   private readonly list = signal<ProductType[]>([]);
   private readonly favourites = signal<string[]>([]);
@@ -53,12 +83,36 @@ export class ProductsPage implements OnInit {
   /** Each card carries its own figures, so the view calls no functions. */
   readonly cards = computed<ProductCard[]>(() => {
     const marked = this.favourites();
-    return this.list().map((raw) => ({
-      raw,
-      priceFrom: lowestPrice(raw),
-      sizeCount: raw.sizes.filter((s) => s.enabled).length,
-      favourite: marked.includes(raw.code),
-    }));
+    const rows = this.list().map((raw, index) => {
+      const badge = BADGES[index % BADGES.length];
+      const cheapest = lowestPrice(raw);
+      return {
+        raw,
+        priceFrom: cheapest,
+        priceValue: cheapest ? BigInt(cheapest) : 0n,
+        sizeCount: raw.sizes.filter((s) => s.enabled).length,
+        favourite: marked.includes(raw.code),
+        badgeKey: badge.key,
+        badgeTone: badge.tone,
+      };
+    });
+    return sortCards(rows, this.ordering());
+  });
+
+  /** How many pieces the workshop has made, read from the real review counts. */
+  readonly reviewTotal = computed(() =>
+    this.list().reduce((sum, p) => sum + (p.rating?.count ?? 0), 0),
+  );
+
+  /** The average score across everything that has been reviewed. */
+  readonly scoreAverage = computed(() => {
+    const scored = this.list().filter((p) => (p.rating?.count ?? 0) > 0);
+    if (scored.length === 0) {
+      return null;
+    }
+    const weighted = scored.reduce((sum, p) => sum + p.rating.average * p.rating.count, 0);
+    const counted = scored.reduce((sum, p) => sum + p.rating.count, 0);
+    return (weighted / counted).toFixed(1);
   });
 
   readonly empty = computed(() => this.status() === 'DONE' && this.list().length === 0);
@@ -92,6 +146,14 @@ export class ProductsPage implements OnInit {
       });
   }
 
+  setKeyword(value: string): void {
+    this.keyword.set(value);
+  }
+
+  setOrdering(value: Ordering): void {
+    this.ordering.set(value);
+  }
+
   /** Putting the keyword in the address makes a search shareable and reloadable. */
   submitSearch(): void {
     const text = this.keyword().trim();
@@ -121,6 +183,15 @@ export class ProductsPage implements OnInit {
         error: () => undefined,
       });
   }
+}
+
+/** Orders the cards without changing the array the signal holds. */
+function sortCards(rows: ProductCard[], ordering: Ordering): ProductCard[] {
+  if (ordering === 'POPULAR') {
+    return rows;
+  }
+  const byPrice = [...rows].sort((a, b) => (a.priceValue < b.priceValue ? -1 : 1));
+  return ordering === 'CHEAP' ? byPrice : byPrice.reverse();
 }
 
 /**

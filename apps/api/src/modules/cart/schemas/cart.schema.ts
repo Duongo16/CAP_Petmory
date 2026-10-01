@@ -1,17 +1,44 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type CartDocument = HydratedDocument<Cart>;
+
+/**
+ * Hai dong hang cua cua hang.
+ *
+ * Hang tuy bien lam theo anh cua be va di qua xuong. Hang co san nhap ve ban,
+ * khong gan voi be nao va khong qua xuong. Chung di chung mot gio va chung
+ * mot don, nhung moi thu khac deu khac nhau nen phai phan biet duoc.
+ */
+export enum LineKind {
+  MADE_TO_ORDER = 'MADE_TO_ORDER',
+  READY_MADE = 'READY_MADE',
+}
 
 @Schema({ _id: true })
 export class CartItem {
   _id!: Types.ObjectId;
 
-  @Prop({ required: true, uppercase: true, trim: true })
+  @Prop({ type: String, enum: LineKind, default: LineKind.MADE_TO_ORDER, index: true })
+  kind!: LineKind;
+
+  @Prop({ uppercase: true, trim: true, default: '' })
   productTypeCode!: string;
 
-  @Prop({ required: true, uppercase: true, trim: true })
+  @Prop({ uppercase: true, trim: true, default: '' })
   sizeCode!: string;
+
+  /** Ma mon hang co san. Rong voi dong hang tuy bien. */
+  @Prop({ uppercase: true, trim: true, default: '' })
+  goodsCode!: string;
+
+  /** Ma to hop bien the. Rong voi dong hang tuy bien. */
+  @Prop({ uppercase: true, trim: true, default: '' })
+  sku!: string;
+
+  /** Anh dai dien cua mon hang co san, de gio hang ve duoc ngay. */
+  @Prop({ trim: true, default: '' })
+  imageUrl!: string;
 
   @Prop({ required: true, trim: true })
   displayName!: string;
@@ -37,7 +64,7 @@ export class CartItem {
    * Unit price frozen when the line was added, stored as an exact decimal.
    * A later price change by the Manager does not alter an existing cart.
    */
-  @Prop({ type: Types.Decimal128, required: true })
+  @Prop({ type: MongooseSchema.Types.Decimal128, required: true })
   unitPrice!: Types.Decimal128;
 
   @Prop({ required: true, default: 'VND', uppercase: true, trim: true })

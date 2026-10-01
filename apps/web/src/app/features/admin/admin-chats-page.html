@@ -1,0 +1,104 @@
+<section class="page">
+  <header class="head">
+    <h1 class="pm-page-title">{{ 'ADMIN.CHAT.TITLE' | translate }}</h1>
+    <p class="lead tw-page-sub">{{ 'ADMIN.CHAT.LEAD' | translate }}</p>
+  </header>
+
+  @if (problem()) {
+    <p class="middle bad" role="alert">{{ problem() | translate }}</p>
+  }
+
+  <div class="desk">
+    <div class="queue">
+      <h2>{{ 'ADMIN.CHAT.QUEUE' | translate }}</h2>
+      @if (rows().length === 0) {
+        <p class="middle">{{ 'ADMIN.CHAT.QUEUE_EMPTY' | translate }}</p>
+      } @else {
+        <ul class="queue-list" id="chat-queue">
+          @for (one of rows(); track one.code) {
+            <li>
+              <button
+                type="button"
+                class="queue-card"
+                [class.on]="open()?.code === one.code"
+                (click)="choose(one.code)"
+              >
+                <span class="queue-top">
+                  <span class="who">{{ one.who || ('ADMIN.CHAT.GUEST' | translate) }}</span>
+                  <span class="chip" [class]="one.state">{{ one.stateKey | translate }}</span>
+                </span>
+                <span class="when">{{ one.lastAt | date: 'dd/MM HH:mm' }}</span>
+                @if (one.note) {
+                  <span class="note">{{ one.note }}</span>
+                }
+                <span class="preview">{{ one.lastText }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    @if (open(); as one) {
+      <div class="thread" id="chat-thread">
+        <header class="thread-head">
+          <div>
+            <h2>{{ openWho() || ('ADMIN.CHAT.GUEST' | translate) }}</h2>
+            <p class="chip-line">
+              <span class="chip" [class]="one.state">{{ openStateKey() | translate }}</span>
+            </p>
+          </div>
+          <div class="thread-actions">
+            @if (canTake()) {
+              <button type="button" class="main-button tw-btn-primary" id="chat-take" [disabled]="working()" (click)="take()">
+                {{ 'ADMIN.CHAT.TAKE' | translate }}
+              </button>
+            }
+            @if (canClose()) {
+              <button type="button" class="plain-button tw-btn-secondary" id="chat-close" [disabled]="working()" (click)="close()">
+                {{ 'ADMIN.CHAT.CLOSE' | translate }}
+              </button>
+            }
+          </div>
+        </header>
+
+        @if (one.handoverNote) {
+          <p class="handover-note">{{ 'ADMIN.CHAT.NOTE' | translate }}: {{ one.handoverNote }}</p>
+        }
+
+        <div class="turns" role="log" aria-live="polite">
+          @for (turn of turns(); track turn.id) {
+            <div class="turn" [class]="turn.side">
+              <p class="turn-who">{{ turn.sideKey | translate }}</p>
+              <p class="turn-text">{{ turn.text }}</p>
+              <p class="turn-when">{{ turn.at | date: 'HH:mm' }}</p>
+            </div>
+          }
+        </div>
+
+        @if (canReply()) {
+          <form class="reply-row" (ngSubmit)="send()">
+            <label class="sr-only" for="chat-reply">{{ 'ADMIN.CHAT.REPLY' | translate }}</label>
+            <input
+              id="chat-reply"
+              class="tw-input min-w-0 flex-1"
+              type="text"
+              autocomplete="off"
+              name="reply"
+              [placeholder]="'ADMIN.CHAT.REPLY' | translate"
+              [ngModel]="typed()"
+              (ngModelChange)="typed.set($event)"
+            />
+            <button type="submit" class="main-button tw-btn-primary" id="chat-send" [disabled]="working()">
+              {{ 'ADMIN.CHAT.SEND' | translate }}
+            </button>
+          </form>
+        } @else {
+          <p class="hint">{{ 'ADMIN.CHAT.TAKE_FIRST' | translate }}</p>
+        }
+      </div>
+    } @else {
+      <p class="middle">{{ 'ADMIN.CHAT.PICK_ONE' | translate }}</p>
+    }
+  </div>
+</section>

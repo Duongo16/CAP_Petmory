@@ -7,11 +7,12 @@
   }
   @case ('READY') {
     @if (product(); as product) {
-      <nav class="flex items-center justify-between gap-4 flex-wrap px-6 py-2 bg-muted text-sm" [attr.aria-label]="'PRODUCT.CRUMBS' | translate">
+      @if (!inPopup()) {
+      <nav class="flex items-center justify-between gap-4 flex-wrap px-6 py-3 bg-muted border-b border-edge text-sm max-[600px]:px-4" [attr.aria-label]="'PRODUCT.CRUMBS' | translate">
         <span class="inline-flex items-center gap-2 text-ink-muted">
           <a class="text-ink-muted no-underline hover:text-accent transition-colors duration-150" routerLink="/home">{{ 'NAV.HOME' | translate }}</a>
           <pm-icon name="chevron" [size]="11" />
-          <a class="text-ink-muted no-underline hover:text-accent transition-colors duration-150" routerLink="/products">{{ 'NAV.PRODUCT' | translate }}</a>
+          <a class="text-ink-muted no-underline hover:text-accent transition-colors duration-150" routerLink="/shop">{{ 'NAV.SHOP' | translate }}</a>
           <pm-icon name="chevron" [size]="11" />
           <span class="font-medium text-accent">{{ product.name }}</span>
         </span>
@@ -20,44 +21,45 @@
           {{ 'PRODUCT.PROMISE' | translate }}
         </span>
       </nav>
+      }
 
-      <div class="flex flex-col gap-10 px-4 pt-8 pb-14 mx-auto max-w-[1180px] box-border">
+      <div class="tw-page flex flex-col gap-10 max-[600px]:px-4">
         <div class="grid grid-cols-1 nav:grid-cols-2 gap-10 items-start">
           <!-- Gallery column -->
           <section class="flex flex-col gap-4">
-            <div class="stage relative grid place-items-center overflow-hidden aspect-square rounded-lg bg-muted text-edge-strong">
+            <div class="stage relative grid place-items-center overflow-hidden aspect-square rounded-xl border border-edge bg-muted text-edge-strong">
               @if (product.imageUrl) {
                 <img [src]="product.imageUrl" [alt]="product.name" />
               } @else {
                 <span aria-hidden="true"><pm-icon name="paw" [size]="56" /></span>
               }
               <span class="absolute top-[14px] left-[14px] flex gap-2 flex-wrap max-w-[calc(100%-28px)]">
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-success-soft text-success">{{ 'PRODUCT.TAG_MATERIAL' | translate }}</span>
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-ink text-card">{{ 'PRODUCT.TAG_HANDMADE' | translate }}</span>
+                <span class="tw-badge tw-badge-success">{{ 'PRODUCT.TAG_MATERIAL' | translate }}</span>
+                <span class="tw-badge bg-night text-on-night">{{ 'PRODUCT.TAG_HANDMADE' | translate }}</span>
               </span>
-              <span class="absolute bottom-[14px] left-[14px] right-[14px] px-3 py-2 rounded-sm bg-ink text-card text-xs opacity-[0.88]">{{ 'PRODUCT.STAGE_NOTE' | translate }}</span>
+              <span class="absolute bottom-[14px] left-[14px] right-[14px] px-3 py-2 rounded-md bg-night text-on-night text-xs opacity-[0.88]">{{ 'PRODUCT.STAGE_NOTE' | translate }}</span>
             </div>
 
-            <article class="flex gap-3 p-4 rounded-md bg-card border border-edge">
-              <span class="grid place-items-center flex-none w-10 h-10 rounded-sm bg-accent-soft text-accent" aria-hidden="true">
+            <article class="tw-card flex gap-4 p-5">
+              <span class="tw-icon-tile" aria-hidden="true">
                 <pm-icon name="heart" [size]="18" />
               </span>
               <div>
-                <h2 class="m-0 text-lg font-semibold text-ink">{{ 'PRODUCT.PROMISE_TITLE' | translate }}</h2>
+                <h2 class="m-0 text-base font-bold text-ink">{{ 'PRODUCT.PROMISE_TITLE' | translate }}</h2>
                 <p class="mt-1 m-0 text-sm leading-[1.55] text-ink-muted">{{ 'PRODUCT.PROMISE_TEXT' | translate }}</p>
               </div>
             </article>
           </section>
 
           <!-- Picker column -->
-          <section class="flex flex-col gap-3">
+          <section class="picker tw-card flex flex-col gap-4 p-6 max-[600px]:p-5">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-soft text-amber">{{ 'PRODUCT.BADGE_MOST_ORDERED' | translate }}</span>
+              <span class="tw-badge tw-badge-amber">{{ 'PRODUCT.BADGE_MOST_ORDERED' | translate }}</span>
               <span class="text-sm text-ink-muted">{{ 'PRODUCT.CODE' | translate }} {{ product.code }}</span>
               @if (user()) {
                 <button
                   type="button"
-                  class="grid place-items-center w-[34px] h-[34px] ml-auto border border-edge-strong rounded-full bg-card cursor-pointer transition-colors duration-150"
+                  class="tw-btn-icon ml-auto w-11 h-11"
                   [class.text-danger]="favourite()"
                   [class.text-ink-muted]="!favourite()"
                   (click)="toggleFavourite()"
@@ -68,7 +70,7 @@
               }
             </div>
 
-            <h1 class="m-0 font-medium leading-[1.2] text-ink pm-page-title">{{ product.name }}</h1>
+            <h1 class="name tw-page-title pm-page-title">{{ product.name }}</h1>
 
             <p class="flex items-center gap-2 m-0 text-base text-ink-muted">
               <span class="text-amber"><pm-icon name="star" [size]="15" /></span>
@@ -80,34 +82,34 @@
             </p>
 
             @if (total(); as amount) {
-              <p class="mt-1 m-0">
-                <strong class="text-[2.75rem] font-semibold text-amber">{{ amount | amount }}</strong>
+              <p class="price m-0">
+                <strong class="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-soft text-on-amber text-[2rem] leading-tight font-bold">{{ amount | amount }}</strong>
               </p>
             }
             <p class="m-0 text-sm text-ink-muted">{{ product.description }}</p>
 
             <p class="flex items-center gap-2 flex-wrap m-0 text-sm text-ink-muted">
-              <span class="px-3 py-1 rounded-full text-xs font-bold bg-success-soft text-success">{{ 'PRODUCT.FREE_SHIPPING' | translate }}</span>
+              <span class="tw-badge tw-badge-success">{{ 'PRODUCT.FREE_SHIPPING' | translate }}</span>
               <span>{{ 'PRODUCT.SHIPPING_NOTE' | translate }}</span>
             </p>
 
             <!-- Step 1: size -->
-            <fieldset class="mt-1 m-0 p-0 border-0">
-              <legend class="p-0 text-lg font-semibold text-ink">{{ 'PRODUCT.STEP_SIZE' | translate }}</legend>
-              <div class="flex flex-col gap-2 mt-[10px]">
+            <fieldset class="step m-0 pt-4 px-0 pb-0 border-0 border-t border-edge">
+              <legend class="float-left w-full p-0 text-base font-bold text-ink">{{ 'PRODUCT.STEP_SIZE' | translate }}</legend>
+              <div class="clear-both flex flex-col gap-2 pt-3">
                 @for (size of sizes(); track size.code) {
                   <button
                     type="button"
-                    class="option flex flex-col gap-1 flex-1 px-4 py-3 rounded-md border border-edge-strong bg-card font-[inherit] text-start cursor-pointer transition-colors duration-150"
+                    class="option flex flex-col gap-1 flex-1 min-h-11 px-4 py-3 rounded-lg border-[1.5px] border-edge bg-card font-[inherit] text-start cursor-pointer transition-colors duration-150 hover:border-edge-strong"
                     [class.picked]="sizeSelected()?.code === size.code"
                     (click)="selectSize(size)"
                   >
                     <span class="flex items-baseline gap-2">
-                      <strong class="text-lg font-semibold text-ink">{{ size.displayName }}</strong>
-                      <span class="text-base font-semibold text-accent">{{ size.dimensions }}</span>
+                      <strong class="text-base font-bold text-ink">{{ size.displayName }}</strong>
+                      <span class="text-sm font-semibold text-accent">{{ size.dimensions }}</span>
                     </span>
                     <span class="text-sm leading-[1.5] text-ink-muted">{{ size.explainer }}</span>
-                    <span class="text-xs font-bold text-amber">{{ size.price.$numberDecimal | amount }}</span>
+                    <span class="self-start tw-badge tw-badge-amber">{{ size.price.$numberDecimal | amount }}</span>
                   </button>
                 }
               </div>
@@ -115,18 +117,18 @@
 
             <!-- Step 2: base -->
             @if (baseOptions().length > 0) {
-              <fieldset class="mt-1 m-0 p-0 border-0">
-                <legend class="p-0 text-lg font-semibold text-ink">{{ 'PRODUCT.STEP_BASE' | translate }}</legend>
-                <p class="mt-1 mb-2 text-sm text-ink-muted">{{ 'PRODUCT.BASE_FREE_NAME' | translate }}</p>
-                <div class="flex flex-row flex-wrap gap-2 mt-[10px]">
+              <fieldset class="step m-0 pt-4 px-0 pb-0 border-0 border-t border-edge">
+                <legend class="float-left w-full p-0 text-base font-bold text-ink">{{ 'PRODUCT.STEP_BASE' | translate }}</legend>
+                <p class="clear-both tw-hint pt-1">{{ 'PRODUCT.BASE_FREE_NAME' | translate }}</p>
+                <div class="flex flex-row flex-wrap gap-2 pt-3">
                   @for (one of baseOptions(); track one.raw.code) {
                     <button
                       type="button"
-                      class="option flex flex-col gap-1 flex-1 px-4 py-3 rounded-md border border-edge-strong bg-card font-[inherit] text-start cursor-pointer transition-colors duration-150"
+                      class="option flex flex-col gap-1 flex-1 min-h-11 px-4 py-3 rounded-lg border-[1.5px] border-edge bg-card font-[inherit] text-start cursor-pointer transition-colors duration-150 hover:border-edge-strong"
                       [class.picked]="one.selected"
                       (click)="selectBase(one.raw)"
                     >
-                      <strong class="text-lg font-semibold text-ink">{{ one.raw.displayName }}</strong>
+                      <strong class="text-base font-bold text-ink">{{ one.raw.displayName }}</strong>
                       <span class="text-xs font-bold" [class.text-ink-muted]="one.free" [class.text-amber]="!one.free">
                         @if (one.free) {
                           {{ 'PRODUCT.BASE_NO_EXTRA' | translate }}
@@ -141,7 +143,7 @@
             }
 
             <!-- Specs -->
-            <dl class="flex flex-wrap gap-x-6 gap-y-2 mt-2 px-4 py-3 rounded-md bg-muted">
+            <dl class="tw-panel flex flex-wrap gap-x-8 gap-y-3 m-0 px-5 py-4">
               <div>
                 <dt class="text-sm text-ink-muted">{{ 'PRODUCT.SPEC_MATERIAL' | translate }}</dt>
                 <dd class="mt-1 m-0 text-base font-semibold text-ink">{{ product.material || ('PRODUCT.NOT_UPDATE' | translate) }}</dd>
@@ -159,15 +161,15 @@
             </dl>
 
             <!-- Buy -->
-            <div class="flex items-center gap-3 mt-[6px]">
-              <div class="inline-flex items-center p-1 border border-edge-strong rounded-full bg-card" role="group" [attr.aria-label]="'PRODUCT.QUANTITY' | translate">
-                <button type="button" class="w-8 h-8 border-0 rounded-full bg-muted text-ink text-base cursor-pointer" (click)="changeQuantity(-1)" [disabled]="quantity() <= 1">−</button>
+            <div class="flex items-center gap-3 flex-wrap">
+              <div class="inline-flex items-center gap-1 min-h-11 p-1 border-[1.5px] border-edge rounded-md bg-card" role="group" [attr.aria-label]="'PRODUCT.QUANTITY' | translate">
+                <button type="button" class="w-9 h-9 border-0 rounded-sm bg-muted text-ink text-base cursor-pointer hover:bg-accent-soft disabled:opacity-40 disabled:cursor-not-allowed" (click)="changeQuantity(-1)" [disabled]="quantity() <= 1">−</button>
                 <span class="min-w-7 text-lg font-bold text-center">{{ quantity() }}</span>
-                <button type="button" class="w-8 h-8 border-0 rounded-full bg-muted text-ink text-base cursor-pointer" (click)="changeQuantity(1)">+</button>
+                <button type="button" class="w-9 h-9 border-0 rounded-sm bg-muted text-ink text-base cursor-pointer hover:bg-accent-soft" (click)="changeQuantity(1)">+</button>
               </div>
               <button
                 type="button"
-                class="to-cart flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 border-0 rounded-full bg-amber text-on-accent font-[inherit] text-base font-bold cursor-pointer transition-colors duration-150"
+                class="to-cart tw-btn-primary flex-1 min-w-48"
                 [disabled]="pendingAdd() || !sizeSelected()"
                 (click)="addToCart()"
               >
@@ -176,23 +178,23 @@
               </button>
             </div>
 
-            <a class="inline-flex items-center justify-center gap-2 px-6 py-3 border-0 rounded-full bg-accent text-on-accent text-base font-bold no-underline transition-colors duration-150" routerLink="/studio">
+            <a class="tw-btn-secondary tw-btn-block" routerLink="/studio">
               <pm-icon name="star" [size]="15" />
               {{ 'PRODUCT.OPEN_STUDIO' | translate }}
             </a>
 
-            <p class="m-0 text-sm leading-[1.55] text-ink-muted">{{ 'PRODUCT.HANDMADE_NOTE' | translate }}</p>
+            <p class="tw-hint">{{ 'PRODUCT.HANDMADE_NOTE' | translate }}</p>
           </section>
         </div>
 
         <!-- Detail tabs -->
-        <section class="p-7 rounded-lg bg-muted">
-          <div class="tabs flex gap-1 flex-wrap mb-5" role="tablist">
+        <section class="tw-card p-7 max-[600px]:p-5">
+          <div class="tabs tw-tabs mb-6" role="tablist">
             @for (one of tabs; track one.value) {
               <button
                 type="button"
                 role="tab"
-                class="px-4 py-2 border-0 rounded-full bg-transparent text-ink-muted font-[inherit] text-base font-medium cursor-pointer transition-colors duration-150"
+                class="tw-tab"
                 [class.on]="tab() === one.value"
                 [attr.aria-selected]="tab() === one.value"
                 (click)="setTab(one.value)"
@@ -208,30 +210,30 @@
           <div role="tabpanel">
             @switch (tab()) {
               @case ('STORY') {
-                <h2 class="m-0 text-2xl font-medium text-ink">{{ 'PRODUCT.STORY_TITLE' | translate }}</h2>
+                <h2 class="m-0 font-serif text-2xl font-medium text-ink">{{ 'PRODUCT.STORY_TITLE' | translate }}</h2>
                 <p class="mt-3 max-w-[60rem] text-base leading-[1.7] text-ink-muted">{{ 'PRODUCT.STORY_TEXT' | translate }}</p>
                 <div class="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4 mt-5">
-                  <article class="p-4 rounded-md bg-card border border-edge">
+                  <article class="tw-panel p-5">
                     <h3 class="m-0 text-lg font-semibold text-accent">{{ 'PRODUCT.NOTE_EYES' | translate }}</h3>
                     <p class="mt-2 m-0 text-sm leading-[1.6] text-ink-muted">{{ 'PRODUCT.NOTE_EYES_TEXT' | translate }}</p>
                   </article>
-                  <article class="p-4 rounded-md bg-card border border-edge">
+                  <article class="tw-panel p-5">
                     <h3 class="m-0 text-lg font-semibold text-amber">{{ 'PRODUCT.NOTE_COAT' | translate }}</h3>
                     <p class="mt-2 m-0 text-sm leading-[1.6] text-ink-muted">{{ 'PRODUCT.NOTE_COAT_TEXT' | translate }}</p>
                   </article>
                 </div>
               }
               @case ('PROCESS') {
-                <h2 class="m-0 text-2xl font-medium text-ink">{{ 'PRODUCT.PROCESS_TITLE' | translate }}</h2>
+                <h2 class="m-0 font-serif text-2xl font-medium text-ink">{{ 'PRODUCT.PROCESS_TITLE' | translate }}</h2>
                 <p class="mt-3 max-w-[60rem] text-base leading-[1.7] text-ink-muted">{{ 'PRODUCT.PROCESS_TEXT' | translate }}</p>
               }
               @case ('CARE') {
-                <h2 class="m-0 text-2xl font-medium text-ink">{{ 'PRODUCT.CARE_TITLE' | translate }}</h2>
+                <h2 class="m-0 font-serif text-2xl font-medium text-ink">{{ 'PRODUCT.CARE_TITLE' | translate }}</h2>
                 <p class="mt-3 max-w-[60rem] text-base leading-[1.7] text-ink-muted">{{ 'PRODUCT.CARE_TEXT' | translate }}</p>
               }
               @case ('REVIEWS') {
                 @if (canReview()) {
-                  <form class="flex flex-col items-start gap-2 mb-5 p-4 rounded-md bg-card border border-edge" (ngSubmit)="sendReview()">
+                  <form class="tw-panel flex flex-col items-start gap-3 mb-5 p-5" (ngSubmit)="sendReview()">
                     <p class="m-0 text-base font-semibold text-ink">{{ 'PRODUCT.WRITE_REVIEW' | translate }}</p>
                     <pm-rating
                       [value]="draftRating()"
@@ -245,25 +247,25 @@
                     <textarea
                       id="review-comment"
                       rows="3"
-                      class="w-full box-border px-3 py-3 rounded-sm border border-edge-strong bg-muted text-ink font-[inherit] text-base resize-y focus-visible:outline-2 focus-visible:outline-accent"
+                      class="tw-textarea"
                       [(ngModel)]="draftComment"
                       [ngModelOptions]="{ standalone: true }"
                       [placeholder]="'PRODUCT.REVIEW_COMMENT' | translate"
                     ></textarea>
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-3 border-0 rounded-full bg-accent text-on-accent text-base font-bold cursor-pointer" [disabled]="draftRating() < 1">
+                    <button type="submit" class="tw-btn-primary" [disabled]="draftRating() < 1">
                       {{ 'PRODUCT.REVIEW_SUBMIT' | translate }}
                     </button>
                   </form>
                 }
                 @if (reviewSent()) {
-                  <p class="m-0 mb-4 px-4 py-2 rounded-sm bg-success-soft text-success text-base font-semibold">{{ 'PRODUCT.REVIEW_SENT' | translate }}</p>
+                  <p class="m-0 mb-4 px-4 py-3 rounded-md bg-success-soft text-on-success-soft text-sm font-semibold">{{ 'PRODUCT.REVIEW_SENT' | translate }}</p>
                 }
                 @if (reviews().length === 0) {
                   <p class="mt-3 text-base leading-[1.7] text-ink-muted">{{ 'PRODUCT.NO_REVIEW' | translate }}</p>
                 } @else {
                   <ul class="flex flex-col gap-3 m-0 p-0 list-none">
                     @for (one of reviews(); track one.id) {
-                      <li class="px-4 py-3 rounded-md bg-card border border-edge">
+                      <li class="tw-panel px-5 py-4">
                         <pm-rating [value]="one.rating" [label]="'PRODUCT.RATING' | translate" />
                         <p class="mt-2 m-0 text-base leading-[1.6] text-ink-muted">{{ one.comment }}</p>
                         <span class="block mt-[7px] text-xs font-semibold text-ink-muted">{{ one.authorName }}</span>

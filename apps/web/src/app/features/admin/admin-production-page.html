@@ -18,11 +18,15 @@
     @case ('READY') {
       @if (profile(); as profile) {
         <header class="page-header">
-          <h1 class="title">{{ 'ADMIN.PROFILE.TITLE' | translate }} {{ profile.orderCode }}</h1>
+          <h1 class="title pm-page-title">
+            {{ 'ADMIN.PROFILE.TITLE' | translate }}
+            <span class="title-code">{{ profile.orderCode }}</span>
+          </h1>
           <span class="status-chip">{{ keyStatus() | translate }}</span>
-          <button class="pm-button-secondary" type="button" class="no-print" (click)="inRa()">
+          <button class="pm-button-secondary no-print" type="button" (click)="inRa()">
             {{ 'ADMIN.PROFILE.PRINT' | translate }}
           </button>
+          <p class="description">{{ 'ADMIN.PROFILE.SHEET_NOTE' | translate }}</p>
         </header>
 
         @if (missingItems().length > 0) {
@@ -38,13 +42,22 @@
 
         <section class="card">
           <h2>{{ 'ADMIN.PROFILE.SCHEDULE' | translate }}</h2>
-          <dl class="info-pair">
-            <dt>{{ 'ADMIN.ORDER.ORDER_DATE' | translate }}</dt>
-            <dd>{{ profile.orderedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
-            <dt>{{ 'ADMIN.PROFILE.LEAD_TIME' | translate }}</dt>
-            <dd>{{ 'STUDIO.DAYS' | translate: { count: profile.productionDays } }}</dd>
-            <dt>{{ 'ADMIN.ORDER.DELIVERY_DATE' | translate }}</dt>
-            <dd>{{ profile.estimatedDelivery | date: 'dd/MM/yyyy' }}</dd>
+          <dl class="plan-row">
+            <div>
+              <dt>{{ 'ADMIN.ORDER.ORDER_DATE' | translate }}</dt>
+              <dd>{{ profile.orderedAt | date: 'dd/MM/yyyy' }}</dd>
+              <span class="plan-note">{{ profile.orderedAt | date: 'HH:mm' }}</span>
+            </div>
+            <div>
+              <dt>{{ 'ADMIN.PROFILE.LEAD_TIME' | translate }}</dt>
+              <dd class="accent">{{ 'STUDIO.DAYS' | translate: { count: profile.productionDays } }}</dd>
+              <span class="plan-note">{{ 'ADMIN.PROFILE.LEAD_NOTE' | translate }}</span>
+            </div>
+            <div>
+              <dt>{{ 'ADMIN.PROFILE.LEAVE_WORKSHOP' | translate }}</dt>
+              <dd class="amber">{{ profile.estimatedDelivery | date: 'dd/MM/yyyy' }}</dd>
+              <span class="plan-note">{{ 'ADMIN.PROFILE.LEAVE_NOTE' | translate }}</span>
+            </div>
           </dl>
         </section>
 
@@ -72,6 +85,21 @@
                 <dd>{{ item.engraving?.message }}</dd>
               }
             </dl>
+
+            <h3>{{ 'ADMIN.PROFILE.ZONE_COLOUR' | translate }}</h3>
+            @if (item.zoneColours.length === 0) {
+              <p class="note">{{ 'ADMIN.PROFILE.ZONE_NONE' | translate }}</p>
+            } @else {
+              <ul class="wool-list">
+                @for (one of item.zoneColours; track one.zone) {
+                  <li>
+                    <span class="swatch-sm" [style.background-color]="one.wool.swatch" aria-hidden="true"></span>
+                    <strong>{{ zoneKeyOf(one.zone) | translate }}</strong>
+                    <span>{{ one.wool.code }} · {{ one.wool.displayName }}</span>
+                  </li>
+                }
+              </ul>
+            }
 
             <h3>{{ 'ADMIN.PROFILE.WOOL_ROLL' | translate }}</h3>
             @if (item.woolRolls.length === 0) {

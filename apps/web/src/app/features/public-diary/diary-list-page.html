@@ -1,0 +1,90 @@
+<div class="wall tw-page flex flex-col gap-5">
+  <header class="wall-head">
+    <h1 class="pm-page-title">{{ 'DIARY.LIST_TITLE' | translate }}</h1>
+    <p class="sub tw-page-sub">{{ 'DIARY.LIST_SUB' | translate }}</p>
+  </header>
+
+  <div class="tw-card flex flex-col gap-4 p-4 nav:p-5">
+    <form class="find flex flex-wrap gap-2" [formGroup]="form" (ngSubmit)="search()">
+      <div class="tw-input-wrap min-w-0 flex-1 basis-60">
+        <input
+          id="diary-search"
+          type="search"
+          class="tw-input"
+          formControlName="keyword"
+          [placeholder]="'DIARY.SEARCH_HINT' | translate"
+        />
+        <span class="tw-input-icon" aria-hidden="true"><pm-icon name="search" [size]="17" /></span>
+      </div>
+      <button type="submit" class="tw-btn-primary">{{ 'DIARY.SEARCH' | translate }}</button>
+    </form>
+
+    <nav class="chips flex flex-wrap gap-2" [attr.aria-label]="'MEMORY.FILTER_LABEL' | translate">
+      @for (chip of chips; track chip.key) {
+        <button
+          type="button"
+          class="chip tw-chip"
+          [class.on]="topic() === chip.topic"
+          [attr.aria-pressed]="topic() === chip.topic"
+          (click)="choose(chip.topic)"
+        >
+          {{ chip.key | translate }}
+        </button>
+      }
+    </nav>
+  </div>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="middle">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <p class="middle">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+    }
+    @case ('DONE') {
+      @if (rows().length === 0) {
+        <p class="middle tw-empty m-0">{{ 'DIARY.LIST_EMPTY' | translate }}</p>
+      } @else {
+        <ul class="cards m-0 grid list-none gap-4 p-0 sm:grid-cols-2 nav:grid-cols-3">
+          @for (one of rows(); track one.petId) {
+            <li>
+              <a class="card tw-card-interactive flex h-full items-start gap-4 p-5" [routerLink]="['/diaries', one.petId]">
+                @if (one.avatarUrl) {
+                  <img class="face" [src]="one.avatarUrl" [alt]="one.name" loading="lazy" />
+                } @else {
+                  <span class="face blank" aria-hidden="true"><pm-icon name="paw" [size]="24" /></span>
+                }
+                <div class="card-text flex min-w-0 flex-col gap-1">
+                  <h2 class="m-0 font-serif text-lg font-medium leading-snug text-ink">{{ one.name }}</h2>
+                  @if (one.tagline) {
+                    <p class="tagline m-0 font-hand text-base leading-snug text-body">{{ one.tagline }}</p>
+                  }
+                  <p class="meta m-0 mt-1 inline-flex flex-wrap items-center gap-1 text-xs font-semibold text-accent">
+                    <pm-icon name="book" [size]="13" />
+                    {{ 'MEMORY.COUNT_MOMENT' | translate: { count: one.momentCount } }}
+                    @if (one.lastMomentAt) {
+                      <span class="font-normal text-ink-muted">· {{ one.lastMomentAt | date: 'dd/MM/yyyy' }}</span>
+                    }
+                  </p>
+                  <p class="by m-0 text-xs text-ink-muted">{{ 'DIARY.KEPT_BY' | translate: { name: one.ownerName } }}</p>
+                </div>
+              </a>
+            </li>
+          }
+        </ul>
+
+        @if (pageCount() > 1) {
+          <div class="paging flex items-center justify-center gap-3 text-sm text-ink-muted">
+            <button type="button" class="tw-btn-secondary" [disabled]="page() <= 1" (click)="changePage(-1)">
+              {{ 'ADMIN.PREV_PAGE' | translate }}
+            </button>
+            <span>{{ page() }} / {{ pageCount() }}</span>
+            <button type="button" class="tw-btn-secondary" [disabled]="page() >= pageCount()" (click)="changePage(1)">
+              {{ 'ADMIN.NEXT_PAGE' | translate }}
+            </button>
+          </div>
+        }
+      }
+    }
+  }
+</div>

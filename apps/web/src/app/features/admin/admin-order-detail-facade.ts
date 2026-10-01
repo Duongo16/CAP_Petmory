@@ -1,5 +1,6 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Subject, catchError, concatMap } from 'rxjs';
 import { AdminService } from '../../core/services/admin.service';
 import { AdminOrderDetail, OrderStatus } from '../../core/models/api.model';
 import {
@@ -17,6 +18,12 @@ export interface TransitionButton {
   groupColor: string;
 }
 
+/** Mot lan nguoi truc tich hoac bo tich mot muc tren phieu. */
+interface QualityWish {
+  at: number;
+  done: boolean;
+}
+
 export interface HistoryRow {
   id: string;
   keyAction: string;
@@ -26,6 +33,24 @@ export interface HistoryRow {
   keyBefore: string;
   keyAfter: string;
 }
+
+/** How far through the workshop an order is, counted from one. */
+const STAGE_OF_STATUS: Record<OrderStatus, number> = {
+  AWAITING_PAYMENT: 1,
+  PAID: 2,
+  IN_PRODUCTION: 3,
+  SHIPPING: 4,
+  COMPLETED: 4,
+  CANCELLED: 0,
+};
+
+/** The four stages a dispatcher reads, written out so no key is ever built up. */
+export const DESK_STAGE_KEYS: string[] = [
+  'ADMIN.ORDER.STAGE_PLACED',
+  'ADMIN.ORDER.STAGE_PAID',
+  'ADMIN.ORDER.STAGE_MAKING',
+  'ADMIN.ORDER.STAGE_SENT',
+];
 
 /**
  * Reads the status out of an audit entry and maps it to a translation key.
@@ -45,6 +70,7 @@ export class AdminOrderDetailFacade {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly data = signal<AdminOrderDetail | null>(null);
+  private readonly tickWanted = new Subject<QualityWish>();
   private orderCode = '';
 
   readonly status = signal<ScreenState>('LOADING');
@@ -54,6 +80,12 @@ export class AdminOrderDetailFacade {
 
   readonly order = computed(() => this.data()?.order ?? null);
   readonly customer = computed(() => this.data()?.customer ?? null);
+
+  /** Which of the four stages the order has reached, zero once cancelled. */
+  readonly stage = computed(() => {
+    const d = this.order();
+    return d ? STAGE_OF_STATUS[d.status] : 0;
+  });
 
   readonly keyStatus = computed(() => {
     const d = this.order();
@@ -87,7 +119,31 @@ export class AdminOrderDetailFacade {
 
   start(orderCode: string): void {
     this.orderCode = orderCode;
+    this.listenTick();
     this.reload();
+  }
+
+  /**
+   * Xep cac lan tich vao mot hang doi va gui lan luot.
+   *
+   * Nguoi truc thuong tich lien tay bay muc mot luc. Neu moi lan tich deu khoa
+   * ca bang cho den khi may chu tra loi thi nhung cai tich sau se roi mat ma
+   * khong ai biet, nen o day giu nguyen thu tu va khong bo lan nao.
+   */
+  private listenTick(): void {
+    this.tickWanted
+      .pipe(
+        concatMap((wish) =>
+          this.service.setQualityTick(this.orderCode, wish.at, wish.done).pipe(
+            catchError((e: { status?: number }) => {
+              this.error.set(this.changeError(e.status));
+              return EMPTY;
+            }),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((fresh) => this.data.set(fresh));
   }
 
   reload(): void {
@@ -102,6 +158,19 @@ export class AdminOrderDetailFacade {
         },
         error: () => this.status.set('ERROR'),
       });
+  }
+
+  /** Cac muc tren phieu kiem tra chat luong cua don dang xem. */
+  readonly qualityCheck = computed(() => this.order()?.qualityCheck ?? []);
+
+  /** Con bao nhieu muc chua tich. Bang khong thi moi roi duoc khau kiem dinh. */
+  readonly qualityLeft = computed(
+    () => this.qualityCheck().filter((one) => !one.done).length,
+  );
+
+  setQualityTick(at: number, done: boolean): void {
+    this.error.set(null);
+    this.tickWanted.next({ at, done });
   }
 
   transition(next: OrderStatus): void {
@@ -121,9 +190,21 @@ export class AdminOrderDetailFacade {
         },
         error: (e: { status?: number }) => {
           this.saving.set(false);
-          this.error.set(this.changeError(e.status));
+          this.error.set(this.stepError(e.status, next));
         },
       });
+  }
+
+  /**
+   * Chon loi de hien. Khi may chu tu choi buoc chuyen sang dang giao ma phieu
+   * kiem tra van con muc chua tich thi noi thang ly do do, vi cau chung chung
+   * se khien nguoi truc tuong la buoc chuyen sai.
+   */
+  private stepError(status: number | undefined, next: OrderStatus): string {
+    if (status === 400 && next === 'SHIPPING' && this.qualityLeft() > 0) {
+      return 'ADMIN.QUALITY.BLOCKED';
+    }
+    return this.changeError(status);
   }
 
   private changeError(status: number | undefined): string {

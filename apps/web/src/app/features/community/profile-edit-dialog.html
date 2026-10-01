@@ -1,0 +1,94 @@
+<form class="sheet" [formGroup]="form" (ngSubmit)="save()">
+  <header class="sheet-head">
+    <div>
+      <p class="eyebrow">{{ 'COMMUNITY.PROFILE.EDIT_EYEBROW' | translate }}</p>
+      <h2 class="sheet-title">{{ 'COMMUNITY.PROFILE.EDIT_TITLE' | translate }}</h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="sheet-body">
+    <div class="avatar-row">
+      <span class="avatar" aria-hidden="true">
+        @if (preview() && form.controls.avatarUrl.valid) {
+          <img [src]="preview()" alt="" />
+        } @else {
+          {{ initial }}
+        }
+      </span>
+
+      <div class="avatar-pick">
+        <span class="field-name">{{ 'COMMUNITY.PROFILE.AVATAR' | translate }}</span>
+        <div class="tw-tabs" role="group" [attr.aria-label]="'COMMUNITY.PROFILE.AVATAR' | translate">
+          <button type="button" class="tw-tab" [class.active]="source() === 'DEVICE'" [attr.aria-pressed]="source() === 'DEVICE'" (click)="pickSource('DEVICE')">
+            <pm-icon name="camera" [size]="14" />
+            {{ 'COMMUNITY.PROFILE.FROM_DEVICE' | translate }}
+          </button>
+          <button type="button" class="tw-tab" [class.active]="source() === 'LINK'" [attr.aria-pressed]="source() === 'LINK'" (click)="pickSource('LINK')">
+            <pm-icon name="tag" [size]="14" />
+            {{ 'COMMUNITY.PROFILE.FROM_LINK' | translate }}
+          </button>
+        </div>
+
+        @if (source() === 'DEVICE') {
+          <div class="device-row">
+            <label class="upload" [class.busy]="uploading()" for="profile-avatar-file">
+              <pm-icon name="image" [size]="15" />
+              {{ (uploading() ? 'COMMUNITY.PROFILE.UPLOADING' : 'COMMUNITY.PROFILE.CHOOSE_FILE') | translate }}
+            </label>
+            <input
+              id="profile-avatar-file"
+              class="sr-only"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              [disabled]="uploading()"
+              (change)="upload($event)"
+            />
+          </div>
+          <p class="field-note">{{ 'COMMUNITY.PROFILE.FILE_RULE' | translate }}</p>
+        } @else {
+          <div class="field">
+            <label class="sr-only" for="profile-avatar">{{ 'COMMUNITY.PROFILE.AVATAR_URL' | translate }}</label>
+            <input id="profile-avatar" type="url" formControlName="avatarUrl" placeholder="https://…" />
+            @if (form.controls.avatarUrl.touched && form.controls.avatarUrl.invalid) {
+              <p class="field-error">{{ 'COMMUNITY.PROFILE.LINK_ERROR' | translate }}</p>
+            }
+          </div>
+        }
+        @if (preview()) {
+          <button type="button" class="plain small remove-avatar" (click)="clearAvatar()">
+            <pm-icon name="trash" [size]="14" />
+            {{ 'COMMUNITY.PROFILE.REMOVE_AVATAR' | translate }}
+          </button>
+        }
+        @if (problem(); as message) {
+          <p class="field-error">{{ message | translate }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="profile-name">{{ 'COMMUNITY.PROFILE.FULL_NAME' | translate }} *</label>
+        <input id="profile-name" type="text" formControlName="fullName" />
+        @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+          <p class="field-error">{{ 'COMMUNITY.PROFILE.NAME_ERROR' | translate }}</p>
+        }
+      </div>
+      <div class="field">
+        <label class="field-name" for="profile-phone">{{ 'COMMUNITY.PROFILE.PHONE' | translate }}</label>
+        <input id="profile-phone" type="tel" formControlName="phone" />
+      </div>
+    </div>
+  </div>
+
+  <footer class="sheet-foot">
+    <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button type="submit" class="strong" [disabled]="saving() || uploading()">
+      {{ 'COMMUNITY.PROFILE.SAVE' | translate }}
+      <pm-icon name="check" [size]="15" />
+    </button>
+  </footer>
+</form>

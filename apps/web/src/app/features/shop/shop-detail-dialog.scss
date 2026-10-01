@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.shop-detail {
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-top: 56px;
+  background: var(--pm-bg);
+}
+
+.shop-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  box-shadow: var(--pm-shadow);
+}

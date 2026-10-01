@@ -85,9 +85,9 @@ async function run() {
   console.log('='.repeat(66));
 
   const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
-  const workshopToken = await login('xuong@petmory.local', PASSWORD_INTERNAL);
-  const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
-  check('All three internal accounts can sign in', Boolean(managerToken && workshopToken && supportToken));
+  const workshopToken = managerToken;
+  const supportToken = await login('quantri@petmory.local', PASSWORD_INTERNAL);
+  check('Hai tai khoan noi bo deu dang nhap duoc', Boolean(managerToken && supportToken));
 
   const customer = await makeCustomerWithOrder('Nguyen Van Kiem Thu');
   await returnMoney(customer.orderCode, 250000);
@@ -96,7 +96,7 @@ async function run() {
   const stats = await call('/admin/orders/stats', { headers: authHeaders(managerToken) });
   check('Reads the counts per status', stats.status === 200 && stats.body.PAID >= 1,
     `paid = ${stats.body?.PAID}`);
-  check('The counts list all ten statuses', Object.keys(stats.body ?? {}).length === 10,
+  check('The counts list all six statuses', Object.keys(stats.body ?? {}).length === 6,
     `${Object.keys(stats.body ?? {}).length} statuses`);
 
         // --- List and filters ---
@@ -147,7 +147,7 @@ async function run() {
         // --- Status changes ---
   const skipStep = await call(`/admin/orders/${customer.orderCode}/status`, {
     method: 'PATCH', headers: authHeaders(managerToken),
-    body: JSON.stringify({ status: 'DELIVERED', reason: 'trying to skip ahead' }),
+    body: JSON.stringify({ status: 'COMPLETED', reason: 'trying to skip ahead' }),
   });
   check('Rejects an illegal transition', skipStep.status === 400, String(skipStep.status));
 
@@ -159,7 +159,7 @@ async function run() {
     money.status === 200 && money.body.order.status === 'IN_PRODUCTION',
     money.body?.order?.status);
   check('After a move the next steps change too',
-    JSON.stringify(money.body?.nextSteps) === JSON.stringify(['QUALITY_CHECK', 'CANCELLED']),
+    JSON.stringify(money.body?.nextSteps) === JSON.stringify(['SHIPPING', 'CANCELLED']),
     JSON.stringify(money.body?.nextSteps));
 
   const writeLabel = (money.body?.history ?? []).find((x) => x.action === 'ORDER_STATUS_CHANGED');
@@ -167,7 +167,7 @@ async function run() {
     Boolean(writeLabel) && writeLabel.reason === 'workshop took the order',
     writeLabel ? writeLabel.reason : 'no entry found');
   check('History records who did it',
-    writeLabel?.actor?.email === 'xuong@petmory.local',
+    writeLabel?.actor?.email === 'quanly@petmory.local',
     writeLabel?.actor?.email);
   check('History also covers the order being created',
     (money.body?.history ?? []).some((x) => x.action === 'ORDER_CREATED'));
@@ -188,13 +188,14 @@ async function run() {
 
         // --- Permissions ---
   const supportRead = await call('/admin/orders', { headers: authHeaders(supportToken) });
-  check('Support can read an order', supportRead.status === 200, String(supportRead.status));
+  check('The account admin group cannot read orders', supportRead.status === 403,
+    String(supportRead.status));
 
   const supportWrite = await call(`/admin/orders/${customer.orderCode}/status`, {
     method: 'PATCH', headers: authHeaders(supportToken),
-    body: JSON.stringify({ status: 'QUALITY_CHECK' }),
+    body: JSON.stringify({ status: 'SHIPPING' }),
   });
-  check('Support cannot change a status', supportWrite.status === 403,
+  check('The account admin group cannot change a status', supportWrite.status === 403,
     String(supportWrite.status));
 
   const customerRead = await call('/admin/orders', { headers: authHeaders(customer.token) });

@@ -7,20 +7,8 @@
   object-fit: cover;
 }
 
-/* Angular class-binding targets */
+/* Angular class-binding target for the chosen option */
 .option.picked {
   border-color: var(--pm-accent);
   background: var(--pm-accent-soft);
-}
-
-.tabs button.on {
-  background: var(--pm-accent);
-  color: var(--pm-on-accent);
-  font-weight: 600;
-}
-
-/* Add-to-cart disabled state */
-.to-cart:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }

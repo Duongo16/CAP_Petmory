@@ -1,10 +1,33 @@
-export type Role = 'MANAGER' | 'ADMIN' | 'SUPPORT' | 'CUSTOMER';
+export type Role = 'MANAGER' | 'ADMIN' | 'CUSTOMER';
+
+/** Mot tai khoan, nhin tu man hinh quan ly tai khoan. */
+export interface Account {
+  _id: string;
+  email: string;
+  fullName: string;
+  phone: string | null;
+  roles: Role[];
+  active: boolean;
+  lastLoginAt: string | null;
+  petProfileLimit: number | null;
+  createdAt: string;
+}
+
+/** Mot trang danh sach tai khoan. */
+export interface AccountPage {
+  rows: Account[];
+  total: number;
+  page: number;
+  pageCount: number;
+}
 
 export interface User {
   id: string;
   email: string;
   fullName: string;
   roles: Role[];
+  /** Missing on sessions saved before pictures were sent with the sign-in. */
+  avatarUrl?: string | null;
 }
 
 export interface LoginResult {
@@ -16,10 +39,19 @@ export interface LoginResult {
 export type PetStatus = 'TOGETHER' | 'PASSED_AWAY';
 export type Gender = 'MALE' | 'FEMALE' | 'UNKNOWN';
 
+/** The kinds of pet the workshop makes a piece for. */
+export type PetKind = 'DOG' | 'CAT' | 'RABBIT' | 'HAMSTER' | 'BIRD' | 'OTHER';
+
+/** Someone at home who looks after the pet, and what they do for it. */
+export interface Carer {
+  name: string;
+  role: string;
+}
+
 export interface Pet {
   _id: string;
   name: string;
-  kind: string;
+  kind: PetKind;
   breed: string;
   gender: Gender;
   birthDate: string | null;
@@ -27,6 +59,79 @@ export interface Pet {
   passedAwayDate: string | null;
   avatarUrl: string;
   createdAt: string;
+  /** A short line in the owner's own words, shown under the name. */
+  tagline: string;
+  /** The day the pet came home, which is often not the day it was born. */
+  adoptionDate: string | null;
+  microchip: string;
+  neutered: boolean;
+  trait: string[];
+  carer: Carer[];
+  /** Cach trinh chieu quyen nhat ky cua be nay. */
+  slideSetting: { trackCode: string; effect: string; seconds: number };
+  /** Quyen nhat ky cua be nay co cho nguoi ngoai doc khong. */
+  diaryPublic: boolean;
+  /** Quan tri vien da an quyen nay khoi cong dong hay chua. */
+  diaryBlocked: boolean;
+  diaryBlockReason: string;
+}
+
+/** What a remembered moment is about. Nothing here touches health records. */
+export type MemoryTopic =
+  | 'FIRST_DAY'
+  | 'BIRTHDAY'
+  | 'OUTING'
+  | 'FUNNY'
+  | 'LEARNING'
+  | 'EVERYDAY';
+
+/**
+ * Mot mon do dat len trang so: o chu, buc anh, hoac hinh trang tri.
+ *
+ * Vi tri ghi theo phan tram cua trang, de trang bay ra man hinh nao hay in
+ * ra giay kho nao thi moi thu van nam dung cho cu.
+ */
+export interface DecorItem {
+  kind: 'TEXT' | 'PHOTO' | 'STICKER';
+  x: number;
+  y: number;
+  width: number;
+  rotate: number;
+  z: number;
+  text: string;
+  photo: string | null;
+  sticker: string;
+  color: string;
+  fontKey: string;
+}
+
+export interface Memory {
+  _id: string;
+  pet: string;
+  title: string;
+  body: string;
+  happenedAt: string;
+  place: string;
+  topic: MemoryTopic;
+  tag: string[];
+  photo: string[];
+  /** Cach bay tri trang so cho khoanh khac nay. Rong la trang chua bay tri. */
+  decor: DecorItem[];
+  /** Kieu giay cua trang. */
+  paper: string;
+  isMilestone: boolean;
+  createdAt: string;
+}
+
+/** One page of a pet's diary, with the counts the filter chips need. */
+export interface DiaryPage {
+  rows: Memory[];
+  total: number;
+  page: number;
+  pageCount: number;
+  countByTopic: Partial<Record<MemoryTopic, number>>;
+  /** How many of this pet's moments were marked worth remembering. */
+  milestoneCount: number;
 }
 
 export type ColorGroup = 'FUR' | 'EYES_NOSE' | 'ACCESSORY';
@@ -44,6 +149,104 @@ export interface ColorCode {
 /** Money from the server arrives as an exact decimal, not a floating point number. */
 export interface Money {
   $numberDecimal: string;
+}
+
+/** Mot dong tien trong bao cao, so nguyen dong viet duoi dang chuoi. */
+export interface ReportMoneyRow {
+  name: string;
+  count: number;
+  amount: string;
+}
+
+/** Bao cao doanh thu trong mot khoang thoi gian. */
+export interface RevenueReport {
+  from: string;
+  to: string;
+  orderCount: number;
+  total: string;
+  byKind: ReportMoneyRow[];
+  byProduct: ReportMoneyRow[];
+}
+
+/** Mot loai luot dung tri tue nhan tao, kem so luot va chi phi. */
+export interface AiCostRow {
+  kind: string;
+  count: number;
+  cost: string;
+}
+
+export interface AiCostReport {
+  from: string;
+  to: string;
+  total: string;
+  rows: AiCostRow[];
+}
+
+/** Bao cao tien do san xuat. */
+export interface ProgressReport {
+  from: string;
+  to: string;
+  byStatus: { status: string; count: number }[];
+  lateCount: number;
+  late: { orderCode: string; status: string; estimatedDelivery: string }[];
+}
+
+/** Hai dong hang cua cua hang, dung nhu ten may chu dung. */
+export type LineKind = 'MADE_TO_ORDER' | 'READY_MADE';
+
+/** Mot nhom hang co san. */
+export interface GoodsCategory {
+  _id: string;
+  code: string;
+  name: string;
+  description: string;
+  sortOrder: number;
+  enabled: boolean;
+}
+
+/** Mot to hop bien the cua mot mon hang co san. */
+export interface GoodsVariant {
+  sku: string;
+  optionValues: string[];
+  price: Money;
+  stock: number;
+  enabled: boolean;
+}
+
+/** Mot mon hang co san. */
+export interface Goods {
+  _id: string;
+  code: string;
+  name: string;
+  category: GoodsCategory | string;
+  description: string;
+  images: string[];
+  optionNames: string[];
+  variant: GoodsVariant[];
+  deliveryDays: number;
+  enabled: boolean;
+}
+
+/** Mot trang cua danh muc hang co san. */
+export interface GoodsPage {
+  rows: Goods[];
+  total: number;
+  page: number;
+  pageCount: number;
+}
+
+/** Mot lan ton kho thay doi. */
+export interface StockMove {
+  _id: string;
+  sku: string;
+  delta: number;
+  before: number;
+  after: number;
+  reason: 'MANUAL' | 'ORDER_PAID' | 'ORDER_CANCELLED';
+  note: string;
+  actor: { fullName: string } | null;
+  orderCode: string;
+  createdAt: string;
 }
 
 export interface ProductSize {
@@ -104,6 +307,12 @@ export interface PendingReview {
 
 export interface CartLine {
   id: string;
+  /** Dong hang tuy bien hay dong hang co san. */
+  kind: LineKind;
+  /** Ma mon hang co san. Rong voi dong hang tuy bien. */
+  goodsCode: string;
+  sku: string;
+  imageUrl: string;
   productTypeCode: string;
   sizeCode: string;
   displayName: string;
@@ -111,7 +320,7 @@ export interface CartLine {
   displayBaseCode: string;
   displayBaseName: string;
   quantity: number;
-  /** Unit price as an integer string in dong; a number type would introduce drift. */
+  /** Unit price as an integer string in dong, because a number type would drift. */
   unitPrice: string;
   currency: string;
   productionDays: number;
@@ -136,13 +345,9 @@ export interface ApiError {
 
 export type OrderStatus =
   | 'AWAITING_PAYMENT'
-  | 'PAYMENT_EXPIRED'
   | 'PAID'
   | 'IN_PRODUCTION'
-  | 'QUALITY_CHECK'
-  | 'READY_TO_SHIP'
   | 'SHIPPING'
-  | 'DELIVERED'
   | 'COMPLETED'
   | 'CANCELLED';
 
@@ -164,6 +369,97 @@ export interface DeliveryInfo {
   note: string;
 }
 
+/** Mot muc tren phieu kiem tra chat luong cua don. */
+/**
+ * Mot tai khoan mau de dang nhap nhanh khi dang lam o may ca nhan.
+ *
+ * May chu that khong tra ve tai khoan nao, nen danh sach nay rong o ban dung
+ * that va man hinh dang nhap khong hien nut nao.
+ */
+export interface DemoAccount {
+  email: string;
+  password: string;
+  labelKey: string;
+  roles: string[];
+}
+
+/** Mot quyen nhat ky nhin tu ben ngoai, da bo het du lieu dinh danh. */
+export interface DiaryCard {
+  petId: string;
+  name: string;
+  kind: string;
+  tagline: string;
+  avatarUrl: string;
+  momentCount: number;
+  lastMomentAt: string | null;
+  ownerName: string;
+  slide: { trackCode: string; effect: string; seconds: number };
+}
+
+/** Mot ban nhac trong kho cua he thong, do Ben A cung cap kem ban quyen. */
+export interface MusicTrack {
+  code: string;
+  title: string;
+  url: string;
+  credit: string;
+}
+
+/** Mot trang cua danh sach cac quyen dang de cong khai. */
+export interface DiaryList {
+  rows: DiaryCard[];
+  total: number;
+  page: number;
+  pageCount: number;
+}
+
+/** Toan bo mot quyen nhat ky cho nguoi doc, kem anh cua cac khoanh khac. */
+export interface DiaryBook {
+  pet: DiaryCard;
+  moments: Memory[];
+  photo: PetPhoto[];
+}
+
+/** Mot duong dan chia se dang mo. Ma nguyen van khong nam trong day. */
+export interface DiaryShare {
+  _id: string;
+  pet: string;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  viewCount: number;
+  lastViewedAt: string | null;
+  createdAt: string;
+}
+
+/** Mot lan xuat quyen nhat ky ra tep. */
+export type ExportState = 'PENDING' | 'READY' | 'FAILED' | 'EXPIRED';
+
+export interface DiaryExport {
+  _id: string;
+  pet: string;
+  state: ExportState;
+  fromDate: string | null;
+  toDate: string | null;
+  byteSize: number;
+  momentCount: number;
+  problem: string;
+  expiresAt: string;
+  createdAt: string;
+}
+
+/** Gioi han ve kich thuoc anh, lay tu tham so nghiep vu. */
+export interface PhotoRules {
+  goodShortEdgePx: number;
+  warnShortEdgePx: number;
+  maxPhotoSizeMb: number;
+}
+
+export interface QualityTick {
+  label: string;
+  done: boolean;
+  doneBy: string | null;
+  doneAt: string | null;
+}
+
 export interface Order {
   _id: string;
   orderCode: string;
@@ -178,6 +474,8 @@ export interface Order {
   paymentDeadline: string;
   paidAt: string | null;
   createdAt: string;
+  /** Phieu kiem tra chat luong, lap khi don buoc vao khau kiem dinh. */
+  qualityCheck: QualityTick[];
 }
 
 export interface PaymentQr {
@@ -195,6 +493,7 @@ export interface PaymentQr {
 }
 
 export type PhotoAngle =
+  | 'GENERAL'
   | 'FRONT'
   | 'LEFT_SIDE'
   | 'RIGHT_SIDE'
@@ -216,7 +515,8 @@ export interface QualityScore {
 
 export interface PetPhoto {
   _id: string;
-  pet: string;
+  /** Null while a restored picture has not been attached to any pet yet. */
+  pet: string | null;
   angle: PhotoAngle;
   originalName: string;
   fileType: string;
@@ -228,6 +528,12 @@ export interface PetPhoto {
   isRestored: boolean;
   confirmedByOwner: boolean;
   createdAt: string;
+}
+
+/** What the restoration screen gets back: the picture before and after. */
+export interface RestorationPair {
+  original: PetPhoto;
+  restored: PetPhoto;
 }
 
 export interface AngleCheckResult {
@@ -249,6 +555,69 @@ export interface AssistantAnswer {
   suggestion: string[];
   path: string | null;
   understood: boolean;
+}
+
+/** Mot luot noi trong phien hoi thoai. */
+export interface ChatTurn {
+  side: 'USER' | 'BOT' | 'STAFF';
+  text: string;
+  suggestion: string[];
+  path: string;
+  productCode: string[];
+  goodsCode: string[];
+  at: string;
+}
+
+/** Bon buoc mot phien hoi thoai co the o. */
+export type ChatState = 'BOT' | 'WAITING' | 'WITH_STAFF' | 'CLOSED';
+
+/** Mot phien hoi thoai ban day du. */
+export interface ChatSession {
+  _id: string;
+  code: string;
+  owner: { _id: string; fullName: string; email: string } | string | null;
+  state: ChatState;
+  staff: { _id: string; fullName: string } | string | null;
+  turn: ChatTurn[];
+  lastAt: string;
+  handoverNote: string;
+}
+
+/** Mot phong cach mau nguoi dung chon truoc khi xin goi y thiet ke. */
+export interface SuggestStyleChoice {
+  key: string;
+  note: string;
+}
+
+/** Mot phuong an thiet ke do may de xuat. */
+export interface SuggestOption {
+  key: string;
+  title: string;
+  rationale: string;
+  modelCode: string;
+  zonePaint: ZonePaint[];
+}
+
+/** Mot lan xin goi y thiet ke, kem cac phuong an nhan duoc. */
+export interface DesignSuggestion {
+  _id: string;
+  code: string;
+  pet: string;
+  style: string;
+  mode: 'LIVE' | 'SAMPLE';
+  option: SuggestOption[];
+  chosenKey: string;
+  appliedDesign: string | null;
+  createdAt: string;
+}
+
+/** Han muc con lai cua mot chuc nang dung tri tue nhan tao. */
+export interface QuotaLeft {
+  day: number;
+  month: number;
+  year: number;
+  /** So luot con lai. So am nghia la khong dat gioi han. */
+  left: number;
 }
 
 export interface PageResult<T> {
@@ -328,6 +697,22 @@ export interface PeriodQuota {
   year: number;
 }
 
+/** Don gia mot luot cho tung chuc nang dung tri tue nhan tao. */
+export interface AiUnitPrice {
+  restorePhoto: Money;
+  designSuggestion: Money;
+  storyWriting: Money;
+  chatReply: Money;
+}
+
+/** Cung bon muc don gia do, nhung viet duoi dang chuoi de gui len may chu. */
+export interface AiUnitPriceInput {
+  restorePhoto: string;
+  designSuggestion: string;
+  storyWriting: string;
+  chatReply: string;
+}
+
 export interface BusinessConfig {
   defaultPetProfileLimit: number;
   qrExpiryHours: number;
@@ -335,7 +720,19 @@ export interface BusinessConfig {
   goodShortEdgePx: number;
   warnShortEdgePx: number;
   maxPhotoSizeMb: number;
-  aiQuota: { restorePhoto: PeriodQuota };
+  /**
+   * Han muc so luot cho tung chuc nang dung tri tue nhan tao.
+   *
+   * Bon chuc nang deu co mat. Dat bang khong o cho nao thi cho do khong gioi han.
+   */
+  aiQuota: {
+    restorePhoto: PeriodQuota;
+    designSuggestion?: PeriodQuota;
+    storyWriting?: PeriodQuota;
+    chatReply?: PeriodQuota;
+  };
+  aiUnitPrice: AiUnitPrice;
+  qcChecklist: string[];
   bankCode: string;
   bankName: string;
   accountNumber: string;
@@ -343,7 +740,12 @@ export interface BusinessConfig {
   lastEditedBy: string | null;
 }
 
-export type UpdateBusinessConfig = Omit<BusinessConfig, 'lastEditedBy'>;
+export type UpdateBusinessConfig = Omit<
+  BusinessConfig,
+  'lastEditedBy' | 'aiUnitPrice'
+> & {
+  aiUnitPrice: AiUnitPriceInput;
+};
 
 export type PreviewAngle = 'FRONT' | 'LEFT' | 'RIGHT' | 'BACK' | 'TOP' | 'ISO';
 
@@ -369,6 +771,13 @@ export interface Design {
   modelCode: string;
   paint: MeshPaint[];
   colorCodesUsed: string[];
+  /**
+   * Mau tung vung co ten.
+   *
+   * Rong voi cac ban thiet ke cu. Ban sinh tu mot phuong an goi y chi co muc
+   * nay chu chua co mau tung mat luoi.
+   */
+  zonePaint?: ZonePaint[];
   productTypeCode: string;
   sizeCode: string;
   engraving: Engraving;
@@ -377,11 +786,19 @@ export interface Design {
   updatedAt: string;
 }
 
+/** Mau cua mot vung co ten tren mo hinh. */
+export interface ZonePaint {
+  zone: string;
+  colorCode: string;
+}
+
 export interface SaveDesign {
   name: string;
   modelCode: string;
   paint?: MeshPaint[];
   colorCodesUsed?: string[];
+  /** Mau tung vung co ten, de ho so san xuat ghi ma mau theo vung. */
+  zonePaint?: ZonePaint[];
   productTypeCode?: string;
   sizeCode?: string;
   engraving?: { name?: string; memorialDate?: string; message?: string };
@@ -414,6 +831,8 @@ export interface ProductionItem {
   nameDesign: string | null;
   designId: string | null;
   woolRolls: WoolRoll[];
+  /** Ma mau theo tung vung co ten, de xuong pha len dung cho. */
+  zoneColours: { zone: string; wool: WoolRoll }[];
   engraving: Engraving | null;
   anglesPreview: PreviewAngle[];
   productionDays: number;

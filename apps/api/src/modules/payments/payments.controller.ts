@@ -27,7 +27,7 @@ export class PaymentsController {
     return this.service.receiveNotification(message);
   }
 
-  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPPORT)
+  @Roles(Role.MANAGER)
   @Get('log')
   log(@Query('limit') limit?: string) {
     return this.service.listLog(Number(limit ?? 50));

@@ -97,7 +97,7 @@ function fail(text) {
 }
 
 /** Checks one model against every rule, printing a line per rule. */
-function checkModel(entry, declaredZones) {
+function checkModel(entry, declaredZones, zoneByFile, zoneName) {
   const file = nodePath.join(MODEL_DIR, entry.file);
   console.log(`\n${entry.code}  (${entry.file})`);
 
@@ -123,6 +123,27 @@ function checkModel(entry, declaredZones) {
     warn(`${known.length} of ${zones.length} zones can be coloured; not declared: ${unknown.join(', ')}`);
   } else {
     pass(`${known.length} zones, all declared and colourable: ${known.join(', ')}`);
+  }
+
+  /*
+   * Kiem lop vung co ten.
+   *
+   * Hop dong yeu cau moi mo hinh chia dung sau vung co ten. Tep mo hinh dat
+   * ten mang vat lieu theo kieu rieng, nen ban do vung trong ban khai la thu
+   * noi mang nao thuoc vung nao. Vung nao khong co mang nao tro toi la vung
+   * tep chua tach rieng, va do la viec phai lam lai trong Blender.
+   */
+  const zoneMap = zoneByFile[entry.file] ?? {};
+  const covered = new Set(zones.map((one) => zoneMap[one]).filter(Boolean));
+  const missingZones = zoneName.filter((one) => !covered.has(one));
+  const unmapped = zones.filter((one) => !zoneMap[one]);
+  if (missingZones.length === 0) {
+    pass(`du ${zoneName.length} vung co ten`);
+  } else {
+    fail(`thieu ${missingZones.length} vung co ten: ${missingZones.join(', ')}`);
+  }
+  if (unmapped.length > 0) {
+    warn(`chua xep vung cho: ${unmapped.join(', ')}`);
   }
 
   const nodeNames = new Set((gltf.nodes ?? []).map((n) => n.name).filter(Boolean));
@@ -163,14 +184,17 @@ function run() {
   }
   const manifest = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
   const declaredZones = new Set((manifest.zoneMaterial ?? []).map((z) => z.name));
+  const zoneByFile = manifest.zoneByFile ?? {};
+  const zoneName = manifest.zoneName ?? [];
 
   console.log('3D MODEL CHECK');
   console.log('='.repeat(72));
   console.log(`Zones the manifest declares: ${[...declaredZones].join(', ')}`);
+  console.log(`Sau vung co ten hop dong yeu cau: ${zoneName.join(', ')}`);
   console.log(`Anchors expected on each model: ${ANCHORS_EXPECTED.join(', ')}`);
 
   for (const entry of manifest.baseModel ?? []) {
-    checkModel(entry, declaredZones);
+    checkModel(entry, declaredZones, zoneByFile, zoneName);
   }
 
   console.log('');

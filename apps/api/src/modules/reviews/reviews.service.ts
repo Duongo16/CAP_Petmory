@@ -7,7 +7,7 @@ import { Order, OrderDocument, OrderStatus } from '../orders/schemas/order.schem
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { MSG } from '../../common/constants/messages';
 
-const NOT_DELIVERED = 'Chi danh gia duoc sau khi don hang da giao';
+const NOT_DELIVERED = 'Chi danh gia duoc sau khi don hang hoan tat';
 const NOT_IN_ORDER = 'Don hang nay khong co san pham do';
 
 /** One review with the author's display name, ready for the product page. */
@@ -55,7 +55,7 @@ export class ReviewsService {
   async pendingForCustomer(owner: string): Promise<{ productTypeCode: string; orderCode: string }[]> {
     const ownerId = new Types.ObjectId(owner);
     const delivered = await this.orderModel
-      .find({ customer: ownerId, status: OrderStatus.DELIVERED })
+      .find({ customer: ownerId, status: OrderStatus.COMPLETED })
       .select('orderCode rows')
       .exec();
 
@@ -87,7 +87,7 @@ export class ReviewsService {
     if (!order) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
-    if (order.status !== OrderStatus.DELIVERED) {
+    if (order.status !== OrderStatus.COMPLETED) {
       throw new ForbiddenException(NOT_DELIVERED);
     }
     if (!order.rows.some((line) => line.productTypeCode === productTypeCode)) {

@@ -17,21 +17,22 @@ const log = new Logger('Seed');
 /** Internal demo accounts. Change the passwords before real use. */
 const PASSWORD_DEFAULT = 'Petmory@2026';
 
+/*
+ * Hai tai khoan noi bo, dung hai nhom quyen.
+ *
+ * Nhom Quan ly lo toan bo phan van hanh. Nhom Quan tri vien chi quan ly tai
+ * khoan, nen tai khoan do khong mo duoc don hang hay bao cao.
+ */
 const ACCOUNT_INTERNAL: { email: string; fullName: string; roles: Role[] }[] = [
   {
     email: 'quanly@petmory.local',
     fullName: 'Quan ly PETMORY',
-    roles: [Role.MANAGER, Role.ADMIN],
+    roles: [Role.MANAGER],
   },
   {
-    email: 'xuong@petmory.local',
-    fullName: 'Dieu phoi xuong',
+    email: 'quantri@petmory.local',
+    fullName: 'Quan tri tai khoan',
     roles: [Role.ADMIN],
-  },
-  {
-    email: 'cskh@petmory.local',
-    fullName: 'Cham soc khach hang',
-    roles: [Role.SUPPORT],
   },
 ];
 
@@ -68,6 +69,23 @@ async function loadDisplayBase(model: Model<DisplayBaseDocument>): Promise<void>
   log.log(`Loaded ${DISPLAY_BASE_LIST.length} display bases`);
 }
 
+/**
+ * Where the demo picture of a product type lives.
+ *
+ * Built from the account name in the environment rather than written out, so
+ * moving to another account needs no change here. With no picture service set
+ * up it falls back to the copy bundled with the web application, which keeps
+ * the screens looking right on a machine that has no credentials.
+ */
+function pictureOf(code: string): string {
+  const account = process.env.CLOUDINARY_CLOUD_NAME;
+  const name = code.toLowerCase();
+  if (process.env.STORAGE_DRIVER === 'cloudinary' && account) {
+    return `https://res.cloudinary.com/${account}/image/upload/petmory/demo/${name}.png`;
+  }
+  return `/demo/${name}.png`;
+}
+
 async function loadProduct(model: Model<ProductTypeDocument>): Promise<void> {
   for (const kind of PRODUCT_LIST) {
     const sizes = kind.sizes.map((size) => ({
@@ -85,6 +103,7 @@ async function loadProduct(model: Model<ProductTypeDocument>): Promise<void> {
           description: kind.description,
           material: kind.material,
           sortOrder: kind.sortOrder,
+          imageUrl: pictureOf(kind.code),
           enabled: true,
           sizes,
         },

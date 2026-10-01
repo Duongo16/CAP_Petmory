@@ -1,0 +1,63 @@
+@use '../../shared/dialog';
+
+/* Phan rieng cua hop thoai ho so thu cung: o ngay roi xa va khu chon anh. */
+
+:host {
+  display: block;
+}
+
+/* O ngay roi xa chi hien khi trang thai la da roi xa. */
+.memorial {
+  padding: var(--pm-space-4);
+  border-radius: 16px;
+  background: var(--pm-memorial-soft);
+  border: 1px solid var(--pm-border);
+}
+
+/* ---------- Anh ---------- */
+
+.album {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-3);
+}
+
+.album-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.album-count {
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+  color: var(--pm-text-muted);
+}
+
+.album-drop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pm-space-2);
+  min-block-size: 72px;
+  padding: var(--pm-space-4);
+  border-radius: 16px;
+  border: 1.5px dashed var(--pm-border-strong);
+  background: var(--pm-bg);
+  color: var(--pm-text-body);
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+  }
+
+  pm-icon {
+    color: var(--pm-accent);
+  }
+}
+

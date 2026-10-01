@@ -1,0 +1,223 @@
+/* Quyen so ky niem, lat duoc tung trang. */
+
+:host {
+  display: block;
+}
+
+.book {
+  position: relative;
+  display: flex;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+  -webkit-user-drag: none;
+
+  img {
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+  width: min(940px, 100%);
+  aspect-ratio: 16 / 10;
+  perspective: 2400px;
+  filter: drop-shadow(0 22px 40px var(--pm-book-edge));
+}
+
+/*
+ * Chong giay o hai via. Ve bang nhieu vach mong sat nhau, nen quyen so co
+ * be day nhin thay duoc ma khong can them mot the nao trong khuon mau.
+ */
+.book::before,
+.book::after {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  width: 10px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    to right,
+    rgb(255 255 255 / 92%) 0 1px,
+    rgb(190 170 140 / 55%) 1px 2px
+  );
+  content: '';
+  pointer-events: none;
+}
+
+.book::before {
+  left: -8px;
+}
+
+.book::after {
+  right: -8px;
+}
+
+.half {
+  position: relative;
+  width: 50%;
+  height: 100%;
+}
+
+.back-left {
+  border-radius: 10px 2px 2px 10px;
+  background: var(--pm-book-cover);
+}
+
+.leaves {
+  transform-style: preserve-3d;
+}
+
+/*
+ * Moi to giay quay quanh gay sach. Chi dong den phep quay, khong dong den
+ * be rong hay le, nen trinh duyet khong phai dat lai bo cuc cho tung khung
+ * hinh cua chuyen dong.
+ */
+.leaf {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: transform 820ms cubic-bezier(0.32, 0.08, 0.24, 1);
+}
+
+.leaf.turned {
+  transform: rotateY(-180deg);
+}
+
+/* A page held by the pointer follows it exactly, with no easing lag. */
+.book.holding {
+  cursor: grabbing;
+}
+
+.leaf.held {
+  transition: none;
+}
+
+/* Light falling across the curve of the page as it lifts. */
+.leaf .face::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to left, var(--pm-art-shadow), transparent 60%);
+  opacity: calc(var(--lift, 0) * 0.9);
+  content: '';
+  pointer-events: none;
+}
+
+.leaf .face.back::after {
+  background: linear-gradient(to right, var(--pm-art-shadow), transparent 60%);
+}
+
+/* Dog-eared corners that invite a drag, and lift a little on hover. */
+.corner {
+  position: absolute;
+  bottom: 0;
+  z-index: 1000;
+  width: 38px;
+  height: 38px;
+  pointer-events: none;
+  transition: transform 220ms ease;
+}
+
+.corner-next {
+  right: 0;
+  border-radius: 0 0 10px 0;
+  background: linear-gradient(135deg, transparent 50%, var(--pm-paper-kraft) 50%, var(--pm-paper-cream) 72%);
+  box-shadow: -3px -3px 6px var(--pm-art-shadow);
+  transform-origin: bottom right;
+}
+
+.corner-back {
+  left: 0;
+  border-radius: 0 0 0 10px;
+  background: linear-gradient(225deg, transparent 50%, var(--pm-paper-kraft) 50%, var(--pm-paper-cream) 72%);
+  box-shadow: 3px -3px 6px var(--pm-art-shadow);
+  transform-origin: bottom left;
+}
+
+.book:hover .corner {
+  transform: scale(1.5);
+}
+
+.book.holding .corner {
+  opacity: 0;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  border-radius: 2px 10px 10px 2px;
+  box-shadow: inset 6px 0 14px -10px rgb(0 0 0 / 45%);
+}
+
+.face.back {
+  transform: rotateY(180deg);
+  border-radius: 10px 2px 2px 10px;
+  box-shadow: inset -6px 0 14px -10px rgb(0 0 0 / 45%);
+}
+
+.spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 14px;
+  margin-left: -7px;
+  background: linear-gradient(
+    to right,
+    rgb(0 0 0 / 0%),
+    rgb(0 0 0 / 22%) 45%,
+    rgb(0 0 0 / 22%) 55%,
+    rgb(0 0 0 / 0%)
+  );
+  pointer-events: none;
+}
+
+/* Mui ten lui dung chung bieu tuong mui ten phai, nen xoay nguoc. */
+.turn:first-child pm-icon {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf {
+    transition: none;
+  }
+}
+
+/*
+ * Man hinh hep: mot trang mot luc. To giay moi bay vao tu canh phai, nen
+ * viec doi trang van co cam giac lat chu khong phai thay noi dung tai cho.
+ */
+.book.one-page {
+  aspect-ratio: 3 / 4;
+
+  .leaves {
+    width: 100%;
+  }
+
+  .leaf.single {
+    animation: pm-leaf-in 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    transform-origin: left center;
+  }
+
+  .face {
+    border-radius: 10px;
+  }
+}
+
+@keyframes pm-leaf-in {
+  from {
+    opacity: 0.2;
+    transform: rotateY(48deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotateY(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book.one-page .leaf.single {
+    animation: none;
+  }
+}

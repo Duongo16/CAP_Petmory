@@ -10,6 +10,7 @@ import { OrdersModule } from '../orders/orders.module';
 import { PetsModule } from '../pets/pets.module';
 import { DesignsModule } from '../designs/designs.module';
 import { CatalogModule } from '../catalog/catalog.module';
+import { MemoriesModule } from '../memories/memories.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CatalogModule } from '../catalog/catalog.module';
     PetsModule,
     DesignsModule,
     CatalogModule,
+    MemoriesModule,
   ],
   controllers: [AdminController],
   providers: [AdminService, ProductionFileService],

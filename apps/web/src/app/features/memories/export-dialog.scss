@@ -1,0 +1,32 @@
+/*
+ * Hop xin xuat quyen nhat ky ra tep doc duoc.
+ *
+ * Khung, nut dong va nut chinh lay tu bo hop thoai dung chung; phan con lai
+ * dung lop Tailwind trong mau.
+ */
+@use '../../shared/dialog';
+
+:host {
+  display: block;
+}
+
+.sheet-sub {
+  margin: var(--pm-space-1) 0 0;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}
+
+.state-line {
+  margin: 0;
+  font-size: var(--pm-text-md);
+
+  &.done {
+    font-weight: 600;
+    color: var(--pm-success);
+  }
+
+  &.bad {
+    font-weight: 600;
+    color: var(--pm-danger);
+  }
+}

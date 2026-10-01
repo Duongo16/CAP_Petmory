@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsEnum, IsIn, IsOptional } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsIn, IsMongoId, IsOptional } from 'class-validator';
 import { PhotoAngle } from '../schemas/pet-photo.schema';
 
 /** The restoration operations the customer can choose. */
@@ -13,8 +13,9 @@ export const OPERATIONS = [
 export type RestoreOperation = (typeof OPERATIONS)[number];
 
 export class UploadPhotoDto {
+  @IsOptional()
   @IsEnum(PhotoAngle)
-  angle!: PhotoAngle;
+  angle?: PhotoAngle;
 }
 
 export class RestoreDto {
@@ -28,4 +29,10 @@ export class ConfirmDto {
   @IsOptional()
   @IsBoolean()
   accept?: boolean;
+}
+
+/** Names the pet a loose picture should join. */
+export class AttachPhotoDto {
+  @IsMongoId()
+  pet!: string;
 }

@@ -1,8 +1,21 @@
 <div class="pm-page">
-  <header class="page-header">
-    <h1 class="pm-page-title">{{ 'PALETTE.ADMIN_TITLE' | translate }}</h1>
-    <p class="pm-page-description">{{ 'PALETTE.ADMIN_HINT' | translate }}</p>
-  </header>
+  <div class="pm-page-head">
+    <div class="pm-page-head-text">
+      <h1 class="title pm-page-title">{{ 'PALETTE.ADMIN_TITLE' | translate }}</h1>
+      <p class="pm-page-description">{{ 'PALETTE.ADMIN_HINT' | translate }}</p>
+    </div>
+    <div class="pm-page-head-actions">
+      <button
+        type="button"
+        class="pm-button-primary"
+        id="color-new"
+        [disabled]="sending()"
+        (click)="add()"
+      >
+        {{ 'PALETTE.ADD_TITLE' | translate }}
+      </button>
+    </div>
+  </div>
 
   @switch (status()) {
     @case ('LOADING') {
@@ -28,154 +41,68 @@
         </div>
       </div>
 
-      <div class="layout">
-        <section class="table-side">
-          <div class="filter-row">
-            @for (tab of groupTabs; track tab.group) {
-              <button
-                type="button"
-                class="pm-chip"
-                [attr.aria-pressed]="groupFilter() === tab.group"
-                (click)="filterGroup(tab.group)"
-              >
-                {{ tab.key | translate }}
-              </button>
-            }
-          </div>
+      @if (error(); as key) {
+        <p class="pm-status" data-tone="bad" role="alert">{{ key | translate }}</p>
+      }
 
-          <div class="table-wrap pm-card">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">{{ 'PALETTE.SWATCH' | translate }}</th>
-                  <th scope="col">{{ 'PALETTE.CODE' | translate }}</th>
-                  <th scope="col">{{ 'PALETTE.NAME' | translate }}</th>
-                  <th scope="col">{{ 'PALETTE.GROUP_LABEL' | translate }}</th>
-                  <th scope="col">{{ 'PALETTE.STATE' | translate }}</th>
-                  <th scope="col"><span class="sr-only">{{ 'COMMON.EDIT' | translate }}</span></th>
+      <section class="table-side">
+        <div class="filter-row">
+          @for (tab of groupTabs; track tab.group) {
+            <button
+              type="button"
+              class="pm-chip"
+              [attr.aria-pressed]="groupFilter() === tab.group"
+              (click)="filterGroup(tab.group)"
+            >
+              {{ tab.key | translate }}
+            </button>
+          }
+        </div>
+
+        <div class="table-wrap pm-card">
+          <table class="table" id="color-table">
+            <thead>
+              <tr>
+                <th scope="col" class="num-col">#</th>
+                <th scope="col">{{ 'PALETTE.SWATCH' | translate }}</th>
+                <th scope="col">{{ 'PALETTE.CODE' | translate }}</th>
+                <th scope="col">{{ 'PALETTE.NAME' | translate }}</th>
+                <th scope="col">{{ 'PALETTE.GROUP_LABEL' | translate }}</th>
+                <th scope="col">{{ 'PALETTE.STATE' | translate }}</th>
+                <th scope="col"><span class="sr-only">{{ 'COMMON.EDIT' | translate }}</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows(); track row.raw.code; let i = $index) {
+                <tr [class.is-off]="!row.raw.enabled">
+                  <td class="num-col muted">{{ i + 1 }}</td>
+                  <td>
+                    <span class="swatch-cell" [style.background-color]="row.raw.swatch"></span>
+                  </td>
+                  <td><code class="small-code">{{ row.raw.code }}</code></td>
+                  <td>{{ row.raw.displayName }}</td>
+                  <td>{{ row.groupKey | translate }}</td>
+                  <td>
+                    <span class="pm-status" [attr.data-tone]="row.raw.enabled ? 'success' : ''">
+                      {{ (row.raw.enabled ? 'PALETTE.ON' : 'PALETTE.OFF') | translate }}
+                    </span>
+                  </td>
+                  <td class="action-cell">
+                    <button type="button" class="pm-chip" [disabled]="sending()" (click)="edit(row)">
+                      {{ 'COMMON.EDIT' | translate }}
+                    </button>
+                    <button type="button" class="pm-chip" (click)="toggle(row)">
+                      {{ (row.raw.enabled ? 'PALETTE.TURN_OFF' : 'PALETTE.TURN_ON') | translate }}
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                @for (row of rows(); track row.raw.code) {
-                  <tr [class.is-off]="!row.raw.enabled">
-                    <td>
-                      <span class="swatch-cell" [style.background-color]="row.raw.swatch"></span>
-                    </td>
-                    <td><code class="small-code">{{ row.raw.code }}</code></td>
-                    <td>{{ row.raw.displayName }}</td>
-                    <td>{{ row.groupKey | translate }}</td>
-                    <td>
-                      <span class="pm-status" [attr.data-tone]="row.raw.enabled ? 'success' : ''">
-                        {{ (row.raw.enabled ? 'PALETTE.ON' : 'PALETTE.OFF') | translate }}
-                      </span>
-                    </td>
-                    <td class="action-cell">
-                      <button type="button" class="pm-chip" (click)="startEdit(row)">
-                        {{ 'COMMON.EDIT' | translate }}
-                      </button>
-                      <button type="button" class="pm-chip" (click)="toggle(row)">
-                        {{ (row.raw.enabled ? 'PALETTE.TURN_OFF' : 'PALETTE.TURN_ON') | translate }}
-                      </button>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <aside class="form-side">
-          <section class="pm-card form-card">
-            <h2 class="pm-section-title">
-              {{ (editing() ? 'PALETTE.EDIT_TITLE' : 'PALETTE.ADD_TITLE') | translate }}
-            </h2>
-
-            <form class="form" (ngSubmit)="submit()">
-              <div class="field">
-                <label for="color-code">{{ 'PALETTE.CODE' | translate }}</label>
-                <input
-                  id="color-code"
-                  name="code"
-                  maxlength="30"
-                  [disabled]="editing() !== null"
-                  [ngModel]="draft().code"
-                  (ngModelChange)="setField('code', $event)"
-                />
-                @if (editing()) {
-                  <p class="hint">{{ 'PALETTE.CODE_LOCKED' | translate }}</p>
-                }
-              </div>
-
-              <div class="field">
-                <label for="color-name">{{ 'PALETTE.NAME' | translate }}</label>
-                <input
-                  id="color-name"
-                  name="displayName"
-                  maxlength="80"
-                  [ngModel]="draft().displayName"
-                  (ngModelChange)="setField('displayName', $event)"
-                />
-              </div>
-
-              <div class="field">
-                <label for="color-swatch">{{ 'PALETTE.SWATCH' | translate }}</label>
-                <div class="swatch-row">
-                  <input
-                    id="color-swatch"
-                    name="swatch"
-                    type="color"
-                    [ngModel]="draft().swatch"
-                    (ngModelChange)="setField('swatch', $event)"
-                  />
-                  <code class="small-code">{{ draft().swatch }}</code>
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="color-group">{{ 'PALETTE.GROUP_LABEL' | translate }}</label>
-                <select
-                  id="color-group"
-                  name="group"
-                  [ngModel]="draft().group"
-                  (ngModelChange)="setField('group', $event)"
-                >
-                  @for (tab of groupTabs; track tab.group) {
-                    <option [value]="tab.group">{{ tab.key | translate }}</option>
-                  }
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="color-note">{{ 'PALETTE.NOTE' | translate }}</label>
-                <input
-                  id="color-note"
-                  name="note"
-                  maxlength="200"
-                  [ngModel]="draft().note"
-                  (ngModelChange)="setField('note', $event)"
-                />
-              </div>
-
-              @if (error(); as key) {
-                <p class="field-error" role="alert">{{ key | translate }}</p>
               }
+            </tbody>
+          </table>
+        </div>
 
-              <div class="button-row">
-                @if (editing()) {
-                  <button type="button" class="pm-button-secondary" (click)="startAdd()">
-                    {{ 'PALETTE.ADD_TITLE' | translate }}
-                  </button>
-                }
-                <button type="submit" class="pm-button-primary" [disabled]="!canSubmit()">
-                  {{ 'COMMON.SAVE' | translate }}
-                </button>
-              </div>
-            </form>
-          </section>
-
-          <p class="pm-empty note">{{ 'PALETTE.ORDER_SAFE' | translate }}</p>
-        </aside>
-      </div>
+        <p class="pm-empty note">{{ 'PALETTE.ORDER_SAFE' | translate }}</p>
+      </section>
     }
   }
 </div>

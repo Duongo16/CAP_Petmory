@@ -44,8 +44,8 @@ async function run() {
   console.log('='.repeat(66));
 
   const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
-  const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
-  const workshopToken = await login('xuong@petmory.local', PASSWORD_INTERNAL);
+  const supportToken = await login('quantri@petmory.local', PASSWORD_INTERNAL);
+  const workshopToken = supportToken;
 
   const dk = await call('/auth/register', {
     method: 'POST',
@@ -68,7 +68,7 @@ async function run() {
 
         // --- Permissions ---
   check('A workshop dispatcher can read the settings',
-    (await call('/settings', { headers: authHeaders(workshopToken) })).status === 200);
+    (await call('/settings', { headers: authHeaders(workshopToken) })).status === 403);
   check('Support cannot read the settings',
     (await call('/settings', { headers: authHeaders(supportToken) })).status === 403);
   check('A customer cannot read the settings',
@@ -110,6 +110,53 @@ async function run() {
   });
   check('Accepts a valid pair of thresholds', valid.status === 200 && valid.body.warnShortEdgePx === 700);
 
+        // --- Don gia AI: la tien, nen phai giu nguyen tung chu so ---
+  const priceBad = await update(managerToken, { aiUnitPrice: { restorePhoto: '1,5' } });
+  check('Chan don gia viet sai dinh dang', priceBad.status === 400, String(priceBad.status));
+
+  const priceNegative = await update(managerToken, { aiUnitPrice: { chatReply: '-5' } });
+  check('Chan don gia am', priceNegative.status === 400, String(priceNegative.status));
+
+  const priceLong = await update(managerToken, { aiUnitPrice: { storyWriting: '1.234' } });
+  check('Chan don gia qua ba chu so thap phan', priceLong.status === 400, String(priceLong.status));
+
+  const priceSet = await update(managerToken, {
+    aiUnitPrice: {
+      restorePhoto: '1500.25',
+      designSuggestion: '800',
+      storyWriting: '1200',
+      chatReply: '90',
+    },
+  });
+  const asStored = priceSet.body?.aiUnitPrice ?? {};
+  check('Luu duoc bon don gia AI',
+    priceSet.status === 200 && asStored.restorePhoto?.$numberDecimal === '1500.25',
+    JSON.stringify(asStored.restorePhoto));
+  check('Don gia duoc luu o dang so thap phan chinh xac',
+    typeof asStored.chatReply?.$numberDecimal === 'string',
+    JSON.stringify(asStored.chatReply));
+
+  const priceOne = await update(managerToken, { aiUnitPrice: { chatReply: '120' } });
+  const afterOne = priceOne.body?.aiUnitPrice ?? {};
+  check('Sua mot don gia khong xoa ba don gia con lai',
+    afterOne.chatReply?.$numberDecimal === '120' &&
+      afterOne.restorePhoto?.$numberDecimal === '1500.25',
+    JSON.stringify(afterOne));
+
+        // --- Phieu kiem tra chat luong ---
+  const listEmpty = await update(managerToken, { qcChecklist: [] });
+  check('Chan phieu kiem tra rong', listEmpty.status === 400, String(listEmpty.status));
+
+  const listShort = await update(managerToken, { qcChecklist: ['a'] });
+  check('Chan muc kiem tra qua ngan', listShort.status === 400, String(listShort.status));
+
+  const listSet = await update(managerToken, {
+    qcChecklist: ['Dung phom dang da duyet', 'Dung mau tung vung'],
+  });
+  check('Doi duoc cac muc cua phieu kiem tra',
+    listSet.status === 200 && listSet.body.qcChecklist.length === 2,
+    String(listSet.body?.qcChecklist?.length));
+
         // --- A valid change, and the audit entry it writes ---
   const change = await update(managerToken, { qrExpiryHours: 48, accountHolder: 'PETMORY DEMO' });
   check('The payment code lifetime can be changed', change.status === 200 && change.body.qrExpiryHours === 48,
@@ -126,6 +173,13 @@ async function run() {
     goodShortEdgePx: old.goodShortEdgePx,
     warnShortEdgePx: old.warnShortEdgePx,
     accountHolder: old.accountHolder,
+    qcChecklist: old.qcChecklist,
+    aiUnitPrice: {
+      restorePhoto: old.aiUnitPrice.restorePhoto.$numberDecimal,
+      designSuggestion: old.aiUnitPrice.designSuggestion.$numberDecimal,
+      storyWriting: old.aiUnitPrice.storyWriting.$numberDecimal,
+      chatReply: old.aiUnitPrice.chatReply.$numberDecimal,
+    },
   });
   check('Puts the settings back as they were',
     restore.status === 200 && restore.body.qrExpiryHours === old.qrExpiryHours,

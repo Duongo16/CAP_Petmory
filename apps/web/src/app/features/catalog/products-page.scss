@@ -19,12 +19,6 @@
   background: var(--pm-amber-soft);
 }
 
-/* Search focus ring on parent */
-.search:focus-within {
-  outline: 2px solid var(--pm-accent);
-  outline-offset: 1px;
-}
-
 /* Badge colour variants (data-tone driven by component) */
 .badge[data-tone='amber'] { background: var(--pm-amber-soft); color: var(--pm-on-amber); }
 .badge[data-tone='green'] { background: var(--pm-success-soft); color: var(--pm-on-success-soft); }

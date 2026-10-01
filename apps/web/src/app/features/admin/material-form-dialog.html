@@ -1,0 +1,64 @@
+<form class="sheet" [formGroup]="form" (ngSubmit)="save()">
+  <header class="sheet-head">
+    <div>
+      <p class="eyebrow">{{ 'PALETTE.ADMIN_TITLE' | translate }}</p>
+      <h2 class="sheet-title">
+        {{ (editing ? 'PALETTE.EDIT_TITLE' : 'PALETTE.ADD_TITLE') | translate }}
+      </h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="sheet-body">
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="color-code">{{ 'PALETTE.CODE' | translate }}</label>
+        <input id="color-code" type="text" maxlength="30" formControlName="code" />
+        @if (editing) {
+          <p class="field-note">{{ 'PALETTE.CODE_LOCKED' | translate }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field-name" for="color-name">{{ 'PALETTE.NAME' | translate }}</label>
+        <input id="color-name" type="text" maxlength="80" formControlName="displayName" />
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="color-swatch">{{ 'PALETTE.SWATCH' | translate }}</label>
+        <div class="swatch-row">
+          <input id="color-swatch" type="color" formControlName="swatch" />
+          <code class="small-code">{{ form.controls.swatch.value }}</code>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-name" for="color-group">{{ 'PALETTE.GROUP_LABEL' | translate }}</label>
+        <select id="color-group" formControlName="group">
+          @for (tab of groupTabs; track tab.group) {
+            <option [value]="tab.group">{{ tab.key | translate }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="color-note">{{ 'PALETTE.NOTE' | translate }}</label>
+      <input id="color-note" type="text" maxlength="200" formControlName="note" />
+    </div>
+
+    <p class="field-note">{{ 'PALETTE.ORDER_SAFE' | translate }}</p>
+  </div>
+
+  <footer class="sheet-foot">
+    <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button type="submit" class="strong" id="color-save">
+      {{ 'COMMON.SAVE' | translate }}
+      <pm-icon name="check" [size]="15" />
+    </button>
+  </footer>
+</form>

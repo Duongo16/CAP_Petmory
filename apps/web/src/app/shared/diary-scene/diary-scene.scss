@@ -1,0 +1,133 @@
+:host {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.scene {
+  overflow: visible;
+}
+
+/* ---------- Background ---------- */
+.halo { fill: var(--pm-amber-soft); opacity: 0.55; }
+.halo-inner { fill: var(--pm-accent-soft); opacity: 0.7; }
+.on-color .halo { fill: var(--pm-glass-on-accent); opacity: 1; }
+.on-color .halo-inner { fill: var(--pm-glass-on-accent); opacity: 1; }
+
+.trail {
+  fill: none;
+  stroke: var(--pm-amber-bright);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 2 11;
+  opacity: 0.75;
+  animation: ds-trail 3.2s linear infinite;
+}
+.t2 { animation-duration: 4s; opacity: 0.55; }
+.t3 { animation-duration: 3.6s; opacity: 0.6; }
+.on-color .trail { stroke: var(--pm-on-accent); }
+
+.spine-glow { fill: var(--pm-amber-bright); opacity: 0.35; filter: blur(14px); animation: ds-glow 3s ease-in-out infinite; }
+.on-color .spine-glow { fill: var(--pm-on-accent); opacity: 0.3; }
+
+/* ---------- Book ---------- */
+.cover { fill: var(--pm-book-cover); }
+.cover-edge { fill: var(--pm-accent-dark); }
+.page { fill: var(--pm-paper-cream); }
+.spine { stroke: var(--pm-book-edge); stroke-width: 2; }
+.ink { fill: none; stroke: var(--pm-paper-mark); stroke-width: 3; stroke-linecap: round; }
+.mini-photo { fill: var(--pm-paper-bloom); stroke: var(--pm-bg-card); stroke-width: 4; }
+.ribbon { fill: var(--pm-memorial); }
+
+/* ---------- Photos ---------- */
+.polaroid { fill: var(--pm-bg-card); filter: drop-shadow(0 10px 16px var(--pm-art-shadow)); }
+.photo-a { fill: var(--pm-paper-bloom); }
+.photo-b { fill: var(--pm-amber-soft); }
+.caption { fill: var(--pm-paper-mark); }
+.tape { fill: var(--pm-tape); }
+
+/* ---------- Animals ---------- */
+.fur { fill: var(--pm-art-fur); }
+.cream { fill: var(--pm-art-cream); }
+.tan { fill: var(--pm-art-tan); }
+.dark { fill: var(--pm-art-dark); }
+.blush { fill: var(--pm-art-blush); }
+.soft { opacity: 0.75; }
+.eye, .nose { fill: var(--pm-art-eye); }
+.rabbit { fill: var(--pm-art-cream); stroke: var(--pm-art-tan); stroke-width: 1.5; }
+.tongue { fill: var(--pm-art-blush); }
+.bird { fill: var(--pm-art-tag); }
+.bird-wing { fill: var(--pm-art-fur); }
+.bird-tail { fill: var(--pm-art-fur); }
+.beak { fill: var(--pm-amber); }
+.stripe { fill: none; stroke: var(--pm-art-dark); stroke-width: 5; stroke-linecap: round; }
+.eye-line, .mouth { fill: none; stroke: var(--pm-art-eye); stroke-width: 3.2; stroke-linecap: round; }
+.mouth { stroke-width: 2.6; }
+
+.heart { fill: var(--pm-danger); opacity: 0.75; }
+.heart.alt { fill: var(--pm-amber-bright); }
+.paw { fill: var(--pm-art-fur); opacity: 0.55; }
+.spark, .dot { fill: var(--pm-amber-bright); }
+.on-color .spark, .on-color .dot { fill: var(--pm-on-accent); }
+
+/* ---------- Motion ---------- */
+.float,
+.wing,
+.peek,
+.spark,
+.dot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.float { animation: ds-float 6s ease-in-out infinite; }
+.f2 { animation-duration: 7s; animation-delay: -2s; }
+.f3 { animation-duration: 5s; animation-delay: -1s; }
+.f4 { animation-duration: 4.5s; animation-delay: -3s; }
+.f5 { animation-duration: 5.5s; animation-delay: -1.5s; }
+
+.wing {
+  transform-origin: 50% 100%;
+  animation: ds-flap 0.5s ease-in-out infinite alternate;
+}
+
+.peek {
+  transform-origin: 50% 100%;
+  animation: ds-peek 4s ease-in-out infinite;
+}
+
+.spark, .dot { animation: ds-twinkle 2.4s ease-in-out infinite; }
+.s2 { animation-delay: -0.8s; }
+.s3 { animation-delay: -1.6s; }
+
+@keyframes ds-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -14px, 0) rotate(2deg); }
+}
+
+@keyframes ds-flap {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(-0.6); }
+}
+
+@keyframes ds-peek {
+  0%, 100% { transform: translate3d(0, 6px, 0); }
+  40%, 60% { transform: translate3d(0, -6px, 0) rotate(-3deg); }
+}
+
+@keyframes ds-twinkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes ds-trail {
+  to { stroke-dashoffset: -26; }
+}
+
+@keyframes ds-glow {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float, .wing, .peek, .spark, .dot, .trail, .spine-glow { animation: none; }
+}

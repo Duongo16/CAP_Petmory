@@ -98,41 +98,12 @@
         <p class="field-error">{{ message | translate }}</p>
       }
 
-      @if (photoLink().length > 0) {
-        <ul class="upload-list">
-          @for (one of photoLink(); track one; let i = $index) {
-            <li>
-              <span class="upload-name">{{ one }}</span>
-              <button
-                type="button"
-                class="upload-drop"
-                (click)="dropLink(i)"
-                [attr.aria-label]="'COMMON.REMOVE' | translate"
-              >
-                <pm-icon name="close" [size]="13" />
-              </button>
-            </li>
-          }
-        </ul>
-      }
-
-      @if (photo().length > 0) {
-        <ul class="upload-list">
-          @for (one of photo(); track one.name + one.size; let i = $index) {
-            <li>
-              <span class="upload-name">{{ one.name }}</span>
-              <button
-                type="button"
-                class="upload-drop"
-                (click)="dropPhoto(i)"
-                [attr.aria-label]="'COMMON.REMOVE' | translate"
-              >
-                <pm-icon name="close" [size]="13" />
-              </button>
-            </li>
-          }
-        </ul>
-      }
+      <pm-photo-previews
+        [files]="photo()"
+        [links]="photoLink()"
+        (dropFile)="dropPhoto($event)"
+        (dropLink)="dropLink($event)"
+      />
     </div>
   </div>
 

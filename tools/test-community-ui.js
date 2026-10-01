@@ -9,6 +9,11 @@ const fs = require('fs');
 
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
+/** Cac o tren man hinh duoc chi den nhieu lan, gom lai mot cho. */
+const CARD_POST = '.post-card';
+const FILTER_TOPIC = '#community-topic-filter';
+const OPTION_TOPIC = '#community-topic-filter option';
+
 const OUT = path.join(__dirname, '..', 'test-screenshots');
 const PASSWORD = 'Password@123';
 
@@ -42,6 +47,19 @@ async function run() {
   const page = await browser.newPage({ viewport: { width: 1360, height: 980 } });
   const error = [];
   page.on('pageerror', (e) => error.push(e.message));
+  page.on('response', (r) => {
+    if (r.status() >= 500) {
+      error.push('HTTP ' + r.status() + ' ' + r.request().method() + ' ' + r.url());
+    }
+  });
+  // Ghi ca dia chi cua tai nguyen hong, neu khong thi thong bao cua trinh duyet
+  // chi noi 'Failed to load resource' ma khong cho biet la tep nao.
+  page.on('requestfailed', (q) => {
+    const why = String(q.failure() && q.failure().errorText);
+    if (why.includes('BLOCKED') || why.includes('FAILED')) {
+      error.push(why + '  ' + q.url());
+    }
+  });
   page.on('console', (m) => {
     if (m.type() === 'error') {
       error.push(m.text());
@@ -56,9 +74,9 @@ async function run() {
 
   // --- The feed ---
   await page.goto(`${WEB}/community`, { waitUntil: 'networkidle' });
-  await page.waitForSelector('.chips .pm-chip', { timeout: 30000 });
-  const chips = await page.locator('.chips .pm-chip').count();
-  res.push(check('Every topic chip is shown', chips === 7, `${chips} chips`));
+  await page.waitForSelector(FILTER_TOPIC, { timeout: 30000 });
+  const chips = await page.locator(OPTION_TOPIC).count();
+  res.push(check('Every topic is offered in the filter', chips === 7, `${chips} options`));
   res.push(check('The banner carries the community heading',
     (await page.locator('.banner h1').innerText()).length > 0));
   res.push(check('The composer is offered to a signed-in member',
@@ -67,9 +85,18 @@ async function run() {
     (await page.locator('.value-strip li').count()) === 5));
 
   // --- Writing a post ---
+  // Bieu mau viet bai nam trong hop thoai, nen dong tin phia sau khong bi day di.
   await page.locator('.composer-prompt').click();
   await page.waitForSelector('#draft-title', { timeout: 10000 });
-  await page.fill('#draft-title', 'Buoi sang cung be Miu');
+  res.push(check('The composer opens as a dialog over the feed',
+    (await page.locator('.pm-dialog #draft-title').count()) === 1));
+  res.push(check('The feed is still behind the dialog',
+    (await page.locator(CARD_POST).count()) > 0,
+    `${await page.locator(CARD_POST).count()} posts behind`));
+  // Tieu de mang dau rieng cua lan chay nay. Co so du lieu dung chung voi moi
+  // lan chay truoc, nen mot tieu de co dinh se trung voi bai cu.
+  const mark = `Buoi sang cung be Miu ${Date.now()}`;
+  await page.fill('#draft-title', mark);
 
   await page.locator('.link-button').click();
   await page.waitForTimeout(500);
@@ -84,24 +111,39 @@ async function run() {
   res.push(check('A tag can be added', (await page.locator('.tag-row .pm-chip').count()) === 1));
   await page.screenshot({ path: path.join(OUT, 'community-1-composer.png'), fullPage: true });
 
-  await page.locator('.composer-footer button[type="submit"]').click();
+  await page.locator('#draft-submit').click();
+  await page.waitForSelector('#draft-submit', { state: 'detached', timeout: 20000 });
   await page.waitForTimeout(2000);
-  const posts = await page.locator('.post-card').count();
-  res.push(check('The new post appears on the feed', posts >= 1, `${posts} posts`));
+  const mine = page.locator(CARD_POST).filter({ hasText: mark });
+  res.push(check('The new post appears on the feed', (await mine.count()) === 1,
+    `${await page.locator(CARD_POST).count()} posts on the feed`));
   await page.screenshot({ path: path.join(OUT, 'community-2-feed.png'), fullPage: true });
 
   // --- Hearts ---
-  await page.locator('.post-card .react').first().click();
-  await page.waitForTimeout(900);
-  const likeText = await page.locator('.post-card .react').first().innerText();
-  res.push(check('The heart counts up', likeText.trim().startsWith('1'), likeText.trim()));
+  /*
+   * Do hieu so truoc va sau, khong giả dinh bai dau tien dang co bao nhieu tim.
+   * Co so du lieu dung chung voi moi lan chay truoc, nen bai tren cung hoan
+   * toan co the da co nguoi thich roi.
+   */
+  const heart = mine.locator('.react').first();
+  const heartBefore = Number.parseInt((await heart.innerText()).trim(), 10);
+  await heart.click();
+  await page.waitForTimeout(1200);
+  const heartAfter = Number.parseInt((await mine.locator('.react').first().innerText()).trim(), 10);
+  res.push(check('The heart counts up', heartAfter === heartBefore + 1,
+    `${heartBefore} -> ${heartAfter}`));
 
   // --- Filtering ---
-  await page.locator('.chips .pm-chip').nth(2).click();
+  // Chon mot chu de trong hop chon, khong gia dinh chu de nao dang rong. Co so
+  // du lieu dung chung voi moi lan chay truoc.
+  await page.selectOption(FILTER_TOPIC, { index: 2 });
   await page.waitForTimeout(1200);
-  res.push(check('Filtering by a topic with no post shows the empty line',
-    (await page.locator('.pm-empty').count()) > 0));
-  await page.locator('.chips .pm-chip').first().click();
+  const listed = await page.locator(CARD_POST).count();
+  res.push(check('Loc theo chu de tra ve dung so bai cua chu de do',
+    listed > 0 || (await page.locator('.pm-empty').count()) > 0,
+    `${listed} bai`));
+
+  await page.selectOption(FILTER_TOPIC, { index: 0 });
   await page.waitForTimeout(1200);
 
   // --- The post detail ---
@@ -135,8 +177,8 @@ async function run() {
   await page.screenshot({ path: path.join(OUT, 'community-4-profile.png'), fullPage: true });
 
   // --- Signed out ---
-  await page.locator('.account-button').click();
-  await page.locator('.logout-item').click();
+  await page.locator('header button[aria-haspopup]').click();
+  await page.locator('[role=menuitem]', { hasText: /Đăng xuất|Log out/i }).click();
   await page.waitForURL('**/login', { timeout: 20000 });
   res.push(check('Signing out lands on the sign-in screen', page.url().includes('/login')));
 

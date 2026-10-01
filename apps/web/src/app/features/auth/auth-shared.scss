@@ -99,18 +99,9 @@ input[type='radio'] {
   position: relative;
   display: grid;
   place-items: center;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  background: var(--pm-glass-on-accent);
-  border: 1px solid var(--pm-glass-on-accent-line);
-  animation: ap-float 6s ease-in-out infinite;
+  max-width: 100%;
 }
 
-@keyframes ap-float {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -14px, 0); }
-}
 
 .ap-visual-title {
   position: relative;
@@ -196,9 +187,6 @@ input[type='radio'] {
   opacity: 0.78;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ap-illustration { animation: none; }
-}
 
 /* ===================================================
    FORM ELEMENTS
@@ -220,16 +208,10 @@ input[type='radio'] {
 }
 
 /* Logo icon */
-.ap-logo-icon {
+.ap-logo {
   align-self: flex-start;
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: var(--pm-accent);
-  color: var(--pm-on-accent);
-  box-shadow: var(--pm-accent-glow);
+  display: inline-flex;
+  text-decoration: none;
 }
 
 /* Heading */
@@ -358,23 +340,43 @@ input[type='radio'] {
 .ap-input {
   width: 100%;
   height: 48px;
-  padding: 0 44px 0 14px;
-  border: 1.5px solid var(--pm-border);
+  padding: 0 44px 0 16px;
+  border: 1px solid var(--pm-border);
   border-radius: 12px;
-  background: var(--pm-bg-muted);
+  background: var(--pm-bg-card);
   color: var(--pm-text);
-  font-size: var(--pm-text-sm);
+  font-size: var(--pm-text-md);
   font-family: inherit;
   outline: none;
   box-sizing: border-box;
+  box-shadow: 0 1px 2px var(--pm-art-shadow);
   transition: border-color 140ms ease, box-shadow 140ms ease;
 
-  &::placeholder { color: var(--pm-text-muted); }
+  &::placeholder {
+    color: var(--pm-text-muted);
+    opacity: 0.75;
+  }
+
+  &:hover:not(:focus) {
+    border-color: var(--pm-border-strong);
+  }
 
   &:focus {
     border-color: var(--pm-accent);
-    background: var(--pm-bg-card);
     box-shadow: 0 0 0 4px var(--pm-accent-soft);
+  }
+
+  /* Chrome paints remembered logins pale yellow; keep the card colour instead. */
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--pm-text);
+    -webkit-box-shadow: 0 0 0 1000px var(--pm-bg-card) inset;
+    caret-color: var(--pm-text);
+  }
+
+  &.ng-invalid.ng-touched {
+    border-color: var(--pm-danger);
   }
 }
 
@@ -591,5 +593,40 @@ input[type='radio'] {
 
   .ap-social-row {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Ho so be bat dau tu trang chao, cho duoc luu vao tai khoan nay. */
+.ap-draft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--pm-border);
+  border-radius: 16px;
+  background: var(--pm-paper-bloom);
+}
+
+.ap-draft-photo {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--pm-bg-card);
+}
+
+.ap-draft-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--pm-text-sm);
+  line-height: 1.5;
+  color: var(--pm-text-body);
+
+  strong {
+    font-size: var(--pm-text-md);
+    color: var(--pm-text);
   }
 }

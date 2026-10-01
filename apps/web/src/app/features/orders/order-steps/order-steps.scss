@@ -1,0 +1,84 @@
+/* Ba chang cua luong dat hang, dung theo thiet ke Figma. */
+
+:host {
+  display: block;
+}
+
+.steps {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  margin: 0 auto;
+  padding: 0;
+  max-inline-size: 768px;
+  list-style: none;
+}
+
+/*
+ * The three stops each take a third of the row, so their circles sit a sixth,
+ * a half and five sixths of the way across. The rail runs between the outer
+ * two of those, which is why it starts and ends a sixth in.
+ */
+.rail {
+  position: absolute;
+  inset-block-start: 19px;
+  inset-inline: 16.6667%;
+  block-size: 2px;
+  background: var(--pm-border);
+}
+
+.rail-done {
+  display: block;
+  block-size: 100%;
+  background: var(--pm-amber-bright);
+  transition: inline-size 240ms ease;
+}
+
+.stop {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pm-space-2);
+  padding-inline: var(--pm-space-2);
+  text-align: center;
+}
+
+.stop-number {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: var(--pm-radius-pill);
+  border: 1px solid var(--pm-border);
+  background: var(--pm-bg-card);
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-md);
+  font-weight: 700;
+}
+
+.stop-name {
+  font-size: var(--pm-text-md);
+  font-weight: 500;
+  color: var(--pm-text-muted);
+}
+
+.stop.is-here .stop-number,
+.stop.is-done .stop-number {
+  border-color: transparent;
+  background: var(--pm-amber-bright);
+  color: var(--pm-on-amber);
+}
+
+.stop.is-here .stop-name {
+  font-weight: 600;
+  color: var(--pm-amber);
+}
+
+@media (max-width: 600px) {
+  .stop-name {
+    font-size: var(--pm-text-xs);
+  }
+}

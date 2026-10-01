@@ -1,0 +1,46 @@
+/*
+ * Doc mot quyen nhat ky cong khai. Chi doc, khong co gi de bam vao noi dung.
+ * Bo cuc nam o lop Tailwind trong mau; o day chi con nen trang, anh dai dien
+ * va o anh trong tung khoanh khac.
+ */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--pm-bg);
+  color: var(--pm-text);
+}
+
+.middle {
+  padding: 56px 20px;
+  text-align: center;
+  color: var(--pm-text-muted);
+}
+
+/* Mui ten quay lai dung chung bieu tuong mui ten phai, nen xoay nguoc. */
+.back-link pm-icon {
+  transform: rotate(180deg);
+}
+
+.who h1 {
+  margin: 0;
+}
+
+.face {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  flex: none;
+  object-fit: cover;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent);
+}
+
+.shots img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--pm-radius);
+}

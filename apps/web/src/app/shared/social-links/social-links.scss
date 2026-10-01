@@ -5,7 +5,7 @@
 .social {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--pm-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -14,17 +14,18 @@
 .social-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-width: 38px;
-  height: 38px;
-  padding: 0 11px;
+  gap: var(--pm-space-2);
+  min-width: 40px;
+  height: 40px;
+  padding: 0 14px 0 9px;
+  box-sizing: border-box;
   border-radius: 999px;
-  border: 1px solid var(--pm-border-strong);
+  border: 1.5px solid var(--pm-border);
   background: var(--pm-bg-card);
   color: var(--pm-text);
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: var(--pm-text-sm);
   transition:
     transform 140ms ease,
     border-color 140ms ease,
@@ -43,7 +44,7 @@
     width: 22px;
     height: 22px;
     border-radius: 999px;
-    font-size: 0.8rem;
+    font-size: var(--pm-text-sm);
     color: var(--pm-on-accent);
   }
 
@@ -63,5 +64,5 @@
 .social:not(.is-full) .social-link {
   justify-content: center;
   padding: 0;
-  width: 38px;
+  width: 40px;
 }

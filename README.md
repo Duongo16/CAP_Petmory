@@ -68,12 +68,11 @@ apps/
     src/app/features/     màn hình theo tính năng
     src/app/layout/       khung giao diện chung
     public/i18n/          tệp ngôn ngữ
-tools/                    bộ kiểm thử và bộ quét tự động
-  integration/            sáu kịch bản kiểm thử tích hợp
+docs/
+  requirements/           tài liệu nghiệp vụ
+  contracts/              hợp đồng và phụ lục
+  CHECKLIST-KHOI-DONG.md  việc còn lại và lộ trình
 ```
-
-Tài liệu nghiệp vụ, hợp đồng và hướng dẫn được giữ **bên ngoài kho mã**, nên lệnh
-`npm run docs:contracts` chỉ chạy được ở nơi có thư mục tài liệu.
 
 ---
 
@@ -105,10 +104,8 @@ Nhờ vậy mô hình mới thay vào là chạy ngay, không phải sửa mã n
 
 ## Việc tiếp theo
 
-Tình trạng đầy đủ và danh sách việc còn lại nằm trong bộ tài liệu giữ bên ngoài kho mã.
+Xem **[docs/TINH-TRANG-DU-AN.md](docs/TINH-TRANG-DU-AN.md)** để biết tình trạng đầy đủ, và [docs/CHECKLIST-KHOI-DONG.md](docs/CHECKLIST-KHOI-DONG.md) cho các điểm còn phải chốt.
 
-Việc gấp nhất không nằm trong mã nguồn: **cài Blender, bỏ lớp ảnh phủ và chia sáu vùng
-vật liệu cho mô hình mèo và chó, rồi tạo tư thế ngồi và nằm.** Chạy `npm run test:models`
-để xem mô hình hiện tại còn thiếu những gì.
+Việc gấp nhất không nằm trong mã nguồn: **cài Blender, bỏ lớp ảnh phủ và chia sáu vùng vật liệu cho mô hình mèo và chó, rồi tạo tư thế ngồi và nằm.** Xem [docs/HUONG-DAN-BLENDER.md](docs/HUONG-DAN-BLENDER.md).
 
 Mô hình dùng bộ **Kenney Cube Pets**, giấy phép CC0. Dáng khối vuông đầu to hợp với sản phẩm len chọc, và có sẵn cả mèo lẫn chó. Hiện tại mỗi mô hình chỉ có một vùng vật liệu nên đổi màu còn nhuộm cả con; xử lý xong trong Blender là đổi màu theo từng vùng.

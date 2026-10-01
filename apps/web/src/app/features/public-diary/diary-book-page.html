@@ -1,0 +1,108 @@
+<div class="read tw-page tw-page-narrow flex flex-col gap-6">
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="middle">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('MISSING') {
+      <div class="middle tw-empty">
+        <p class="m-0">{{ 'DIARY.MISSING' | translate }}</p>
+        <a class="back-link tw-btn-secondary" routerLink="/diaries">{{ 'DIARY.BACK_TO_LIST' | translate }}</a>
+      </div>
+    }
+    @case ('DONE') {
+      @if (book(); as whole) {
+        <header class="top flex flex-col gap-4">
+          <a class="back-link tw-back m-0 self-start" routerLink="/diaries">
+            <pm-icon name="chevron" [size]="13" />
+            {{ 'DIARY.BACK_TO_LIST' | translate }}
+          </a>
+
+          <div class="tw-card flex flex-col gap-4 p-5 nav:p-6">
+            <div class="who flex items-center gap-4">
+              @if (coverFace(); as face) {
+                <img class="face" [src]="face" [alt]="whole.pet.name" />
+              } @else {
+                <span class="face blank" aria-hidden="true"><pm-icon name="paw" [size]="26" /></span>
+              }
+              <div class="flex min-w-0 flex-col gap-1">
+                <h1 class="pm-page-title">{{ whole.pet.name }}</h1>
+                @if (whole.pet.tagline) {
+                  <p class="tagline m-0 font-hand text-lg leading-snug text-body">{{ whole.pet.tagline }}</p>
+                }
+                <p class="by m-0 text-sm text-ink-muted">
+                  {{ 'DIARY.KEPT_BY' | translate: { name: whole.pet.ownerName } }}
+                  · {{ 'MEMORY.COUNT_MOMENT' | translate: { count: whole.pet.momentCount } }}
+                </p>
+              </div>
+            </div>
+
+            <div class="top-tools flex flex-wrap items-center gap-3 border-t border-edge pt-4">
+              <button type="button" class="tool tw-btn-secondary tw-btn-sm" (click)="toggleShow()">
+                <pm-icon name="image" [size]="15" />
+                {{ (showing() ? 'DIARY.HIDE_SHOW' : 'MEMORY.SLIDESHOW') | translate }}
+              </button>
+              <span class="read-only tw-badge tw-badge-muted">
+                <pm-icon name="eye" [size]="13" />
+                {{ 'DIARY.READ_ONLY' | translate }}
+              </span>
+            </div>
+          </div>
+        </header>
+
+        @if (showing()) {
+          <pm-slideshow
+            [moments]="moments()"
+            [sourceOf]="sourceOf()"
+            [setting]="setting()"
+            [tracks]="tracks()"
+          />
+        }
+
+        <nav class="view-switch tw-tabs self-start" [attr.aria-label]="'BOOK.VIEW_LABEL' | translate">
+          <button type="button" class="tw-tab" [class.on]="asBook()" [attr.aria-pressed]="asBook()" (click)="showBook(true)">
+            {{ 'BOOK.AS_BOOK' | translate }}
+          </button>
+          <button type="button" class="tw-tab" [class.on]="!asBook()" [attr.aria-pressed]="!asBook()" (click)="showBook(false)">
+            {{ 'BOOK.AS_LIST' | translate }}
+          </button>
+        </nav>
+
+        @if (asBook()) {
+          <pm-diary-book [faces]="faces()" [sourceOf]="sourceOf()" />
+        }
+
+        @if (cards().length === 0) {
+          <p class="middle tw-empty m-0">{{ 'DIARY.NO_MOMENT' | translate }}</p>
+        } @else if (!asBook()) {
+          <ol class="moments m-0 grid list-none gap-4 p-0">
+            @for (card of cards(); track card.raw._id) {
+              <li class="moment tw-card flex flex-col gap-2 p-5 nav:p-6">
+                <div class="moment-head flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+                  <span class="topic tw-badge tw-badge-accent" [class]="card.topicTone">{{ card.topicKey | translate }}</span>
+                  <span class="when inline-flex items-center gap-1">
+                    <pm-icon name="calendar" [size]="13" />
+                    {{ card.raw.happenedAt | date: 'dd/MM/yyyy' }}
+                  </span>
+                  @if (card.raw.place) {
+                    <span class="place">· {{ card.raw.place }}</span>
+                  }
+                </div>
+                <h2 class="m-0 font-serif text-xl font-medium leading-snug text-ink">{{ card.raw.title }}</h2>
+                @if (card.raw.body) {
+                  <p class="body m-0 whitespace-pre-wrap font-hand text-lg leading-relaxed text-body">{{ card.raw.body }}</p>
+                }
+                @if (card.shots.length > 0) {
+                  <div class="shots mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    @for (id of card.shots; track id) {
+                      <img [src]="sourceOf()[id]" [alt]="card.raw.title" loading="lazy" />
+                    }
+                  </div>
+                }
+              </li>
+            }
+          </ol>
+        }
+      }
+    }
+  }
+</div>

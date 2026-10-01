@@ -1,52 +1,49 @@
 <div class="pm-page">
-  <section class="banner flex items-center justify-between gap-5 px-[30px] py-7 mb-[var(--pm-gap)] rounded-xl border border-edge">
-    <div>
+  <section class="banner tw-card flex items-center justify-between flex-wrap gap-5 p-6 nav:px-8 nav:py-7 mb-6">
+    <div class="min-w-0">
       <p class="flex items-center gap-3 flex-wrap m-0 mb-2">
-        <span class="text-xs font-bold tracking-[0.08em] text-accent">{{ 'COMMUNITY.EYEBROW' | translate }}</span>
-        <span class="px-2 py-1 rounded-full bg-amber-soft text-amber text-sm font-medium">
+        <span class="tw-eyebrow">{{ 'COMMUNITY.EYEBROW' | translate }}</span>
+        <span class="tw-badge tw-badge-amber">
           {{ 'COMMUNITY.MEMBERS' | translate: { count: facade.memberCount() } }}
         </span>
       </p>
-      <h1 class="m-0 mb-1 font-extrabold tracking-tight pm-page-title">{{ 'COMMUNITY.TITLE' | translate }}</h1>
-      <p class="m-0 max-w-[44ch] text-ink-muted">{{ 'COMMUNITY.SUBTITLE' | translate }}</p>
+      <h1 class="pm-page-title">{{ 'COMMUNITY.TITLE' | translate }}</h1>
+      <p class="m-0 max-w-[52ch] text-[15px] leading-relaxed text-ink-muted">{{ 'COMMUNITY.SUBTITLE' | translate }}</p>
     </div>
 
     <div class="flex items-center gap-4">
       <span class="flex" aria-hidden="true">
         @for (one of facade.faces(); track one.id) {
-          <span class="grid place-items-center w-[34px] h-[34px] -ml-2 first:ml-0 border-2 border-card rounded-full bg-accent text-on-accent text-xs font-bold">{{ one.initials }}</span>
+          <span class="tw-avatar w-9 h-9 -ml-2 first:ml-0 border-2 border-card text-xs">{{ one.initials }}</span>
         }
         @if (facade.moreFaces() > 0) {
-          <span class="grid place-items-center w-[34px] h-[34px] -ml-2 border-2 border-card rounded-full bg-accent-soft text-accent text-xs font-bold">+{{ facade.moreFaces() }}</span>
+          <span class="tw-avatar w-9 h-9 -ml-2 border-2 border-card bg-accent-soft text-accent-dark text-xs">+{{ facade.moreFaces() }}</span>
         }
       </span>
-      <span class="text-accent" aria-hidden="true"><pm-icon name="paw" [size]="42" /></span>
+      <span class="grid place-items-center w-14 h-14 rounded-[18px] bg-accent-soft text-accent" aria-hidden="true"><pm-icon name="paw" [size]="30" /></span>
     </div>
   </section>
 
-  <div class="grid grid-cols-[minmax(0,1fr)_280px] gap-[var(--pm-gap)] items-start max-nav:grid-cols-1">
-    <div class="flex flex-col gap-[var(--pm-gap)] min-w-0">
-      <div class="flex flex-wrap gap-2" role="group" [attr.aria-label]="'COMMUNITY.TOPIC.ALL' | translate">
-        @for (chip of facade.chips(); track chip.key) {
-          <button
-            type="button"
-            class="pm-chip"
-            [attr.aria-pressed]="facade.topic() === chip.topic"
-            (click)="facade.chooseTopic(chip.topic)"
-          >
-            {{ chip.key | translate }}
-            <span class="chip-count">{{ chip.count }}</span>
-          </button>
-        }
+  <div class="grid grid-cols-[minmax(0,1fr)_300px] gap-6 items-start max-nav:grid-cols-1">
+    <div class="flex flex-col gap-5 min-w-0">
+      <div class="filters flex flex-wrap items-center gap-2">
+        <label class="tw-label" for="community-topic-filter">{{ 'COMMUNITY.FILTER_LABEL' | translate }}</label>
+        <select id="community-topic-filter" class="tw-select w-auto min-w-56" (change)="chooseTopicFrom($event)">
+          @for (chip of facade.chips(); track chip.key) {
+            <option [value]="chip.topic ?? ''" [selected]="facade.topic() === chip.topic">
+              {{ chip.key | translate }} ({{ chip.count }})
+            </option>
+          }
+        </select>
       </div>
 
       @if (user()) {
-        <section class="pm-card p-4">
+        <section class="pm-card p-5">
           <div class="flex items-center gap-3">
-            <span class="grid place-items-center w-[38px] h-[38px] rounded-full bg-accent text-on-accent font-bold flex-shrink-0" aria-hidden="true">{{ user()!.fullName.charAt(0) }}</span>
+            <pm-user-face [name]="user()!.fullName" [url]="user()!.avatarUrl" [size]="44" aria-hidden="true" />
             <button
               type="button"
-              class="flex-1 py-3 px-4 border border-edge-strong rounded-full bg-muted text-ink-muted font-sans text-left cursor-pointer transition-colors duration-150 hover:border-accent"
+              class="composer-prompt flex-1 min-h-12 px-5 border-[1.5px] border-edge rounded-full bg-surface text-ink-muted font-sans text-sm text-left cursor-pointer transition-colors duration-150 hover:border-accent hover:bg-card"
               id="composer-open"
               [disabled]="sending()"
               (click)="openComposer('MOMENT')"
@@ -54,7 +51,7 @@
               {{ 'COMMUNITY.COMPOSER.PROMPT' | translate }}
             </button>
           </div>
-          <div class="flex flex-wrap gap-2 mt-3">
+          <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-edge-soft">
             <button type="button" class="pm-chip" [disabled]="sending()" (click)="openComposer('MOMENT')">
               <pm-icon name="image" [size]="17" /> {{ 'COMMUNITY.COMPOSER.PHOTO' | translate }}
             </button>
@@ -67,7 +64,7 @@
           </div>
         </section>
       } @else {
-        <p class="pm-empty p-4 text-center">{{ 'COMMUNITY.SIGN_IN_TO_POST' | translate }}</p>
+        <p class="pm-empty tw-empty m-0">{{ 'COMMUNITY.SIGN_IN_TO_POST' | translate }}</p>
       }
 
       @switch (facade.status()) {
@@ -75,8 +72,8 @@
           <div class="pm-center"><mat-spinner diameter="36" /></div>
         }
         @case ('ERROR') {
-          <div class="pm-center">
-            <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+          <div class="pm-center tw-empty">
+            <p class="m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
             <button type="button" class="pm-button-secondary" (click)="facade.load()">
               {{ 'COMMON.RETRY' | translate }}
             </button>
@@ -84,19 +81,20 @@
         }
         @default {
           @if (facade.empty()) {
-            <p class="pm-empty pm-center">{{ 'COMMUNITY.EMPTY' | translate }}</p>
+            <p class="pm-empty pm-center tw-empty m-0">{{ 'COMMUNITY.EMPTY' | translate }}</p>
           } @else {
-            <ul class="flex flex-col gap-[var(--pm-gap)] m-0 p-0 list-none">
+            <ul class="flex flex-col gap-4 m-0 p-0 list-none">
               @for (card of facade.cards(); track card.raw.id) {
-                <li class="pm-card pm-card-interactive p-4">
+                <li class="post-card pm-card pm-card-interactive p-5 nav:p-6">
                   <header class="flex items-center justify-between gap-3">
-                    <a class="flex items-center gap-2 no-underline text-inherit" [routerLink]="['/community/users', card.raw.author.id]">
-                      <span class="grid place-items-center w-[38px] h-[38px] rounded-full bg-accent text-on-accent font-bold flex-shrink-0" aria-hidden="true">{{ card.raw.author.initial }}</span>
-                      <span class="flex flex-col">
-                        <span class="font-semibold text-base text-ink">{{ card.raw.author.fullName }}</span>
-                        <span class="text-xs text-ink-muted">
-                          {{ card.raw.createdAt | date: 'dd/MM/yyyy HH:mm' }} ·
-                          {{ card.topicKey | translate }}
+                    <a class="flex items-center gap-3 min-w-0 no-underline text-inherit" [routerLink]="['/community/users', card.raw.author.id]">
+                      <pm-user-face [name]="card.raw.author.fullName" [url]="card.raw.author.avatarUrl" [size]="44" aria-hidden="true" />
+                      <span class="flex flex-col min-w-0">
+                        <span class="font-bold text-[15px] text-ink truncate">{{ card.raw.author.fullName }}</span>
+                        <span class="flex items-center gap-1.5 flex-wrap text-xs text-ink-muted">
+                          {{ card.raw.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                          <span aria-hidden="true">·</span>
+                          <span class="tw-badge tw-badge-accent py-0.5">{{ card.topicKey | translate }}</span>
                         </span>
                       </span>
                     </a>
@@ -108,13 +106,13 @@
                     }
                   </header>
 
-                  <a class="block mt-3 no-underline text-inherit" [routerLink]="['/community/posts', card.raw.id]">
-                    <h2 class="m-0 mb-1 text-base font-bold text-ink">{{ card.raw.title }}</h2>
-                    <p class="m-0 text-ink-muted text-base leading-[1.55] line-clamp-3">{{ card.raw.content }}</p>
+                  <a class="post-body block mt-4 no-underline text-inherit" [routerLink]="['/community/posts', card.raw.id]">
+                    <h2 class="post-title m-0 mb-1.5 font-serif text-xl font-medium leading-snug text-ink">{{ card.raw.title }}</h2>
+                    <p class="m-0 text-body text-[15px] leading-[1.6] line-clamp-3">{{ card.raw.content }}</p>
                   </a>
 
                   @if (card.photoUrls.length > 0) {
-                    <a class="post-photos block mt-3" [routerLink]="['/community/posts', card.raw.id]">
+                    <a class="post-photos block mt-4" [routerLink]="['/community/posts', card.raw.id]">
                       @for (url of card.photoUrls; track url) {
                         <img
                           [src]="url"
@@ -125,14 +123,14 @@
                   }
 
                   @if (card.raw.tags.length > 0) {
-                    <ul class="flex flex-wrap gap-1 mt-3 m-0 p-0 list-none text-xs">
+                    <ul class="flex flex-wrap gap-1.5 mt-4 m-0 p-0 list-none text-xs">
                       @for (tag of card.raw.tags; track tag) {
                         <li class="pm-status">#{{ tag }}</li>
                       }
                     </ul>
                   }
 
-                  <footer class="flex items-center gap-2 mt-3 pt-3 border-t border-edge">
+                  <footer class="flex items-center gap-1 mt-4 pt-3 border-t border-edge-soft">
                     <button
                       type="button"
                       class="react"
@@ -152,7 +150,7 @@
 
                     <button
                       type="button"
-                      class="react"
+                      class="react ml-auto"
                       [class.is-on]="card.raw.savedByMe"
                       (click)="facade.toggleSave(card.raw)"
                     >
@@ -170,7 +168,7 @@
             </ul>
 
             @if (facade.pageCount() > 1) {
-              <div class="flex items-center justify-center gap-3 text-base font-semibold">
+              <div class="flex items-center justify-center gap-3 text-sm font-semibold text-ink">
                 <button
                   type="button"
                   class="pm-button-secondary"
@@ -195,11 +193,11 @@
       }
     </div>
 
-    <aside class="sticky top-[88px] flex flex-col gap-[var(--pm-gap)] max-nav:static">
-      <section class="pm-card p-4">
+    <aside class="sticky top-[88px] flex flex-col gap-4 max-nav:static">
+      <section class="pm-card p-5">
         <h2 class="pm-section-title">{{ 'COMMUNITY.DISCOVER.TITLE' | translate }}</h2>
         <p class="m-0 text-sm text-ink-muted">{{ 'COMMUNITY.DISCOVER.SUBTITLE' | translate }}</p>
-        <ul class="flex flex-wrap gap-2 mt-3 m-0 p-0 list-none">
+        <ul class="flex flex-wrap gap-2 mt-4 m-0 p-0 list-none">
           @for (chip of scopeChips(); track chip.scope) {
             <li>
               <button
@@ -215,19 +213,19 @@
         </ul>
       </section>
 
-      <section class="pm-card p-4">
+      <section class="pm-card p-5">
         <h2 class="pm-section-title">{{ 'FOOTER.FOLLOW' | translate }}</h2>
         <pm-social-links variant="full" />
       </section>
     </aside>
   </div>
 
-  <ul class="grid gap-4 mt-9 p-5 list-none rounded-xl bg-muted border border-edge [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
+  <ul class="value-strip grid gap-5 mt-10 p-6 list-none rounded-xl bg-card border border-edge [grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr))]">
     @for (value of values; track value.titleKey) {
-      <li class="flex items-start gap-2">
-        <span class="grid place-items-center w-9 h-9 flex-shrink-0 rounded-full bg-accent-soft text-accent"><pm-icon [name]="value.icon" [size]="18" /></span>
+      <li class="flex items-start gap-3">
+        <span class="tw-icon-tile"><pm-icon [name]="value.icon" [size]="20" /></span>
         <span class="flex flex-col gap-1 text-sm text-ink-muted">
-          <strong class="text-ink text-base">{{ value.titleKey | translate }}</strong>
+          <strong class="text-ink text-[15px]">{{ value.titleKey | translate }}</strong>
           <span>{{ value.textKey | translate }}</span>
         </span>
       </li>

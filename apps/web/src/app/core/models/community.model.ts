@@ -6,6 +6,7 @@ export interface PostAuthor {
   id: string;
   fullName: string;
   initial: string;
+  avatarUrl: string | null;
 }
 
 export interface CommunityPost {
@@ -59,7 +60,7 @@ export interface CommunityProfile {
   followingCount: number;
   followedByMe: boolean;
   mine: boolean;
-  pets: { id: string; name: string; kind: string; breed: string }[];
+  pets: { id: string; name: string; kind: string; breed: string; avatarUrl: string | null }[];
 }
 
 export interface WritePostInput {

@@ -1,0 +1,191 @@
+<form class="sheet" [formGroup]="form" (ngSubmit)="save()">
+  <header class="sheet-head">
+    <div>
+      <p class="eyebrow">{{ 'PET.FORM_EYEBROW' | translate }}</p>
+      <h2 class="sheet-title">
+        {{ (editing ? 'PET.FORM_EDIT' : 'PET.FORM_ADD') | translate }}
+      </h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="sheet-body">
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="pet-name">{{ 'PET.NAME' | translate }} *</label>
+        <input id="pet-name" type="text" formControlName="name" [placeholder]="'PET.NAME_HINT' | translate" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <p class="field-error">{{ 'PET.NAME_ERROR' | translate }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field-name" for="pet-kind">{{ 'PET.SPECIES' | translate }}</label>
+        <select id="pet-kind" formControlName="kind">
+          @for (choice of kinds; track choice.value) {
+            <option [value]="choice.value">{{ choice.key | translate }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="pet-breed">{{ 'PET.BREED' | translate }}</label>
+        <input id="pet-breed" type="text" formControlName="breed" [placeholder]="'PET.BREED_HINT' | translate" />
+      </div>
+
+      <div class="field">
+        <label class="field-name" for="pet-gender">{{ 'PET.GENDER_LABEL' | translate }}</label>
+        <select id="pet-gender" formControlName="gender">
+          @for (choice of genders; track choice.value) {
+            <option [value]="choice.value">{{ choice.key | translate }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="pet-birth">{{ 'PET.BIRTH_DATE' | translate }}</label>
+        <input id="pet-birth" type="date" formControlName="birthDate" [max]="today" />
+      </div>
+
+      <div class="field">
+        <label class="field-name" for="pet-status">{{ 'PET.STATUS' | translate }}</label>
+        <select
+          id="pet-status"
+          formControlName="status"
+          (change)="setStatus($any($event.target).value)"
+        >
+          @for (choice of statuses; track choice.value) {
+            <option [value]="choice.value">{{ choice.key | translate }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="pet-tagline">{{ 'PET.TAGLINE' | translate }}</label>
+      <input
+        id="pet-tagline"
+        type="text"
+        formControlName="tagline"
+        [placeholder]="'PET.TAGLINE_HINT' | translate"
+      />
+    </div>
+
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="pet-home">{{ 'PET.CAME_HOME' | translate }}</label>
+        <input id="pet-home" type="date" formControlName="adoptionDate" [max]="today" />
+      </div>
+
+      <div class="field">
+        <label class="field-name" for="pet-chip">{{ 'PET.MICROCHIP' | translate }}</label>
+        <input
+          id="pet-chip"
+          type="text"
+          formControlName="microchip"
+          [placeholder]="'PET.MICROCHIP_HINT' | translate"
+        />
+      </div>
+    </div>
+
+    @if (form.hasError('cameAhead')) {
+      <p class="field-error">{{ 'PET.ERROR_CAME_AHEAD' | translate }}</p>
+    }
+    @if (form.hasError('cameBeforeBirth')) {
+      <p class="field-error">{{ 'PET.ERROR_CAME_BEFORE_BIRTH' | translate }}</p>
+    }
+
+    <label class="tick">
+      <input type="checkbox" formControlName="neutered" />
+      <span>{{ 'PET.NEUTERED' | translate }}</span>
+    </label>
+
+    <div class="field">
+      <label class="field-name" for="pet-traits">{{ 'PET.TRAITS' | translate }}</label>
+      <input
+        id="pet-traits"
+        type="text"
+        formControlName="trait"
+        [placeholder]="'PET.TRAITS_HINT' | translate"
+      />
+      <p class="field-note">{{ 'PET.TRAITS_NOTE' | translate }}</p>
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="pet-carers">{{ 'PET.CARERS' | translate }}</label>
+      <textarea
+        id="pet-carers"
+        rows="3"
+        formControlName="carer"
+        [placeholder]="'PET.CARERS_HINT' | translate"
+      ></textarea>
+      <p class="field-note">{{ 'PET.CARERS_NOTE' | translate }}</p>
+    </div>
+
+    @if (memorial()) {
+      <div class="field memorial">
+        <label class="field-name" for="pet-gone">{{ 'PET.PASSED_DATE' | translate }} *</label>
+        <input id="pet-gone" type="date" formControlName="passedAwayDate" [max]="today" />
+        <p class="field-note">{{ 'PET.PASSED_DATE_WHY' | translate }}</p>
+      </div>
+    }
+
+    @if (form.touched && form.hasError('goneMissing')) {
+      <p class="field-error">{{ 'PET.ERROR_GONE_MISSING' | translate }}</p>
+    }
+    @if (form.hasError('goneBeforeBirth')) {
+      <p class="field-error">{{ 'PET.ERROR_GONE_BEFORE_BIRTH' | translate }}</p>
+    }
+    @if (form.hasError('birthAhead') || form.hasError('goneAhead')) {
+      <p class="field-error">{{ 'PET.ERROR_DATE_AHEAD' | translate }}</p>
+    }
+
+    <section class="album">
+      <div class="album-head">
+        <span class="field-name">{{ 'PET.PHOTOS' | translate }}</span>
+        <span class="album-count">{{ photoCount() }}/{{ photoMax }}</span>
+      </div>
+
+      <label class="album-drop" for="pet-photos">
+        <pm-icon name="image" [size]="22" />
+        <span>{{ 'PET.PHOTOS_PICK' | translate }}</span>
+        <input
+          id="pet-photos"
+          class="sr-only"
+          type="file"
+          accept="image/png,image/jpeg"
+          multiple
+          (change)="pickPhotos($event)"
+        />
+      </label>
+
+      <pm-image-link boxId="pet-photo-link" [disabled]="photoFull()" (picked)="addLink($event)" />
+
+      @if (photoError(); as message) {
+        <p class="field-error">{{ message | translate }}</p>
+      }
+
+      <pm-photo-previews
+        [files]="photos()"
+        [links]="photoLinks()"
+        (dropFile)="dropPhoto($event)"
+        (dropLink)="dropLink($event)"
+      />
+    </section>
+
+  </div>
+
+  <footer class="sheet-foot">
+    <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button type="submit" class="strong">
+      {{ (editing ? 'COMMON.SAVE' : 'PET.ADD_NEW') | translate }}
+      <pm-icon name="check" [size]="15" />
+    </button>
+  </footer>
+</form>

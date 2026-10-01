@@ -1,0 +1,195 @@
+<div class="editor flex flex-col gap-5 bg-card p-6 text-ink max-nav:p-4">
+  <header class="editor-head flex items-start justify-between gap-4">
+    <div>
+      <h2>{{ 'BOOK.EDIT_TITLE' | translate }}</h2>
+      <p class="sub tw-hint mt-1 text-sm">{{ 'BOOK.EDIT_SUB' | translate }}</p>
+    </div>
+    <button type="button" class="shut tw-btn-icon flex-none" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="16" />
+    </button>
+  </header>
+
+  <div class="editor-body grid gap-5 nav:grid-cols-[auto_minmax(260px,1fr)]">
+    <div class="surface" [class]="paperClass()" [class.holding]="dragging()">
+      <div
+        class="canvas"
+        (pointermove)="dragMove($event)"
+        (pointerup)="dragEnd()"
+        (pointerleave)="dragEnd()"
+      >
+      @for (one of items(); track $index) {
+        <div
+          class="item"
+          [class.on]="picked() === $index"
+          [style.left.%]="one.x"
+          [style.top.%]="one.y"
+          [style.width.%]="one.width"
+          [style.transform]="'rotate(' + one.rotate + 'deg)'"
+          [style.z-index]="one.z"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="'BOOK.ITEM_LABEL' | translate"
+          (pointerdown)="dragStart($index, $event)"
+          (click)="pick($index)"
+          (keydown.arrowleft)="nudge(-1, 0)"
+          (keydown.arrowright)="nudge(1, 0)"
+          (keydown.arrowup)="nudge(0, -1)"
+          (keydown.arrowdown)="nudge(0, 1)"
+          (keydown.delete)="drop()"
+        >
+          @switch (one.kind) {
+            @case ('TEXT') {
+              <p
+                class="text"
+                [class]="'font-' + (one.fontKey || 'HAND').toLowerCase()"
+                [style.color]="one.color || null"
+              >{{ one.text }}</p>
+            }
+            @case ('PHOTO') {
+              <img class="shot" [src]="sourceOf(one.photo)" [alt]="''" />
+            }
+            @case ('STICKER') {
+              <svg class="sticker" viewBox="0 0 100 100" aria-hidden="true">
+                <path [attr.d]="pathOf(one.sticker)" [attr.fill]="one.color || '#b0413e'" />
+              </svg>
+            }
+          }
+        </div>
+      }
+      @if (items().length === 0) {
+        <p class="hint">{{ 'BOOK.EDIT_HINT' | translate }}</p>
+      }
+      </div>
+    </div>
+
+    <aside class="tools tw-panel grid content-start gap-3 p-4 nav:max-h-[62vh] nav:overflow-y-auto">
+      <div class="tool-tabs tw-tabs flex w-full" role="group" [attr.aria-label]="'BOOK.ADD_LABEL' | translate">
+        <button type="button" class="tw-tab flex-1 justify-center" [class.on]="tray() === 'TEXT'" [attr.aria-pressed]="tray() === 'TEXT'" (click)="showTray('TEXT')">
+          {{ 'BOOK.ADD_TEXT' | translate }}
+        </button>
+        <button type="button" class="tw-tab flex-1 justify-center" [class.on]="tray() === 'PHOTO'" [attr.aria-pressed]="tray() === 'PHOTO'" (click)="showTray('PHOTO')">
+          {{ 'BOOK.ADD_PHOTO' | translate }}
+        </button>
+        <button type="button" class="tw-tab flex-1 justify-center" [class.on]="tray() === 'STICKER'" [attr.aria-pressed]="tray() === 'STICKER'" (click)="showTray('STICKER')">
+          {{ 'BOOK.ADD_STICKER' | translate }}
+        </button>
+      </div>
+
+      @switch (tray()) {
+        @case ('TEXT') {
+          <button type="button" class="wide tw-btn-secondary tw-btn-block" [disabled]="full()" (click)="addText()">
+            {{ 'BOOK.NEW_TEXT' | translate }}
+          </button>
+        }
+        @case ('PHOTO') {
+          @if (shots.length === 0) {
+            <p class="note tw-hint">{{ 'MEMORY.PHOTO_NONE' | translate }}</p>
+          } @else {
+            <div class="shot-tray grid grid-cols-4 gap-1.5">
+              @for (shot of shots; track shot.id) {
+                <button type="button" [disabled]="full()" (click)="addPhoto(shot.id)">
+                  <img [src]="shot.source" [alt]="'MEMORY.PHOTO_ALT' | translate" />
+                </button>
+              }
+            </div>
+          }
+        }
+        @case ('STICKER') {
+          <div class="sticker-tray grid grid-cols-4 gap-1.5">
+            @for (one of stickers; track one.code) {
+              <button type="button" [disabled]="full()" (click)="addSticker(one.code)">
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <path [attr.d]="one.path" fill="currentColor" />
+                </svg>
+              </button>
+            }
+          </div>
+        }
+      }
+
+      <h3 class="tw-eyebrow m-0 mt-1 text-ink-muted">{{ 'BOOK.PAPER_LABEL' | translate }}</h3>
+      <div class="paper-tray flex flex-wrap gap-1.5">
+        @for (one of papers; track one.value) {
+          <button
+            type="button"
+            class="paper-chip tw-chip"
+            [class.on]="paper() === one.value"
+            [attr.aria-pressed]="paper() === one.value"
+            (click)="setPaper(one.value)"
+          >
+            {{ one.key | translate }}
+          </button>
+        }
+      </div>
+
+      @if (chosen(); as one) {
+        <h3 class="tw-eyebrow m-0 mt-1 text-ink-muted">{{ 'BOOK.CHOSEN' | translate }}</h3>
+
+        @if (one.kind === 'TEXT') {
+          <label class="knob tw-field">
+            <span class="tw-label">{{ 'BOOK.WORDS' | translate }}</span>
+            <textarea class="tw-textarea font-hand" rows="3" [value]="one.text" (input)="setText($event)"></textarea>
+          </label>
+          <div class="knob tw-field">
+            <span class="tw-label">{{ 'BOOK.FONT_LABEL' | translate }}</span>
+            <div class="chips flex flex-wrap gap-1.5">
+              @for (font of fonts; track font.value) {
+                <button
+                  type="button"
+                  class="chip tw-chip"
+                  [class.on]="one.fontKey === font.value"
+                  [attr.aria-pressed]="one.fontKey === font.value"
+                  (click)="setFont(font.value)"
+                >
+                  {{ font.key | translate }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (one.kind !== 'PHOTO') {
+          <div class="knob tw-field">
+            <span class="tw-label">{{ 'BOOK.COLOR' | translate }}</span>
+            <div class="swatches flex flex-wrap gap-2">
+              @for (color of colors; track color) {
+                <button
+                  type="button"
+                  class="swatch"
+                  [class.on]="one.color === color"
+                  [style.background-color]="color"
+                  [attr.aria-label]="color"
+                  (click)="setColor(color)"
+                ></button>
+              }
+            </div>
+          </div>
+        }
+
+        <label class="knob tw-field">
+          <span class="tw-label">{{ 'BOOK.SIZE' | translate }} · {{ one.width }}%</span>
+          <input type="range" min="4" max="100" step="1" [value]="one.width" (input)="setWidth($event)" />
+        </label>
+
+        <label class="knob tw-field">
+          <span class="tw-label">{{ 'BOOK.TILT' | translate }} · {{ one.rotate }}°</span>
+          <input type="range" min="-45" max="45" step="1" [value]="one.rotate" (input)="setRotate($event)" />
+        </label>
+
+        <div class="knob-row flex flex-wrap gap-1.5">
+          <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="layer(1)">{{ 'BOOK.BRING_UP' | translate }}</button>
+          <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="layer(-1)">{{ 'BOOK.SEND_DOWN' | translate }}</button>
+          <button type="button" class="danger tw-btn-ghost tw-btn-sm text-danger hover:bg-danger-soft" (click)="drop()">{{ 'BOOK.REMOVE' | translate }}</button>
+        </div>
+      } @else {
+        <p class="note tw-hint">{{ 'BOOK.PICK_ONE' | translate }}</p>
+      }
+    </aside>
+  </div>
+
+  <footer class="editor-foot flex flex-wrap items-center justify-end gap-2 border-t border-edge pt-4">
+    <span class="tally tw-badge tw-badge-muted me-auto">{{ items().length }}/{{ limit }}</span>
+    <button type="button" class="plain tw-btn-secondary" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button type="button" class="solid tw-btn-primary" (click)="save()">{{ 'BOOK.SAVE_PAGE' | translate }}</button>
+  </footer>
+</div>

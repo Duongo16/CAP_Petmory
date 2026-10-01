@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AdminOrdersFacade } from './admin-orders-facade';
 import { MoneyPipe } from '../../shared/money.pipe';
+import { Icon } from '../../shared/icon/icon';
 
 @Component({
   selector: 'pm-admin-orders-page',
@@ -17,6 +18,7 @@ import { MoneyPipe } from '../../shared/money.pipe';
     MatProgressSpinnerModule,
     TranslatePipe,
     MoneyPipe,
+    Icon,
   ],
   providers: [AdminOrdersFacade],
   templateUrl: './admin-orders-page.html',

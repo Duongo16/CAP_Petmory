@@ -26,7 +26,7 @@ async function scenario(report) {
   const pet = await h.call('/pets', {
     method: 'POST',
     headers: customer.auth,
-    body: JSON.stringify({ name: 'Mun', kind: 'Mèo', breed: 'Mèo ta', gender: 'MALE' }),
+    body: JSON.stringify({ name: 'Mun', kind: 'CAT', breed: 'Mèo ta', gender: 'MALE' }),
   });
   report.require('The pet is created', pet.status === 201, String(pet.status));
   const petId = pet.body._id;
@@ -167,11 +167,61 @@ async function scenario(report) {
     !file.body.missing.includes('NO_DESIGN') && !file.body.missing.includes('NO_COLOR_CODES'),
     JSON.stringify(file.body.missing));
 
+  // --- The order holds its own copy of the design ---
+  /*
+   * There is no separate approval step in this product, so the copy taken at
+   * order time is the only record of what the customer agreed to. Editing or
+   * removing the design afterwards must not reach into an order already made.
+   */
+  report.step('Editing the design afterwards does not change the order');
+  const changed = await h.call(`/designs/${designId}`, {
+    method: 'PATCH',
+    headers: customer.auth,
+    body: JSON.stringify({
+      name: 'Ban da sua sau khi dat',
+      modelCode: 'TEMP-DOG',
+      productTypeCode: 'PT-01',
+      sizeCode: size.code,
+      paint: [{ mesh: 'Body', color: 'ff0000' }],
+      colorCodesUsed: ['WOOL-W02'],
+      engraving: { name: 'Doi ten', message: 'Doi loi' },
+    }),
+  });
+  report.require('The design itself can still be edited', changed.status === 200,
+    String(changed.status));
+
+  const afterEdit = await h.call(`/admin/orders/${orderCode}/production-file`, {
+    headers: manager.auth,
+  });
+  const keptItem = afterEdit.body.items[0];
+  report.check('The production file keeps the model that was ordered',
+    keptItem.modelCode === 'TEMP-CAT', keptItem.modelCode);
+  report.check('The production file keeps the engraving that was ordered',
+    keptItem.engraving?.message === 'Mun', keptItem.engraving?.message);
+
+  const dropped = await h.call(`/designs/${designId}`, {
+    method: 'DELETE',
+    headers: customer.auth,
+  });
+  report.require('The design can be removed', dropped.status === 200, String(dropped.status));
+
+  const afterDrop = await h.call(`/admin/orders/${orderCode}/production-file`, {
+    headers: manager.auth,
+  });
+  report.check('Removing the design leaves the production file readable',
+    afterDrop.status === 200, String(afterDrop.status));
+  report.check('And the file still names what was ordered',
+    afterDrop.body.items[0].modelCode === 'TEMP-CAT', afterDrop.body.items[0].modelCode);
+
   // --- Through the workshop to the customer ---
   report.step('The order is walked through to delivered');
-  const walk = ['IN_PRODUCTION', 'QUALITY_CHECK', 'READY_TO_SHIP', 'SHIPPING', 'DELIVERED'];
+  const walk = ['IN_PRODUCTION', 'SHIPPING', 'COMPLETED'];
   let allMoved = true;
   for (const status of walk) {
+    // Khong roi khau kiem dinh khi phieu con muc chua tich.
+    if (status === 'SHIPPING') {
+      await h.passQualityCheck(orderCode, manager);
+    }
     const moved = await h.call(`/admin/orders/${orderCode}/status`, {
       method: 'PATCH',
       headers: workshop.auth,

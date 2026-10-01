@@ -102,7 +102,7 @@ async function run() {
   const pet = await call('/pets', {
     method: 'POST',
     headers: authHeaders(customer.token),
-    body: JSON.stringify({ name: 'Shadow', kind: 'Meo' }),
+    body: JSON.stringify({ name: 'Shadow', kind: 'CAT' }),
   });
 
   const create = await call('/designs', {
@@ -250,7 +250,7 @@ async function run() {
 
         // --- Production file ---
   const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
-  const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
+  const supportToken = await login('quantri@petmory.local', PASSWORD_INTERNAL);
 
   const file = await call(`/admin/orders/${orderCode}/production-file`, { headers: authHeaders(managerToken) });
   check('The production file can be opened', file.status === 200, String(file.status));

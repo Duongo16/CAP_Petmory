@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Painter, PaintMode, PaintState } from './painter';
+import { BodyShape, bodyShapeOf } from './body-shape';
 
 /** Six standard angles for viewing and for capturing stills for the workshop. */
 export type StandardAngle = 'FRONT' | 'LEFT' | 'RIGHT' | 'BACK' | 'TOP' | 'ISO';
@@ -39,7 +40,8 @@ export interface EngineOptions {
 
 /**
  * A Three.js wrapper. It does not depend on Angular, so it can be reused and tested
- * on its own. The render loop runs on requestAnimationFrame and touches no signals,
+ * on its own. The render loop runs on the browser's own animation callback
+ * and touches no signals,
  * so it never triggers the framework's change detection.
  */
 export class Engine3d {
@@ -57,6 +59,7 @@ export class Engine3d {
   private originalBoneScale = new Map<string, THREE.Vector3>();
   private materialByZone = new Map<string, THREE.MeshStandardMaterial[]>();
   private attachedAccessories = new Map<string, THREE.Object3D>();
+  private shapeWanted = '';
   private radius = 1;
   private modelCenter = new THREE.Vector3();
   private frameHandle = 0;
@@ -114,6 +117,7 @@ export class Engine3d {
     this.painter = new Painter(this.angle);
     this.groupMaterialByZone(this.angle);
     this.collectBones(this.angle);
+    this.applyBodyShape(this.shapeWanted);
     const countVertex = this.countVertex(this.angle);
     this.centerAndNormalise(this.angle);
     this.setAngle('ISO');
@@ -126,10 +130,36 @@ export class Engine3d {
     return { zone, countVertex };
   }
 
-  /** Recolours one zone. Touches only the material; the model is not rebuilt. */
+  /**
+   * To mau cho mot hoac nhieu vung cung luc.
+   *
+   * Sau khi lop to mau da nhan viec, mau nam o tung dinh chu khong o mang vat
+   * lieu nua, nen doi mau mang vat lieu se khong con tac dung gi. Duong nay
+   * chon dung cach con tac dung, va tra ve so mat da to de ben goi biet ban do
+   * vung co khop voi tep mo hinh dang mo hay khong.
+   */
+  applyZoneColors(colorByZone: Record<string, string>): number {
+    if (this.painter?.ready) {
+      return this.painter.paintZones(colorByZone);
+    }
+    let touched = 0;
+    for (const [zone, hex] of Object.entries(colorByZone)) {
+      const list = this.materialByZone.get(zone);
+      if (!list) {
+        continue;
+      }
+      for (const material of list) {
+        material.color.set(hex);
+        touched += 1;
+      }
+    }
+    return touched;
+  }
+
+  /** Recolours one zone. Touches only the material, and never rebuilds the model. */
   changeColorZone(nameZone: string, hexColor: string): void {
         // Once the model is on vertex colours the material colour is only a multiplier,
-        // so changing it here would tint everything; skip it.
+        // so changing it here would tint the whole model. Skip it.
     if (this.painter?.ready) {
       return;
     }
@@ -288,6 +318,38 @@ export class Engine3d {
       });
       node.material = Array.isArray(node.material) ? cloned : cloned[0];
     });
+  }
+
+  /**
+   * Nan lai ti le cac phan than cua mo hinh.
+   *
+   * Moi lan deu tinh tu ti le goc da nho luc doc tep, nen goi bao nhieu lan
+   * cung ra cung mot ket qua, va ten dang rong thi tra ve nguyen dang goc.
+   *
+   * Chi nhung ten xuong co that trong tep moi duoc dung. Ten khong co thi bo
+   * qua, vi moi bo mo hinh dat ten mot kieu.
+   */
+  setBodyShape(name: string): void {
+    this.shapeWanted = name;
+    if (!this.angle) {
+      return;
+    }
+    this.applyBodyShape(name);
+    this.centerAndNormalise(this.angle);
+    this.setAngle('ISO');
+  }
+
+  private applyBodyShape(name: string): void {
+    const shape: BodyShape = bodyShapeOf(name);
+    for (const [bone, original] of this.originalBoneScale.entries()) {
+      const node = this.bonesByName.get(bone);
+      if (!node) {
+        continue;
+      }
+      const factor = shape[bone] ?? 1;
+      node.scale.copy(original).multiplyScalar(factor);
+    }
+    this.angle?.updateMatrixWorld(true);
   }
 
   /** Remembers each named node and its original scale so it can be restored. */

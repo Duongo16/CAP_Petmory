@@ -30,6 +30,27 @@ export class AddToCartDto {
   quantity!: number;
 }
 
+/**
+ * Them mot mon hang co san vao gio.
+ *
+ * Duong rieng voi hang tuy bien, vi hai dong hang can hai bo du lieu khac
+ * han nhau va gop chung mot duong se sinh ra mot mo o de trong.
+ */
+export class AddGoodsDto {
+  @IsString()
+  @MaxLength(40)
+  goodsCode!: string;
+
+  @IsString()
+  @MaxLength(40)
+  sku!: string;
+
+  @IsInt()
+  @Min(1)
+  @Max(99)
+  quantity!: number;
+}
+
 export class ChangeQuantityDto {
   @IsInt()
   @Min(1)

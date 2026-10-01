@@ -54,6 +54,14 @@ export class AdminService {
     );
   }
 
+  /** Tich hoac bo tich mot muc tren phieu kiem tra chat luong. */
+  setQualityTick(orderCode: string, at: number, done: boolean): Observable<AdminOrderDetail> {
+    return this.http.patch<AdminOrderDetail>(
+      `${this.base}/admin/orders/${orderCode}/quality/${at}`,
+      { done },
+    );
+  }
+
   listCustomers(keyword: string, page: number): Observable<PageResult<CustomerRow>> {
     let ts = new HttpParams();
     if (keyword) {

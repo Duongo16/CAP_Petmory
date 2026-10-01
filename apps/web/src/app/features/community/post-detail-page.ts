@@ -11,13 +11,14 @@ import { AuthService } from '../../core/services/auth.service';
 import { PostComment, PostDetail } from '../../core/models/community.model';
 import { topicKey } from './community-topics';
 import { Icon } from '../../shared/icon/icon';
+import { UserFace } from '../../shared/user-face/user-face';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
 @Component({
   selector: 'pm-post-detail-page',
   standalone: true,
-  imports: [FormsModule, RouterLink, DatePipe, TranslatePipe, MatProgressSpinnerModule, Icon],
+  imports: [UserFace, FormsModule, RouterLink, DatePipe, TranslatePipe, MatProgressSpinnerModule, Icon],
   templateUrl: './post-detail-page.html',
   styleUrl: './post-detail-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,81 @@
+/* Ba o dem so tai khoan theo tung nhom quyen. */
+.count-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: var(--pm-space-3);
+  margin-bottom: var(--pm-space-5);
+}
+
+.count-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px 20px;
+  border: 1px solid var(--pm-border);
+  border-radius: 18px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+
+  strong {
+    font-family: var(--pm-font-display);
+    font-size: 1.875rem;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--pm-accent);
+  }
+
+  span {
+    font-size: var(--pm-text-sm);
+    color: var(--pm-text-muted);
+  }
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: var(--pm-space-5);
+}
+
+/* Dong cua tai khoan dang tat thi mo di, de nhin luot la thay. */
+tr.off {
+  opacity: 0.55;
+}
+
+.thin {
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-sm);
+}
+
+/* Nhan cho biet dong nay chinh la nguoi dang dang nhap. */
+.self-tag {
+  margin-inline-start: var(--pm-space-2);
+  padding: 2px 10px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+}
+
+.state-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-muted);
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  white-space: nowrap;
+
+  &.on {
+    background: var(--pm-success-soft);
+    color: var(--pm-on-success-soft);
+  }
+}
+
+.row-tools {
+  white-space: nowrap;
+}

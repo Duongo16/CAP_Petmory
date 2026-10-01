@@ -1,0 +1,138 @@
+<div class="pm-page-head">
+  <div class="pm-page-head-text">
+    <p class="pm-page-eyebrow">{{ 'ADMIN.ACCOUNT.EYEBROW' | translate }}</p>
+    <h1 class="title pm-page-title">{{ 'ADMIN.ACCOUNT.TITLE' | translate }}</h1>
+    <p class="pm-page-description">{{ 'ADMIN.ACCOUNT.SUB' | translate }}</p>
+  </div>
+  <div class="pm-page-head-actions">
+    <button type="button" class="pm-button-primary" id="account-new" (click)="add()">
+      {{ 'ADMIN.ACCOUNT.NEW' | translate }}
+    </button>
+  </div>
+</div>
+
+@if (status() === 'LOADING') {
+  <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+} @else if (status() === 'ERROR') {
+  <div class="pm-center"><p class="pm-empty">{{ 'ADMIN.ACCOUNT.ERROR_LIST' | translate }}</p></div>
+} @else {
+  <div class="count-row">
+    @for (one of counts(); track one.key) {
+      <div class="count-tile">
+        <strong>{{ one.count }}</strong>
+        <span>{{ one.key | translate }}</span>
+      </div>
+    }
+  </div>
+
+  @if (problem()) {
+    <p class="pm-status" data-tone="bad" role="alert">{{ problem() | translate }}</p>
+  }
+  @if (note()) {
+    <p class="pm-status" data-tone="good" role="status">{{ note() | translate }}</p>
+  }
+
+  <section class="pm-card tw-card-pad">
+    <div class="filter-row">
+      <input
+        id="account-search"
+        class="tw-input min-w-0 flex-1 basis-60"
+        type="search"
+        [placeholder]="'ADMIN.ACCOUNT.SEARCH' | translate"
+        [ngModel]="keyword()"
+        (ngModelChange)="keyword.set($event)"
+        (keyup.enter)="search()"
+        name="keyword"
+      />
+      <button type="button" class="pm-button-secondary" (click)="search()">
+        {{ 'ADMIN.FIND' | translate }}
+      </button>
+      <select
+        id="account-filter"
+        class="tw-select w-full sm:w-56"
+        [ngModel]="roleFilter()"
+        (ngModelChange)="pickRole($event)"
+        name="roleFilter"
+      >
+        <option value="">{{ 'ADMIN.LOG.GROUP_ALL' | translate }}</option>
+        @for (one of roleChoices(); track one.value) {
+          <option [value]="one.value">{{ one.key | translate }}</option>
+        }
+      </select>
+    </div>
+
+    @if (rows().length === 0) {
+      <p class="pm-empty">{{ 'ADMIN.ACCOUNT.EMPTY' | translate }}</p>
+    } @else {
+      <div class="table-wrap">
+        <table class="table" id="account-table">
+          <thead>
+            <tr>
+              <th class="num-col">#</th>
+              <th>{{ 'ADMIN.ACCOUNT.FULL_NAME' | translate }}</th>
+              <th>{{ 'ADMIN.ACCOUNT.EMAIL' | translate }}</th>
+              <th>{{ 'ADMIN.ACCOUNT.ROLE' | translate }}</th>
+              <th>{{ 'ADMIN.ACCOUNT.LAST_LOGIN' | translate }}</th>
+              <th>{{ 'ADMIN.ACCOUNT.STATE' | translate }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (one of rows(); track one.raw._id; let i = $index) {
+              <tr [class.off]="!one.raw.active">
+                <td class="num-col muted">{{ i + 1 }}</td>
+                <td>
+                  {{ one.raw.fullName }}
+                  @if (one.isSelf) {
+                    <span class="self-tag">{{ 'ADMIN.ACCOUNT.SELF' | translate }}</span>
+                  }
+                </td>
+                <td class="thin">{{ one.raw.email }}</td>
+                <td>{{ one.roleKey | translate }}</td>
+                <td class="thin">
+                  @if (one.raw.lastLoginAt) {
+                    {{ one.raw.lastLoginAt | date: 'dd/MM/yyyy HH:mm' }}
+                  } @else {
+                    {{ 'ADMIN.NONE_YET' | translate }}
+                  }
+                </td>
+                <td>
+                  <span class="state-tag" [class.on]="one.raw.active">
+                    {{ (one.raw.active ? 'ADMIN.ACCOUNT.ON' : 'ADMIN.ACCOUNT.OFF') | translate }}
+                  </span>
+                </td>
+                <td class="row-tools">
+                  <button
+                    type="button"
+                    class="plain"
+                    [disabled]="one.isSelf || working()"
+                    (click)="edit(one)"
+                  >
+                    {{ 'COMMON.EDIT' | translate }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (page().pageCount > 1) {
+        <nav class="paging" [attr.aria-label]="'ADMIN.PAGING' | translate">
+          <button type="button" class="pager-btn" [disabled]="page().page <= 1" (click)="goTo(page().page - 1)">
+            {{ 'ADMIN.PREV_PAGE' | translate }}
+          </button>
+          <span class="pager-gap">{{ page().page }} / {{ page().pageCount }}</span>
+          <button
+            type="button"
+            class="pager-btn"
+            [disabled]="page().page >= page().pageCount"
+            (click)="goTo(page().page + 1)"
+          >
+            {{ 'ADMIN.NEXT_PAGE' | translate }}
+          </button>
+        </nav>
+      }
+    }
+  </section>
+}

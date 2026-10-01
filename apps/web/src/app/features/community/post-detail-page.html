@@ -1,13 +1,16 @@
 <div class="pm-page">
-  <a class="back-link" routerLink="/community">← {{ 'COMMUNITY.POST.BACK' | translate }}</a>
+  <a class="back-link tw-back" routerLink="/community">
+    <span class="rotate-180 inline-flex"><pm-icon name="chevron" [size]="14" /></span>
+    {{ 'COMMUNITY.POST.BACK' | translate }}
+  </a>
 
   @switch (status()) {
     @case ('LOADING') {
       <div class="pm-center"><mat-spinner diameter="36" /></div>
     }
     @case ('ERROR') {
-      <div class="pm-center">
-        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+      <div class="pm-center tw-empty">
+        <p class="m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
         <button type="button" class="pm-button-secondary" (click)="load()">
           {{ 'COMMON.RETRY' | translate }}
         </button>
@@ -19,7 +22,7 @@
           <article class="main-column pm-card">
             <header class="post-head">
               <a class="author" [routerLink]="['/community/users', d.post.author.id]">
-                <span class="avatar" aria-hidden="true">{{ d.post.author.initial }}</span>
+                <pm-user-face [name]="d.post.author.fullName" [url]="d.post.author.avatarUrl" [size]="44" aria-hidden="true" />
                 <span class="author-text">
                   <span class="author-name">{{ d.post.author.fullName }}</span>
                   <span class="post-meta">
@@ -31,7 +34,7 @@
               </a>
             </header>
 
-            <span class="topic-chip">{{ topicKey() | translate }}</span>
+            <span class="topic-chip tw-badge tw-badge-accent">{{ topicKey() | translate }}</span>
             <h1 class="post-title pm-page-title">{{ d.post.title }}</h1>
             <p class="post-text">{{ d.post.content }}</p>
 
@@ -131,6 +134,7 @@
                   </label>
                   <input
                     id="comment-input"
+                    class="tw-input"
                     name="comment"
                     maxlength="2000"
                     [placeholder]="'COMMUNITY.DETAIL.COMMENT_PLACEHOLDER' | translate"
@@ -145,7 +149,7 @@
               <ul class="comment-list">
                 @for (comment of comments(); track comment.id) {
                   <li>
-                    <span class="avatar sm" aria-hidden="true">{{ comment.author.initial }}</span>
+                    <pm-user-face [name]="comment.author.fullName" [url]="comment.author.avatarUrl" [size]="36" aria-hidden="true" />
                     <div>
                       <p class="comment-head">
                         <strong>{{ comment.author.fullName }}</strong>
@@ -198,7 +202,7 @@
             <section class="pm-card side-card">
               <h2 class="pm-section-title">{{ 'COMMUNITY.DETAIL.BY_AUTHOR' | translate }}</h2>
               <a class="author" [routerLink]="['/community/users', d.post.author.id]">
-                <span class="avatar" aria-hidden="true">{{ d.post.author.initial }}</span>
+                <pm-user-face [name]="d.post.author.fullName" [url]="d.post.author.avatarUrl" [size]="44" aria-hidden="true" />
                 <span class="author-text">
                   <span class="author-name">{{ d.post.author.fullName }}</span>
                   <span class="post-meta">

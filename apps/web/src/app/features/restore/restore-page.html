@@ -1,0 +1,70 @@
+<div class="pm-page restore">
+  <header class="head">
+    <p class="eyebrow tw-eyebrow">{{ 'RESTORE.EYEBROW' | translate }}</p>
+    <h1 class="pm-section-title pm-page-title">{{ 'RESTORE.TITLE' | translate }}</h1>
+    <p class="sub tw-page-sub">{{ 'RESTORE.SUB' | translate }}</p>
+  </header>
+
+  @if (error(); as message) {
+    <p class="note note-bad" role="alert">{{ message | translate }}</p>
+  }
+  @if (done(); as message) {
+    <p class="note note-good" role="status">{{ message | translate }}</p>
+  }
+
+  <label
+    class="drop"
+    [class.hovering]="hovering()"
+    [class.busy]="working()"
+    for="restore-file"
+    (dragover)="dragOver($event)"
+    (dragleave)="dragOut()"
+    (drop)="drop($event)"
+  >
+    <span class="drop-mark" aria-hidden="true"><pm-icon name="image" [size]="28" /></span>
+    @if (working()) {
+      <span class="drop-name">{{ 'RESTORE.WORKING' | translate }}</span>
+      <span class="drop-sub">{{ 'RESTORE.WORKING_SUB' | translate }}</span>
+    } @else {
+      <span class="drop-name">{{ 'RESTORE.DROP' | translate }}</span>
+      <span class="drop-sub">{{ 'RESTORE.DROP_SUB' | translate }}</span>
+    }
+    <input
+      id="restore-file"
+      class="sr-only"
+      type="file"
+      accept="image/png,image/jpeg"
+      [disabled]="working()"
+      (change)="pick($event)"
+    />
+  </label>
+
+  <section class="kept">
+    <h2 class="kept-title tw-section-title">{{ 'RESTORE.KEPT' | translate }}</h2>
+
+    @if (loose().length === 0) {
+      <p class="empty tw-empty">{{ 'RESTORE.NONE_YET' | translate }}</p>
+    } @else {
+      <ul class="kept-list">
+        @for (photo of loose(); track photo._id) {
+          <li class="kept-item">
+            <span class="kept-mark" aria-hidden="true"><pm-icon name="sparkle" [size]="20" /></span>
+            <div class="kept-text">
+              <strong>{{ photo.originalName }}</strong>
+              <span>
+                {{ photo.quality.width }} × {{ photo.quality.height }}
+                @if (photo.resemblance !== null) {
+                  · {{ 'RESTORE.RESEMBLANCE' | translate }} {{ photo.resemblance }}%
+                }
+              </span>
+            </div>
+            <button type="button" class="kept-open tw-btn-secondary tw-btn-sm" (click)="reopen(photo)">
+              {{ 'RESTORE.OPEN_AGAIN' | translate }}
+              <pm-icon name="chevron" [size]="13" />
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

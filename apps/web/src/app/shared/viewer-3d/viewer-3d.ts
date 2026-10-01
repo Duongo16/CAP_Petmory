@@ -18,6 +18,9 @@ import { PaintMode, PaintState } from './painter';
 
 type ScreenState = 'NOT_LOADED' | 'LOADING' | 'READY' | 'ERROR' | 'UNSUPPORTED';
 
+/** Trang thai khung nhin khi mo hinh da tai xong. */
+const READY = 'READY';
+
 /** Checks whether the device can draw three-dimensional graphics at all. */
 function supportsWebgl(): boolean {
   try {
@@ -39,6 +42,23 @@ function supportsWebgl(): boolean {
 export class Viewer3d {
   /** Path to the model file. Changing it reloads the model. */
   readonly pathModel = input.required<string>();
+
+  /**
+   * Che do gon.
+   *
+   * Dung khi khung nhin chi de xem va so sanh: bo cac nut cua trang xuong, va
+   * de mo hinh dung yen thay vi tu xoay, vi hai mo hinh tu xoay lech nhau thi
+   * khong so sanh duoc.
+   */
+  readonly compact = input(false);
+
+  /**
+   * Ten dang than muon ap cho mo hinh.
+   *
+   * Rong nghia la giu nguyen dang goc cua tep. Doi ten thi nan lai ngay, khong
+   * phai tai lai tep mo hinh.
+   */
+  readonly bodyShape = input('');
 
   /** Colour map by zone name. Changing it applies immediately without reloading the model. */
   readonly colorByZone = input<Record<string, string>>({});
@@ -91,14 +111,21 @@ export class Viewer3d {
     });
 
     effect(() => {
-      const zoneMap = this.colorByZone();
+      const shape = this.bodyShape();
       const engine = this.engine;
-      if (!engine || this.status() !== 'READY') {
+      if (!engine || this.status() !== READY) {
         return;
       }
-      for (const [zone, color] of Object.entries(zoneMap)) {
-        engine.changeColorZone(zone, color);
+      engine.setBodyShape(shape);
+    });
+
+    effect(() => {
+      const zoneMap = this.colorByZone();
+      const engine = this.engine;
+      if (!engine || this.status() !== READY || Object.keys(zoneMap).length === 0) {
+        return;
       }
+      engine.applyZoneColors(zoneMap);
     });
 
     this.destroyRef.onDestroy(() => {
@@ -200,15 +227,19 @@ export class Viewer3d {
         baseModel: getComputedStyle(box).getPropertyValue('--pm-bg-3d').trim() || '#f2efed',
         maxPixelRatio: 2,
       });
+      if (this.compact()) {
+        this.autoRotate.set(false);
+      }
       this.engine.setAutoRotate(this.autoRotate());
     }
 
     this.status.set('LOADING');
+    this.engine.setBodyShape(this.bodyShape());
     this.engine
       .loadModel(path)
       .then((kq) => {
         this.countVertex.set(kq.countVertex);
-        this.status.set('READY');
+        this.status.set(READY);
         this.canPaint.set(this.engine?.canPaint ?? false);
         this.zoneDetected.emit(kq.zone);
         for (const [zone, color] of Object.entries(this.colorByZone())) {

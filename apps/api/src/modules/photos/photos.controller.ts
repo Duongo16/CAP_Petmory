@@ -13,12 +13,17 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { PhotosService } from './photos.service';
-import { RestoreDto, UploadPhotoDto, ConfirmDto } from './dto/photo.dto';
+import { AttachPhotoDto, RestoreDto, UploadPhotoDto, ConfirmDto } from './dto/photo.dto';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
+import { ImageLinkDto } from '../../common/storage/image-link.dto';
+import { RemoteImageService } from '../../common/storage/remote-image';
 
 @Controller('pet-photos')
 export class PhotosController {
-  constructor(private readonly service: PhotosService) {}
+  constructor(
+    private readonly service: PhotosService,
+    private readonly remote: RemoteImageService,
+  ) {}
 
   @Get()
   list(@Query('pet') pet: string, @CurrentUser() user: AuthUser) {
@@ -44,6 +49,49 @@ export class PhotosController {
     res.setHeader('Content-Type', `image/${fileType === 'jpg' ? 'jpeg' : fileType}`);
     res.setHeader('Cache-Control', 'private, max-age=300');
     res.send(data);
+  }
+
+  @Get('restoration')
+  listLoose(@CurrentUser() user: AuthUser) {
+    return this.service.listLoose(user.userId);
+  }
+
+  /**
+   * Takes one photograph, cleans it up, and hands back both versions.
+   *
+   * Nothing is attached to a pet here. The caller decides afterwards whether to
+   * keep the result, by downloading it or by attaching it to a profile.
+   */
+  @Post('restoration')
+  @UseInterceptors(FileInterceptor('file'))
+  async restoreFresh(
+    @Body() dto: RestoreDto,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: AuthUser,
+  ) {
+    const original = await this.service.loadLoose(user.userId, file);
+    const restored = await this.service.restore(original.id, user.userId, dto.operation);
+    return { original, restored };
+  }
+
+  @Post(':id/attach')
+  attach(
+    @Param('id') id: string,
+    @Body() dto: AttachPhotoDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.service.attach(id, dto.pet, user.userId);
+  }
+
+  /** Nhan mot duong dan anh tren mang thay cho tep tren may khach. */
+  @Post(':pet/from-link')
+  async loadByLink(
+    @Param('pet') pet: string,
+    @Body() dto: ImageLinkDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    const file = await this.remote.fetch(dto.url);
+    return this.service.load(pet, user.userId, undefined, file);
   }
 
   @Post(':pet')

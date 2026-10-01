@@ -1,0 +1,150 @@
+<div class="dialog-shell">
+  <header class="dialog-header">
+    <h2 class="dialog-title">{{ 'ADMIN.RECIPIENT.TITLE' | translate }}</h2>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="dialog-body">
+    @switch (status()) {
+      @case ('LOADING') {
+        <div class="pm-center"><mat-spinner diameter="40" /></div>
+      }
+      @case ('ERROR') {
+        <div class="pm-center">
+          <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+          <button class="pm-button-secondary" type="button" (click)="reload()">
+            {{ 'COMMON.RETRY' | translate }}
+          </button>
+        </div>
+      }
+      @case ('READY') {
+        @if (customer(); as k) {
+          <section class="who-card">
+            <span class="who-mark" aria-hidden="true">{{ initials() }}</span>
+            <div class="who-text">
+              <h1 class="who-name">{{ k.fullName }}</h1>
+              <p class="who-lines">
+                <span>{{ k.email }}</span>
+                @if (phone(); as number) {
+                  <span class="who-dot" aria-hidden="true">•</span>
+                  <span class="who-phone">{{ number }}</span>
+                }
+              </p>
+            </div>
+            <dl class="who-figures">
+              <div>
+                <dd>{{ orderCount() }}</dd>
+                <dt>{{ 'ADMIN.RECIPIENT.COUNT_ORDER' | translate }}</dt>
+              </div>
+              <div>
+                <dd class="amber">{{ spentText() | amount }}</dd>
+                <dt>{{ 'ADMIN.RECIPIENT.SPENT' | translate }}</dt>
+              </div>
+              <div>
+                <dd class="green">{{ petCount() }}</dd>
+                <dt>{{ 'ADMIN.RECIPIENT.PET' | translate }}</dt>
+              </div>
+            </dl>
+          </section>
+
+          <section class="card">
+            <h2>{{ 'ADMIN.RECIPIENT.ACCOUNT_INFO' | translate }}</h2>
+            <dl class="info-pair">
+              <dt>{{ 'ADMIN.RECIPIENT.CREATED_DATE' | translate }}</dt>
+              <dd>{{ k.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              <dt>{{ 'ADMIN.RECIPIENT.LOGIN_LAST' | translate }}</dt>
+              <dd>
+                {{
+                  k.lastLoginAt
+                    ? (k.lastLoginAt | date: 'dd/MM/yyyy HH:mm')
+                    : ('ADMIN.NONE_YET' | translate)
+                }}
+              </dd>
+              <dt>{{ 'ADMIN.RECIPIENT.SPENT' | translate }}</dt>
+              <dd class="spend-figure">{{ spentText() | amount }}</dd>
+              <dt>{{ 'ADMIN.RECIPIENT.DONE_COUNT' | translate }}</dt>
+              <dd>{{ 'ADMIN.RECIPIENT.DONE_VALUE' | translate: { count: doneCount() } }}</dd>
+            </dl>
+
+            <div class="tier">
+              <p class="tier-head">
+                <span>{{ 'ADMIN.RECIPIENT.TIER_NEXT' | translate }}</span>
+                <strong>{{ tierShare() }}%</strong>
+              </p>
+              <span class="tier-rail" aria-hidden="true">
+                <span class="tier-done" [style.inline-size.%]="tierShare()"></span>
+              </span>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h2>{{ 'ADMIN.RECIPIENT.PET' | translate }}</h2>
+              <span class="header-note">{{ 'ADMIN.RECIPIENT.PET_NOTE' | translate }}</span>
+            </div>
+            @if (pets().length === 0) {
+              <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
+            } @else {
+              <ul class="pet-grid">
+                @for (t of pets(); track t.raw._id) {
+                  <li class="pet-card">
+                    <span class="pet-photo">
+                      @if (t.raw.avatarUrl) {
+                        <img [src]="t.raw.avatarUrl" alt="" />
+                      }
+                    </span>
+                    <span class="pet-text">
+                      <strong>{{ t.raw.name }}</strong>
+                      <span class="pet-chip">{{ t.raw.breed || (t.keyKind | translate) }}</span>
+                      <span class="sub">{{ t.keyStatus | translate }}</span>
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+
+          <section class="card">
+            <h2>{{ 'ADMIN.RECIPIENT.HISTORY_ORDER' | translate }}</h2>
+            @if (orders().length === 0) {
+              <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
+            } @else {
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{{ 'ADMIN.ORDER.CODE' | translate }}</th>
+                      <th scope="col">{{ 'ADMIN.ORDER.ORDER_DATE' | translate }}</th>
+                      <th scope="col">{{ 'ADMIN.ORDER.TOTAL' | translate }}</th>
+                      <th scope="col">{{ 'ADMIN.ORDER.STATUS' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (d of orders(); track d.raw._id) {
+                      <tr>
+                        <td>
+                          <a class="order-code" [routerLink]="['/admin/orders', d.raw.orderCode]" (click)="close()">
+                            {{ d.raw.orderCode }}
+                          </a>
+                        </td>
+                        <td>{{ d.raw.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                        <td class="right">{{ d.raw.total | amount: d.raw.currency }}</td>
+                        <td>
+                          <span class="status-chip" [attr.data-group]="d.groupColor">
+                            {{ d.keyStatus | translate }}
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </section>
+        }
+      }
+    }
+  </div>
+</div>

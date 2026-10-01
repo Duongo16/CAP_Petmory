@@ -1,26 +1,26 @@
-<div class="basket relative flex flex-col gap-7 w-full max-w-[1180px] mx-auto px-6 pt-7 pb-16 box-border">
+<div class="basket tw-page relative flex flex-col gap-7 max-[600px]:px-4">
   <span class="glow glow-purple" aria-hidden="true"></span>
   <span class="glow glow-amber" aria-hidden="true"></span>
 
   <header class="relative flex flex-col gap-3">
-    <nav class="flex items-center gap-2 text-base font-medium" [attr.aria-label]="'CART.CRUMBS' | translate">
-      <a class="text-ink-muted no-underline hover:text-accent transition-colors duration-150" routerLink="/products">{{ 'CART.KEEP_BROWSING' | translate }}</a>
+    <nav class="flex items-center gap-2 text-sm font-semibold" [attr.aria-label]="'CART.CRUMBS' | translate">
+      <a class="text-ink-muted no-underline hover:text-accent transition-colors duration-150" routerLink="/shop">{{ 'CART.KEEP_BROWSING' | translate }}</a>
       <span class="text-edge-strong" aria-hidden="true">/</span>
       <span class="text-ink">{{ 'CART.CRUMB_HERE' | translate }}</span>
     </nav>
 
     <div class="flex items-center justify-between gap-6 flex-wrap">
-      <h1 class="m-0 font-medium text-ink pm-page-title">{{ 'CART.TITLE' | translate }}</h1>
+      <h1 class="tw-page-title pm-page-title">{{ 'CART.TITLE' | translate }}</h1>
       @if (!empty()) {
         <p class="flex gap-2 m-0 flex-wrap">
-          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-accent-soft text-accent">
+          <span class="tw-badge tw-badge-accent">
             {{ 'CART.CHIP_COUNT' | translate: { count: cart().countItem } }}
           </span>
-          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-success-soft text-success">
+          <span class="tw-badge tw-badge-success">
             <pm-icon name="check" [size]="13" />
             {{ 'CART.CHIP_HANDMADE' | translate }}
           </span>
-          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-amber-soft text-amber">
+          <span class="tw-badge tw-badge-amber">
             <pm-icon name="bulb" [size]="13" />
             {{ 'CART.CHIP_PREVIEW' | translate }}
           </span>
@@ -31,13 +31,13 @@
 
   @switch (status()) {
     @case ('LOADING') {
-      <div class="flex flex-col items-center gap-3 py-14 px-5 text-ink-muted text-center">
-        <p>{{ 'COMMON.LOADING' | translate }}</p>
+      <div class="tw-empty">
+        <p class="m-0">{{ 'COMMON.LOADING' | translate }}</p>
       </div>
     }
     @case ('ERROR') {
-      <div class="flex flex-col items-center gap-3 py-14 px-5 text-ink-muted text-center">
-        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+      <div class="tw-empty">
+        <p class="m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
         <button type="button" class="tw-btn-secondary" (click)="reload()">
           {{ 'COMMON.RETRY' | translate }}
         </button>
@@ -45,43 +45,41 @@
     }
     @default {
       @if (empty()) {
-        <div class="flex flex-col items-center gap-3 py-14 px-5 text-ink-muted text-center rounded-lg bg-muted">
-          <span class="grid place-items-center w-[60px] h-[60px] rounded-full bg-card text-accent" aria-hidden="true">
+        <div class="tw-empty">
+          <span class="grid place-items-center w-[60px] h-[60px] rounded-full bg-accent-soft text-accent" aria-hidden="true">
             <pm-icon name="cart" [size]="30" />
           </span>
-          <p>{{ 'CART.EMPTY' | translate }}</p>
-          <a class="tw-btn-primary" routerLink="/products">{{ 'CART.VIEW_PRODUCTS' | translate }}</a>
+          <p class="m-0">{{ 'CART.EMPTY' | translate }}</p>
+          <a class="tw-btn-primary" routerLink="/shop">{{ 'CART.VIEW_PRODUCTS' | translate }}</a>
         </div>
       } @else {
-        <div class="grid relative gap-8 items-start" style="grid-template-columns: minmax(0,1fr) 373px">
+        <div class="grid relative grid-cols-1 nav:grid-cols-[minmax(0,1fr)_373px] gap-8 items-start">
           <!-- Left column: cart lines -->
           <section class="lines flex flex-col gap-6 min-w-0">
-            <ul class="flex flex-col gap-4 m-0 p-0 list-none">
+            <ul class="line-list flex flex-col gap-4 m-0 p-0 list-none">
               @for (card of cards(); track card.raw.id) {
-                <li class="line flex gap-6 p-7 rounded-lg bg-card border border-edge shadow-card">
-                  <div class="line-photo relative grid place-items-center overflow-hidden flex-none w-40 h-40 rounded-md bg-muted text-edge-strong">
+                <li class="line tw-card flex gap-6 p-6 max-[600px]:p-4 max-[600px]:gap-4">
+                  <div class="line-photo relative grid place-items-center overflow-hidden flex-none w-40 h-40 rounded-lg bg-muted text-edge-strong">
                     @if (card.imageUrl) {
                       <img class="absolute inset-0 w-full h-full object-cover" [src]="card.imageUrl" [alt]="card.raw.displayName" />
                     } @else {
                       <span aria-hidden="true"><pm-icon name="paw" [size]="34" /></span>
                     }
-                    <span class="absolute bottom-[10px] left-[10px] px-2 py-1 rounded-sm bg-ink text-muted text-xs font-semibold">
+                    <span class="absolute bottom-[10px] left-[10px] tw-badge bg-night text-on-night">
                       {{ (card.readyMade ? 'GOODS.TAG' : 'CART.TAG_MADE_TO_ORDER') | translate }}
                     </span>
                   </div>
 
                   <div class="flex flex-col gap-2 min-w-0 flex-1">
                     <span
-                      class="self-start inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold"
-                      [class.bg-success-soft]="card.readyMade"
-                      [class.text-success]="card.readyMade"
-                      [class.bg-accent-soft]="!card.readyMade"
-                      [class.text-accent]="!card.readyMade"
+                      class="self-start tw-badge"
+                      [class.tw-badge-success]="card.readyMade"
+                      [class.tw-badge-accent]="!card.readyMade"
                     >
                       {{ (card.readyMade ? 'GOODS.TAG' : 'CART.TAG_ONE_OFF') | translate }}
                     </span>
-                    <h2 class="m-0 text-2xl font-medium leading-[1.25] text-ink">
-                      <a class="text-ink no-underline hover:text-accent transition-colors duration-150" [routerLink]="card.productLink">{{ card.raw.displayName }}</a>
+                    <h2 class="m-0 font-serif text-xl font-medium leading-[1.3] text-ink">
+                      <a class="text-ink no-underline hover:text-accent transition-colors duration-150" [routerLink]="card.productLink" [queryParams]="card.productQuery">{{ card.raw.displayName }}</a>
                     </h2>
 
                     <p class="flex items-center gap-1 flex-wrap m-0 text-xs text-ink-muted">
@@ -113,27 +111,27 @@
                     }
 
                     <div class="flex items-center gap-4 flex-wrap mt-auto pt-4 border-t border-edge">
-                      <div class="inline-flex items-center overflow-hidden border border-edge-strong rounded-full" role="group" [attr.aria-label]="'PRODUCT.QUANTITY' | translate">
+                      <div class="inline-flex items-center gap-1 min-h-11 p-1 border-[1.5px] border-edge rounded-md bg-card" role="group" [attr.aria-label]="'PRODUCT.QUANTITY' | translate">
                         <button
                           type="button"
-                          class="w-8 h-8 border-0 bg-transparent text-[inherit] text-base cursor-pointer hover:bg-muted disabled:opacity-35 disabled:cursor-not-allowed"
+                          class="w-9 h-9 border-0 rounded-sm bg-muted text-ink text-base cursor-pointer hover:bg-accent-soft disabled:opacity-35 disabled:cursor-not-allowed"
                           (click)="changeQuantity(card.raw, -1)"
                           [disabled]="card.raw.quantity <= 1"
                           [attr.aria-label]="'CART.LESS' | translate"
                         >−</button>
-                        <span class="min-w-7 text-center text-base font-semibold">{{ card.raw.quantity }}</span>
+                        <span class="min-w-8 text-center text-base font-bold tabular-nums">{{ card.raw.quantity }}</span>
                         <button
                           type="button"
-                          class="w-8 h-8 border-0 bg-transparent text-[inherit] text-base cursor-pointer hover:bg-muted disabled:opacity-35 disabled:cursor-not-allowed"
+                          class="w-9 h-9 border-0 rounded-sm bg-muted text-ink text-base cursor-pointer hover:bg-accent-soft disabled:opacity-35 disabled:cursor-not-allowed"
                           (click)="changeQuantity(card.raw, 1)"
                           [disabled]="card.raw.quantity >= 99"
                           [attr.aria-label]="'CART.MORE' | translate"
                         >+</button>
                       </div>
 
-                      <a class="inline-flex items-center gap-1 border-0 bg-transparent p-0 text-xs text-ink-muted no-underline cursor-pointer hover:text-accent transition-colors duration-150" [routerLink]="card.productLink">{{ 'CART.EDIT_AGAIN' | translate }}</a>
+                      <a class="tw-btn-ghost tw-btn-sm" [routerLink]="card.productLink" [queryParams]="card.productQuery">{{ 'CART.EDIT_AGAIN' | translate }}</a>
 
-                      <button type="button" class="inline-flex items-center gap-1 border-0 bg-none p-0 font-[inherit] text-xs text-ink-muted cursor-pointer hover:text-danger transition-colors duration-150" (click)="remove(card.raw)">
+                      <button type="button" class="inline-flex items-center gap-1 min-h-9 px-2 border-0 rounded-sm bg-transparent font-[inherit] text-xs font-semibold text-ink-muted cursor-pointer hover:text-danger hover:bg-danger-soft transition-colors duration-150" (click)="remove(card.raw)">
                         <pm-icon name="trash" [size]="14" />
                         {{ 'COMMON.REMOVE' | translate }}
                       </button>
@@ -143,7 +141,7 @@
                           {{ 'CART.UNIT_PRICE' | translate }}
                           {{ card.raw.unitPrice | amount: card.raw.currency }}
                         </span>
-                        <strong class="text-2xl font-bold text-accent">{{ card.lineTotal | amount: card.raw.currency }}</strong>
+                        <strong class="inline-flex items-center px-3 py-1 rounded-full bg-amber-soft text-on-amber text-lg font-bold">{{ card.lineTotal | amount: card.raw.currency }}</strong>
                       </span>
                     </div>
                   </div>
@@ -151,26 +149,26 @@
               }
             </ul>
 
-            <article class="flex gap-4 p-6 rounded-lg bg-muted border border-edge">
-              <span class="grid place-items-center flex-none w-10 h-10 rounded-full bg-accent text-on-accent" aria-hidden="true">
+            <article class="tw-panel flex gap-4 p-5">
+              <span class="tw-icon-tile" aria-hidden="true">
                 <pm-icon name="heart" [size]="18" />
               </span>
               <div>
-                <h2 class="m-0 mb-1 text-base font-semibold text-ink">{{ 'CART.ARTISAN_TITLE' | translate }}</h2>
-                <p class="m-0 text-base leading-[1.6] text-ink-muted">{{ 'CART.ARTISAN_TEXT' | translate }}</p>
+                <h2 class="m-0 mb-1 text-base font-bold text-ink">{{ 'CART.ARTISAN_TITLE' | translate }}</h2>
+                <p class="m-0 text-sm leading-[1.6] text-ink-muted">{{ 'CART.ARTISAN_TEXT' | translate }}</p>
               </div>
             </article>
 
-            <article class="flex flex-col gap-4 p-6 rounded-lg bg-card border border-edge shadow-card">
+            <article class="tw-card flex flex-col gap-4 p-6 max-[600px]:p-5">
               <div class="flex items-center justify-between gap-4 flex-wrap">
-                <h2 class="m-0 text-lg font-medium text-ink">{{ 'CART.CRAFT_TITLE' | translate }}</h2>
-                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-success-soft text-success">
+                <h2 class="tw-card-title">{{ 'CART.CRAFT_TITLE' | translate }}</h2>
+                <span class="tw-badge tw-badge-success">
                   {{ 'CART.CRAFT_LEAD' | translate: { count: cart().productionDaysMax } }}
                 </span>
               </div>
               <ol class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 m-0 p-0 list-none">
                 @for (one of craftSteps; track one.step) {
-                  <li class="flex flex-col gap-1 p-3 rounded-md bg-muted border border-edge" [attr.data-tone]="one.tone">
+                  <li class="tw-panel flex flex-col gap-1 p-4" [attr.data-tone]="one.tone">
                     <span class="craft-step-no text-[0.625rem] font-bold tracking-[0.06em] text-accent">{{ one.step | translate }}</span>
                     <strong class="text-xs font-bold text-ink">{{ one.name | translate }}</strong>
                     <span class="text-xs leading-[1.45] text-ink-muted">{{ one.note | translate }}</span>
@@ -180,7 +178,7 @@
             </article>
 
             <p class="flex items-center justify-between gap-4 flex-wrap m-0">
-              <a class="inline-flex items-center gap-2 text-base font-semibold text-accent no-underline" routerLink="/products">
+              <a class="tw-link inline-flex items-center gap-2 text-sm" routerLink="/shop">
                 <pm-icon name="gift" [size]="13" />
                 {{ 'CART.ADD_ACCESSORY' | translate }}
               </a>
@@ -190,24 +188,24 @@
               </span>
             </p>
 
-            <section class="flex items-center gap-4 p-4 rounded-lg bg-muted border border-edge">
-              <span class="grid place-items-center flex-none w-10 h-10 rounded-full bg-accent text-on-accent" aria-hidden="true">
+            <section class="tw-panel flex items-center gap-4 p-4 max-[600px]:flex-wrap">
+              <span class="tw-icon-tile" aria-hidden="true">
                 <pm-icon name="comment" [size]="17" />
               </span>
               <div class="flex flex-col min-w-0 flex-1">
-                <strong class="text-xs font-semibold text-ink">{{ 'CART.ADVICE_TITLE' | translate }}</strong>
+                <strong class="text-sm font-bold text-ink">{{ 'CART.ADVICE_TITLE' | translate }}</strong>
                 <span class="text-xs text-ink-muted">{{ 'CART.ADVICE_SUB' | translate }}</span>
               </div>
-              <a class="flex-none px-4 py-1 rounded-full bg-card text-accent text-xs font-bold no-underline" routerLink="/community">{{ 'CART.ADVICE_GO' | translate }}</a>
+              <a class="tw-btn-secondary tw-btn-sm flex-none" routerLink="/community">{{ 'CART.ADVICE_GO' | translate }}</a>
             </section>
           </section>
 
           <!-- Right column: summary -->
           <aside class="flex flex-col gap-4">
-            <section class="bill flex flex-col gap-4 px-7 pt-7 pb-0 overflow-hidden rounded-lg bg-card border border-edge shadow-card">
+            <section class="bill tw-card flex flex-col gap-4 px-6 pt-6 pb-0 overflow-hidden">
               <header class="flex items-start justify-between gap-4 pb-4 border-b border-edge text-ink-muted">
                 <div>
-                  <h2 class="m-0 text-xl font-medium text-ink">{{ 'CART.SUMMARY' | translate }}</h2>
+                  <h2 class="m-0 font-serif text-xl font-medium text-ink">{{ 'CART.SUMMARY' | translate }}</h2>
                   <p class="mt-1 m-0 text-xs text-ink-muted">{{ 'CART.SUMMARY_SUB' | translate }}</p>
                 </div>
                 <pm-icon name="cart" [size]="18" />
@@ -215,62 +213,62 @@
 
               <dl class="flex flex-col gap-3 m-0">
                 <div class="flex items-baseline justify-between gap-4">
-                  <dt class="text-base text-ink-muted">{{ 'CART.COUNT_ITEM' | translate }}</dt>
-                  <dd class="m-0 text-base font-semibold text-ink">{{ 'CART.COUNT_VALUE' | translate: { count: cart().countItem } }}</dd>
+                  <dt class="text-sm text-ink-muted">{{ 'CART.COUNT_ITEM' | translate }}</dt>
+                  <dd class="m-0 text-sm font-semibold text-ink">{{ 'CART.COUNT_VALUE' | translate: { count: cart().countItem } }}</dd>
                 </div>
                 <div class="flex items-baseline justify-between gap-4">
-                  <dt class="text-base text-ink-muted">{{ 'CART.LEAD_TIME' | translate }}</dt>
-                  <dd class="m-0 text-base font-semibold text-ink">{{ 'CART.LEAD_VALUE' | translate: { count: cart().productionDaysMax } }}</dd>
+                  <dt class="text-sm text-ink-muted">{{ 'CART.LEAD_TIME' | translate }}</dt>
+                  <dd class="m-0 text-sm font-semibold text-ink">{{ 'CART.LEAD_VALUE' | translate: { count: cart().productionDaysMax } }}</dd>
                 </div>
                 <div class="flex items-baseline justify-between gap-4">
-                  <dt class="text-base text-ink-muted">{{ 'CART.SUBTOTAL' | translate }}</dt>
-                  <dd class="m-0 text-base font-semibold text-ink">{{ cart().total | amount: cart().currency }}</dd>
+                  <dt class="text-sm text-ink-muted">{{ 'CART.SUBTOTAL' | translate }}</dt>
+                  <dd class="m-0 text-sm font-semibold text-ink">{{ cart().total | amount: cart().currency }}</dd>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <dt class="text-base text-ink-muted">
+                  <dt class="text-sm text-ink-muted">
                     {{ 'CART.SHIPPING' | translate }}
                     <span class="block mt-0.5 text-xs font-medium text-success">{{ 'CART.SHIPPING_COVERED' | translate }}</span>
                   </dt>
                   <dd class="m-0">
-                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-success-soft text-success">{{ 'CART.FREE' | translate }}</span>
+                    <span class="tw-badge tw-badge-success">{{ 'CART.FREE' | translate }}</span>
                   </dd>
                 </div>
               </dl>
 
-              <form class="flex flex-col gap-2" (ngSubmit)="applyVoucher()">
-                <label class="text-xs font-semibold text-ink-muted" for="cart-voucher">{{ 'CART.VOUCHER' | translate }}</label>
+              <form class="tw-field" (ngSubmit)="applyVoucher()">
+                <label class="tw-label" for="cart-voucher">{{ 'CART.VOUCHER' | translate }}</label>
                 <div class="flex gap-2">
                   <input
                     id="cart-voucher"
                     name="voucher"
                     type="text"
                     autocomplete="off"
-                    class="flex-1 min-w-0 px-3 py-2 rounded-md border border-edge-strong bg-card text-ink font-[inherit] text-xs focus-visible:outline-2 focus-visible:outline-accent"
+                    class="tw-input flex-1 min-w-0"
                     [ngModel]="voucherCode()"
                     (ngModelChange)="setVoucher($event)"
                     [placeholder]="'CART.VOUCHER_HINT' | translate"
                   />
-                  <button type="submit" class="flex-none px-4 py-2 border-0 rounded-md bg-sunken text-ink font-[inherit] text-xs font-bold cursor-pointer">{{ 'CART.VOUCHER_APPLY' | translate }}</button>
+                  <button type="submit" class="tw-btn-secondary flex-none">{{ 'CART.VOUCHER_APPLY' | translate }}</button>
                 </div>
                 @if (voucherRejected()) {
-                  <p class="m-0 text-xs text-ink-muted">{{ 'CART.VOUCHER_NONE' | translate }}</p>
+                  <p class="tw-hint">{{ 'CART.VOUCHER_NONE' | translate }}</p>
                 }
               </form>
 
-              <div class="flex items-center justify-between flex-wrap gap-1 gap-x-4 pt-4 border-t border-edge text-base font-semibold text-ink">
+              <div class="flex items-center justify-between flex-wrap gap-1 gap-x-4 pt-4 border-t border-edge text-base font-bold text-ink">
                 <span>{{ 'CART.TOTAL' | translate }}</span>
-                <strong class="ml-auto text-[1.625rem] font-bold whitespace-nowrap text-amber">{{ cart().total | amount: cart().currency }}</strong>
+                <strong class="ml-auto text-[1.625rem] font-bold whitespace-nowrap text-accent-dark">{{ cart().total | amount: cart().currency }}</strong>
               </div>
               <p class="m-0 -mt-3 text-xs text-ink-muted">{{ 'CART.TOTAL_NOTE' | translate }}</p>
 
-              <a class="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-amber text-on-accent text-base font-bold no-underline transition-colors duration-150" routerLink="/checkout">
+              <a class="tw-btn-primary tw-btn-lg tw-btn-block" routerLink="/checkout">
                 {{ 'CART.CHECKOUT' | translate }}
                 <pm-icon name="chevron" [size]="14" />
               </a>
 
-              <ul class="flex flex-col gap-2 m-0 -mx-7 px-5 py-4 pb-5 list-none bg-muted border-t border-edge">
+              <ul class="flex flex-col gap-2 m-0 -mx-6 px-6 py-4 pb-5 list-none bg-muted border-t border-edge">
                 @for (one of promises; track one) {
-                  <li class="flex items-start gap-2 text-xs font-bold text-ink">
+                  <li class="flex items-start gap-2 text-xs font-semibold text-ink">
                     <span class="flex-none text-success"><pm-icon name="check" [size]="13" /></span>
                     {{ one | translate }}
                   </li>
@@ -281,31 +279,31 @@
         </div>
 
         @if (suggestions().length > 0) {
-          <section class="relative flex flex-col gap-6 px-12 py-12 -mx-4 rounded-lg bg-muted">
+          <section class="tw-card relative flex flex-col gap-6 p-10 max-[600px]:p-5">
             <header class="text-center">
-              <p class="m-0 text-xs font-bold tracking-[0.08em] text-accent">{{ 'CART.ALSO_EYEBROW' | translate }}</p>
-              <h2 class="mt-2 m-0 text-[1.875rem] font-medium text-ink">{{ 'CART.ALSO_TITLE' | translate }}</h2>
+              <p class="tw-eyebrow m-0">{{ 'CART.ALSO_EYEBROW' | translate }}</p>
+              <h2 class="mt-2 m-0 font-serif text-[1.75rem] font-medium text-ink">{{ 'CART.ALSO_TITLE' | translate }}</h2>
               <p class="mt-2 m-0 text-sm text-ink-muted">{{ 'CART.ALSO_SUB' | translate }}</p>
             </header>
 
-            <ul class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 m-0 p-0 list-none">
+            <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] gap-5 m-0 p-0 list-none">
               @for (one of suggestions(); track one.code) {
-                <li class="flex flex-col gap-2 p-4 rounded-md bg-card border border-edge shadow-card transition-all duration-150 hover:-translate-y-0.5 hover:shadow-elevated">
-                  <div class="also-photo relative grid place-items-center overflow-hidden aspect-[4/3] rounded-sm bg-muted text-edge-strong">
+                <li class="tw-card-interactive flex flex-col gap-2 p-4">
+                  <div class="also-photo relative grid place-items-center overflow-hidden aspect-[4/3] rounded-lg bg-muted text-edge-strong">
                     @if (one.imageUrl) {
                       <img class="absolute inset-0 w-full h-full object-cover" [src]="one.imageUrl" [alt]="one.name" />
                     } @else {
                       <span aria-hidden="true"><pm-icon name="paw" [size]="30" /></span>
                     }
-                    <span class="absolute top-[10px] left-[10px] px-2 py-1 rounded-full bg-accent text-on-accent text-xs font-bold">{{ one.badgeKey | translate }}</span>
+                    <span class="absolute top-[10px] left-[10px] tw-badge bg-accent text-on-accent">{{ one.badgeKey | translate }}</span>
                   </div>
-                  <h3 class="mt-2 m-0 text-lg font-semibold text-ink">{{ one.name }}</h3>
+                  <h3 class="mt-2 m-0 text-base font-bold text-ink">{{ one.name }}</h3>
                   <p class="line-clamp-2 m-0 text-sm leading-[1.5] text-ink-muted">{{ one.blurb }}</p>
                   <div class="flex items-center justify-between gap-3 mt-auto pt-3">
                     @if (one.priceFrom; as price) {
-                      <strong class="text-lg font-bold text-accent">{{ price | amount }}</strong>
+                      <strong class="inline-flex items-center px-3 py-1 rounded-full bg-amber-soft text-on-amber text-sm font-bold">{{ price | amount }}</strong>
                     }
-                    <a class="px-4 py-2 rounded-full bg-sunken text-ink text-base font-semibold no-underline" [routerLink]="['/products', one.code]">
+                    <a class="tw-btn-secondary tw-btn-sm" routerLink="/shop" [queryParams]="{ tab: 'custom', product: one.code }">
                       {{ 'CART.ALSO_ADD' | translate }}
                     </a>
                   </div>

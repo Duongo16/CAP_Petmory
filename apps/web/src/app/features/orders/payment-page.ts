@@ -1,91 +1,64 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  OnInit,
-  computed,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { interval, switchMap } from 'rxjs';
+import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { OrdersService } from '../../core/services/orders.service';
-import { PaymentQr } from '../../core/models/api.model';
+import { PaymentFacade } from './payment-facade';
+import { OrderSteps } from './order-steps/order-steps';
 import { MoneyPipe } from '../../shared/money.pipe';
+import { Icon } from '../../shared/icon/icon';
 
-type ScreenState = 'LOADING' | 'ERROR' | 'READY';
-
-/** How often to ask the server whether the money has arrived. */
-const POLL_INTERVAL_MS = 5000;
+/** How long the copy button keeps saying that it worked. */
+const COPIED_FOR_MS = 2000;
 
 @Component({
   selector: 'pm-payment-page',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, MoneyPipe],
+  imports: [RouterLink, DatePipe, TranslatePipe, MoneyPipe, Icon, OrderSteps],
   templateUrl: './payment-page.html',
   styleUrl: './payment-page.scss',
+  providers: [PaymentFacade],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PaymentPage implements OnInit {
+export class PaymentPage implements OnInit, OnDestroy {
   readonly orderCode = input.required<string>();
 
-  private readonly orders = inject(OrdersService);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly facade = inject(PaymentFacade);
+  private forgetCopied: ReturnType<typeof setTimeout> | null = null;
 
-  readonly status = signal<ScreenState>('LOADING');
-  readonly maQr = signal<PaymentQr | null>(null);
-  readonly copied = signal<string | null>(null);
-
-  readonly isPaid = computed(() => {
-    const t = this.maQr()?.status;
-    return t !== undefined && t !== 'AWAITING_PAYMENT' && t !== 'PAYMENT_EXPIRED';
-  });
+  readonly status = this.facade.status;
+  readonly payment = this.facade.payment;
+  readonly paidOrder = this.facade.paidOrder;
+  readonly paid = this.facade.paid;
+  readonly copied = this.facade.copied;
+  readonly countdown = this.facade.countdown;
+  readonly expired = this.facade.expired;
+  readonly checkingNow = this.facade.checkingNow;
 
   ngOnInit(): void {
-    this.load();
-    this.byChange();
+    this.facade.start(this.orderCode());
   }
 
-  /** Copies the account number or message so the customer can paste it into their banking app. */
-  async copy(value: string, label: string): Promise<void> {
-    try {
-      await navigator.clipboard.writeText(value);
-      this.copied.set(label);
-      setTimeout(() => this.copied.set(null), 2000);
-    } catch {
-      return;
+  ngOnDestroy(): void {
+    if (this.forgetCopied !== null) {
+      clearTimeout(this.forgetCopied);
     }
   }
 
-  private load(): void {
-    this.orders
-      .maQr(this.orderCode())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (qr) => {
-          this.maQr.set(qr);
-          this.status.set('READY');
-        },
-        error: () => this.status.set('ERROR'),
-      });
+  /** Copies a value so the customer can paste it into their banking app. */
+  async copy(value: string, label: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      return;
+    }
+    this.facade.markCopied(label);
+    if (this.forgetCopied !== null) {
+      clearTimeout(this.forgetCopied);
+    }
+    this.forgetCopied = setTimeout(() => this.facade.markCopied(null), COPIED_FOR_MS);
   }
 
-  /**
-   * Polls the server until the order changes status.
-   * The customer never has to refresh the page.
-   */
-  private byChange(): void {
-    interval(POLL_INTERVAL_MS)
-      .pipe(
-        switchMap(() => this.orders.maQr(this.orderCode())),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (qr) => this.maQr.set(qr),
-        error: () => undefined,
-      });
+  checkNow(): void {
+    this.facade.checkNow();
   }
 }

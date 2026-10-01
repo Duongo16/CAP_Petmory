@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: var(--pm-space-2, 8px);
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 1px solid var(--pm-border);
+  border-radius: 12px;
+  background: var(--pm-bg-muted);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.tile-broken {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: var(--pm-text-muted);
+}
+
+.tile-drop {
+  position: absolute;
+  inset-block-start: 6px;
+  inset-inline-end: 6px;
+  display: grid;
+  place-items: center;
+  inline-size: 26px;
+  block-size: 26px;
+  border: 0;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-card);
+  color: var(--pm-danger);
+  box-shadow: var(--pm-shadow-sm, 0 1px 3px rgb(0 0 0 / 0.2));
+  cursor: pointer;
+  transition: transform 130ms ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: scale(1.1);
+  }
+}

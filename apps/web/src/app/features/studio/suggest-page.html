@@ -1,0 +1,147 @@
+<section class="page tw-page flex flex-col gap-6 max-[600px]:px-4">
+  <header class="head tw-page-head mb-0 items-start">
+    <div>
+      <h1 class="pm-page-title tw-page-title">{{ 'SUGGEST.TITLE' | translate }}</h1>
+      <p class="lead tw-page-sub">{{ 'SUGGEST.LEAD' | translate }}</p>
+    </div>
+    <a class="plain-link tw-btn-secondary" routerLink="/studio">
+      <pm-icon name="paw" [size]="18" />
+      {{ 'SUGGEST.GO_STUDIO' | translate }}
+    </a>
+  </header>
+
+  @if (status() === 'LOADING') {
+    <p class="middle tw-empty m-0">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else if (status() === 'ERROR') {
+    <p class="middle bad tw-empty m-0 text-danger">{{ 'SUGGEST.ERROR_LIBRARY' | translate }}</p>
+  } @else {
+    <form class="asking tw-card tw-card-pad flex flex-wrap items-end gap-5 max-[600px]:p-5" (ngSubmit)="ask()">
+      <div class="field tw-field min-w-[200px] max-[600px]:w-full">
+        <label class="tw-label" for="suggest-pet">{{ 'SUGGEST.PICK_PET' | translate }}</label>
+        <select
+          id="suggest-pet"
+          name="pet"
+          class="tw-select"
+          [ngModel]="petChosen()"
+          (ngModelChange)="petChosen.set($event)"
+        >
+          @for (one of petList(); track one._id) {
+            <option [value]="one._id">{{ one.name }}</option>
+          }
+        </select>
+      </div>
+
+      <fieldset class="field styles flex flex-1 flex-row flex-wrap items-center gap-2 min-w-[200px] m-0 p-0 border-0">
+        <legend class="tw-label float-left w-full p-0 mb-1.5">{{ 'SUGGEST.PICK_STYLE' | translate }}</legend>
+        @for (one of styles(); track one.key) {
+          <label class="style-chip tw-chip min-h-11" [class.on]="styleChosen() === one.key">
+            <input
+              type="radio"
+              name="style"
+              class="sr-only"
+              [value]="one.key"
+              [ngModel]="styleChosen()"
+              (ngModelChange)="styleChosen.set($event)"
+            />
+            {{ one.textKey | translate }}
+          </label>
+        }
+      </fieldset>
+
+      <button type="submit" class="ask-button tw-btn-primary max-[600px]:w-full" [disabled]="!canAsk()">
+        <pm-icon name="sparkle" [size]="16" />
+        {{ (working() ? 'SUGGEST.ASKING' : 'SUGGEST.ASK') | translate }}
+      </button>
+    </form>
+
+    @if (quotaLeft() >= 0) {
+      <p class="quota tw-hint -mt-2" id="suggest-quota">
+        {{ 'SUGGEST.QUOTA_LEFT' | translate: { count: quotaLeft() } }}
+      </p>
+    }
+
+    @if (petList().length === 0) {
+      <p class="middle tw-empty m-0">{{ 'SUGGEST.NO_PET' | translate }}</p>
+    }
+
+    @if (problem()) {
+      <p class="middle bad m-0 px-4 py-3 rounded-md bg-danger-soft text-on-danger-soft text-sm" role="alert">{{ problem() | translate }}</p>
+    }
+
+    @if (plan(); as got) {
+      @if (bySample()) {
+        <p class="sample-note m-0 px-4 py-3 rounded-md border border-dashed border-edge-strong bg-card text-sm text-ink-muted">{{ 'SUGGEST.BY_SAMPLE' | translate }}</p>
+      }
+
+      <div class="plan grid grid-cols-1 nav:grid-cols-[260px_1fr] gap-6">
+        <ul class="option-list flex flex-col max-nav:flex-row max-nav:overflow-x-auto gap-3 m-0 p-0 list-none" id="suggest-options">
+          @for (one of options(); track one.key) {
+            <li>
+              <button
+                type="button"
+                class="option-card flex flex-col gap-3 w-full max-nav:min-w-[170px] p-4 rounded-lg border-[1.5px] border-edge bg-card text-ink font-[inherit] text-left cursor-pointer transition-colors duration-150 hover:border-edge-strong"
+                [class.on]="shown()?.key === one.key"
+                (click)="show(one.key)"
+              >
+                <span class="option-title text-sm font-bold">{{ one.title }}</span>
+                <span class="swatch-row flex gap-1.5">
+                  @for (each of one.zoneLine; track each.zoneKey) {
+                    <span
+                      class="swatch"
+                      [style.background]="each.swatch"
+                      [attr.title]="each.name"
+                    ></span>
+                  }
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+
+        @if (shown(); as one) {
+          <article class="option-detail tw-card grid grid-cols-1 nav:grid-cols-[1fr_300px] gap-6 p-5">
+            <div class="stage min-h-[380px] rounded-lg bg-muted overflow-hidden">
+              @if (one.modelPath) {
+                <pm-viewer-3d [pathModel]="one.modelPath" [colorByZone]="one.colorByZone" />
+              }
+            </div>
+
+            <div class="words flex flex-col gap-3">
+              <h2 class="m-0 font-serif text-xl font-medium text-ink">{{ one.title }}</h2>
+              @if (one.rationale) {
+                <p class="why m-0 text-sm leading-[1.6] text-body">{{ one.rationale }}</p>
+              }
+
+              <h3 class="m-0 mt-2 text-sm font-bold text-ink">{{ 'SUGGEST.ZONE_COLOURS' | translate }}</h3>
+              <ul class="zone-list tw-panel flex flex-col gap-2 m-0 p-4 list-none">
+                @for (each of one.zoneLine; track each.zoneKey) {
+                  <li class="flex items-center gap-2 text-sm" [class.not-drawn]="!each.rendered">
+                    <span class="swatch" [style.background]="each.swatch"></span>
+                    <span class="zone-name min-w-24 font-medium text-ink">{{ each.zoneKey | translate }}</span>
+                    <span class="colour-name text-ink-muted">{{ each.name }}</span>
+                    @if (!each.rendered) {
+                      <span class="mark text-ink-muted">*</span>
+                    }
+                  </li>
+                }
+              </ul>
+              @if (one.someUnrendered) {
+                <p class="hint tw-hint">{{ 'SUGGEST.ZONE_NOT_DRAWN' | translate }}</p>
+              }
+
+              <button
+                type="button"
+                class="choose-button tw-btn-primary tw-btn-block mt-2"
+                [disabled]="working()"
+                (click)="choose(one.key)"
+              >
+                {{ 'SUGGEST.CHOOSE' | translate }}
+              </button>
+              <p class="after-note tw-hint">{{ 'SUGGEST.AFTER_CHOOSE' | translate }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+</section>

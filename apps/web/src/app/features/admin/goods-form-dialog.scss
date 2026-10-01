@@ -1,0 +1,234 @@
+@use '../../shared/dialog';
+
+/* Phan rieng cua hop thoai hang co san: bang cac to hop. */
+
+.sub-head {
+  margin: var(--pm-space-2) 0 0;
+  font-size: var(--pm-text-md);
+  font-weight: 700;
+}
+
+/*
+ * Bon cot cua mot to hop, cong mot cot cho o tich va mot cot cho nut bo dong.
+ *
+ * Hang tieu de va hang nhap dung chung mot khung cot, nen chu tren dau luon
+ * thang hang voi o nhap ben duoi.
+ */
+.variant-head,
+.variant-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1.2fr 1fr 0.8fr auto auto;
+  gap: var(--pm-space-2);
+  align-items: center;
+}
+
+.variant-head {
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-xs);
+  font-weight: 600;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-1);
+  min-inline-size: 0;
+}
+
+/*
+ * Ten cua tung o.
+ *
+ * Man hinh rong da co hang tieu de o tren nen ten nay chi danh cho trinh doc
+ * man hinh. Man hinh hep khong co hang tieu de, nen ten hien ra that.
+ */
+.cell-name {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.variant-row input:not([type='checkbox']) {
+  inline-size: 100%;
+  min-block-size: 44px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1.5px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font-family: inherit;
+  font-size: var(--pm-text-sm);
+  outline: none;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+
+  &:hover:not(:focus) {
+    border-color: var(--pm-border-strong);
+  }
+
+  &:focus {
+    border-color: var(--pm-accent);
+    box-shadow: 0 0 0 4px var(--pm-accent-soft);
+  }
+}
+
+.tick-cell {
+  align-items: center;
+}
+
+.variant-tick {
+  inline-size: 17px;
+  block-size: 17px;
+  padding: 0;
+  accent-color: var(--pm-accent);
+}
+
+.drop-variant {
+  display: grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border: 0;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-muted);
+  color: var(--pm-danger);
+  cursor: pointer;
+  transition: background 140ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--pm-danger-soft);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
+.add-variant {
+  align-self: flex-start;
+  padding: var(--pm-space-2) var(--pm-space-4);
+}
+
+@media (max-width: 900px) {
+  .variant-head {
+    display: none;
+  }
+
+  .variant-row {
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+    padding-block-end: var(--pm-space-3);
+    border-block-end: 1px solid var(--pm-border);
+    margin-block-end: var(--pm-space-2);
+  }
+
+  /* Khong con hang tieu de nen ten cua tung o phai hien ra. */
+  .cell-name {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    color: var(--pm-text-muted);
+    font-size: var(--pm-text-xs);
+    font-weight: 600;
+  }
+
+  .tick-cell {
+    align-items: flex-start;
+  }
+}
+
+/* Mo ta + checkbox "hien tren shop" cung hang */
+.pair-desc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-2);
+
+  .tick {
+    align-self: flex-start;
+  }
+}
+
+/* Khoi anh mon hang: luoi xem truoc thu nho. */
+.shot-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--pm-space-2);
+}
+
+.shot-count {
+  font-size: 0.76rem;
+  color: var(--pm-text-muted);
+}
+
+.shot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-space-2);
+  margin-top: var(--pm-space-2);
+}
+
+.shot-item {
+  position: relative;
+  flex: 0 0 auto;
+  inline-size: 80px;
+  block-size: 80px;
+  border: 1.5px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  overflow: hidden;
+  background: var(--pm-bg-sunken);
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  &.is-main {
+    border-color: var(--pm-accent);
+  }
+
+  .shot-lead {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline: 0;
+    padding: 2px 4px;
+    background: var(--pm-night);
+    color: var(--pm-on-night);
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .shot-drop {
+    position: absolute;
+    inset-block-start: 3px;
+    inset-inline-end: 3px;
+    display: grid;
+    place-items: center;
+    inline-size: 22px;
+    block-size: 22px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--pm-night);
+    color: var(--pm-on-night);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 140ms ease;
+  }
+
+  &:hover .shot-drop,
+  .shot-drop:focus-visible {
+    opacity: 1;
+  }
+}

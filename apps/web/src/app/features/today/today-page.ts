@@ -20,6 +20,7 @@ import { kindKeyOf } from '../../shared/pet-labels';
 import { topicKey } from '../../shared/memory-topics';
 import { Icon } from '../../shared/icon/icon';
 import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
+import { PetFace } from '../../shared/pet-face/pet-face';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -58,7 +59,7 @@ function yearsAgo(from: string): number {
 @Component({
   selector: 'pm-today-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, TranslatePipe, Icon, PetArt],
+  imports: [PetFace, RouterLink, DatePipe, TranslatePipe, Icon, PetArt],
   templateUrl: './today-page.html',
   styleUrl: './today-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

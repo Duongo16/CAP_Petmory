@@ -1,51 +1,74 @@
 # Giấy phép mô hình 3D
 
-Các tệp `.glb` trong thư mục này thuộc bộ **Cube Pets 2.0** của tác giả **Kenney**.
+Thư mục này chứa hai bộ mô hình, cả hai đều **CC0 1.0 Universal** (hiến tặng vào
+miền công cộng): dùng thương mại được, không bắt buộc ghi nguồn. Tệp này là bằng
+chứng giấy phép theo khoản 6.3 Hợp đồng dịch vụ.
+
+## Bộ 1 — Kenney, Cube Pets 2.0 (dáng khối vuông)
 
 | Thuộc tính | Nội dung |
 |---|---|
 | Tác giả | Kenney |
 | Trang chính thức | https://kenney.nl/assets/cube-pets |
-| Giấy phép | **CC0 1.0 Universal** (hiến tặng vào miền công cộng) |
-| Toàn văn giấy phép | https://creativecommons.org/publicdomain/zero/1.0/ |
-| Cho phép dùng thương mại | Có |
-| Bắt buộc ghi nguồn | Không, nhưng tác giả khuyến khích ghi "Kenney" hoặc "www.kenney.nl" |
-| Số mô hình trong bộ gốc | 24 con, **có sẵn cả mèo và chó** |
-| Ngày tải | 25/09/2026 |
+| Giấy phép | CC0 1.0 Universal |
+| Toàn văn | https://creativecommons.org/publicdomain/zero/1.0/ |
+| Số mô hình trong bộ gốc | 24 con, có sẵn cả mèo và chó |
+| Tệp tải về | `kenney_cube-pets_1.0.zip` |
+| Ngày tải lần đầu | 25/09/2026 |
+| Ngày bổ sung | 30/09/2026 |
 
 Bản giấy phép gốc do tác giả phát hành kèm theo được lưu tại `Kenney-License.txt`.
-Tệp này là bằng chứng giấy phép theo khoản 6.3 Hợp đồng dịch vụ.
 
-## Tệp hiện có
+Tệp đang dùng: `animal-cat.glb`, `animal-dog.glb`, `animal-bunny.glb`,
+`animal-fox.glb`, `animal-panda.glb`, `animal-tiger.glb`, `animal-parrot.glb`,
+`animal-fish.glb`.
 
-| Tệp | Loài | Dùng cho |
-|---|---|---|
-| `animal-cat.glb` | Mèo | Mẫu nền chính, sẽ tạo hai tư thế |
-| `animal-dog.glb` | Chó | Mẫu nền chính, sẽ tạo hai tư thế |
-| `animal-bunny.glb` | Thỏ | Dự phòng cho giai đoạn sau |
-| `animal-fox.glb` | Cáo | Dự phòng cho giai đoạn sau |
-| `animal-panda.glb` | Gấu trúc | Dự phòng cho giai đoạn sau |
-| `animal-tiger.glb` | Hổ | Dự phòng cho giai đoạn sau |
-| `Textures/colormap.png` | — | Bảng màu dùng chung cho toàn bộ mô hình |
+## Bộ 2 — Quaternius, Ultimate Animated Animal Pack (dáng thật)
+
+| Thuộc tính | Nội dung |
+|---|---|
+| Tác giả | Quaternius |
+| Trang chính thức | https://quaternius.com/packs/ultimateanimatedanimals.html |
+| Giấy phép | CC0 |
+| Số mô hình trong bộ gốc | 12 con: Alpaca, Bull, Cow, Deer, Donkey, Fox, Horse, Horse_White, Husky, ShibaInu, Stag, Wolf |
+| Ngày tải lần đầu | 25/09/2026 |
+| Ngày bổ sung | 30/09/2026 |
+
+Tệp đang dùng: `q-ShibaInu.glb`, `q-Husky.glb`, `q-Fox.glb`, `q-Wolf.glb`,
+`q-Deer.glb`.
+
+**Đường lấy tệp.** Trang chính thức đưa về một thư mục Google Drive, không tải
+bằng lệnh được. Các tệp được lấy từ bản sao công khai trên GitHub
+(`trebeljahr/quaternius-showcase`, thư mục `public/glb/animals_pack`). Đã đối
+chiếu mã băm SHA-256 của ba tệp đang dùng từ trước với bản sao này: **trùng khớp
+từng byte**, nên bản sao đúng là bộ gốc chứ không phải bản đã chỉnh.
+
+## Dáng len — không phải bộ thứ ba
+
+Các mẫu "dáng len" trong danh mục **không có tệp mô hình riêng**. Chúng dùng lại
+đúng tệp của bộ Quaternius, chỉ khác ở chỗ tỉ lệ một số xương được nắn lại lúc
+hiển thị: đầu to hơn, thân tròn hơn, chân ngắn lại. Bảng hệ số nằm trong
+`apps/web/src/app/shared/viewer-3d/body-shape.ts`.
+
+Vì vậy dáng len không làm nặng thêm trang web và không phát sinh vấn đề giấy phép
+nào mới.
 
 ## Trạng thái kỹ thuật
 
-Các tệp hiện tại **là bản gốc chưa qua Blender**. Mỗi mô hình chỉ có
-**một vùng vật liệu** tên `colormap` dùng ảnh texture chung, nên đổi màu trên web
-sẽ nhuộm toàn bộ con vật kể cả mắt.
+| Bộ | Vùng màu mỗi con | Dùng ảnh phủ | Đổi màu theo vùng |
+|---|--:|---|---|
+| Kenney Cube Pets | 1 | có | Không — nhuộm cả con, kể cả mắt |
+| Quaternius | 4 đến 8 | không | Được ngay, không cần sửa gì |
 
-Việc cần làm để đổi màu theo vùng: bỏ texture và chia sáu vùng vật liệu trong Blender.
-Xem `docs/HUONG-DAN-BLENDER.md`.
+Bộ Kenney muốn đổi màu theo vùng thì phải bỏ ảnh phủ và chia lại vùng vật liệu
+trong Blender. Xem `docs/HUONG-DAN-BLENDER.md`.
 
-Chạy `node tools/phan-tich-glb.js` để xem lại chi tiết từng tệp.
+Chạy `node tools/inspect-glb.js apps/web/public/models` để xem lại chi tiết từng tệp.
 
-## Vì sao đổi từ bộ Quaternius sang bộ này
+## Cái còn thiếu
 
-Bộ Quaternius trước đó có ưu điểm là sẵn 4 đến 6 vùng vật liệu độc lập và không dùng
-texture, rất hợp cho việc đổi màu. Nhưng tỉ lệ các con vật là tỉ lệ thật, thân dài,
-không hợp với dáng sản phẩm len chọc vốn đầu to thân tròn. Bộ đó cũng không có mèo,
-phải chỉnh sửa con cáo thành mèo.
-
-Bộ Kenney ngược lại: dáng khối vuông đầu to đúng chất len chọc, có sẵn cả mèo lẫn chó,
-nhưng phải bỏ texture và chia lại vùng vật liệu. Khối lượng Blender tương đương,
-đổi lại được đúng dáng sản phẩm và không phải chế ra con mèo.
+Không bộ nào có **mèo dáng thật**. Bộ Quaternius chỉ có mười hai con kể trên,
+không có mèo; bộ Kenney có mèo nhưng là dáng khối vuông. Đã tìm qua các nguồn
+CC0 công khai khác (Kenney, Quaternius, KayKit, Sketchfab, Poly Pizza) và không
+nguồn nào có sẵn mèo dáng thật dùng thương mại được. Ba hướng xử lý nằm trong
+`docs/CHON-MAU-3D.md`.

@@ -17,6 +17,20 @@ export interface AppConfig {
     dir: string;
     maxSizeMb: number;
   };
+  ai: {
+    apiKey: string;
+    model: string;
+    timeoutMs: number;
+  };
+  storage: {
+    driver: string;
+    cloudinary: {
+      cloudName: string;
+      apiKey: string;
+      apiSecret: string;
+      signedSeconds: number;
+    };
+  };
 }
 
 function required(name: string): string {
@@ -42,5 +56,19 @@ export default (): AppConfig => ({
   upload: {
     dir: process.env.UPLOAD_DIR ?? './uploads',
     maxSizeMb: Number(process.env.UPLOAD_MAX_SIZE_MB ?? 10),
+  },
+  ai: {
+    apiKey: process.env.ANTHROPIC_API_KEY ?? '',
+    model: process.env.AI_MODEL ?? 'claude-opus-5',
+    timeoutMs: Number(process.env.AI_TIMEOUT_MS ?? 45000),
+  },
+  storage: {
+    driver: process.env.STORAGE_DRIVER ?? 'disk',
+    cloudinary: {
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME ?? '',
+      apiKey: process.env.CLOUDINARY_API_KEY ?? '',
+      apiSecret: process.env.CLOUDINARY_API_SECRET ?? '',
+      signedSeconds: Number(process.env.CLOUDINARY_SIGNED_URL_TTL ?? 600),
+    },
   },
 });

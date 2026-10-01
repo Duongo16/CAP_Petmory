@@ -1,0 +1,20 @@
+<span class="brand">
+  <img
+    class="brand-mark"
+    src="img/logo-mark.png"
+    alt=""
+    [attr.width]="markPx()"
+    [attr.height]="markPx()"
+  />
+  @if (!markOnly()) {
+    <img
+      class="brand-word"
+      src="img/logo-word-clear.png"
+      alt="Petmory"
+      [attr.width]="wordWidth()"
+      [attr.height]="wordPx()"
+    />
+  } @else {
+    <span class="sr-only">Petmory</span>
+  }
+</span>

@@ -3,11 +3,11 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { catchError, of, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { PetsService } from '../../core/services/pets.service';
+import { PetDraftService } from '../../core/services/pet-draft.service';
 import { Icon } from '../../shared/icon/icon';
-import { PetArt } from '../../shared/pet-art/pet-art';
+import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
 
 /** A benefit shown in the left panel. Both keys are written out in full. */
 interface Perk {
@@ -57,11 +57,13 @@ function scorePassword(value: string): number {
   }
   return Math.min(score, 4);
 }
+import { DiaryScene } from '../../shared/diary-scene/diary-scene';
+import { Brand } from '../../shared/brand/brand';
 
 @Component({
   selector: 'pm-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './register.html',
   styleUrls: ['./auth-shared.scss', './register.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,9 +71,13 @@ function scorePassword(value: string): number {
 export class RegisterPage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
-  private readonly pets = inject(PetsService);
+  private readonly drafts = inject(PetDraftService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** The pet profile started on the welcome page, waiting for this account. */
+  readonly draft = this.drafts.draft;
+  readonly draftArt = computed<PetArtKind>(() => (this.draft()?.kind === 'CAT' ? 'cat' : 'dog'));
 
   readonly pendingSend = signal(false);
   readonly error = signal<string | null>(null);
@@ -97,7 +103,6 @@ export class RegisterPage {
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.pattern(/^0[0-9]{9}$/)]],
-      petName: [''],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirm: ['', [Validators.required]],
       terms: [false, [Validators.requiredTrue]],
@@ -130,17 +135,11 @@ export class RegisterPage {
     this.pendingSend.set(true);
     this.error.set(null);
 
-    const petName = value.petName.trim();
-
     this.auth
       .register(value.email, value.password, value.fullName, value.phone || undefined)
       .pipe(
         // The first pet is a nicety, so a failure there must not undo the account.
-        switchMap(() =>
-          petName.length > 0
-            ? this.pets.create({ name: petName }).pipe(catchError(() => of(null)))
-            : of(null),
-        ),
+        switchMap(() => this.drafts.claim()),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({

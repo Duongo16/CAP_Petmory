@@ -3,22 +3,27 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  computed,
   inject,
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
+import { PetDraftService } from '../../core/services/pet-draft.service';
 import { DemoAccount } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
-import { PetArt } from '../../shared/pet-art/pet-art';
+import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
+import { DiaryScene } from '../../shared/diary-scene/diary-scene';
+import { Brand } from '../../shared/brand/brand';
 
 @Component({
   selector: 'pm-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './login.html',
   styleUrls: ['./auth-shared.scss', './login.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +32,11 @@ export class LoginPage implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly drafts = inject(PetDraftService);
+
+  /** The pet profile started on the welcome page, waiting for this account. */
+  readonly draft = this.drafts.draft;
+  readonly draftArt = computed<PetArtKind>(() => (this.draft()?.kind === 'CAT' ? 'cat' : 'dog'));
   private readonly destroyRef = inject(DestroyRef);
 
   /** Tai khoan mau de bam mot phat la vao, chi co khi chay o may ca nhan. */
@@ -82,7 +92,11 @@ export class LoginPage implements OnInit {
 
     this.auth
       .login(value.email, value.password)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        // A pet started on the welcome page joins the account it signs in to.
+        switchMap(() => this.drafts.claim()),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: () => {
           this.pendingSend.set(false);

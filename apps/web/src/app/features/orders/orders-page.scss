@@ -1,12 +1,5 @@
 :host { display: block; }
 
-/* Filter button active state (Angular class binding) */
-.on {
-  background: var(--pm-accent);
-  color: var(--pm-on-accent);
-  border-color: transparent;
-}
-
 /* Status chip colour variants driven by data-tone */
 .chip-status[data-tone='awaiting']    { background: var(--pm-amber-soft); color: var(--pm-on-amber); }
 .chip-status[data-tone='in-progress'] { background: var(--pm-accent-soft); color: var(--pm-accent); }
@@ -20,6 +13,5 @@
 }
 
 @media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; }
   .side { position: static; }
 }

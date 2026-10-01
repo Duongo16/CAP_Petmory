@@ -1,0 +1,30 @@
+<div class="pm-page pm-page-narrow show-page">
+  <header class="head mb-5">
+    <a class="back tw-back" [routerLink]="['/pets', pet()?._id, 'journal']">
+      <pm-icon name="chevron" [size]="13" />
+      {{ 'MEMORY.BACK_TO_BOOK' | translate }}
+    </a>
+    <h1 class="pm-section-title pm-page-title">
+      {{ 'MEMORY.SHOW_TITLE' | translate: { name: pet()?.name } }}
+    </h1>
+  </header>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="middle tw-empty m-0">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <p class="middle tw-empty m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+    }
+    @case ('DONE') {
+      <pm-slideshow
+        [moments]="moments()"
+        [sourceOf]="sourceOf()"
+        [setting]="setting()"
+        [tracks]="tracks()"
+        [canChange]="true"
+        (settingChanged)="keepSetting($event)"
+      />
+    }
+  }
+</div>

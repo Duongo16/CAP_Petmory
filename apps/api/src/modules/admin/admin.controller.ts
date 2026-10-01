@@ -1,13 +1,24 @@
-import { Body, Controller, Get, Param, Patch, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { AdminService } from './admin.service';
 import { ProductionFileService } from './production-file.service';
 import { DesignsService } from '../designs/designs.service';
 import { PreviewAngle } from '../designs/schemas/design.schema';
-import { ChangeStatusDto, OrderFilterDto, CustomerSearchDto } from './dto/admin.dto';
+import {
+  ChangeStatusDto,
+  OrderFilterDto,
+  CustomerSearchDto,
+  QualityTickDto,
+} from './dto/admin.dto';
+import { HideDiaryDto } from '../memories/dto/diary.dto';
+import { DiaryService } from '../memories/diary.service';
+import { AuditService } from '../../common/audit.service';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/constants/roles';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
+
+/** Loai tai nguyen ghi vao nhat ky he thong khi an mot quyen nhat ky. */
+const RESOURCE_TYPE_DIARY = 'PetDiary';
 
 /**
  * Operations screens for internal staff.
@@ -21,21 +32,23 @@ export class AdminController {
     private readonly service: AdminService,
     private readonly profile: ProductionFileService,
     private readonly designs: DesignsService,
+    private readonly diary: DiaryService,
+    private readonly audit: AuditService,
   ) {}
 
-  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPPORT)
+  @Roles(Role.MANAGER)
   @Get('orders/stats')
   stats() {
     return this.service.countByStatus();
   }
 
-  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPPORT)
+  @Roles(Role.MANAGER)
   @Get('orders')
   listOrder(@Query() filter: OrderFilterDto) {
     return this.service.listOrder(filter);
   }
 
-  @Roles(Role.MANAGER, Role.ADMIN)
+  @Roles(Role.MANAGER)
   @Get('orders/:orderCode/production-file')
   productionFile(@Param('orderCode') orderCode: string) {
     return this.profile.buildProfile(orderCode);
@@ -46,7 +59,7 @@ export class AdminController {
    * The workshop needs to see what the customer approved, so ownership is not
    * checked here; in exchange this path is open only to the two operations groups.
    */
-  @Roles(Role.MANAGER, Role.ADMIN)
+  @Roles(Role.MANAGER)
   @Get('designs/:id/preview/:angle')
   async photoDesign(
     @Param('id') id: string,
@@ -59,13 +72,13 @@ export class AdminController {
     res.send(data);
   }
 
-  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPPORT)
+  @Roles(Role.MANAGER)
   @Get('orders/:orderCode')
   detailOrder(@Param('orderCode') orderCode: string) {
     return this.service.detailOrder(orderCode);
   }
 
-  @Roles(Role.MANAGER, Role.ADMIN)
+  @Roles(Role.MANAGER)
   @Patch('orders/:orderCode/status')
   changeStatus(
     @Param('orderCode') orderCode: string,
@@ -75,13 +88,63 @@ export class AdminController {
     return this.service.changeOrderStatus(orderCode, dto.status, user.userId, dto.reason ?? '');
   }
 
-  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPPORT)
+  @Roles(Role.MANAGER)
+  @Patch('orders/:orderCode/quality/:at')
+  setQualityTick(
+    @Param('orderCode') orderCode: string,
+    @Param('at', ParseIntPipe) at: number,
+    @Body() dto: QualityTickDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.service.setQualityTick(orderCode, at, dto.done, user.userId);
+  }
+
+  /**
+   * An mot quyen nhat ky khoi cong dong.
+   *
+   * Ly do la bat buoc, va duoc ghi vao nhat ky he thong kem ten nguoi lam,
+   * vi day la mot quyet dinh cham den noi dung cua nguoi khac.
+   */
+  @Roles(Role.MANAGER)
+  @Patch('diaries/:petId/block')
+  async blockDiary(
+    @Param('petId') petId: string,
+    @Body() dto: HideDiaryDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    const pet = await this.diary.blockDiary(petId, dto.reason, user.userId);
+    await this.audit.write({
+      actor: user.userId,
+      action: 'DIARY_BLOCKED',
+      resourceType: RESOURCE_TYPE_DIARY,
+      resourceId: pet._id.toString(),
+      reason: dto.reason,
+      after: { diaryBlocked: true },
+    });
+    return pet;
+  }
+
+  @Roles(Role.MANAGER)
+  @Patch('diaries/:petId/unblock')
+  async unblockDiary(@Param('petId') petId: string, @CurrentUser() user: AuthUser) {
+    const pet = await this.diary.unblockDiary(petId);
+    await this.audit.write({
+      actor: user.userId,
+      action: 'DIARY_UNBLOCKED',
+      resourceType: RESOURCE_TYPE_DIARY,
+      resourceId: pet._id.toString(),
+      after: { diaryBlocked: false },
+    });
+    return pet;
+  }
+
+  @Roles(Role.MANAGER)
   @Get('customers')
   listCustomers(@Query() filter: CustomerSearchDto) {
     return this.service.listCustomers(filter);
   }
 
-  @Roles(Role.MANAGER, Role.ADMIN, Role.SUPPORT)
+  @Roles(Role.MANAGER)
   @Get('customers/:id')
   customerDetail(@Param('id') id: string) {
     return this.service.customerDetail(id);

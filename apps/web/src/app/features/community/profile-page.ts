@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -20,19 +20,16 @@ import { TokenStore } from '../../core/services/token-store';
 import { CommunityPost, CommunityProfile } from '../../core/models/community.model';
 import { topicKey } from './community-topics';
 import { Icon } from '../../shared/icon/icon';
+import { ProfileEditDialog, ProfileEditResult } from './profile-edit-dialog';
+import { UserFace } from '../../shared/user-face/user-face';
+import { PetFace } from '../../shared/pet-face/pet-face';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
-
-interface EditForm {
-  fullName: FormControl<string>;
-  phone: FormControl<string>;
-  avatarUrl: FormControl<string>;
-}
 
 @Component({
   selector: 'pm-community-profile-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, TranslatePipe, MatProgressSpinnerModule, Icon, ReactiveFormsModule],
+  imports: [PetFace, UserFace, RouterLink, DatePipe, TranslatePipe, MatProgressSpinnerModule, Icon],
   templateUrl: './profile-page.html',
   styleUrl: './profile-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,6 +39,7 @@ export class CommunityProfilePage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly store = inject(TokenStore);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly dialog = inject(MatDialog);
 
   readonly id = input.required<string>();
 
@@ -50,14 +48,6 @@ export class CommunityProfilePage implements OnInit {
   readonly profile = signal<CommunityProfile | null>(null);
   private readonly posts = signal<CommunityPost[]>([]);
 
-  readonly editMode = signal(false);
-  readonly saving = signal(false);
-
-  readonly editForm = new FormGroup<EditForm>({
-    fullName: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
-    phone: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(20)] }),
-    avatarUrl: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(500)] }),
-  });
 
   readonly cards = computed(() =>
     this.posts().map((p) => ({
@@ -92,50 +82,38 @@ export class CommunityProfilePage implements OnInit {
       .subscribe({ next: (list) => this.posts.set(list), error: () => undefined });
   }
 
+  /** Opens the profile editor as a popup and shows the change once it is saved. */
   openEdit(): void {
     const p = this.profile();
     if (!p) {
       return;
     }
-    this.editForm.setValue({
-      fullName: p.fullName,
-      phone: p.phone ?? '',
-      avatarUrl: p.avatarUrl ?? '',
-    });
-    this.editMode.set(true);
-  }
-
-  cancelEdit(): void {
-    this.editMode.set(false);
-  }
-
-  saveProfile(): void {
-    if (this.editForm.invalid || this.saving()) {
-      return;
-    }
-    const { fullName, phone, avatarUrl } = this.editForm.getRawValue();
-    this.saving.set(true);
-    this.service
-      .updateProfile({ fullName, phone, avatarUrl })
+    this.dialog
+      .open<ProfileEditDialog, CommunityProfile, ProfileEditResult>(ProfileEditDialog, {
+        data: p,
+        width: 'min(620px, 96vw)',
+        maxHeight: '92vh',
+        panelClass: ['pm-dialog', 'pm-dialog-wide'],
+        autoFocus: 'first-tabbable',
+      })
+      .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.profile.update((p) =>
-            p
-              ? {
-                  ...p,
-                  fullName,
-                  initial: fullName.trim().charAt(0).toUpperCase() || '?',
-                  phone: phone || null,
-                  avatarUrl: avatarUrl || null,
-                }
-              : p,
-          );
-          this.store.patchUser({ fullName });
-          this.saving.set(false);
-          this.editMode.set(false);
-        },
-        error: () => this.saving.set(false),
+      .subscribe((saved) => {
+        if (!saved) {
+          return;
+        }
+        this.profile.update((now) =>
+          now
+            ? {
+                ...now,
+                fullName: saved.fullName,
+                initial: saved.fullName.charAt(0).toUpperCase() || '?',
+                phone: saved.phone || null,
+                avatarUrl: saved.avatarUrl || null,
+              }
+            : now,
+        );
+        this.store.patchUser({ fullName: saved.fullName, avatarUrl: saved.avatarUrl || null });
       });
   }
 

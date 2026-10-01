@@ -35,6 +35,26 @@ async function scenario(report) {
   const customer = await h.newCustomer('double');
   const manager = await h.signInInternal(h.ACCOUNT_MANAGER);
 
+  // --- A brand new account asking for its basket several times at once ---
+  /*
+   * A page that has just opened asks for the basket more than once in the same
+   * instant. The basket does not exist yet for a new account, so the writes
+   * arrive together and the database, which allows one basket per account,
+   * refuses all but the first. That refusal used to reach the customer as a
+   * system error on their very first page.
+   */
+  report.step('A new account asking for its basket several times at once');
+  const fresh = await h.newCustomer('double-basket');
+  const baskets = await Promise.all(
+    [0, 1, 2, 3].map(() => h.call('/cart', { headers: fresh.auth })),
+  );
+  report.check('Every one of the four answers is a basket',
+    baskets.every((one) => one.status === 200),
+    baskets.map((one) => one.status).join(', '));
+  report.check('They all describe the same empty basket',
+    baskets.every((one) => one.body?.countItem === 0),
+    baskets.map((one) => one.body?.countItem).join(', '));
+
   // --- The same transaction id arriving twice ---
   report.step('The same bank transaction sent twice is only acted on once');
   const order = await placeOrder(customer);
@@ -116,7 +136,11 @@ async function scenario(report) {
   report.step('The same review sent twice leaves one review');
   const journey = await placeOrder(customer);
   await h.sendTransfer(journey.code, Number(journey.total));
-  for (const status of ['IN_PRODUCTION', 'QUALITY_CHECK', 'READY_TO_SHIP', 'SHIPPING', 'DELIVERED']) {
+  for (const status of ['IN_PRODUCTION', 'SHIPPING', 'COMPLETED']) {
+    // Khong roi khau kiem dinh khi phieu con muc chua tich.
+    if (status === 'SHIPPING') {
+      await h.passQualityCheck(journey.code, manager);
+    }
     await h.call(`/admin/orders/${journey.code}/status`, {
       method: 'PATCH',
       headers: manager.auth,

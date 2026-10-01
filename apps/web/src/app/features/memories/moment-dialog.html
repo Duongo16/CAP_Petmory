@@ -1,0 +1,227 @@
+<form class="sheet" [class.wide]="step() === 3" [formGroup]="form" (ngSubmit)="step() === 3 ? save() : next()">
+  <header class="sheet-head">
+    <div>
+      <p class="eyebrow">{{ 'MEMORY.STEP' | translate: { step: step(), total: 3 } }}</p>
+      <h2 class="sheet-title">
+        @switch (step()) {
+          @case (1) { {{ 'MEMORY.STEP_LAYOUT' | translate }} }
+          @case (2) { {{ 'MEMORY.STEP_PHOTOS' | translate }} }
+          @default { {{ 'MEMORY.STEP_WRITE' | translate }} }
+        }
+      </h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <ol class="steps" aria-hidden="true">
+    <li [class.on]="step() >= 1">{{ 'MEMORY.STEP_LAYOUT_SHORT' | translate }}</li>
+    <li [class.on]="step() >= 2">{{ 'MEMORY.STEP_PHOTOS_SHORT' | translate }}</li>
+    <li [class.on]="step() >= 3">{{ 'MEMORY.STEP_WRITE_SHORT' | translate }}</li>
+  </ol>
+
+  @switch (step()) {
+    @case (1) {
+      <div class="sheet-body">
+        <ul class="layout-grid" [attr.aria-label]="'MEMORY.STEP_LAYOUT' | translate">
+          @for (one of layouts; track one.code) {
+            <li>
+              <button
+                type="button"
+                class="layout-card"
+                [class.on]="layoutCode() === one.code"
+                [attr.aria-pressed]="layoutCode() === one.code"
+                (click)="pickLayout(one.code)"
+              >
+                <span class="mini" [attr.data-paper]="one.paper" aria-hidden="true">
+                  @for (slot of one.photos; track $index) {
+                    <span
+                      class="mini-photo"
+                      [style.left.%]="slot.x"
+                      [style.top.%]="slot.y"
+                      [style.width.%]="slot.width"
+                      [style.height.%]="slot.width * 0.6"
+                      [style.transform]="'rotate(' + slot.rotate + 'deg)'"
+                    ><pm-icon name="image" [size]="14" /></span>
+                  }
+                  <span
+                    class="mini-title"
+                    [style.left.%]="one.title.x"
+                    [style.top.%]="one.title.y"
+                    [style.width.%]="one.title.width * 0.6"
+                  ></span>
+                  <span
+                    class="mini-lines"
+                    [style.left.%]="one.body.x"
+                    [style.top.%]="one.body.y"
+                    [style.width.%]="one.body.width"
+                  ></span>
+                </span>
+                <span class="layout-name">{{ one.nameKey | translate }}</span>
+                <span class="layout-text">{{ one.textKey | translate }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    @case (2) {
+      <div class="sheet-body">
+        <div class="photo-head">
+          <p class="field-note">
+            {{ 'MEMORY.PHOTO_SLOTS' | translate: { count: chosenPhoto().length, limit: slotCount() } }}
+          </p>
+          <label class="upload" [class.busy]="uploading()" for="moment-upload">
+            <pm-icon name="camera" [size]="16" />
+            {{ (uploading() ? 'MEMORY.UPLOADING' : 'MEMORY.UPLOAD') | translate }}
+          </label>
+          <input
+            id="moment-upload"
+            class="sr-only"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            [disabled]="uploading()"
+            (change)="upload($event)"
+          />
+        </div>
+        @if (uploadProblem(); as problem) {
+          <p class="field-error">{{ problem | translate }}</p>
+        }
+
+        @if (shots().length > 0) {
+          <ul class="shot-grid">
+            @for (one of shots(); track one.id) {
+              <li>
+                <button
+                  type="button"
+                  class="shot-pick"
+                  [class.on]="orderOf(one.id) > 0"
+                  [attr.aria-pressed]="orderOf(one.id) > 0"
+                  [disabled]="full() && orderOf(one.id) === 0"
+                  (click)="togglePhoto(one.id)"
+                >
+                  <img [src]="one.source" [alt]="'MEMORY.PHOTO_ALT' | translate" />
+                  @if (orderOf(one.id) > 0) {
+                    <span class="shot-order">{{ orderOf(one.id) }}</span>
+                  }
+                </button>
+                @if (orderOf(one.id) > 1) {
+                  <button type="button" class="shot-up" (click)="moveEarlier(one.id)">
+                    {{ 'MEMORY.PHOTO_EARLIER' | translate }}
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="empty-album">{{ 'MEMORY.PHOTO_NONE' | translate }}</p>
+        }
+      </div>
+    }
+
+    @default {
+      <div class="write">
+        <div class="sheet-body write-fields">
+          <div class="field">
+            <label class="field-name" for="moment-title">{{ 'MEMORY.TITLE_LABEL' | translate }} *</label>
+            <input
+              id="moment-title"
+              type="text"
+              formControlName="title"
+              [placeholder]="'MEMORY.TITLE_HINT' | translate"
+            />
+            @if (form.controls.title.touched && form.controls.title.invalid) {
+              <p class="field-error">{{ 'MEMORY.TITLE_ERROR' | translate }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-name" for="moment-body">{{ 'MEMORY.BODY' | translate }}</label>
+            <textarea
+              id="moment-body"
+              rows="5"
+              formControlName="body"
+              [placeholder]="'MEMORY.BODY_HINT' | translate"
+            ></textarea>
+            @if (bodyTooLong()) {
+              <p class="field-note">{{ 'MEMORY.BODY_ON_PAGE' | translate: { limit: bodyLimit() } }}</p>
+            }
+          </div>
+
+          <div class="pair">
+            <div class="field">
+              <label class="field-name" for="moment-when">{{ 'MEMORY.WHEN' | translate }} *</label>
+              <input id="moment-when" type="datetime-local" formControlName="happenedAt" />
+              @if (form.controls.happenedAt.touched && form.controls.happenedAt.invalid) {
+                <p class="field-error">{{ 'MEMORY.WHEN_ERROR' | translate }}</p>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-name" for="moment-topic">{{ 'MEMORY.TOPIC_LABEL' | translate }}</label>
+              <select id="moment-topic" formControlName="topic">
+                @for (one of topics; track one.value) {
+                  <option [value]="one.value">{{ one.key | translate }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-name" for="moment-place">{{ 'MEMORY.PLACE' | translate }}</label>
+            <input
+              id="moment-place"
+              type="text"
+              formControlName="place"
+              [placeholder]="'MEMORY.PLACE_HINT' | translate"
+            />
+          </div>
+
+          <div class="field">
+            <label class="field-name" for="moment-tag">{{ 'MEMORY.TAGS' | translate }}</label>
+            <input
+              id="moment-tag"
+              type="text"
+              formControlName="tag"
+              [placeholder]="'MEMORY.TAGS_HINT' | translate"
+            />
+            <p class="field-hint field-note">{{ 'MEMORY.TAGS_NOTE' | translate }}</p>
+          </div>
+
+          <label class="tick">
+            <input type="checkbox" formControlName="isMilestone" />
+            <span>{{ 'MEMORY.IS_MILESTONE' | translate }}</span>
+          </label>
+        </div>
+
+        <figure class="preview">
+          <figcaption class="field-name">{{ 'MEMORY.PREVIEW' | translate }}</figcaption>
+          <div class="preview-page">
+            <pm-page-face [face]="previewFace()" [sourceOf]="sourceOf()" />
+          </div>
+        </figure>
+      </div>
+    }
+  }
+
+  <footer class="sheet-foot">
+    @if (step() > 1) {
+      <button type="button" class="plain" (click)="back()">
+        <pm-icon name="back" [size]="15" />
+        {{ 'MEMORY.BACK' | translate }}
+      </button>
+    } @else {
+      <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+    }
+    @if (step() < 3) {
+      <button type="submit" class="solid strong">
+        {{ (step() === 2 && chosenPhoto().length === 0 ? 'MEMORY.SKIP_PHOTOS' : 'MEMORY.NEXT') | translate }}
+        <pm-icon name="arrow" [size]="15" />
+      </button>
+    } @else {
+      <button type="submit" class="solid strong submit">{{ 'MEMORY.SAVE' | translate }}</button>
+    }
+  </footer>
+</form>

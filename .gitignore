@@ -12,3 +12,7 @@ Thumbs.db
 uploads/
 test-screenshots/
 *.tsbuildinfo
+
+# Tai lieu tham khao rieng, khong thuoc du an
+TailMates_PetCareWeb/
+TAILMATES_REVIEW.md

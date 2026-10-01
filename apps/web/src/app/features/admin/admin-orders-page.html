@@ -1,43 +1,47 @@
 <div class="pm-page">
-  <header class="page-header">
-    <h1 class="title">{{ 'ADMIN.ORDER.TITLE' | translate }}</h1>
-    <p class="description">{{ 'ADMIN.ORDER.DESCRIPTION' | translate }}</p>
+  <header class="page-header order-bar">
+    <div class="order-bar-title">
+      <h1 class="title pm-page-title">{{ 'ADMIN.ORDER.TITLE' | translate }}</h1>
+    </div>
+
+    <form class="search-row" (ngSubmit)="facade.search(searchInput.value)">
+      <label class="sr-only" for="search-order">{{ 'ADMIN.ORDER.SEARCH_INPUT' | translate }}</label>
+      <input
+        id="search-order"
+        #searchInput
+        type="search"
+        autocomplete="off"
+        [value]="facade.keyword()"
+        [placeholder]="'ADMIN.ORDER.SEARCH_INPUT' | translate"
+      />
+      <button class="pm-button-primary" type="submit">{{ 'ADMIN.FIND' | translate }}</button>
+      @if (facade.keyword() || facade.filterStatus()) {
+        <button class="pm-button-secondary" type="button" (click)="searchInput.value = ''; facade.removeFilter()">
+          {{ 'ADMIN.REMOVE_FILTER' | translate }}
+        </button>
+      }
+      <span class="result-count">{{ 'ADMIN.RESULT_COUNT' | translate: { count: facade.total() } }}</span>
+    </form>
   </header>
 
   <section class="counter-board" [attr.aria-label]="'ADMIN.ORDER.COUNTER_BOARD' | translate">
-    @for (o of facade.tiles(); track o.code) {
+    @for (o of facade.tiles(); track o.code; let at = $index) {
       <button
         type="button"
         class="counter-tile"
         [attr.data-group]="o.groupColor"
         [class.selected]="o.selected"
         [attr.aria-pressed]="o.selected"
+        [style.--tile-index]="at"
         (click)="facade.selectStatus(o.code)"
       >
+        <span class="tile-icon"><pm-icon [name]="o.icon" [size]="16" /></span>
         <span class="number">{{ o.count }}</span>
         <span class="tile-name">{{ o.key | translate }}</span>
       </button>
     }
   </section>
-
-  <form class="search-row" (ngSubmit)="facade.search(searchInput.value)">
-    <label class="sr-only" for="search-order">{{ 'ADMIN.ORDER.SEARCH_INPUT' | translate }}</label>
-    <input
-      id="search-order"
-      #searchInput
-      type="search"
-      autocomplete="off"
-      [value]="facade.keyword()"
-      [placeholder]="'ADMIN.ORDER.SEARCH_INPUT' | translate"
-    />
-    <button class="pm-button-primary" type="submit">{{ 'ADMIN.FIND' | translate }}</button>
-    @if (facade.keyword() || facade.filterStatus()) {
-      <button class="pm-button-secondary" type="button" (click)="searchInput.value = ''; facade.removeFilter()">
-        {{ 'ADMIN.REMOVE_FILTER' | translate }}
-      </button>
-    }
-    <span class="result-count">{{ 'ADMIN.RESULT_COUNT' | translate: { count: facade.total() } }}</span>
-  </form>
+  <p class="filter-hint">{{ 'ADMIN.ORDER.DESCRIPTION' | translate }}</p>
 
   @switch (facade.status()) {
     @case ('LOADING') {
@@ -59,16 +63,19 @@
           <table class="table">
             <thead>
               <tr>
+                <th scope="col" class="num-col">#</th>
                 <th scope="col">{{ 'ADMIN.ORDER.CODE' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.ORDER.RECIPIENT' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.ORDER.ORDER_DATE' | translate }}</th>
+                <th scope="col">{{ 'ADMIN.ORDER.PRODUCT' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.ORDER.TOTAL' | translate }}</th>
                 <th scope="col">{{ 'ADMIN.ORDER.STATUS' | translate }}</th>
               </tr>
             </thead>
             <tbody>
-              @for (d of facade.rows(); track d.raw._id) {
+              @for (d of facade.rows(); track d.raw._id; let i = $index) {
                 <tr>
+                  <td class="num-col muted">{{ (facade.page() - 1) * 20 + i + 1 }}</td>
                   <td>
                     <a class="order-code" [routerLink]="['/admin/orders', d.raw.orderCode]">
                       {{ d.raw.orderCode }}
@@ -79,6 +86,12 @@
                     <span class="sub">{{ d.raw.delivery.phone }}</span>
                   </td>
                   <td>{{ d.raw.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                  <td>
+                    <span class="what">{{ d.what }}</span>
+                    @if (d.more > 0) {
+                      <span class="sub">{{ 'ADMIN.ORDER.AND_MORE' | translate: { count: d.more } }}</span>
+                    }
+                  </td>
                   <td class="right">{{ d.raw.total | amount: d.raw.currency }}</td>
                   <td>
                     <span class="status-chip" [attr.data-group]="d.groupColor">
@@ -91,25 +104,39 @@
           </table>
         </div>
 
-        <nav class="paging" [attr.aria-label]="'ADMIN.PAGING' | translate">
-          <button
-            class="pm-button-secondary"
-            type="button"
-            [disabled]="!facade.remainingPrevPage()"
-            (click)="facade.changePage(-1)"
-          >
-            {{ 'ADMIN.PREV_PAGE' | translate }}
-          </button>
-          <span>{{ facade.page() }} / {{ facade.pageCount() }}</span>
-          <button
-            class="pm-button-secondary"
-            type="button"
-            [disabled]="!facade.remainingNextPage()"
-            (click)="facade.changePage(1)"
-          >
-            {{ 'ADMIN.NEXT_PAGE' | translate }}
-          </button>
-        </nav>
+        @if (facade.pageCount() > 1) {
+          <nav class="paging" [attr.aria-label]="'ADMIN.PAGING' | translate">
+            <button
+              class="pager-btn"
+              type="button"
+              [disabled]="!facade.remainingPrevPage()"
+              (click)="facade.changePage(-1)"
+              [attr.aria-label]="'ADMIN.PREV_PAGE' | translate"
+            >&lsaquo;</button>
+
+            @for (p of facade.pageRange(); track $index) {
+              @if (p === null) {
+                <span class="pager-gap">…</span>
+              } @else {
+                <button
+                  class="pager-btn"
+                  type="button"
+                  [class.active]="p === facade.page()"
+                  [attr.aria-current]="p === facade.page() ? 'page' : null"
+                  (click)="facade.goToPage(p)"
+                >{{ p }}</button>
+              }
+            }
+
+            <button
+              class="pager-btn"
+              type="button"
+              [disabled]="!facade.remainingNextPage()"
+              (click)="facade.changePage(1)"
+              [attr.aria-label]="'ADMIN.NEXT_PAGE' | translate"
+            >&rsaquo;</button>
+          </nav>
+        }
       }
     }
   }

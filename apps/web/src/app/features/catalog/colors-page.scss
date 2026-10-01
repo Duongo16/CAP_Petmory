@@ -2,79 +2,10 @@
   display: block;
 }
 
-.title {
-  font-size: 1.5rem;
-  margin: 0 0 4px;
-}
-
-.description {
-  margin: 0 0 var(--pm-gap);
-  color: var(--pm-text-muted);
-  font-size: 0.9rem;
-}
-
-.group {
-  margin-bottom: 24px;
-}
-
-.group-name {
-  font-size: 1.05rem;
-  margin: 0 0 8px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
-}
-
+/* The Material card ships its own unlayered surface styles, so the card look is set here. */
 .color-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px;
-  border-radius: var(--pm-radius);
-}
-
-.swatch {
-  inline-size: 40px;
-  block-size: 40px;
-  border-radius: 8px;
+  background: var(--pm-bg-card);
   border: 1px solid var(--pm-border);
-  flex: 0 0 auto;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.code {
-  font-family: ui-monospace, 'Courier New', monospace;
-  font-size: 0.78rem;
-  color: var(--pm-text-muted);
-}
-
-.name {
-  font-weight: 500;
-}
-
-.note {
-  font-size: 0.75rem;
-  color: var(--pm-text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.center {
-  display: grid;
-  place-items: center;
-  padding: 48px 16px;
-  text-align: center;
-}
-
-.empty {
-  color: var(--pm-text-muted);
+  border-radius: 20px;
+  box-shadow: var(--pm-shadow);
 }

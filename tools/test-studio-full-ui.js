@@ -12,6 +12,9 @@ const fs = require('fs');
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
 const OUT = path.join(__dirname, '..', 'test-screenshots');
+
+/** Dau xuong dong, viet bang ma ky tu de khong bi bien dang khi sinh tep. */
+const SPLIT_LINES = new RegExp(String.fromCharCode(10), 'g');
 const TEMP = path.join(OUT, 'temp');
 const EMAIL = `sd.${Date.now()}@petmory.local`;
 const PASSWORD = 'Password@123';
@@ -194,9 +197,9 @@ async function run() {
 
                 // --- The cart carries the design with it ---
     await page.goto(`${WEB}/cart`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('.line-item', { timeout: 20000 });
+    await page.waitForSelector('.line-list .line', { timeout: 20000 });
     res.push(check('The cart holds exactly one item',
-      (await page.locator('.line-item').count()) === 1));
+      (await page.locator('.line-list .line').count()) === 1));
 
                 // --- Place the order, then view the production file from the internal side ---
     await page.locator('a:has-text("Tiến hành đặt hàng")').click();
@@ -232,8 +235,15 @@ async function run() {
     res.push(check('The production file names the wool rolls needed',
       (await page.locator('.wool-list li').count()) === 1,
       (await page.locator('.wool-list li').first().innerText()).trim()));
-    res.push(check('The production file carries the engraving and its font',
-      (await page.locator('.info-pair').nth(1).innerText()).includes('Nho be nhieu lam')));
+    /*
+     * Tim dung the chua danh sach len thay vi dem theo thu tu the tren trang.
+     * Dem theo thu tu la cach bai kiem thu nay tung lam, va no hong ngay khi
+     * trang them mot the moi.
+     */
+    const cardItem = page.locator('.card:has(.wool-list)').first();
+    const wordItem = (await cardItem.innerText()).trim();
+    res.push(check('The production file carries the engraving',
+      wordItem.includes('Nho be nhieu lam'), wordItem.slice(0, 90).replace(SPLIT_LINES, ' / ')));
 
     await page.waitForSelector('.photo-grid img', { timeout: 30000 });
     res.push(check('The production file shows the six angles the customer approved',

@@ -138,6 +138,7 @@ export class StudioFacade {
     modelCode: string,
     paint: MeshPaint[],
     colorCodesUsed: string[],
+    zonePaint: { zone: string; colorCode: string }[],
     sixAnglePhotos: { angle: PreviewAngle; photo: string }[],
   ): void {
     if (this.form.invalid) {
@@ -153,6 +154,7 @@ export class StudioFacade {
       modelCode,
       paint,
       colorCodesUsed,
+      zonePaint,
       productTypeCode: this.codeKindSelected() || undefined,
       sizeCode: this.sizeCodeSelected() || undefined,
       // Tying the design to a pet is what carries the customer's photos through

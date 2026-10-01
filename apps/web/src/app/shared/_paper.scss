@@ -1,0 +1,47 @@
+/*
+ * Sau kieu giay cua quyen so.
+ *
+ * De rieng o day vi ca trang trong quyen lan trang dang duoc bay tri deu ve
+ * cung mot loai giay, ma kieu dang cua hai thanh phan lai khong dung chung.
+ */
+
+.paper-cream {
+  background: var(--pm-paper-cream);
+}
+
+.paper-kraft {
+  background: var(--pm-paper-kraft);
+}
+
+.paper-dot {
+  background-color: var(--pm-paper-cream);
+  background-image: radial-gradient(var(--pm-paper-mark) 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
+}
+
+.paper-line {
+  background-color: var(--pm-paper-cream);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    var(--pm-paper-mark) 27px,
+    var(--pm-paper-mark) 28px
+  );
+}
+
+.paper-grid {
+  background-color: var(--pm-paper-cream);
+  background-image:
+    repeating-linear-gradient(to bottom, transparent 0, transparent 21px, var(--pm-paper-mark) 21px, var(--pm-paper-mark) 22px),
+    repeating-linear-gradient(to right, transparent 0, transparent 21px, var(--pm-paper-mark) 21px, var(--pm-paper-mark) 22px);
+}
+
+.paper-bloom {
+  background-color: var(--pm-paper-bloom);
+  background-image:
+    radial-gradient(circle at 18% 22%, var(--pm-paper-petal) 0 7px, transparent 8px),
+    radial-gradient(circle at 74% 38%, var(--pm-paper-petal) 0 5px, transparent 6px),
+    radial-gradient(circle at 42% 78%, var(--pm-paper-petal) 0 6px, transparent 7px);
+  background-size: 120px 120px;
+}

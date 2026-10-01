@@ -16,6 +16,7 @@ export class UsersService {
     email: string;
     password: string;
     fullName: string;
+    phone?: string;
     roles?: Role[];
   }): Promise<UserDocument> {
     const alreadyExists = await this.model.exists({ email: input.email.toLowerCase() });
@@ -26,6 +27,7 @@ export class UsersService {
     return this.model.create({
       email: input.email.toLowerCase(),
       fullName: input.fullName,
+      phone: input.phone ?? null,
       passwordHash,
       roles: input.roles ?? [Role.CUSTOMER],
     });
@@ -45,6 +47,22 @@ export class UsersService {
 
   checkPassword(password: string, hash: string): Promise<boolean> {
     return bcrypt.compare(password, hash);
+  }
+
+  /** Replaces the stored password. The caller must already have proved who they are. */
+  async setPassword(id: string, password: string): Promise<void> {
+    const passwordHash = await bcrypt.hash(password, HASH_ROUNDS);
+    await this.model.updateOne({ _id: id }, { $set: { passwordHash } }).exec();
+  }
+
+  /** Moves the session mark on, which ends every token issued before now. */
+  async bumpTokenEpoch(id: string): Promise<void> {
+    await this.model.updateOne({ _id: id }, { $inc: { tokenEpoch: 1 } }).exec();
+  }
+
+  /** The account behind an address, or nothing. Used where absence must stay quiet. */
+  findByEmailQuietly(email: string) {
+    return this.model.findOne({ email: email.toLowerCase() }).exec();
   }
 
   async recordLogin(id: string): Promise<void> {

@@ -2,11 +2,7 @@
   <header class="lp-bar">
     <div class="lp-bar-inner">
       <a class="lp-brand" routerLink="/landing">
-        <span class="lp-mark" aria-hidden="true"><pm-icon name="paw" [size]="20" /></span>
-        <span class="lp-brand-text">
-          <strong>Petmory</strong>
-          <span>{{ 'AUTH.BRAND_SUB' | translate }}</span>
-        </span>
+        <pm-brand size="md" />
       </a>
       <nav class="lp-nav" [attr.aria-label]="'NAV.MAIN' | translate">
         <a href="#features">{{ 'LANDING.NAV_DIARY' | translate }}</a>
@@ -49,18 +45,7 @@
       </div>
 
       <div class="lp-art" aria-hidden="true">
-        <div class="lp-art-back"></div>
-        <div class="lp-art-card">
-          <span class="lp-tape"></span>
-          <div class="lp-art-photo">
-            <span class="lp-art-halo"></span>
-            <pm-pet-art kind="cat" [width]="250" />
-          </div>
-          <div class="lp-art-caption">
-            <span class="lp-hand">{{ 'LANDING.ART_CAPTION' | translate }}</span>
-            <span class="lp-art-date">12.06</span>
-          </div>
-        </div>
+        <pm-diary-scene class="lp-scene" [width]="540" />
         <div class="lp-chip lp-chip-memory">
           <span class="lp-chip-icon"><pm-icon name="calendar" [size]="20" /></span>
           <span class="lp-chip-text">
@@ -150,7 +135,7 @@
     <div class="lp-footer-inner">
       <div class="lp-footer-top">
         <div class="lp-footer-brand">
-          <strong>Petmory</strong>
+          <pm-brand size="md" />
           <span>{{ 'LANDING.FOOTER_SLOGAN' | translate }}</span>
         </div>
         <nav class="lp-footer-nav" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
@@ -164,56 +149,6 @@
   </footer>
 </div>
 
-@if (onboardingStep(); as step) {
-  <div class="lp-modal-backdrop" (click)="closeOnboarding()" (keydown.escape)="closeOnboarding()">
-    <div
-      class="lp-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="lp-modal-title"
-      tabindex="-1"
-      (click)="$event.stopPropagation()"
-      (keydown)="$event.stopPropagation()"
-    >
-      <button class="lp-modal-close" type="button" (click)="closeOnboarding()" [attr.aria-label]="'COMMON.CLOSE' | translate">
-        <pm-icon name="close" [size]="16" />
-      </button>
-      <div class="lp-progress" aria-hidden="true">
-        <span class="lp-progress-bar" [class.full]="step === 2"></span>
-      </div>
-      <p class="lp-step-label">{{ 'LANDING.MODAL.STEP' | translate: { step: step } }}</p>
-
-      @if (step === 1) {
-        <div class="lp-modal-body">
-          <pm-pet-art kind="cat" [width]="120" />
-          <h2 class="lp-modal-title" id="lp-modal-title">{{ 'LANDING.MODAL.TITLE_1' | translate }}</h2>
-          <p class="lp-modal-sub">{{ 'LANDING.MODAL.SUB_1' | translate }}</p>
-          <div class="lp-preview">
-            <span class="lp-preview-photo"><pm-pet-art kind="dog" [face]="true" [width]="52" /></span>
-            <span class="lp-preview-text">
-              <strong>{{ 'LANDING.MODAL.PREVIEW_NAME' | translate }}</strong>
-              <span>{{ 'LANDING.MODAL.PREVIEW_SUB' | translate }}</span>
-            </span>
-          </div>
-          <button type="button" class="lp-btn lp-btn-block" (click)="nextOnboardingStep()">
-            {{ 'LANDING.MODAL.NEXT' | translate }}
-            <pm-icon name="arrow" [size]="16" />
-          </button>
-        </div>
-      } @else {
-        <div class="lp-modal-body">
-          <span class="lp-modal-mark" aria-hidden="true"><pm-icon name="shield" [size]="26" /></span>
-          <h2 class="lp-modal-title" id="lp-modal-title">{{ 'LANDING.MODAL.TITLE_2' | translate }}</h2>
-          <p class="lp-modal-sub">{{ 'LANDING.MODAL.SUB_2' | translate }}</p>
-          <ul class="lp-perks">
-            @for (perk of perks; track perk) {
-              <li><pm-icon name="check" [size]="16" />{{ perk | translate }}</li>
-            }
-          </ul>
-          <a class="lp-btn lp-btn-block" routerLink="/register">{{ 'LANDING.MODAL.REGISTER' | translate }}</a>
-          <a class="lp-btn-ghost lp-btn-block" routerLink="/login">{{ 'LANDING.MODAL.LOGIN' | translate }}</a>
-        </div>
-      }
-    </div>
-  </div>
+@if (starterOpen()) {
+  <pm-pet-starter (closed)="closeOnboarding()" />
 }

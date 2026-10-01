@@ -1,17 +1,31 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Design, DesignSchema } from './schemas/design.schema';
+import {
+  DesignSuggestion,
+  DesignSuggestionSchema,
+} from './schemas/design-suggestion.schema';
 import { DesignsService } from './designs.service';
+import { DesignSuggestService } from './design-suggest.service';
+import { ModelLibraryService } from './model-library.service';
 import { DesignsController } from './designs.controller';
+import { DesignSuggestController } from './design-suggest.controller';
 import { CatalogModule } from '../catalog/catalog.module';
+import { PetsModule } from '../pets/pets.module';
+import { PhotosModule } from '../photos/photos.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Design.name, schema: DesignSchema }]),
+    MongooseModule.forFeature([
+      { name: Design.name, schema: DesignSchema },
+      { name: DesignSuggestion.name, schema: DesignSuggestionSchema },
+    ]),
     CatalogModule,
+    PetsModule,
+    PhotosModule,
   ],
-  controllers: [DesignsController],
-  providers: [DesignsService],
+  controllers: [DesignsController, DesignSuggestController],
+  providers: [DesignsService, DesignSuggestService, ModelLibraryService],
   exports: [DesignsService],
 })
 export class DesignsModule {}

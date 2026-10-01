@@ -1,0 +1,23 @@
+@use '../../shared/dialog';
+
+/* Phan rieng cua hop thoai vat lieu: o chon mau va ma mau doc duoc. */
+
+.swatch-row {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-space-3);
+}
+
+.swatch-row input {
+  inline-size: 56px;
+  block-size: 36px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.small-code {
+  color: var(--pm-text-muted);
+  font-family: monospace;
+  font-size: var(--pm-text-xs);
+  text-transform: uppercase;
+}

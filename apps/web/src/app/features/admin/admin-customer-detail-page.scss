@@ -1,0 +1,193 @@
+/* Rieng cho man ho so khach hang. */
+
+/* --- Customer profile head --- */
+.who-card {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-space-5);
+  flex-wrap: wrap;
+  margin-bottom: var(--pm-gap);
+  padding: var(--pm-space-6);
+  border: 1px solid var(--pm-border);
+  border-radius: 20px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+}
+
+.who-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 64px;
+  block-size: 64px;
+  border-radius: 999px;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  font: 700 1.25rem var(--pm-font-display);
+}
+
+.who-text {
+  flex: 1;
+  min-inline-size: 12rem;
+}
+
+.who-name {
+  margin: 0;
+  font-weight: 500;
+  color: var(--pm-text);
+}
+
+.who-lines {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-space-2);
+  flex-wrap: wrap;
+  margin: var(--pm-space-1) 0 0;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-body);
+}
+
+.who-dot {
+  color: var(--pm-border-strong);
+}
+
+.who-phone {
+  font-weight: 500;
+  color: var(--pm-text);
+}
+
+.who-figures {
+  display: flex;
+  gap: 28px;
+  margin: 0;
+
+  div {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  dt {
+    font-size: var(--pm-text-sm);
+    color: var(--pm-text-body);
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--pm-font-display);
+    font-size: var(--pm-text-xl);
+    font-weight: 600;
+    color: var(--pm-accent);
+  }
+
+  dd.amber {
+    color: var(--pm-amber);
+  }
+
+  dd.green {
+    color: var(--pm-success);
+  }
+}
+
+.spend-figure {
+  font-family: var(--pm-font-display);
+  font-size: var(--pm-text-xl);
+  font-weight: 500;
+  color: var(--pm-amber);
+}
+
+/* --- How far along the way to the next tier --- */
+.tier {
+  margin-top: var(--pm-space-4);
+  padding-top: var(--pm-space-3);
+  border-top: 1px solid var(--pm-border);
+}
+
+.tier-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--pm-space-3);
+  margin: 0 0 var(--pm-space-1);
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}
+
+.tier-head strong {
+  color: var(--pm-text);
+}
+
+.tier-rail {
+  display: block;
+  overflow: hidden;
+  block-size: 6px;
+  border-radius: 999px;
+  background: var(--pm-bg-muted);
+}
+
+.tier-done {
+  display: block;
+  block-size: 100%;
+  background: var(--pm-amber-bright);
+}
+
+/* --- Pets linked to a customer --- */
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--pm-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pet-card {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-space-3);
+  padding: 14px 16px;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-lg);
+  background: var(--pm-bg-muted);
+}
+
+.pet-photo {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  flex: none;
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: 999px;
+  background: var(--pm-bg-card);
+
+  img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.pet-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-1);
+  min-inline-size: 0;
+
+  strong {
+    font-family: var(--pm-font-display);
+    font-size: var(--pm-text-base);
+    color: var(--pm-text);
+  }
+}
+
+.pet-chip {
+  align-self: flex-start;
+  padding: var(--pm-space-1) var(--pm-space-2);
+  border-radius: 999px;
+  background: var(--pm-success-soft);
+  color: var(--pm-on-success-soft);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+}

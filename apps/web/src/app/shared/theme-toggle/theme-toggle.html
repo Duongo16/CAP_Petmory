@@ -1,0 +1,10 @@
+<button
+  type="button"
+  class="theme-button pm-icon-button"
+  (click)="press()"
+  [attr.aria-label]="'THEME.SWITCH_TO' | translate: { name: nextLabel() | translate }"
+  [attr.title]="'THEME.SWITCH_TO' | translate: { name: nextLabel() | translate }"
+>
+  <pm-icon [name]="glyph()" [size]="18" />
+  <span class="sr-only">{{ label() | translate }}</span>
+</button>

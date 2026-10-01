@@ -1,0 +1,18 @@
+@if (tiles().length > 0) {
+  <ul class="tiles">
+    @for (tile of tiles(); track tile.key) {
+      <li class="tile">
+        @if (broken().has(tile.key)) {
+          <span class="tile-broken" [attr.aria-label]="'COMMON.IMAGE_BROKEN' | translate">
+            <pm-icon name="image" [size]="22" />
+          </span>
+        } @else {
+          <img [src]="tile.src" alt="" loading="lazy" (error)="markBroken(tile.key)" />
+        }
+        <button type="button" class="tile-drop" (click)="drop(tile)" [attr.aria-label]="'COMMON.REMOVE' | translate">
+          <pm-icon name="close" [size]="12" />
+        </button>
+      </li>
+    }
+  </ul>
+}

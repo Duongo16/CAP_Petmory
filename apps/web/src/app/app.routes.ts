@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { Routes } from '@angular/router';
+import { Router, Routes } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import {
   authGuard,
@@ -58,7 +58,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'home',
-        loadComponent: () => import('./features/home/home-page').then((m) => m.HomePage),
+        loadComponent: () => import('./features/today/today-page').then((m) => m.TodayPage),
       },
       {
         path: 'community',
@@ -76,24 +76,29 @@ export const routes: Routes = [
           import('./features/community/profile-page').then((m) => m.CommunityProfilePage),
       },
       {
+        path: 'shop',
+        loadComponent: () => import('./features/shop/shop-page').then((m) => m.ShopPage),
+      },
+      // Products and ready-made goods now share the shop, and details open as a popup there.
+      {
         path: 'products',
-        loadComponent: () =>
-          import('./features/catalog/products-page').then((m) => m.ProductsPage),
+        pathMatch: 'full',
+        redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom' } }),
       },
       {
         path: 'goods',
-        loadComponent: () =>
-          import('./features/goods/goods-list-page').then((m) => m.GoodsListPage),
-      },
-      {
-        path: 'goods/:code',
-        loadComponent: () =>
-          import('./features/goods/goods-detail-page').then((m) => m.GoodsDetailPage),
+        pathMatch: 'full',
+        redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready' } }),
       },
       {
         path: 'products/:code',
-        loadComponent: () =>
-          import('./features/catalog/product-detail-page').then((m) => m.ProductDetailPage),
+        redirectTo: ({ params }) =>
+          inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom', product: params['code'] } }),
+      },
+      {
+        path: 'goods/:code',
+        redirectTo: ({ params }) =>
+          inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready', goods: params['code'] } }),
       },
       {
         path: 'cart',
@@ -130,14 +135,13 @@ export const routes: Routes = [
         path: 'pets',
         loadComponent: () => import('./features/pets/pets-page').then((m) => m.PetsPage),
       },
+      { path: 'today', redirectTo: 'home', pathMatch: 'full' },
       {
-        path: 'today',
-        loadComponent: () => import('./features/today/today-page').then((m) => m.TodayPage),
-      },
-      {
+        // The record now opens as a popup over the list, so old links land there.
         path: 'pets/:id',
-        loadComponent: () =>
-          import('./features/pets/pet-profile-page').then((m) => m.PetProfilePage),
+        pathMatch: 'full',
+        redirectTo: ({ params }) =>
+          inject(Router).createUrlTree(['/pets'], { queryParams: { open: params['id'] } }),
       },
       {
         path: 'pets/:id/photos',
@@ -149,15 +153,16 @@ export const routes: Routes = [
           import('./features/memories/slideshow-page').then((m) => m.SlideshowPage),
       },
       {
+        path: 'journals',
+        loadComponent: () =>
+          import('./features/memories/bookshelf/bookshelf-page').then((m) => m.BookshelfPage),
+      },
+      {
         path: 'pets/:id/journal',
         loadComponent: () =>
           import('./features/memories/memories-page').then((m) => m.MemoriesPage),
       },
-      {
-        path: 'pets/:id/story',
-        loadComponent: () =>
-          import('./features/memories/story-page').then((m) => m.StoryPage),
-      },
+      { path: 'pets/:id/story', redirectTo: 'pets/:id/journal' },
       {
         // The internal screens share a side rail, so they sit inside one frame.
         path: 'admin',

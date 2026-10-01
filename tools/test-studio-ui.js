@@ -82,7 +82,12 @@ async function run() {
                 // --- Step 2 ---
     await page.locator('button:has-text("Tiếp tục")').click();
     await page.waitForTimeout(600);
-    res.push(check('Step two can be reached', (await page.locator('.step-button.current').innerText()).includes('Ngoại hình')));
+    // Kiem theo vi tri buoc chu khong theo chu, vi chu co the doi theo thiet ke.
+    const atStep = await page.evaluate(() => {
+      const all = Array.from(document.querySelectorAll('.step-button'));
+      return all.findIndex((b) => b.classList.contains('current')) + 1;
+    });
+    res.push(check('Step two can be reached', atStep === 2, `dang o buoc ${atStep}`));
 
     const countCell = await page.locator('.swatch').count();
     res.push(check('Step 2 shows the colour palette', countCell > 0, `${countCell} colour codes`));

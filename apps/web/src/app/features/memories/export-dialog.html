@@ -1,0 +1,57 @@
+<div class="sheet">
+  <header class="sheet-head">
+    <div>
+      <h2 class="sheet-title">{{ 'MEMORY.EXPORT_TITLE' | translate }}</h2>
+      <p class="sheet-sub">{{ 'MEMORY.EXPORT_SUB' | translate }}</p>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="16" />
+    </button>
+  </header>
+
+  <form class="window tw-panel grid gap-3 p-4" [formGroup]="form" (ngSubmit)="ask()">
+    <div class="window-row grid gap-3 sm:grid-cols-2">
+      <label class="tw-field">
+        <span class="field-name tw-label">{{ 'MEMORY.EXPORT_FROM' | translate }}</span>
+        <input class="tw-input" type="date" formControlName="fromDate" />
+      </label>
+      <label class="tw-field">
+        <span class="field-name tw-label">{{ 'MEMORY.EXPORT_TO' | translate }}</span>
+        <input class="tw-input" type="date" formControlName="toDate" />
+      </label>
+    </div>
+    <p class="field-hint tw-hint">{{ 'MEMORY.EXPORT_WHOLE' | translate }}</p>
+    <button type="submit" class="solid strong justify-self-start no-underline">{{ 'MEMORY.EXPORT_START' | translate }}</button>
+  </form>
+
+  @if (facade.exporting(); as job) {
+    <div class="state tw-card grid justify-items-start gap-3 p-4 shadow-none" role="status">
+      @switch (job.state) {
+        @case ('PENDING') {
+          <p class="state-line">{{ 'MEMORY.EXPORT_WORKING' | translate }}</p>
+        }
+        @case ('READY') {
+          <p class="state-line done">
+            {{ 'MEMORY.EXPORT_DONE' | translate: { count: job.momentCount } }}
+          </p>
+          @if (fileLink(); as link) {
+            <a class="solid strong justify-self-start no-underline" [href]="link" [download]="fileName()">
+              {{ 'MEMORY.EXPORT_SAVE' | translate }}
+            </a>
+          } @else {
+            <button type="button" class="solid strong justify-self-start no-underline" (click)="fetchFile()">
+              {{ 'MEMORY.EXPORT_FETCH' | translate }}
+            </button>
+          }
+          <p class="field-hint tw-hint">{{ 'MEMORY.EXPORT_KEEP' | translate }}</p>
+        }
+        @case ('FAILED') {
+          <p class="state-line bad">{{ job.problem }}</p>
+        }
+        @case ('EXPIRED') {
+          <p class="state-line bad">{{ 'MEMORY.EXPORT_GONE' | translate }}</p>
+        }
+      }
+    </div>
+  }
+</div>

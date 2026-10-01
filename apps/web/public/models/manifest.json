@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "description": "Declares the base models and their material zones. The viewer reads the zones straight from the model file; this file only attaches a display label and the colour group each zone may use.",
   "zoneMaterial": [
     {
@@ -97,6 +97,36 @@
       "labelDisplay": "PET.ZONE.WHOLE_BODY",
       "colorGroupAllowed": "FUR",
       "required": false
+    },
+    {
+      "name": "Material",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "Material.001",
+      "labelDisplay": "PET.ZONE.BELLY_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "Material.002",
+      "labelDisplay": "PET.ZONE.EYES",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "Material.003",
+      "labelDisplay": "PET.ZONE.EYES",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "Material.006",
+      "labelDisplay": "PET.ZONE.NOSE",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
     }
   ],
   "baseModel": [
@@ -191,6 +221,112 @@
       "styleGroup": "BLOCKY"
     },
     {
+      "code": "Q-WOLF",
+      "name": "Chó sói",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-Wolf.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "REALISTIC"
+    },
+    {
+      "code": "Q-DEER",
+      "name": "Hươu",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "q-Deer.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "REALISTIC"
+    },
+    {
+      "code": "TEMP-PARROT",
+      "name": "Vẹt",
+      "kind": "BIRD",
+      "pose": "STANDING",
+      "file": "animal-parrot.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "BLOCKY"
+    },
+    {
+      "code": "TEMP-FISH",
+      "name": "Cá",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "animal-fish.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "BLOCKY"
+    },
+    {
+      "code": "F-SHIBA-SOFT",
+      "name": "Shiba dáng len",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-ShibaInu.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "FELTED",
+      "bodyShape": "FELTED_SOFT"
+    },
+    {
+      "code": "F-SHIBA-ROUND",
+      "name": "Shiba dáng len tròn",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-ShibaInu.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "FELTED",
+      "bodyShape": "FELTED_ROUND"
+    },
+    {
+      "code": "F-HUSKY-SOFT",
+      "name": "Husky dáng len",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-Husky.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "FELTED",
+      "bodyShape": "FELTED_SOFT"
+    },
+    {
+      "code": "F-HUSKY-ROUND",
+      "name": "Husky dáng len tròn",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-Husky.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "FELTED",
+      "bodyShape": "FELTED_ROUND"
+    },
+    {
+      "code": "F-WOLF-ROUND",
+      "name": "Chó sói dáng len tròn",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-Wolf.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "FELTED",
+      "bodyShape": "FELTED_ROUND"
+    },
+    {
+      "code": "F-FOX-ROUND",
+      "name": "Cáo dáng len tròn",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "q-Fox.glb",
+      "ready": true,
+      "temporary": true,
+      "styleGroup": "FELTED",
+      "bodyShape": "FELTED_ROUND"
+    },
+    {
       "code": "DOG-SITTING",
       "name": "Chó ngồi",
       "kind": "DOG",
@@ -228,6 +364,77 @@
     "site": "https://kenney.nl",
     "licence": "CC0 1.0 Universal",
     "origin": "Cube Pets 2.0",
-    "note": "Hai bo mo hinh cung ton tai de so sanh: Kenney Cube Pets dang khoi vuong, va Quaternius dang that. Bo phu kien nen khong bat buoc dung chung mot bo nua."
+    "note": "Ba nhom dang cung ton tai de so sanh: Kenney Cube Pets dang khoi vuong, Quaternius dang that, va dang len la chinh mo hinh that duoc nan lai ti le xuong cho dau to than tron chan ngan. Dang len khong them tep mo hinh nao."
+  },
+  "zoneName": [
+    "MAIN_FUR",
+    "BELLY_FUR",
+    "EAR",
+    "TAIL",
+    "EYE",
+    "NOSE"
+  ],
+  "zoneNote": "Sau vung co ten ma hop dong yeu cau. Ban do duoi day noi tung mang vat lieu trong tung tep thuoc vung nao, doc bang cach to do tung mang roi nhin tan mat. Vung khong co ten trong ban do la vung tep mo hinh hien tai chua tach rieng: tai va duoi cua ca ba tep deu dung chung mang voi than, nen muon to rieng thi phai dung lai tep trong Blender.",
+  "zoneByFile": {
+    "q-ShibaInu.glb": {
+      "Main": "MAIN_FUR",
+      "Main_Light": "BELLY_FUR",
+      "Black": "NOSE",
+      "Eyes_White": "EYE",
+      "Eyes_Pupil": "EYE",
+      "Eyes_Black": "EYE"
+    },
+    "q-Husky.glb": {
+      "Material": "MAIN_FUR",
+      "Material.001": "BELLY_FUR",
+      "Material.006": "NOSE",
+      "Material.003": "EYE",
+      "Material.002": "EYE"
+    },
+    "q-Fox.glb": {
+      "Main": "MAIN_FUR",
+      "Main_Light": "BELLY_FUR",
+      "Grey": "BELLY_FUR",
+      "Black": "NOSE",
+      "Eyes": "EYE"
+    },
+    "animal-cat.glb": {
+      "colormap": "MAIN_FUR"
+    },
+    "animal-dog.glb": {
+      "colormap": "MAIN_FUR"
+    },
+    "animal-bunny.glb": {
+      "colormap": "MAIN_FUR"
+    },
+    "animal-fox.glb": {
+      "colormap": "MAIN_FUR"
+    },
+    "animal-panda.glb": {
+      "colormap": "MAIN_FUR"
+    },
+    "animal-tiger.glb": {
+      "colormap": "MAIN_FUR"
+    },
+    "q-Wolf.glb": {
+      "Main": "MAIN_FUR",
+      "Main_Light": "BELLY_FUR",
+      "Nose": "NOSE",
+      "Eyes_Black": "EYE"
+    },
+    "q-Deer.glb": {
+      "Main": "MAIN_FUR",
+      "Main_Light": "BELLY_FUR",
+      "Main_Dark": "MAIN_FUR",
+      "Eye_Black": "EYE",
+      "Eye_White": "EYE",
+      "Eye_Lighter": "EYE"
+    },
+    "animal-parrot.glb": {
+      "colormap": "MAIN_FUR"
+    },
+    "animal-fish.glb": {
+      "colormap": "MAIN_FUR"
+    }
   }
 }

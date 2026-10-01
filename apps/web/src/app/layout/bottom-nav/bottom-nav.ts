@@ -11,9 +11,10 @@ interface Stop {
 }
 
 const STOPS: Stop[] = [
-  { path: '/today', key: 'NAV.TODAY', icon: 'home' },
+  { path: '/home', key: 'NAV.HOME', icon: 'home' },
   { path: '/pets', key: 'NAV.PET_SHORT', icon: 'paw' },
-  { path: '/products', key: 'NAV.PRODUCT', icon: 'cart' },
+  { path: '/journals', key: 'NAV.JOURNALS', icon: 'book' },
+  { path: '/shop', key: 'NAV.SHOP', icon: 'cart' },
   { path: '/orders', key: 'NAV.ORDER', icon: 'bookmark' },
 ];
 

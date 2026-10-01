@@ -1,0 +1,10 @@
+<div class="shop-detail">
+  <button type="button" class="shop-close tw-btn-icon" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+    <pm-icon name="close" [size]="16" />
+  </button>
+  @if (data.kind === 'PRODUCT') {
+    <pm-product-detail-page [code]="data.code" [inPopup]="true" />
+  } @else {
+    <pm-goods-detail-page [code]="data.code" [inPopup]="true" />
+  }
+</div>

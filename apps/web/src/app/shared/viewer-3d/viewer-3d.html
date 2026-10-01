@@ -48,18 +48,23 @@
       {{ (autoRotate() ? 'VIEWER.STOP_ROTATE' : 'VIEWER.AUTO_ROTATE') | translate }}
     </button>
 
-    @if (canPaint()) {
-      <button class="pm-button-secondary" type="button" (click)="undo()">
-        {{ 'VIEWER.UNDO' | translate }}
+    @if (!compact()) {
+      @if (canPaint()) {
+        <button class="pm-button-secondary" type="button" (click)="undo()">
+          {{ 'VIEWER.UNDO' | translate }}
+        </button>
+      }
+
+      <button class="pm-button-secondary" type="button" (click)="captureSixAngles()">
+        {{ 'VIEWER.CAPTURE_AFTER_ANGLE' | translate }}
       </button>
     }
-
-    <button class="pm-button-secondary" type="button" (click)="captureSixAngles()">
-      {{ 'VIEWER.CAPTURE_AFTER_ANGLE' | translate }}
-    </button>
   </div>
 
   <p class="note">
-    {{ 'VIEWER.HINT' | translate }} · {{ 'VIEWER.COUNT_VERTEX' | translate: { count: countVertex() } }}
+    @if (!compact()) {
+      {{ 'VIEWER.HINT' | translate }} ·
+    }
+    {{ 'VIEWER.COUNT_VERTEX' | translate: { count: countVertex() } }}
   </p>
 }

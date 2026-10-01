@@ -1,0 +1,39 @@
+/*
+ * Danh sach cac quyen nhat ky dang de cong khai. Bo cuc nam o lop Tailwind
+ * trong mau; o day chi con nen trang, anh dai dien va chip dang chon.
+ */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--pm-bg);
+  color: var(--pm-text);
+}
+
+.wall-head h1 {
+  margin: 0;
+}
+
+.chip.on {
+  border-color: var(--pm-night);
+  background: var(--pm-night);
+  color: var(--pm-on-night);
+}
+
+.middle {
+  padding: 50px 0;
+  text-align: center;
+  color: var(--pm-text-muted);
+}
+
+.face {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  object-fit: cover;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent);
+}

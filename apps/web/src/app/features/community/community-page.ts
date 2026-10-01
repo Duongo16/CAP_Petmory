@@ -24,6 +24,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { CommunityPost, PostTopic } from '../../core/models/community.model';
 import { SocialLinks } from '../../shared/social-links/social-links';
 import { Icon } from '../../shared/icon/icon';
+import { UserFace } from '../../shared/user-face/user-face';
 
 /** The five value lines along the bottom of the community screen. */
 interface ValueLine {
@@ -38,7 +39,7 @@ const SHEET = { width: 'min(720px, 96vw)', maxHeight: '94vh', panelClass: 'pm-di
 @Component({
   selector: 'pm-community-page',
   standalone: true,
-  imports: [
+  imports: [UserFace, 
     RouterLink,
     DatePipe,
     TranslatePipe,
@@ -79,6 +80,15 @@ export class CommunityPage implements OnInit {
   }
 
   /** Mo hop thoai viet bai, da chon san chu de nguoi dung bam vao. */
+  /** Doi chu de theo lua chon trong hop chon; lua chon rong nghia la tat ca. */
+  chooseTopicFrom(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    const topic = this.facade.chips().find((one) => (one.topic ?? '') === value)?.topic ?? null;
+    if (topic !== this.facade.topic()) {
+      this.facade.chooseTopic(topic);
+    }
+  }
+
   openComposer(topic: PostTopic): void {
     const input: PostComposerInput = { topic };
     this.dialog

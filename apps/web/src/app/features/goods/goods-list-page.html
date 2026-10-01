@@ -1,104 +1,114 @@
-<div class="w-full max-w-[1180px] mx-auto px-6 pt-7 pb-16 box-border">
-  <header class="flex flex-wrap gap-3 items-end justify-between mb-4">
+<div class="tw-page flex flex-col gap-6 max-[600px]:px-4">
+  <header class="tw-page-head mb-0">
     <div>
-      <p class="m-0 mb-1 text-xs font-bold tracking-[0.1em] uppercase text-accent">{{ 'GOODS.EYEBROW' | translate }}</p>
-      <h1 class="tw-section-title">{{ 'GOODS.TITLE' | translate }}</h1>
-      <p class="mt-1 text-sm text-ink-muted">{{ 'GOODS.SUB' | translate }}</p>
+      <p class="tw-eyebrow m-0 mb-1">{{ 'GOODS.EYEBROW' | translate }}</p>
+      <h1 class="tw-page-title">{{ 'GOODS.TITLE' | translate }}</h1>
+      <p class="tw-page-sub">{{ 'GOODS.SUB' | translate }}</p>
     </div>
-    <a class="inline-flex gap-1 items-center text-accent text-sm no-underline transition-colors hover:opacity-80" routerLink="/products">
+    <a class="tw-link inline-flex gap-1 items-center text-sm" routerLink="/shop" [queryParams]="{ tab: 'custom' }">
       {{ 'GOODS.SEE_MADE_TO_ORDER' | translate }}
       <pm-icon name="chevron" [size]="13" />
     </a>
   </header>
 
-  <div class="flex flex-wrap gap-3 items-center mb-3">
-    <form class="flex flex-1 min-w-[240px] gap-2" [formGroup]="form" (ngSubmit)="search()">
-      <input
-        id="goods-search"
-        type="search"
-        formControlName="keyword"
-        class="flex-1 px-3.5 py-2.5 rounded-sm border border-edge-strong bg-muted text-ink text-sm placeholder:text-ink-muted focus-visible:outline-2 focus-visible:outline-accent transition-colors"
-        [placeholder]="'GOODS.SEARCH_HINT' | translate"
-      />
-      <button type="submit" class="tw-btn-primary">{{ 'GOODS.SEARCH' | translate }}</button>
-    </form>
+  <section class="tw-card flex flex-col gap-4 p-4">
+    <div class="flex flex-wrap gap-3 items-center">
+      <form class="flex flex-1 min-w-[240px] max-[600px]:min-w-full gap-2" [formGroup]="form" (ngSubmit)="search()">
+        <input
+          id="goods-search"
+          type="search"
+          formControlName="keyword"
+          class="tw-input flex-1"
+          [placeholder]="'GOODS.SEARCH_HINT' | translate"
+        />
+        <button type="submit" class="tw-btn-primary">{{ 'GOODS.SEARCH' | translate }}</button>
+      </form>
 
-    <label class="flex gap-2 items-center text-sm text-ink-muted">
-      <span>{{ 'GOODS.SORT' | translate }}</span>
-      <select class="px-2 py-2 border border-edge rounded-sm bg-card text-ink text-sm cursor-pointer" [value]="sort()" (change)="chooseSort($event)">
-        @for (one of sorts; track one.value) {
-          <option [value]="one.value">{{ one.key | translate }}</option>
-        }
-      </select>
-    </label>
-  </div>
+      <label class="flex gap-2 items-center tw-label text-ink-muted">
+        <span class="whitespace-nowrap">{{ 'GOODS.SORT' | translate }}</span>
+        <select class="tw-select w-auto min-w-44" [value]="sort()" (change)="chooseSort($event)">
+          @for (one of sorts; track one.value) {
+            <option [value]="one.value">{{ one.key | translate }}</option>
+          }
+        </select>
+      </label>
+    </div>
 
-  <nav class="flex flex-wrap gap-2 mb-4" [attr.aria-label]="'GOODS.GROUP_LABEL' | translate">
-    <button type="button" class="px-3 py-1 border border-edge rounded-full bg-transparent text-ink text-sm cursor-pointer transition-colors"
-      [class.chip-on]="group() === ''"
-      (click)="chooseGroup('')">
-      {{ 'GOODS.ALL_GROUPS' | translate }}
-    </button>
-    @for (one of groups(); track one.code) {
-      <button
-        type="button"
-        class="px-3 py-1 border border-edge rounded-full bg-transparent text-ink text-sm cursor-pointer transition-colors"
-        [class.chip-on]="group() === one.code"
-        [attr.aria-pressed]="group() === one.code"
-        (click)="chooseGroup(one.code)"
-      >
-        {{ one.name }}
+    <nav class="groups flex flex-wrap gap-2" [attr.aria-label]="'GOODS.GROUP_LABEL' | translate">
+      <button type="button" class="chip tw-chip"
+        [class.chip-on]="group() === ''"
+        [class.is-selected]="group() === ''"
+        (click)="chooseGroup('')">
+        {{ 'GOODS.ALL_GROUPS' | translate }}
       </button>
-    }
-  </nav>
+      @for (one of groups(); track one.code) {
+        <button
+          type="button"
+          class="chip tw-chip"
+          [class.chip-on]="group() === one.code"
+          [attr.aria-pressed]="group() === one.code"
+          (click)="chooseGroup(one.code)"
+        >
+          {{ one.name }}
+        </button>
+      }
+    </nav>
+  </section>
 
   @switch (status()) {
     @case ('LOADING') {
-      <p class="py-12 text-center text-ink-muted">{{ 'COMMON.LOADING' | translate }}</p>
+      <p class="tw-empty m-0">{{ 'COMMON.LOADING' | translate }}</p>
     }
     @case ('ERROR') {
-      <p class="py-12 text-center text-ink-muted">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+      <p class="tw-empty m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
     }
     @case ('DONE') {
       @if (cards().length === 0) {
-        <p class="py-12 text-center text-ink-muted">{{ 'GOODS.EMPTY' | translate }}</p>
+        <div class="tw-empty">
+          <span class="grid place-items-center w-[60px] h-[60px] rounded-full bg-accent-soft text-accent" aria-hidden="true">
+            <pm-icon name="cart" [size]="28" />
+          </span>
+          <p class="m-0">{{ 'GOODS.EMPTY' | translate }}</p>
+        </div>
       } @else {
-        <p class="m-0 mb-3 text-sm text-ink-muted">{{ 'GOODS.COUNT' | translate: { count: total() } }}</p>
-        <ul class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4 m-0 p-0 list-none">
-          @for (card of cards(); track card.raw.code) {
-            <li>
-              <a class="group block h-full overflow-hidden border border-edge rounded-md bg-card text-inherit no-underline transition-all duration-150 hover:-translate-y-0.5 hover:border-accent hover:shadow-elevated" [routerLink]="['/goods', card.raw.code]">
-                <span class="relative block aspect-square bg-muted">
-                  @if (card.image) {
-                    <img [src]="card.image" [alt]="card.raw.name" loading="lazy" class="w-full h-full object-cover" />
-                  } @else {
-                    <span class="grid place-items-center w-full h-full text-accent" aria-hidden="true"><pm-icon name="cart" [size]="26" /></span>
-                  }
-                  @if (card.soldOut) {
-                    <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-danger-soft text-danger text-xs font-bold">{{ 'GOODS.SOLD_OUT' | translate }}</span>
-                  }
-                </span>
-                <span class="grid gap-1 px-3 py-3">
-                  <span class="font-semibold text-ink">{{ card.raw.name }}</span>
-                  <span class="font-bold text-accent-dark">
-                    {{ 'GOODS.FROM' | translate }} {{ card.fromPrice | amount }}
+        <div class="flex flex-col gap-4">
+          <p class="m-0 text-sm font-medium text-ink-muted">{{ 'GOODS.COUNT' | translate: { count: total() } }}</p>
+          <ul class="grid grid-cols-[repeat(auto-fill,minmax(min(240px,100%),1fr))] gap-5 m-0 p-0 list-none max-[600px]:grid-cols-2 max-[600px]:gap-3">
+            @for (card of cards(); track card.raw.code) {
+              <li>
+                <a class="card tw-card-interactive group flex flex-col gap-3 h-full p-3 no-underline" routerLink="/shop" [queryParams]="{ tab: 'ready', goods: card.raw.code }">
+                  <span class="relative block aspect-square overflow-hidden rounded-lg bg-muted">
+                    @if (card.image) {
+                      <img [src]="card.image" [alt]="card.raw.name" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                    } @else {
+                      <span class="grid place-items-center w-full h-full text-accent" aria-hidden="true"><pm-icon name="cart" [size]="26" /></span>
+                    }
+                    @if (card.soldOut) {
+                      <span class="absolute top-2.5 left-2.5 tw-badge tw-badge-danger">{{ 'GOODS.SOLD_OUT' | translate }}</span>
+                    }
                   </span>
-                  <span class="text-xs text-ink-muted">
-                    {{ 'GOODS.DELIVERY_DAYS' | translate: { count: card.raw.deliveryDays } }}
+                  <span class="flex flex-col items-start gap-2 px-1 pb-1">
+                    <span class="font-bold text-ink leading-snug">{{ card.raw.name }}</span>
+                    <span class="card-price inline-flex items-center px-3 py-1 rounded-full bg-amber-soft text-on-amber text-sm font-bold">
+                      {{ 'GOODS.FROM' | translate }} {{ card.fromPrice | amount }}
+                    </span>
+                    <span class="text-xs text-ink-muted">
+                      {{ 'GOODS.DELIVERY_DAYS' | translate: { count: card.raw.deliveryDays } }}
+                    </span>
                   </span>
-                </span>
-              </a>
-            </li>
-          }
-        </ul>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
 
         @if (pageCount() > 1) {
-          <div class="flex gap-2 items-center justify-center mt-5 text-sm">
-            <button type="button" class="px-3 py-2 border border-edge rounded-full bg-transparent text-ink cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed" [disabled]="page() <= 1" (click)="changePage(-1)">
+          <div class="flex gap-3 items-center justify-center text-sm font-medium text-ink-muted">
+            <button type="button" class="tw-btn-secondary" [disabled]="page() <= 1" (click)="changePage(-1)">
               {{ 'ADMIN.PREV_PAGE' | translate }}
             </button>
             <span>{{ page() }} / {{ pageCount() }}</span>
-            <button type="button" class="px-3 py-2 border border-edge rounded-full bg-transparent text-ink cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed" [disabled]="page() >= pageCount()" (click)="changePage(1)">
+            <button type="button" class="tw-btn-secondary" [disabled]="page() >= pageCount()" (click)="changePage(1)">
               {{ 'ADMIN.NEXT_PAGE' | translate }}
             </button>
           </div>

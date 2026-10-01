@@ -129,6 +129,12 @@ export class AdminService {
     return this.detailOrder(orderCode);
   }
 
+  /** Tich hoac bo tich mot muc tren phieu kiem tra chat luong cua don. */
+  async setQualityTick(orderCode: string, at: number, done: boolean, actor: string) {
+    await this.orders.setQualityTick(orderCode, at, done, actor);
+    return this.detailOrder(orderCode);
+  }
+
   async listCustomers(filter: CustomerSearchDto): Promise<PageResult<CustomerRow>> {
     const where: QueryFilter<UserDocument> = {};
     const keyword = filter.keyword?.trim();

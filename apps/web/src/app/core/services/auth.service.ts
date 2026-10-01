@@ -4,12 +4,10 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { API_BASE } from './api-base';
 import { TokenStore } from './token-store';
-import { LoginResult, Role } from '../models/api.model';
+import { DemoAccount, LoginResult, Role } from '../models/api.model';
 
-const INTERNAL: Role[] = ['MANAGER', 'ADMIN', 'SUPPORT'];
-
-/** The two groups allowed to move an order status by hand. */
-const OPERATIONS: Role[] = ['MANAGER', 'ADMIN'];
+/** Cac nhom duoc tinh la nguoi cua PETMORY. */
+const INTERNAL: Role[] = ['MANAGER', 'ADMIN'];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -25,15 +23,25 @@ export class AuthService {
   );
 
   /**
-   * Only used to show or hide buttons. The server re-checks permission on every
-   * request and does not rely on this signal.
+   * Nhom Quan ly: san pham, don hang, vat lieu, tham so, bao cao, kho hang.
+   *
+   * Chi dung de an hien nut. May chu kiem lai quyen o moi yeu cau va khong
+   * dua vao dau hieu nay.
    */
-  readonly isOperations = computed(() =>
-    (this.user()?.roles ?? []).some((role) => OPERATIONS.includes(role)),
-  );
-
-  /** Only the Manager group may change business settings. */
   readonly isManager = computed(() => (this.user()?.roles ?? []).includes('MANAGER'));
+
+  /** Nhom Quan tri vien: chi quan ly tai khoan. */
+  readonly isAccountAdmin = computed(() => (this.user()?.roles ?? []).includes('ADMIN'));
+
+  /**
+   * Cac tai khoan mau de dang nhap nhanh khi dang lam o may ca nhan.
+   *
+   * May chu that tra ve danh sach rong, nen man hinh dang nhap khong hien
+   * nut nao. Khong co mat khau nao duoc viet cung trong ma nguon o day.
+   */
+  demoAccounts(): Observable<DemoAccount[]> {
+    return this.http.get<DemoAccount[]>(`${this.base}/auth/demo-accounts`);
+  }
 
   login(email: string, password: string): Observable<LoginResult> {
     return this.http
@@ -41,9 +49,19 @@ export class AuthService {
       .pipe(tap((result) => this.store.save(result.accessToken, result.refreshToken, result.user)));
   }
 
-  register(email: string, password: string, fullName: string): Observable<LoginResult> {
+  register(
+    email: string,
+    password: string,
+    fullName: string,
+    phone?: string,
+  ): Observable<LoginResult> {
     return this.http
-      .post<LoginResult>(`${this.base}/auth/register`, { email, password, fullName })
+      .post<LoginResult>(`${this.base}/auth/register`, {
+        email,
+        password,
+        fullName,
+        ...(phone ? { phone } : {}),
+      })
       .pipe(tap((result) => this.store.save(result.accessToken, result.refreshToken, result.user)));
   }
 

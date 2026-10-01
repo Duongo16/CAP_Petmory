@@ -6,6 +6,7 @@ import { PostTopic } from '../../core/models/community.model';
 import { TOPIC_ORDER, templateKey, topicKey } from './community-topics';
 import { Icon } from '../../shared/icon/icon';
 import { ImageLink } from '../../shared/image-link/image-link';
+import { PhotoPreviews } from '../../shared/photo-previews/photo-previews';
 
 /** Hop thoai duoc mo voi chu de nao. */
 export interface PostComposerInput {
@@ -45,7 +46,7 @@ const KEY_DEFAULT_PET = 'COMMUNITY.TEMPLATE.DEFAULT_PET';
 @Component({
   selector: 'pm-post-composer-dialog',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, Icon, ImageLink],
+  imports: [FormsModule, TranslatePipe, Icon, ImageLink, PhotoPreviews],
   templateUrl: './post-composer-dialog.html',
   styleUrl: './post-composer-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
