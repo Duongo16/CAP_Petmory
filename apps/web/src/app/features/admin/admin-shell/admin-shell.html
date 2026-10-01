@@ -1,0 +1,58 @@
+<div class="desk">
+  <aside class="rail">
+    <div class="rail-inner">
+      <div class="rail-head">
+        <span class="rail-mark" aria-hidden="true"><pm-icon name="paw" [size]="20" /></span>
+        <span class="rail-title">
+          <strong>{{ 'ADMIN.DESK' | translate }}</strong>
+          <span>{{ 'ADMIN.DESK_SUB' | translate }}</span>
+        </span>
+      </div>
+
+      <nav class="rail-nav" [attr.aria-label]="'ADMIN.DESK_NAV' | translate">
+        @if (coreStops().length > 0) {
+          <span class="rail-group">{{ 'ADMIN.GROUP_OPERATE' | translate }}</span>
+        }
+        @for (stop of coreStops(); track stop.path) {
+          <a class="rail-link" [routerLink]="stop.path" routerLinkActive="on">
+            <pm-icon [name]="stop.icon" [size]="17" />
+            {{ stop.key | translate }}
+          </a>
+        }
+
+        @if (accountStops().length > 0) {
+          <span class="rail-group">{{ 'ADMIN.GROUP_ACCOUNT' | translate }}</span>
+          @for (stop of accountStops(); track stop.path) {
+            <a class="rail-link" [routerLink]="stop.path" routerLinkActive="on">
+              <pm-icon [name]="stop.icon" [size]="17" />
+              {{ stop.key | translate }}
+            </a>
+          }
+        }
+
+        @if (workshopStops().length > 0) {
+          <span class="rail-group">{{ 'ADMIN.GROUP_CATALOG' | translate }}</span>
+          @for (stop of workshopStops(); track stop.path) {
+            <a class="rail-link" [routerLink]="stop.path" routerLinkActive="on">
+              <pm-icon [name]="stop.icon" [size]="17" />
+              {{ stop.key | translate }}
+            </a>
+          }
+        }
+      </nav>
+
+      <div class="rail-foot">
+        <span class="rail-face" aria-hidden="true">{{ initial() }}</span>
+        <span class="rail-who">
+          <strong>{{ who() }}</strong>
+          <span>{{ 'ADMIN.DESK_ROLE' | translate }}</span>
+        </span>
+        <a class="rail-out" routerLink="/home">{{ 'ADMIN.BACK_TO_SHOP' | translate }}</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="desk-main">
+    <router-outlet />
+  </main>
+</div>

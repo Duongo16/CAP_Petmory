@@ -1,0 +1,576 @@
+:host {
+  display: block;
+}
+
+.day {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 36px 24px 64px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ---------- Loi chao ---------- */
+
+.hello {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.hello-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hello-date {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pm-amber);
+  text-transform: capitalize;
+}
+
+.hello-line {
+  margin: 0;
+  font-family: var(--pm-font-display);
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--pm-text);
+}
+
+.hello-sub {
+  margin: 0;
+  font-size: 14px;
+  color: var(--pm-text-muted);
+}
+
+.hello-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-solid,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+
+  &:hover { transform: translate3d(0, -2px, 0); }
+}
+
+.btn-solid {
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  box-shadow: var(--pm-accent-glow);
+
+  &:hover { background: var(--pm-accent-dark); }
+}
+
+.btn-ghost {
+  border: 1.5px solid var(--pm-border);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font-weight: 600;
+
+  &:hover { border-color: var(--pm-accent); }
+}
+
+/* ---------- Chua co thu cung ---------- */
+
+.blank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 24px;
+  border-radius: 24px;
+  border: 1.5px dashed var(--pm-border);
+  background: var(--pm-bg-card);
+  text-align: center;
+}
+
+.blank-text {
+  margin: 0;
+  font-size: 15px;
+  color: var(--pm-text-body);
+}
+
+/* ---------- Bo cuc hai cot ---------- */
+
+.board {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.board-main {
+  flex: 2 1 560px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.board-side {
+  flex: 1 1 300px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- The hoi tuong ---------- */
+
+.flash {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  min-height: 260px;
+  border-radius: 24px;
+  background: var(--pm-night);
+  color: var(--pm-on-night);
+}
+
+.flash-glow {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  top: -100px;
+  left: -60px;
+  border-radius: 50%;
+  background: var(--pm-accent);
+  opacity: 0.45;
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+.flash-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 32px;
+}
+
+.flash-chip {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-night-hover);
+  color: var(--pm-amber-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.flash-title {
+  margin: 0;
+  font-family: var(--pm-font-display);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.flash-body {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--pm-on-night-muted);
+}
+
+.flash-go {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: var(--pm-amber-bright);
+  color: var(--pm-on-amber);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.flash-collage {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 24px;
+}
+
+.flash-tile {
+  min-height: 100px;
+  border-radius: 14px;
+}
+
+.flash-tile-a {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  background: var(--pm-art-fur);
+  color: var(--pm-art-cream);
+  transform: rotate(-2deg);
+}
+
+.flash-tile-b {
+  background: var(--pm-art-tan);
+  transform: rotate(2deg);
+}
+
+.flash-tile-c {
+  background: var(--pm-art-collar);
+  transform: rotate(-1deg);
+}
+
+/* ---------- Khoi noi dung ---------- */
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.block-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pm-text);
+}
+
+.block-link {
+  color: var(--pm-accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { color: var(--pm-accent-dark); }
+}
+
+/* ---------- The thu cung ---------- */
+
+.pets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(210px, 100%), 1fr));
+  gap: 16px;
+}
+
+.pet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--pm-border);
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+  color: var(--pm-text);
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+
+  &:hover {
+    transform: translate3d(0, -3px, 0);
+    box-shadow: var(--pm-shadow-lifted);
+  }
+}
+
+.pet-photo {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 2px solid var(--pm-accent-soft);
+  background: var(--pm-paper-bloom);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.pet-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  span {
+    font-size: 13px;
+    color: var(--pm-text-muted);
+  }
+}
+
+.pet-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  padding: 4px 10px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-muted);
+  color: var(--pm-text-body);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tag-accent {
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+}
+
+.tag-success {
+  background: var(--pm-success-soft);
+  color: var(--pm-on-success-soft);
+}
+
+.pet-add {
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  border: 1.5px dashed var(--pm-border);
+  background: var(--pm-bg);
+  box-shadow: none;
+  color: var(--pm-amber);
+
+  strong {
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.pet-add-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--pm-amber-soft);
+}
+
+/* ---------- Trang nhat ky gan day ---------- */
+
+.entries {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+  border-radius: 20px;
+  border: 1px solid var(--pm-border);
+  background: var(--pm-bg-card);
+
+  li + li { border-top: 1px solid var(--pm-info-soft); }
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  color: var(--pm-text);
+  text-decoration: none;
+  transition: background 140ms ease;
+
+  &:hover { background: var(--pm-bg); }
+
+  > pm-icon { color: var(--pm-border-strong); }
+}
+
+.entry-mark {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: var(--pm-paper-bloom);
+  color: var(--pm-accent);
+}
+
+.entry-text {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.entry-title {
+  overflow: hidden;
+  font-family: var(--pm-font-hand);
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry-meta {
+  font-size: 13px;
+  color: var(--pm-text-muted);
+}
+
+.quiet {
+  margin: 0;
+  padding: 24px;
+  border-radius: 20px;
+  border: 1.5px dashed var(--pm-border);
+  color: var(--pm-text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------- Cot phai ---------- */
+
+.promo {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+}
+
+.promo-glow {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  top: -60px;
+  right: -60px;
+  border-radius: 50%;
+  background: var(--pm-amber-bright);
+  opacity: 0.35;
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+.promo-eyebrow {
+  position: relative;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.promo-title {
+  position: relative;
+  margin: 0;
+  font-family: var(--pm-font-display);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.promo-go {
+  position: relative;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: var(--pm-night);
+  color: var(--pm-on-night);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.side-tile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid var(--pm-border);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  text-decoration: none;
+  transition: border-color 140ms ease, transform 140ms ease;
+
+  &:hover {
+    border-color: var(--pm-accent);
+    transform: translate3d(0, -2px, 0);
+  }
+
+  > pm-icon { color: var(--pm-border-strong); }
+}
+
+.side-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+
+  &[data-tone='amber'] { background: var(--pm-amber-soft); color: var(--pm-amber); }
+  &[data-tone='memorial'] { background: var(--pm-memorial-soft); color: var(--pm-memorial); }
+  &[data-tone='accent'] { background: var(--pm-accent-soft); color: var(--pm-accent); }
+}
+
+.side-text {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  span {
+    font-size: 13px;
+    color: var(--pm-text-muted);
+  }
+}
+
+@media (max-width: 600px) {
+  .day { padding: 24px 16px 48px; }
+  .flash-text { padding: 24px; }
+}

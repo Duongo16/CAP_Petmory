@@ -8,7 +8,7 @@
     "SAVE": "Lưu",
     "ADD": "Thêm",
     "REMOVE": "Xóa",
-    "CLOSE": "Đóng",
+    "CLOSE": "Close",
     "GENERIC_ERROR": "Đã xảy ra lỗi. Vui lòng thử lại.",
     "NO_DATA": "Chưa có dữ liệu",
     "BACK": "Quay lại",
@@ -149,7 +149,11 @@
     "FOOTER": "© 2024 Petmory. Every moment as precious as a family keepsake.",
     "FOOTER_PRIVACY": "Privacy policy",
     "FOOTER_TERMS": "Terms of service",
-    "FOOTER_HELP": "Help"
+    "FOOTER_HELP": "Help",
+    "VISUAL_TITLE": "Keep the memories, keep the love",
+    "VISUAL_SUB": "A digital memory book for you and your pet.",
+    "VISUAL_QUOTE": "“Open the book and last summer is right there.”",
+    "VISUAL_QUOTE_BY": "— A note from Petmory"
   },
   "PET": {
     "TAGLINE": "A line about them",
@@ -994,7 +998,18 @@
     "NO_MOMENT": "Nothing has been written down yet.",
     "FLASHBACK": "ON THIS DAY",
     "YEARS_AGO": "{{count}} year(s) ago",
-    "OPEN_AGAIN": "Open that page again"
+    "OPEN_AGAIN": "Open that page again",
+    "UPLOAD": "Upload photos",
+    "YOUR_PETS": "Your pets",
+    "MANAGE": "Manage",
+    "DIARY_PUBLIC": "Public diary",
+    "DIARY_PRIVATE": "Private diary",
+    "STUDIO_PROMO": "Turn a favourite photo into a keepsake",
+    "STUDIO_OPEN": "Open Studio",
+    "STORY": "Their story",
+    "STORY_SUB": "Petmory retells the journey",
+    "ORDERS": "Your orders",
+    "ORDERS_SUB": "Follow the keepsakes being made"
   },
   "PHOTO": {
     "ADVISER_EYEBROW": "WORKSHOP ADVISER",
@@ -1461,7 +1476,7 @@
       "ERROR_READ": "That conversation could not be read.",
       "ERROR_ACT": "That did not go through. Try again."
     },
-    "GROUP_ACCOUNT": "ACCOUNT ADMIN",
+    "GROUP_ACCOUNT": "Accounts",
     "ACCOUNT": {
       "EYEBROW": "USER PERMISSIONS",
       "TITLE": "Account management",
@@ -1510,7 +1525,9 @@
       "NOTE_FELTED": "The realistic model reshaped: bigger head, rounder body, shorter legs. Cuter, while the build is still a real animal.",
       "NOTE_REALISTIC": "Proportions as in life, long body and tall legs. Already split into four to eight colour zones.",
       "NOTE_BLOCKY": "Cube shaped and very cute, but not lifelike. The whole animal has a single colour zone."
-    }
+    },
+    "GROUP_OPERATE": "Operations",
+    "GROUP_CATALOG": "Catalogue & workshop"
   },
   "FOOTER": {
     "TAGLINE": "More than a product — a piece of memory.",
@@ -1753,6 +1770,91 @@
       "PLAYFUL": "Playful",
       "TENDER": "Tender",
       "SHORT": "Short"
+    }
+  },
+  "LANDING": {
+    "NAV_DIARY": "Diary",
+    "NAV_MEMORY": "Memories",
+    "NAV_PUBLIC": "Public diaries",
+    "START_FREE": "Start for free",
+    "BADGE": "A digital memory book for pets",
+    "TITLE_LEAD": "Every moment",
+    "TITLE_ACCENT": "deserves to be remembered",
+    "LEAD": "Keep a diary, see memories again on the right day, and turn favourite photos into keepsakes you can hold — all in one warm place for you and your pet.",
+    "CREATE_PET": "Create a pet profile",
+    "HOW_IT_WORKS": "See how it works",
+    "TRUST_FREE": "Free for your first pet",
+    "TRUST_PRIVATE": "Private by default",
+    "TRUST_CARD": "No card needed",
+    "ART_CAPTION": "Mochi, first summer",
+    "ART_CHIP_EYEBROW": "TODAY, 1 YEAR AGO",
+    "ART_CHIP_TITLE": "Mochi’s first trip to the beach",
+    "ART_STATUS": "Keepsake in the making",
+    "FEATURES_EYEBROW": "All in one place",
+    "FEATURES_TITLE": "More than a photo album",
+    "FEATURES_SUB": "Four small corners that keep your pet’s journey — from the first diary page to a keepsake gift.",
+    "FEATURE": {
+      "DIARY": {
+        "NAME": "Pet diary",
+        "TEXT": "Write a few lines, add photos and videos. Every day is a page in their book."
+      },
+      "MEMORY": {
+        "NAME": "Memories on the day",
+        "TEXT": "Petmory brings back last year’s moments as a story and a slideshow."
+      },
+      "STUDIO": {
+        "NAME": "Keepsake studio",
+        "TEXT": "Pick the best photo and order a figure, keyring or frame in their likeness."
+      },
+      "COMMUNITY": {
+        "NAME": "Pet lovers",
+        "TEXT": "Share a public diary and follow other people who love their pets."
+      }
+    },
+    "STEPS_EYEBROW": "Get started",
+    "STEPS_TITLE": "Three steps, under two minutes",
+    "STEP": {
+      "1": {
+        "NAME": "Create an account",
+        "TEXT": "An email and a password is enough. Add your pet’s name while you sign up."
+      },
+      "2": {
+        "NAME": "Add your pet",
+        "TEXT": "Name, breed, birthday and a lovely profile photo."
+      },
+      "3": {
+        "NAME": "Keep the moments",
+        "TEXT": "Post photos, write a few lines — Petmory sorts and reminds."
+      }
+    },
+    "BOOK_EYEBROW": "Public diary",
+    "BOOK_TITLE": "Turn the pages like a real book",
+    "BOOK_SUB": "Open your pet’s diary to the public and send the link to family — they can read it without an account.",
+    "BOOK_LINK": "Browse the diaries",
+    "BOOK_DATE": "SATURDAY · 03.08",
+    "BOOK_PAGE_TITLE": "Today they learned to open the cupboard.",
+    "BOOK_PAGE_BODY": "We found out when they were sitting proudly on the freshly folded towels...",
+    "CTA_TITLE": "Start your pet’s book today",
+    "CTA_SUB": "Free for your first pet. No credit card needed.",
+    "CTA_CREATE": "Create account",
+    "CTA_LOGIN": "I already have an account",
+    "FOOTER_SLOGAN": "Keep the memories, keep the love.",
+    "FOOTER_COPY": "© 2026 Petmory",
+    "MODAL": {
+      "STEP": "Step {{step}} of 2",
+      "TITLE_1": "Let’s make a profile for your pet",
+      "SUB_1": "A small profile that keeps their whole journey.",
+      "PREVIEW_NAME": "Your pet’s name",
+      "PREVIEW_SUB": "Breed · Birthday",
+      "NEXT": "Continue",
+      "TITLE_2": "Create an account to save the profile",
+      "SUB_2": "It takes less than a minute and it is free.",
+      "PERK_1": "A private pet profile",
+      "PERK_2": "Photo and video diary",
+      "PERK_3": "Memories on the right day",
+      "PERK_4": "Keepsakes made from their photos",
+      "REGISTER": "Sign up free",
+      "LOGIN": "I already have an account"
     }
   }
 }

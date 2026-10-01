@@ -13,11 +13,12 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { DemoAccount } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
+import { PetArt } from '../../shared/pet-art/pet-art';
 
 @Component({
   selector: 'pm-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './login.html',
   styleUrls: ['./auth-shared.scss', './login.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

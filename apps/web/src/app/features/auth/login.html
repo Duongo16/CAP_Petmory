@@ -4,9 +4,9 @@
   <div class="ap-form-panel">
     <div class="ap-form-inner">
 
-      <a class="ap-back" routerLink="/landing">← {{ 'AUTH.BACK_HOME' | translate }}</a>
+      <a class="ap-back" routerLink="/landing"><pm-icon name="back" [size]="16" />{{ 'AUTH.BACK_HOME' | translate }}</a>
 
-      <div class="ap-logo-icon" aria-hidden="true">🐾</div>
+      <span class="ap-logo-icon" aria-hidden="true"><pm-icon name="paw" [size]="26" /></span>
 
       <div class="ap-head">
         <h1 class="ap-title">{{ 'AUTH.LOGIN_TITLE' | translate }}</h1>
@@ -134,14 +134,14 @@
     <span class="ap-blob ap-blob-a"></span>
     <span class="ap-blob ap-blob-b"></span>
 
-    <div class="ap-illustration">🐕</div>
+    <div class="ap-illustration"><pm-pet-art kind="dog" [width]="240" /></div>
 
-    <h2 class="ap-visual-title">Petmory</h2>
-    <p class="ap-visual-sub">Ghi lại ký ức,<br>giữ mãi yêu thương.</p>
+    <h2 class="ap-visual-title">{{ 'AUTH.VISUAL_TITLE' | translate }}</h2>
+    <p class="ap-visual-sub">{{ 'AUTH.VISUAL_SUB' | translate }}</p>
 
     <div class="ap-glass-quote">
-      <blockquote>"Mỗi khoảnh khắc với thú cưng đều xứng đáng được nhớ mãi."</blockquote>
-      <cite>— Cộng đồng Petmory</cite>
+      <p class="ap-quote-text">{{ 'AUTH.VISUAL_QUOTE' | translate }}</p>
+      <p class="ap-quote-by">{{ 'AUTH.VISUAL_QUOTE_BY' | translate }}</p>
     </div>
   </div>
 

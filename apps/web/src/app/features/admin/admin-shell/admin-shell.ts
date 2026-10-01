@@ -1,0 +1,66 @@
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AuthService } from '../../../core/services/auth.service';
+import { Icon } from '../../../shared/icon/icon';
+
+/** One destination in the side rail. */
+interface Stop {
+  path: string;
+  key: string;
+  icon: string;
+}
+
+/** Phan van hanh hang ngay, thuoc nhom Quan ly. */
+const CORE_STOPS: Stop[] = [
+  { path: '/admin/orders', key: 'NAV.DISPATCH_ORDER', icon: 'cart' },
+  { path: '/admin/customers', key: 'NAV.CUSTOMER', icon: 'user' },
+  { path: '/admin/chats', key: 'NAV.CHAT_DESK', icon: 'comment' },
+  { path: '/admin/payment-log', key: 'NAV.LOG_PAYMENT', icon: 'tag' },
+  { path: '/admin/goods', key: 'NAV.GOODS_STOCK', icon: 'bookmark' },
+];
+
+/** Phan xuong va tham so, cung thuoc nhom Quan ly. */
+const WORKSHOP_STOPS: Stop[] = [
+  { path: '/admin/reports', key: 'NAV.REPORT', icon: 'tag' },
+  { path: '/admin/materials', key: 'NAV.MATERIAL', icon: 'paw' },
+  { path: '/admin/models', key: 'NAV.MODELS', icon: 'star' },
+  { path: '/admin/settings', key: 'NAV.SETTINGS', icon: 'bulb' },
+];
+
+/** Phan quan ly tai khoan, thuoc nhom Quan tri vien. */
+const ACCOUNT_STOPS: Stop[] = [
+  { path: '/admin/accounts', key: 'NAV.ACCOUNTS', icon: 'shield' },
+];
+
+/**
+ * The frame every internal screen sits in: a side rail of destinations beside
+ * the screen itself. The rail only hides what an account may not open. The
+ * server checks permission again on every request.
+ */
+@Component({
+  selector: 'pm-admin-shell',
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, Icon],
+  templateUrl: './admin-shell.html',
+  styleUrl: './admin-shell.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AdminShell {
+  private readonly auth = inject(AuthService);
+
+  readonly isManager = this.auth.isManager;
+  readonly isAccountAdmin = this.auth.isAccountAdmin;
+
+  /*
+   * Thanh ben chi hien nhung cho tai khoan mo duoc.
+   *
+   * Nhom Quan ly thay phan van hanh, nhom Quan tri vien thay phan tai khoan.
+   * Day chi la viec an hien: may chu kiem lai quyen o moi yeu cau.
+   */
+  readonly coreStops = computed(() => (this.isManager() ? CORE_STOPS : []));
+  readonly workshopStops = computed(() => (this.isManager() ? WORKSHOP_STOPS : []));
+  readonly accountStops = computed(() => (this.isAccountAdmin() ? ACCOUNT_STOPS : []));
+  readonly who = computed(() => this.auth.user()?.fullName ?? '');
+  readonly initial = computed(() => this.who().trim().charAt(0).toUpperCase() || '?');
+}

@@ -4,16 +4,15 @@
 >{{ 'COMMON.SKIP_TO_CONTENT' | translate }}</a>
 
 <!-- ───── Header ───── -->
-<header class="sticky top-0 z-10 border-b border-edge bg-card/95 backdrop-blur-md transition-shadow">
+<header class="sticky top-0 z-10 border-b border-edge bg-card/85 backdrop-blur-md transition-shadow">
   <div class="flex items-center gap-4 max-w-[1180px] mx-auto px-6 py-3 box-border">
 
     <!-- Brand -->
     <a class="inline-flex items-center gap-2.5 flex-shrink-0 no-underline text-ink" routerLink="/home">
-      <img
-        class="w-9 h-9 rounded-xl object-cover bg-accent-soft"
-        src="img/logo-mark.png" alt="" width="36" height="36"
-      />
-      <span class="text-lg font-extrabold tracking-wide">{{ 'COMMON.APP_NAME' | translate }}</span>
+      <span class="grid place-items-center w-9 h-9 rounded-xl bg-accent text-on-accent" aria-hidden="true">
+        <pm-icon name="paw" [size]="19" />
+      </span>
+      <span class="font-serif text-[1.2rem] font-semibold">{{ 'COMMON.APP_NAME' | translate }}</span>
     </a>
 
     <!-- Desktop nav -->

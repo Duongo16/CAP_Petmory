@@ -141,9 +141,44 @@ html {
   --pm-font-display: 'Noto Serif', Georgia, serif;
   --pm-shadow: 0 1px 2px rgba(74, 48, 24, 0.06), 0 10px 28px rgba(74, 48, 24, 0.08);
   --pm-shadow-lifted: 0 2px 4px rgba(74, 48, 24, 0.07), 0 18px 40px rgba(74, 48, 24, 0.14);
+  --pm-accent-glow: 0 10px 24px rgba(168, 80, 12, 0.28);
+
+  /* Mang toi: thanh ben noi bo, the hoi tuong, chan trang */
+  --pm-night: #2c1d10;
+  --pm-on-night: #fbf1de;
+  --pm-on-night-muted: #d9c4a6;
+  --pm-night-line: rgba(251, 241, 222, 0.14);
+  --pm-night-hover: rgba(251, 241, 222, 0.08);
+
+  /* Lop kinh mo cho thanh dinh va the noi */
+  --pm-glass: rgba(255, 250, 242, 0.88);
+  --pm-glass-card: rgba(255, 255, 255, 0.92);
+  --pm-glass-on-accent: rgba(255, 255, 255, 0.14);
+  --pm-glass-on-accent-line: rgba(255, 255, 255, 0.24);
+
+  /* Mau ve hinh minh hoa thu cung, giu nguyen o ca hai che do */
+  --pm-art-fur: #c4661a;
+  --pm-art-cream: #fbf1de;
+  --pm-art-tan: #e8d3ae;
+  --pm-art-dark: #843e08;
+  --pm-art-blush: #f2b48a;
+  --pm-art-eye: #2c1d10;
+  --pm-art-collar: #5b6640;
+  --pm-art-tag: #fb8b1f;
+  --pm-art-shadow: rgba(74, 48, 24, 0.12);
+  --pm-tape: rgba(251, 139, 31, 0.35);
 }
 
 @mixin pm-dark-tokens {
+  --pm-accent-glow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  --pm-night: #0f0b07;
+  --pm-on-night: #fbf1de;
+  --pm-on-night-muted: #c9b496;
+  --pm-night-line: rgba(251, 241, 222, 0.12);
+  --pm-night-hover: rgba(251, 241, 222, 0.07);
+  --pm-glass: rgba(26, 20, 14, 0.85);
+  --pm-glass-card: rgba(37, 28, 20, 0.92);
+
   --pm-bg: #1a140e;
   --pm-bg-card: #251c14;
   --pm-bg-muted: #2e241a;

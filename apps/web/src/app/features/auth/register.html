@@ -5,10 +5,10 @@
     <span class="ap-blob ap-blob-a"></span>
     <span class="ap-blob ap-blob-b"></span>
 
-    <div class="ap-illustration">🐾</div>
+    <div class="ap-illustration"><pm-pet-art kind="cat" [width]="220" /></div>
 
-    <h2 class="ap-visual-title">Cùng nhau tạo<br>kỷ niệm tuyệt vời</h2>
-    <p class="ap-visual-sub">Hàng nghìn sen đã tin dùng Petmory<br>để lưu giữ yêu thương.</p>
+    <h2 class="ap-visual-title">{{ 'AUTH.SIDE_UP_TITLE' | translate }}</h2>
+    <p class="ap-visual-sub">{{ 'AUTH.SIDE_UP_TEXT' | translate }}</p>
 
     <div class="ap-glass-card">
       @for (perk of perks; track perk.nameKey) {
@@ -29,9 +29,9 @@
   <div class="ap-form-panel">
     <div class="ap-form-inner">
 
-      <a class="ap-back" routerLink="/landing">← {{ 'AUTH.BACK_HOME' | translate }}</a>
+      <a class="ap-back" routerLink="/landing"><pm-icon name="back" [size]="16" />{{ 'AUTH.BACK_HOME' | translate }}</a>
 
-      <div class="ap-logo-icon" aria-hidden="true">🐾</div>
+      <span class="ap-logo-icon" aria-hidden="true"><pm-icon name="paw" [size]="26" /></span>
 
       <div class="ap-head">
         <h1 class="ap-title">{{ 'AUTH.REGISTER_TITLE' | translate }}</h1>

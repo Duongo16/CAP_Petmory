@@ -52,6 +52,7 @@ export class Shell implements OnInit {
 
   /** The shop destinations that stay visible in the bar. */
   readonly menu: MenuItem[] = [
+    { path: '/today', key: 'NAV.TODAY' },
     { path: '/home', key: 'NAV.HOME' },
     { path: '/products', key: 'NAV.PRODUCT' },
     { path: '/goods', key: 'NAV.GOODS' },

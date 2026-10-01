@@ -149,7 +149,11 @@
     "FOOTER": "© 2024 Petmory. Từng khoảnh khắc trân quý như một kỷ vật gia đình.",
     "FOOTER_PRIVACY": "Chính sách bảo mật",
     "FOOTER_TERMS": "Điều khoản dịch vụ",
-    "FOOTER_HELP": "Trợ giúp"
+    "FOOTER_HELP": "Trợ giúp",
+    "VISUAL_TITLE": "Ghi lại ký ức, giữ mãi yêu thương",
+    "VISUAL_SUB": "Cuốn sổ kỷ niệm số cho bạn và thú cưng.",
+    "VISUAL_QUOTE": "“Mở sổ ra là thấy cả mùa hè năm ngoái của bé.”",
+    "VISUAL_QUOTE_BY": "— Lời nhắn từ Petmory"
   },
   "PET": {
     "TAGLINE": "Một câu về bé",
@@ -994,7 +998,18 @@
     "NO_MOMENT": "Chưa có khoảnh khắc nào được ghi lại.",
     "FLASHBACK": "HỒI TƯỞNG KỶ NIỆM",
     "YEARS_AGO": "{{count}} năm trước",
-    "OPEN_AGAIN": "Mở lại trang nhật ký này"
+    "OPEN_AGAIN": "Mở lại trang nhật ký này",
+    "UPLOAD": "Tải ảnh lên",
+    "YOUR_PETS": "Các bé của bạn",
+    "MANAGE": "Quản lý",
+    "DIARY_PUBLIC": "Nhật ký công khai",
+    "DIARY_PRIVATE": "Nhật ký riêng tư",
+    "STUDIO_PROMO": "Biến ảnh của bé thành kỷ vật cầm tay",
+    "STUDIO_OPEN": "Mở Studio",
+    "STORY": "Câu chuyện của bé",
+    "STORY_SUB": "Petmory kể lại hành trình",
+    "ORDERS": "Đơn hàng của bạn",
+    "ORDERS_SUB": "Theo dõi kỷ vật đang chế tác"
   },
   "PHOTO": {
     "ADVISER_EYEBROW": "TRỢ LÝ NGHỆ NHÂN",
@@ -1461,7 +1476,7 @@
       "ERROR_READ": "Không đọc được cuộc trò chuyện này.",
       "ERROR_ACT": "Thao tác chưa thực hiện được. Bạn thử lại."
     },
-    "GROUP_ACCOUNT": "QUẢN TRỊ TÀI KHOẢN",
+    "GROUP_ACCOUNT": "Tài khoản",
     "ACCOUNT": {
       "EYEBROW": "PHÂN QUYỀN NGƯỜI DÙNG",
       "TITLE": "Quản lý tài khoản",
@@ -1510,7 +1525,9 @@
       "NOTE_FELTED": "Mô hình thật được nắn lại: đầu to hơn, thân tròn hơn, chân ngắn lại. Đáng yêu hơn mà cấu trúc vẫn là con vật thật.",
       "NOTE_REALISTIC": "Tỉ lệ đúng như con vật ngoài đời, thân dài chân cao. Tách sẵn 4 đến 8 vùng màu.",
       "NOTE_BLOCKY": "Dáng khối vuông, rất đáng yêu nhưng không giống thật. Cả con chỉ có một vùng màu."
-    }
+    },
+    "GROUP_OPERATE": "Vận hành",
+    "GROUP_CATALOG": "Danh mục & xưởng"
   },
   "FOOTER": {
     "TAGLINE": "Không chỉ là một sản phẩm, đó là một phần ký ức…",
@@ -1753,6 +1770,91 @@
       "PLAYFUL": "Vui tươi",
       "TENDER": "Lắng đọng",
       "SHORT": "Ngắn gọn"
+    }
+  },
+  "LANDING": {
+    "NAV_DIARY": "Nhật ký",
+    "NAV_MEMORY": "Kỷ niệm",
+    "NAV_PUBLIC": "Nhật ký công khai",
+    "START_FREE": "Bắt đầu miễn phí",
+    "BADGE": "Cuốn sổ kỷ niệm số cho thú cưng",
+    "TITLE_LEAD": "Mỗi khoảnh khắc",
+    "TITLE_ACCENT": "đều xứng được nhớ mãi",
+    "LEAD": "Ghi nhật ký, gợi lại kỷ niệm đúng ngày, và biến những tấm ảnh yêu thích thành kỷ vật cầm nắm được — tất cả trong một nơi ấm áp dành cho bạn và bé.",
+    "CREATE_PET": "Tạo hồ sơ thú cưng",
+    "HOW_IT_WORKS": "Xem cách hoạt động",
+    "TRUST_FREE": "Miễn phí cho bé đầu tiên",
+    "TRUST_PRIVATE": "Riêng tư mặc định",
+    "TRUST_CARD": "Không cần thẻ",
+    "ART_CAPTION": "Mochi, mùa hè đầu tiên",
+    "ART_CHIP_EYEBROW": "HÔM NAY, 1 NĂM TRƯỚC",
+    "ART_CHIP_TITLE": "Mochi lần đầu đi biển",
+    "ART_STATUS": "Kỷ vật đang được chế tác",
+    "FEATURES_EYEBROW": "Tất cả trong một nơi",
+    "FEATURES_TITLE": "Không chỉ là album ảnh",
+    "FEATURES_SUB": "Bốn góc nhỏ giúp bạn giữ lại hành trình của bé — từ trang nhật ký đầu tiên đến món quà kỷ niệm.",
+    "FEATURE": {
+      "DIARY": {
+        "NAME": "Nhật ký thú cưng",
+        "TEXT": "Viết vài dòng, gắn ảnh và video. Mỗi ngày là một trang trong cuốn sổ của bé."
+      },
+      "MEMORY": {
+        "NAME": "Kỷ niệm đúng ngày",
+        "TEXT": "Petmory nhắc lại khoảnh khắc của năm trước, kể thành câu chuyện và trình chiếu."
+      },
+      "STUDIO": {
+        "NAME": "Studio kỷ vật",
+        "TEXT": "Chọn ảnh đẹp nhất, đặt làm mô hình, móc khóa hay khung ảnh mang dáng hình của bé."
+      },
+      "COMMUNITY": {
+        "NAME": "Cộng đồng sen",
+        "TEXT": "Chia sẻ nhật ký công khai, theo dõi những người cùng yêu thú cưng."
+      }
+    },
+    "STEPS_EYEBROW": "Bắt đầu thôi",
+    "STEPS_TITLE": "Ba bước, chưa tới hai phút",
+    "STEP": {
+      "1": {
+        "NAME": "Tạo tài khoản",
+        "TEXT": "Email và mật khẩu là đủ. Có thể thêm tên bé ngay lúc đăng ký."
+      },
+      "2": {
+        "NAME": "Thêm thú cưng",
+        "TEXT": "Tên, giống, ngày sinh và một tấm ảnh đại diện thật xinh."
+      },
+      "3": {
+        "NAME": "Ghi lại kỷ niệm",
+        "TEXT": "Đăng ảnh, viết vài dòng — Petmory lo phần sắp xếp và nhắc lại."
+      }
+    },
+    "BOOK_EYEBROW": "Nhật ký công khai",
+    "BOOK_TITLE": "Lật từng trang sổ như một cuốn sách thật",
+    "BOOK_SUB": "Chọn mở công khai nhật ký của bé, gửi đường dẫn cho người thân — họ đọc được ngay mà không cần tài khoản.",
+    "BOOK_LINK": "Xem các cuốn nhật ký",
+    "BOOK_DATE": "THỨ BẢY · 03.08",
+    "BOOK_PAGE_TITLE": "Hôm nay bé học được cách mở cửa tủ.",
+    "BOOK_PAGE_BODY": "Cả nhà phát hiện ra lúc bé ngồi chễm chệ giữa đống khăn mới gấp...",
+    "CTA_TITLE": "Bắt đầu cuốn sổ của bé ngay hôm nay",
+    "CTA_SUB": "Miễn phí cho thú cưng đầu tiên. Không cần thẻ tín dụng.",
+    "CTA_CREATE": "Tạo tài khoản",
+    "CTA_LOGIN": "Tôi đã có tài khoản",
+    "FOOTER_SLOGAN": "Ghi lại ký ức, giữ mãi yêu thương.",
+    "FOOTER_COPY": "© 2026 Petmory",
+    "MODAL": {
+      "STEP": "Bước {{step}} / 2",
+      "TITLE_1": "Cùng tạo hồ sơ cho thú cưng của bạn",
+      "SUB_1": "Một hồ sơ nhỏ xinh để ghi lại trọn vẹn hành trình của bé.",
+      "PREVIEW_NAME": "Tên thú cưng của bạn",
+      "PREVIEW_SUB": "Giống · Ngày sinh",
+      "NEXT": "Tiếp tục",
+      "TITLE_2": "Tạo tài khoản để lưu hồ sơ của bé",
+      "SUB_2": "Chỉ mất chưa tới một phút, hoàn toàn miễn phí.",
+      "PERK_1": "Hồ sơ thú cưng riêng tư",
+      "PERK_2": "Nhật ký ảnh và video",
+      "PERK_3": "Nhắc lại kỷ niệm đúng ngày",
+      "PERK_4": "Đặt làm kỷ vật từ ảnh của bé",
+      "REGISTER": "Đăng ký miễn phí",
+      "LOGIN": "Tôi đã có tài khoản"
     }
   }
 }

@@ -4,6 +4,7 @@
 @layer theme {
   :root, :host {
     --font-sans: 'Be Vietnam Pro', Roboto, 'Helvetica Neue', sans-serif;
+    --font-serif: 'Noto Serif', Georgia, serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --spacing: 0.25rem;
@@ -55,7 +56,6 @@
     --color-ink-muted: var(--pm-text-muted);
     --color-edge: var(--pm-border);
     --color-edge-strong: var(--pm-border-strong);
-    --font-hand: 'Patrick Hand', 'Quicksand', 'Be Vietnam Pro', cursive;
     --radius-full: 9999px;
     --shadow-card: 0 1px 2px rgba(74,48,24,0.06), 0 10px 28px rgba(74,48,24,0.08);
     --shadow-elevated: 0 2px 4px rgba(74,48,24,0.07), 0 18px 40px rgba(74,48,24,0.14);
@@ -873,10 +873,10 @@
   .bg-card {
     background-color: var(--color-card);
   }
-  .bg-card\/95 {
+  .bg-card\/85 {
     background-color: var(--color-card);
     @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-card) 95%, transparent);
+      background-color: color-mix(in oklab, var(--color-card) 85%, transparent);
     }
   }
   .bg-danger-soft {
@@ -1050,6 +1050,9 @@
   .font-sans {
     font-family: var(--font-sans);
   }
+  .font-serif {
+    font-family: var(--font-serif);
+  }
   .text-2xl {
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
@@ -1079,6 +1082,9 @@
   }
   .text-\[0\.625rem\] {
     font-size: 0.625rem;
+  }
+  .text-\[1\.2rem\] {
+    font-size: 1.2rem;
   }
   .text-\[1\.6rem\] {
     font-size: 1.6rem;
@@ -1251,6 +1257,10 @@
   }
   .opacity-\[0\.88\] {
     opacity: 0.88;
+  }
+  .shadow {
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .shadow-card {
     --tw-shadow: 0 1px 2px var(--tw-shadow-color, rgba(74,48,24,0.06)), 0 10px 28px var(--tw-shadow-color, rgba(74,48,24,0.08));

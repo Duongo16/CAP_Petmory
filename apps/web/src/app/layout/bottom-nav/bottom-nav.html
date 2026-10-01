@@ -1,0 +1,8 @@
+<nav class="bar" [attr.aria-label]="'NAV.MAIN' | translate">
+  @for (stop of stops; track stop.path) {
+    <a class="stop" [routerLink]="stop.path" routerLinkActive="on">
+      <pm-icon [name]="stop.icon" [size]="20" />
+      <span>{{ stop.key | translate }}</span>
+    </a>
+  }
+</nav>

@@ -7,6 +7,7 @@ import { catchError, of, switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { PetsService } from '../../core/services/pets.service';
 import { Icon } from '../../shared/icon/icon';
+import { PetArt } from '../../shared/pet-art/pet-art';
 
 /** A benefit shown in the left panel. Both keys are written out in full. */
 interface Perk {
@@ -60,7 +61,7 @@ function scorePassword(value: string): number {
 @Component({
   selector: 'pm-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './register.html',
   styleUrls: ['./auth-shared.scss', './register.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

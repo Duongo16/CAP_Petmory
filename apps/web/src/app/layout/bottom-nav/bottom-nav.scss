@@ -1,0 +1,50 @@
+/* Thanh dieu huong noi o day man hinh dien thoai. */
+
+:host {
+  display: none;
+}
+
+.bar {
+  position: fixed;
+  inset-inline: 12px;
+  inset-block-end: calc(12px + env(safe-area-inset-bottom));
+  z-index: 45;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  min-block-size: 64px;
+  padding: 6px;
+  border-radius: 22px;
+  border: 1px solid var(--pm-border);
+  background: var(--pm-glass-card);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--pm-shadow-lifted);
+}
+
+.stop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-inline-size: 56px;
+  padding: 6px 8px;
+  border-radius: 14px;
+  color: var(--pm-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 140ms ease, background 140ms ease;
+}
+
+.stop.on {
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+  font-weight: 700;
+}
+
+/* Chi hien tren man hinh hep, vi man rong da co thanh tren dau trang. */
+@media (max-width: 900px) {
+  :host {
+    display: block;
+  }
+}

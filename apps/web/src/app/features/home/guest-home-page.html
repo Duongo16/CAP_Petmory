@@ -1,317 +1,217 @@
-<div class="guest-home">
+<div class="lp">
+  <header class="lp-bar">
+    <div class="lp-bar-inner">
+      <a class="lp-brand" routerLink="/landing">
+        <span class="lp-mark" aria-hidden="true"><pm-icon name="paw" [size]="20" /></span>
+        <span class="lp-brand-text">
+          <strong>Petmory</strong>
+          <span>{{ 'AUTH.BRAND_SUB' | translate }}</span>
+        </span>
+      </a>
+      <nav class="lp-nav" [attr.aria-label]="'NAV.MAIN' | translate">
+        <a href="#features">{{ 'LANDING.NAV_DIARY' | translate }}</a>
+        <a href="#features">{{ 'LANDING.NAV_MEMORY' | translate }}</a>
+        <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
+      </nav>
+      <div class="lp-bar-actions">
+        <a class="lp-link-btn" routerLink="/login">{{ 'AUTH.SIGN_IN' | translate }}</a>
+        <button type="button" class="lp-btn lp-btn-sm" (click)="openOnboarding()">{{ 'LANDING.START_FREE' | translate }}</button>
+      </div>
+    </div>
+  </header>
 
-  <!-- ===== HERO ===== -->
-  <section class="gh-hero">
-    <!-- Ambient glow blobs (TailMates-style) -->
-    <span class="gh-glow gh-glow-a" aria-hidden="true"></span>
-    <span class="gh-glow gh-glow-b" aria-hidden="true"></span>
-
-    <!-- Floating particles (paw-print dots) -->
-    <span class="gh-particle gh-p1" aria-hidden="true">🐾</span>
-    <span class="gh-particle gh-p2" aria-hidden="true">🐾</span>
-    <span class="gh-particle gh-p3" aria-hidden="true">✨</span>
-    <span class="gh-particle gh-p4" aria-hidden="true">🐾</span>
-
-    <div class="gh-hero-inner">
-      <!-- Left: text column -->
-      <div class="gh-hero-text">
-        <p class="gh-badge">
-          <span aria-hidden="true">🐾</span>
-          Ghi lại hành trình cùng thú cưng
-        </p>
-
-        <h1 class="gh-hero-title">
-          Mỗi khoảnh khắc<br>
-          <em>đều xứng được nhớ mãi</em>
+  <section class="lp-hero">
+    <span class="lp-glow lp-glow-a" aria-hidden="true"></span>
+    <span class="lp-glow lp-glow-b" aria-hidden="true"></span>
+    <div class="lp-hero-inner">
+      <div class="lp-hero-text">
+        <span class="lp-pill">
+          <pm-icon name="sparkle" [size]="14" />
+          {{ 'LANDING.BADGE' | translate }}
+        </span>
+        <h1 class="lp-title">
+          {{ 'LANDING.TITLE_LEAD' | translate }}<br />
+          <em>{{ 'LANDING.TITLE_ACCENT' | translate }}</em>
         </h1>
-
-        <p class="gh-hero-desc">
-          Petmory là cuốn nhật ký số ấm áp dành cho bạn và thú cưng — ghi lại ký ức, chia sẻ với cộng đồng, và tạo ra những kỷ vật độc nhất không nơi nào có.
-        </p>
-
-        <div class="gh-hero-cta">
-          <button class="gh-btn-primary" (click)="openOnboarding()" type="button">
-            Bắt đầu miễn phí
-            <span aria-hidden="true">→</span>
+        <p class="lp-lead">{{ 'LANDING.LEAD' | translate }}</p>
+        <div class="lp-cta-row">
+          <button type="button" class="lp-btn lp-btn-lg" (click)="openOnboarding()">
+            {{ 'LANDING.CREATE_PET' | translate }}
+            <pm-icon name="arrow" [size]="18" />
           </button>
-          <a class="gh-btn-secondary" href="#features">
-            Xem tính năng
-          </a>
+          <a class="lp-btn-ghost lp-btn-lg" href="#how">{{ 'LANDING.HOW_IT_WORKS' | translate }}</a>
         </div>
-
-        <ul class="gh-stats">
-          <li>
-            <strong>10K+</strong>
-            <span>thú cưng được nhớ</span>
-          </li>
-          <li aria-hidden="true" class="gh-stats-sep">·</li>
-          <li>
-            <strong>4.9 ★</strong>
-            <span>đánh giá cộng đồng</span>
-          </li>
-          <li aria-hidden="true" class="gh-stats-sep">·</li>
-          <li>
-            <strong>Miễn phí</strong>
-            <span>mãi mãi cho 1 bé</span>
-          </li>
+        <ul class="lp-trust">
+          @for (key of trust; track key) {
+            <li><pm-icon name="check" [size]="16" />{{ key | translate }}</li>
+          }
         </ul>
       </div>
 
-      <!-- Right: illustration panel -->
-      <div class="gh-hero-art" aria-hidden="true">
-        <!-- Main pet card illustration -->
-        <div class="gh-art-card">
-          <!-- Fake pet photo area with layered emojis -->
-          <div class="gh-art-photo">
-            <span class="gh-art-emoji-main">🐕</span>
-            <span class="gh-art-badge-love">❤️</span>
+      <div class="lp-art" aria-hidden="true">
+        <div class="lp-art-back"></div>
+        <div class="lp-art-card">
+          <span class="lp-tape"></span>
+          <div class="lp-art-photo">
+            <span class="lp-art-halo"></span>
+            <pm-pet-art kind="cat" [width]="250" />
           </div>
-          <div class="gh-art-meta">
-            <div class="gh-art-avatar-row">
-              <span class="gh-art-avatar">M</span>
-              <div>
-                <p class="gh-art-name">Bé Mochi</p>
-                <p class="gh-art-sub">Golden Retriever · 2 tuổi</p>
-              </div>
-            </div>
-            <div class="gh-art-tags">
-              <span class="gh-art-tag gh-art-tag-accent">Nhật ký</span>
-              <span class="gh-art-tag gh-art-tag-amber">Kỷ niệm</span>
-              <span class="gh-art-tag gh-art-tag-success">Khoẻ mạnh</span>
-            </div>
+          <div class="lp-art-caption">
+            <span class="lp-hand">{{ 'LANDING.ART_CAPTION' | translate }}</span>
+            <span class="lp-art-date">12.06</span>
           </div>
         </div>
-
-        <!-- Floating glassmorphism chips (TailMates-inspired) -->
-        <div class="gh-art-chip gh-art-chip-top">
-          <span class="gh-chip-dot"></span>
-          <span>Đang trực tuyến</span>
+        <div class="lp-chip lp-chip-memory">
+          <span class="lp-chip-icon"><pm-icon name="calendar" [size]="20" /></span>
+          <span class="lp-chip-text">
+            <small>{{ 'LANDING.ART_CHIP_EYEBROW' | translate }}</small>
+            <strong>{{ 'LANDING.ART_CHIP_TITLE' | translate }}</strong>
+          </span>
         </div>
-        <div class="gh-art-chip gh-art-chip-btm">
-          <span>✨</span>
-          <span>Kỷ niệm mới!</span>
-        </div>
-        <div class="gh-art-chip gh-art-chip-side">
-          <span>🐾</span>
-          <span>+12 ảnh hôm nay</span>
+        <div class="lp-chip lp-chip-status">
+          <span class="lp-dot"></span>
+          {{ 'LANDING.ART_STATUS' | translate }}
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== FEATURES ===== -->
-  <section class="gh-features" id="features">
-    <header class="gh-section-head">
-      <p class="gh-eyebrow">Tính năng</p>
-      <h2 class="gh-section-title">Tất cả trong một nơi</h2>
-      <p class="gh-section-sub">Petmory không chỉ là album ảnh — đây là trải nghiệm gắn kết bạn với thú cưng mỗi ngày.</p>
+  <section class="lp-section" id="features">
+    <header class="lp-head">
+      <span class="lp-eyebrow">{{ 'LANDING.FEATURES_EYEBROW' | translate }}</span>
+      <h2 class="lp-h2">{{ 'LANDING.FEATURES_TITLE' | translate }}</h2>
+      <p class="lp-sub">{{ 'LANDING.FEATURES_SUB' | translate }}</p>
     </header>
-
-    <div class="gh-feature-grid">
-      @for (feat of features; track feat.title) {
-        <article class="gh-feature-card" [attr.data-tone]="feat.tone">
-          <!-- Hover shine sweep (TailMates-inspired) -->
-          <span class="gh-card-shine" aria-hidden="true"></span>
-          <span class="gh-feature-icon" aria-hidden="true">{{ feat.icon }}</span>
-          <h3 class="gh-feature-name">{{ feat.title }}</h3>
-          <p class="gh-feature-desc">{{ feat.description }}</p>
-          <span class="gh-feature-arrow" aria-hidden="true">→</span>
+    <div class="lp-features">
+      @for (feat of features; track feat.nameKey) {
+        <article class="lp-feature">
+          <span class="lp-feature-icon" [attr.data-tone]="feat.tone"><pm-icon [name]="feat.icon" [size]="24" /></span>
+          <h3>{{ feat.nameKey | translate }}</h3>
+          <p>{{ feat.textKey | translate }}</p>
         </article>
       }
     </div>
   </section>
 
-  <!-- ===== HOW IT WORKS ===== -->
-  <section class="gh-how">
-    <div class="gh-how-inner">
-      <header class="gh-section-head">
-        <p class="gh-eyebrow">Bắt đầu thôi</p>
-        <h2 class="gh-section-title">Chỉ 3 bước đơn giản</h2>
-        <p class="gh-section-sub">Không cần kỹ thuật — chỉ cần tình yêu dành cho thú cưng.</p>
+  <section class="lp-band" id="how">
+    <div class="lp-section">
+      <header class="lp-head">
+        <span class="lp-eyebrow">{{ 'LANDING.STEPS_EYEBROW' | translate }}</span>
+        <h2 class="lp-h2">{{ 'LANDING.STEPS_TITLE' | translate }}</h2>
       </header>
-
-      <ol class="gh-steps">
+      <ol class="lp-steps">
         @for (step of steps; track step.number) {
-          <li class="gh-step">
-            <div class="gh-step-icon" [attr.data-tone]="step.tone">{{ step.icon }}</div>
-            <span class="gh-step-num" [attr.data-tone]="step.tone">{{ step.number }}</span>
-            <h3 class="gh-step-name">{{ step.title }}</h3>
-            <p class="gh-step-desc">{{ step.description }}</p>
+          <li class="lp-step">
+            <span class="lp-step-num" [attr.data-tone]="step.tone">{{ step.number }}</span>
+            <h3>{{ step.nameKey | translate }}</h3>
+            <p>{{ step.textKey | translate }}</p>
           </li>
         }
       </ol>
     </div>
   </section>
 
-  <!-- ===== COMMUNITY PREVIEW ===== -->
-  <section class="gh-community">
-    <div class="gh-community-inner">
-      <header class="gh-section-head gh-section-head-left">
-        <p class="gh-eyebrow">Cộng đồng</p>
-        <h2 class="gh-section-title">Câu chuyện từ cộng đồng</h2>
-        <p class="gh-section-sub">Hàng nghìn "sen" đã lưu lại những khoảnh khắc không thể quên.</p>
-      </header>
-
-      <!-- Fake community post cards (illustration) -->
-      <div class="gh-post-grid" aria-hidden="true">
-        <div class="gh-post-card">
-          <div class="gh-post-header">
-            <span class="gh-post-avatar gh-post-avatar-amber">A</span>
-            <div>
-              <p class="gh-post-author">Anh Khôi</p>
-              <p class="gh-post-time">2 giờ trước</p>
-            </div>
-          </div>
-          <div class="gh-post-photo gh-post-photo-1">🐱</div>
-          <p class="gh-post-text">Hôm nay Luna tròn 1 tuổi rồi! Bé ăn bánh sinh nhật rất ngon 🎂</p>
-          <div class="gh-post-actions">
-            <span>❤️ 42</span>
-            <span>💬 8</span>
-          </div>
-        </div>
-
-        <div class="gh-post-card gh-post-card-featured">
-          <div class="gh-post-header">
-            <span class="gh-post-avatar gh-post-avatar-accent">T</span>
-            <div>
-              <p class="gh-post-author">Thảo Nhi</p>
-              <p class="gh-post-time">5 giờ trước</p>
-            </div>
-          </div>
-          <div class="gh-post-photo gh-post-photo-2">🐶</div>
-          <p class="gh-post-text">Mochi vừa được tạo kỷ vật 3D cực cute — cảm ơn Petmory! ✨</p>
-          <div class="gh-post-actions">
-            <span>❤️ 127</span>
-            <span>💬 31</span>
-          </div>
-        </div>
-
-        <div class="gh-post-card">
-          <div class="gh-post-header">
-            <span class="gh-post-avatar gh-post-avatar-memorial">M</span>
-            <div>
-              <p class="gh-post-author">Minh Tuấn</p>
-              <p class="gh-post-time">hôm qua</p>
-            </div>
-          </div>
-          <div class="gh-post-photo gh-post-photo-3">🐰</div>
-          <p class="gh-post-text">Kỷ niệm 3 năm cùng bé Bông 🐰 Mỗi tấm ảnh là một câu chuyện.</p>
-          <div class="gh-post-actions">
-            <span>❤️ 89</span>
-            <span>💬 14</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== CTA BANNER ===== -->
-  <section class="gh-cta">
-    <!-- decorative blobs -->
-    <span class="gh-cta-blob gh-cta-blob-l" aria-hidden="true"></span>
-    <span class="gh-cta-blob gh-cta-blob-r" aria-hidden="true"></span>
-
-    <span class="gh-cta-icon" aria-hidden="true">🐾</span>
-    <h2 class="gh-cta-title">Bắt đầu hành trình cùng thú cưng của bạn</h2>
-    <p class="gh-cta-sub">Miễn phí mãi mãi cho 1 thú cưng. Không cần thẻ tín dụng.</p>
-    <div class="gh-cta-btns">
-      <button class="gh-btn-cta" (click)="openOnboarding()" type="button">
-        Tạo tài khoản ngay
-      </button>
-      <a class="gh-btn-cta-ghost" routerLink="/login">
-        Đăng nhập
+  <section class="lp-section lp-book-row">
+    <div class="lp-book-text">
+      <span class="lp-eyebrow">{{ 'LANDING.BOOK_EYEBROW' | translate }}</span>
+      <h2 class="lp-h2">{{ 'LANDING.BOOK_TITLE' | translate }}</h2>
+      <p class="lp-sub">{{ 'LANDING.BOOK_SUB' | translate }}</p>
+      <a class="lp-text-link" routerLink="/diaries">
+        {{ 'LANDING.BOOK_LINK' | translate }}
+        <pm-icon name="arrow" [size]="16" />
       </a>
     </div>
+    <div class="lp-book" aria-hidden="true">
+      <div class="lp-page lp-page-left">
+        <span class="lp-page-date">{{ 'LANDING.BOOK_DATE' | translate }}</span>
+        <span class="lp-hand lp-page-title">{{ 'LANDING.BOOK_PAGE_TITLE' | translate }}</span>
+        <span class="lp-hand lp-page-body">{{ 'LANDING.BOOK_PAGE_BODY' | translate }}</span>
+      </div>
+      <div class="lp-page lp-page-right">
+        <div class="lp-polaroid"><pm-pet-art kind="dog" [width]="150" /></div>
+      </div>
+    </div>
   </section>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="gh-footer">
-    <div class="gh-footer-inner">
-      <div class="gh-footer-brand">
-        <p class="gh-footer-logo">Petmory</p>
-        <p class="gh-footer-tagline">Ghi lại ký ức, giữ mãi yêu thương.</p>
+  <section class="lp-section lp-cta-wrap">
+    <div class="lp-cta">
+      <span class="lp-cta-glow lp-cta-glow-a" aria-hidden="true"></span>
+      <span class="lp-cta-glow lp-cta-glow-b" aria-hidden="true"></span>
+      <h2>{{ 'LANDING.CTA_TITLE' | translate }}</h2>
+      <p>{{ 'LANDING.CTA_SUB' | translate }}</p>
+      <div class="lp-cta-row lp-center">
+        <button type="button" class="lp-btn-light lp-btn-lg" (click)="openOnboarding()">{{ 'LANDING.CTA_CREATE' | translate }}</button>
+        <a class="lp-btn-outline lp-btn-lg" routerLink="/login">{{ 'LANDING.CTA_LOGIN' | translate }}</a>
       </div>
-      <nav class="gh-footer-nav" aria-label="Điều hướng footer">
-        <a routerLink="/login">Đăng nhập</a>
-        <a routerLink="/register">Đăng ký</a>
-        <a routerLink="/community">Cộng đồng</a>
-        <a routerLink="/products">Cửa hàng</a>
-        <a routerLink="/diaries">Nhật ký công khai</a>
-      </nav>
     </div>
-    <p class="gh-footer-copy">© 2026 Petmory. Made with love for pets 🐾</p>
-  </footer>
+  </section>
 
+  <footer class="lp-footer">
+    <div class="lp-footer-inner">
+      <div class="lp-footer-top">
+        <div class="lp-footer-brand">
+          <strong>Petmory</strong>
+          <span>{{ 'LANDING.FOOTER_SLOGAN' | translate }}</span>
+        </div>
+        <nav class="lp-footer-nav" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
+          <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
+          <a routerLink="/login">{{ 'AUTH.SIGN_IN' | translate }}</a>
+          <a routerLink="/register">{{ 'AUTH.SIGN_UP' | translate }}</a>
+        </nav>
+      </div>
+      <span class="lp-footer-copy">{{ 'LANDING.FOOTER_COPY' | translate }}</span>
+    </div>
+  </footer>
 </div>
 
-<!-- ===== ONBOARDING MODAL ===== -->
-@if (onboardingStep() !== null) {
-  <div class="gh-modal-backdrop" (click)="closeOnboarding()" role="dialog" aria-modal="true" aria-labelledby="gh-modal-title">
-    <div class="gh-modal" (click)="$event.stopPropagation()">
-      <button class="gh-modal-close" (click)="closeOnboarding()" type="button" aria-label="Đóng">✕</button>
-
-      <!-- Step progress bar (TailMates-style gradient) -->
-      <div class="gh-modal-progress" aria-hidden="true">
-        <div class="gh-modal-progress-bar" [style.width]="onboardingStep() === 1 ? '50%' : '100%'"></div>
+@if (onboardingStep(); as step) {
+  <div class="lp-modal-backdrop" (click)="closeOnboarding()" (keydown.escape)="closeOnboarding()">
+    <div
+      class="lp-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="lp-modal-title"
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+      (keydown)="$event.stopPropagation()"
+    >
+      <button class="lp-modal-close" type="button" (click)="closeOnboarding()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+        <pm-icon name="close" [size]="16" />
+      </button>
+      <div class="lp-progress" aria-hidden="true">
+        <span class="lp-progress-bar" [class.full]="step === 2"></span>
       </div>
-      <p class="gh-modal-step-label" aria-hidden="true">Bước {{ onboardingStep() }} / 2</p>
+      <p class="lp-step-label">{{ 'LANDING.MODAL.STEP' | translate: { step: step } }}</p>
 
-      @if (onboardingStep() === 1) {
-        <div class="gh-modal-body">
-          <span class="gh-modal-icon" aria-hidden="true">🐾</span>
-          <h2 class="gh-modal-title" id="gh-modal-title">
-            Chào mừng! Hãy cùng tạo hồ sơ cho thú cưng của bạn
-          </h2>
-          <p class="gh-modal-sub">
-            Một hồ sơ nhỏ xinh để ghi lại trọn vẹn hành trình của bé.
-          </p>
-
-          <!-- Pet profile preview card -->
-          <div class="gh-preview-card">
-            <div class="gh-preview-photo">
-              <span aria-hidden="true">🐕</span>
-            </div>
-            <div class="gh-preview-info">
-              <p class="gh-preview-name">Tên thú cưng của bạn</p>
-              <p class="gh-preview-breed">Giống · Tuổi</p>
-              <div class="gh-preview-tags">
-                <span class="gh-preview-tag">Nhật ký</span>
-                <span class="gh-preview-tag">Kỷ niệm</span>
-              </div>
-            </div>
+      @if (step === 1) {
+        <div class="lp-modal-body">
+          <pm-pet-art kind="cat" [width]="120" />
+          <h2 class="lp-modal-title" id="lp-modal-title">{{ 'LANDING.MODAL.TITLE_1' | translate }}</h2>
+          <p class="lp-modal-sub">{{ 'LANDING.MODAL.SUB_1' | translate }}</p>
+          <div class="lp-preview">
+            <span class="lp-preview-photo"><pm-pet-art kind="dog" [face]="true" [width]="52" /></span>
+            <span class="lp-preview-text">
+              <strong>{{ 'LANDING.MODAL.PREVIEW_NAME' | translate }}</strong>
+              <span>{{ 'LANDING.MODAL.PREVIEW_SUB' | translate }}</span>
+            </span>
           </div>
-
-          <button class="gh-btn-primary gh-modal-next" (click)="nextOnboardingStep()" type="button">
-            Tiếp tục →
+          <button type="button" class="lp-btn lp-btn-block" (click)="nextOnboardingStep()">
+            {{ 'LANDING.MODAL.NEXT' | translate }}
+            <pm-icon name="arrow" [size]="16" />
           </button>
         </div>
-      }
-
-      @if (onboardingStep() === 2) {
-        <div class="gh-modal-body">
-          <span class="gh-modal-icon" aria-hidden="true">🔐</span>
-          <h2 class="gh-modal-title" id="gh-modal-title">
-            Để lưu hồ sơ, bạn cần đăng nhập hoặc tạo tài khoản
-          </h2>
-          <p class="gh-modal-sub">
-            Chỉ mất 30 giây — hoàn toàn miễn phí!
-          </p>
-
-          <ul class="gh-modal-perks" aria-label="Quyền lợi khi đăng ký">
-            <li>✅ Hồ sơ thú cưng riêng tư &amp; đẹp mắt</li>
-            <li>✅ Ghi nhật ký ảnh + video không giới hạn</li>
-            <li>✅ Tạo kỷ vật 3D độc nhất vô nhị</li>
-            <li>✅ Kết nối cộng đồng yêu thú cưng</li>
+      } @else {
+        <div class="lp-modal-body">
+          <span class="lp-modal-mark" aria-hidden="true"><pm-icon name="shield" [size]="26" /></span>
+          <h2 class="lp-modal-title" id="lp-modal-title">{{ 'LANDING.MODAL.TITLE_2' | translate }}</h2>
+          <p class="lp-modal-sub">{{ 'LANDING.MODAL.SUB_2' | translate }}</p>
+          <ul class="lp-perks">
+            @for (perk of perks; track perk) {
+              <li><pm-icon name="check" [size]="16" />{{ perk | translate }}</li>
+            }
           </ul>
-
-          <div class="gh-modal-auth-options">
-            <a class="gh-btn-primary" routerLink="/register">
-              🎉 Đăng ký miễn phí
-            </a>
-            <a class="gh-btn-secondary" routerLink="/login">
-              Đã có tài khoản? Đăng nhập
-            </a>
-          </div>
+          <a class="lp-btn lp-btn-block" routerLink="/register">{{ 'LANDING.MODAL.REGISTER' | translate }}</a>
+          <a class="lp-btn-ghost lp-btn-block" routerLink="/login">{{ 'LANDING.MODAL.LOGIN' | translate }}</a>
         </div>
       }
     </div>

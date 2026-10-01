@@ -1,0 +1,37 @@
+:host {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.fur { fill: var(--pm-art-fur); }
+.cream { fill: var(--pm-art-cream); }
+.tan { fill: var(--pm-art-tan); }
+.dark { fill: var(--pm-art-dark); }
+.blush { fill: var(--pm-art-blush); }
+.soft { opacity: 0.7; }
+.eye { fill: var(--pm-art-eye); }
+.shine { fill: var(--pm-art-cream); }
+.collar { fill: var(--pm-art-collar); }
+.tag { fill: var(--pm-art-tag); }
+.shadow { fill: var(--pm-art-shadow); }
+
+.tail {
+  fill: none;
+  stroke: var(--pm-art-fur);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+.stripe {
+  fill: none;
+  stroke: var(--pm-art-dark);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.mouth {
+  fill: none;
+  stroke: var(--pm-art-eye);
+  stroke-width: 2;
+  stroke-linecap: round;
+}

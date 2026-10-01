@@ -61,85 +61,87 @@ input[type='radio'] {
   align-items: center;
   gap: 24px;
   text-align: center;
-
-  &.ap-grad-login {
-    background: linear-gradient(135deg, var(--pm-accent) 0%, var(--pm-amber-bright) 100%);
-  }
-
-  &.ap-grad-register {
-    background: linear-gradient(135deg, var(--pm-amber-bright) 0%, var(--pm-accent) 100%);
-  }
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
 }
 
 @media (min-width: 1024px) {
   .ap-visual-panel { display: flex; }
 }
 
-/* Decorative blobs */
 .ap-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(56px);
   pointer-events: none;
-  opacity: 0.22;
 }
 
 .ap-blob-a {
-  width: 320px;
-  height: 320px;
-  top: -80px;
-  right: -40px;
-  background: var(--pm-on-accent);
+  width: 420px;
+  height: 420px;
+  top: -120px;
+  right: -100px;
+  background: var(--pm-amber-bright);
+  opacity: 0.4;
+  filter: blur(80px);
 }
 
 .ap-blob-b {
-  width: 260px;
-  height: 260px;
-  bottom: -60px;
-  left: -30px;
-  background: var(--pm-amber-bright);
+  width: 360px;
+  height: 360px;
+  bottom: -120px;
+  left: -80px;
+  background: var(--pm-accent-dark);
+  opacity: 0.7;
+  filter: blur(70px);
 }
 
-/* Floating pet illustration */
 .ap-illustration {
-  font-size: 7rem;
-  line-height: 1;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.18));
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: var(--pm-glass-on-accent);
+  border: 1px solid var(--pm-glass-on-accent-line);
   animation: ap-float 6s ease-in-out infinite;
 }
 
 @keyframes ap-float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%       { transform: translateY(-20px) rotate(5deg); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -14px, 0); }
 }
 
-/* Visual text */
 .ap-visual-title {
+  position: relative;
   margin: 0;
+  max-width: 440px;
   font-family: var(--pm-font-display);
   font-size: 2rem;
   font-weight: 500;
-  color: var(--pm-on-accent);
   line-height: 1.25;
 }
 
 .ap-visual-sub {
+  position: relative;
   margin: 0;
-  font-size: var(--pm-text-md);
-  color: rgba(255, 255, 255, 0.82);
+  max-width: 400px;
+  font-size: var(--pm-text-base);
   line-height: 1.6;
+  opacity: 0.88;
 }
 
-/* Glassmorphism card (perks list / quote) */
 .ap-glass-card,
 .ap-glass-quote {
+  position: relative;
   width: 100%;
-  max-width: 320px;
+  max-width: 380px;
+  box-sizing: border-box;
   padding: 20px 24px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background: var(--pm-glass-on-accent);
+  border: 1px solid var(--pm-glass-on-accent-line);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
   text-align: left;
 }
 
@@ -153,7 +155,6 @@ input[type='radio'] {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--pm-on-accent);
 }
 
 .ap-glass-perk-icon {
@@ -162,8 +163,8 @@ input[type='radio'] {
   width: 36px;
   height: 36px;
   flex-shrink: 0;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: var(--pm-glass-on-accent-line);
 }
 
 .ap-glass-perk-text {
@@ -179,22 +180,24 @@ input[type='radio'] {
 
 .ap-glass-perk-desc {
   font-size: var(--pm-text-xs);
-  opacity: 0.75;
+  opacity: 0.8;
 }
 
-.ap-glass-quote blockquote {
-  margin: 0 0 8px;
-  font-family: var(--pm-font-display);
-  font-size: var(--pm-text-md);
-  font-style: italic;
-  color: var(--pm-on-accent);
-  line-height: 1.5;
+.ap-quote-text {
+  margin: 0 0 10px;
+  font-family: var(--pm-font-hand);
+  font-size: 22px;
+  line-height: 1.35;
 }
 
-.ap-glass-quote cite {
-  font-size: var(--pm-text-xs);
-  color: rgba(255, 255, 255, 0.7);
-  font-style: normal;
+.ap-quote-by {
+  margin: 0;
+  font-size: var(--pm-text-sm);
+  opacity: 0.78;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-illustration { animation: none; }
 }
 
 /* ===================================================
@@ -203,6 +206,7 @@ input[type='radio'] {
 
 /* Back link */
 .ap-back {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -217,19 +221,15 @@ input[type='radio'] {
 
 /* Logo icon */
 .ap-logo-icon {
+  align-self: flex-start;
   display: grid;
   place-items: center;
   width: 52px;
   height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--pm-accent), var(--pm-amber-bright));
-  box-shadow: 0 6px 20px var(--pm-accent-soft);
-  font-size: 1.6rem;
-  cursor: default;
-  transition: transform 180ms ease;
-  user-select: none;
-
-  &:hover { transform: scale(1.05) rotate(5deg); }
+  border-radius: 16px;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  box-shadow: var(--pm-accent-glow);
 }
 
 /* Heading */
@@ -315,7 +315,6 @@ input[type='radio'] {
   &.ap-notice-danger {
     background: var(--pm-danger-soft);
     color: var(--pm-danger);
-    border: 1px solid rgba(var(--pm-danger-rgb, 220, 38, 38), 0.2);
   }
 }
 
@@ -360,8 +359,8 @@ input[type='radio'] {
   width: 100%;
   height: 48px;
   padding: 0 44px 0 14px;
-  border: 1.5px solid var(--pm-border-strong);
-  border-radius: 10px;
+  border: 1.5px solid var(--pm-border);
+  border-radius: 12px;
   background: var(--pm-bg-muted);
   color: var(--pm-text);
   font-size: var(--pm-text-sm);
@@ -374,7 +373,8 @@ input[type='radio'] {
 
   &:focus {
     border-color: var(--pm-accent);
-    box-shadow: 0 0 0 3px var(--pm-accent-soft);
+    background: var(--pm-bg-card);
+    box-shadow: 0 0 0 4px var(--pm-accent-soft);
   }
 }
 
@@ -428,12 +428,12 @@ input[type='radio'] {
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 16px var(--pm-accent-soft);
+  box-shadow: var(--pm-accent-glow);
   transition: background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 
   &:hover:not(:disabled) {
     background: var(--pm-accent-dark);
-    box-shadow: 0 8px 24px var(--pm-accent-soft);
+    box-shadow: var(--pm-accent-glow);
     transform: translate3d(0, -1px, 0);
   }
 

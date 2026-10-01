@@ -1,0 +1,58 @@
+<svg
+  viewBox="0 0 240 220"
+  [attr.width]="width()"
+  [attr.height]="width() * 0.917"
+  aria-hidden="true"
+  focusable="false"
+>
+  @if (kind() === 'cat') {
+    @if (face()) {
+      <path class="fur" d="M70 70 L62 20 L110 46 Z" />
+      <path class="fur" d="M170 70 L178 20 L130 46 Z" />
+      <circle class="fur" cx="120" cy="104" r="72" />
+      <ellipse class="cream" cx="120" cy="126" rx="30" ry="21" />
+      <circle class="eye" cx="94" cy="96" r="8" />
+      <circle class="eye" cx="146" cy="96" r="8" />
+      <path class="eye" d="M113 116 h14 l-7 8 z" />
+    } @else {
+      <ellipse class="shadow" cx="120" cy="206" rx="72" ry="8" />
+      <path class="tail" d="M168 188 C218 182 222 128 192 118" />
+      <ellipse class="fur" cx="120" cy="150" rx="58" ry="55" />
+      <ellipse class="cream" cx="120" cy="166" rx="30" ry="34" />
+      <path class="fur" d="M84 62 L78 20 L114 46 Z" />
+      <path class="fur" d="M156 62 L162 20 L126 46 Z" />
+      <path class="blush" d="M88 54 L85 32 L104 46 Z" />
+      <path class="blush" d="M152 54 L155 32 L136 46 Z" />
+      <circle class="fur" cx="120" cy="84" r="44" />
+      <path class="stripe" d="M108 46 q12 9 24 0" />
+      <ellipse class="cream" cx="120" cy="98" rx="19" ry="13" />
+      <circle class="blush soft" cx="96" cy="96" r="6" />
+      <circle class="blush soft" cx="144" cy="96" r="6" />
+      <circle class="eye" cx="104" cy="80" r="4.5" />
+      <circle class="eye" cx="136" cy="80" r="4.5" />
+      <path class="eye" d="M115 92 h10 l-5 6 z" />
+      <path class="mouth" d="M120 98 q-5 6 -10 3 M120 98 q5 6 10 3" />
+      <ellipse class="cream" cx="98" cy="202" rx="14" ry="8" />
+      <ellipse class="cream" cx="142" cy="202" rx="14" ry="8" />
+    }
+  } @else {
+    @if (!face()) {
+      <path class="tan" d="M78 160 Q120 236 162 160 L172 220 H68 Z" />
+    }
+    <path class="dark" d="M66 64 C38 76 40 142 70 142 C82 120 84 88 66 64 Z" />
+    <path class="dark" d="M174 64 C202 76 200 142 170 142 C158 120 156 88 174 64 Z" />
+    <circle class="tan" cx="120" cy="100" r="60" />
+    <ellipse class="fur" cx="143" cy="90" rx="17" ry="15" />
+    <ellipse class="cream" cx="120" cy="126" rx="32" ry="24" />
+    <circle class="eye" cx="98" cy="94" r="6" />
+    <circle class="eye" cx="142" cy="92" r="6" />
+    <circle class="shine" cx="100" cy="92" r="2" />
+    <circle class="shine" cx="144" cy="90" r="2" />
+    <ellipse class="eye" cx="120" cy="116" rx="10" ry="7" />
+    <path class="mouth" d="M120 123 v8 M120 131 q-8 7 -15 2 M120 131 q8 7 15 2" />
+    @if (!face()) {
+      <rect class="collar" x="82" y="156" width="76" height="12" rx="6" />
+      <circle class="tag" cx="120" cy="176" r="9" />
+    }
+  }
+</svg>

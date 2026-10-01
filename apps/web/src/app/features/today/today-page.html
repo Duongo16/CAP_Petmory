@@ -1,0 +1,174 @@
+<div class="day">
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+    }
+    @case ('DONE') {
+      <header class="hello">
+        <div class="hello-text">
+          <p class="hello-date">{{ today | date: 'EEEE, d MMMM' }}</p>
+          <h1 class="hello-line">{{ greetingKey() | translate: { name: whoseName() } }}</h1>
+          <p class="hello-sub">{{ 'TODAY.GREET_SUB' | translate }}</p>
+        </div>
+        @if (spotlight(); as pet) {
+          <div class="hello-actions">
+            <a class="btn-ghost" [routerLink]="['/pets', pet._id, 'photos']">
+              <pm-icon name="camera" [size]="17" />
+              {{ 'TODAY.UPLOAD' | translate }}
+            </a>
+            <a class="btn-solid" [routerLink]="['/pets', pet._id, 'journal']">
+              <pm-icon name="plus" [size]="17" />
+              {{ 'TODAY.WRITE' | translate }}
+            </a>
+          </div>
+        }
+      </header>
+
+      @if (noPets()) {
+        <section class="blank">
+          <pm-pet-art kind="cat" [width]="160" />
+          <p class="blank-text">{{ 'TODAY.NO_PET' | translate }}</p>
+          <a class="btn-solid" routerLink="/pets">
+            <pm-icon name="plus" [size]="17" />
+            {{ 'TODAY.ADD_PET' | translate }}
+          </a>
+        </section>
+      } @else {
+        <div class="board">
+          <div class="board-main">
+            @if (flashback(); as back) {
+              <section class="flash">
+                <span class="flash-glow" aria-hidden="true"></span>
+                <div class="flash-text">
+                  <span class="flash-chip">
+                    <pm-icon name="sparkle" [size]="13" />
+                    {{ 'TODAY.FLASHBACK' | translate }} · {{ 'TODAY.YEARS_AGO' | translate: { count: flashbackYears() } }}
+                  </span>
+                  <h2 class="flash-title">{{ back.title }}</h2>
+                  @if (back.body) {
+                    <p class="flash-body">{{ back.body }}</p>
+                  }
+                  <a class="flash-go" [routerLink]="['/pets', back.pet, 'journal']">{{ 'TODAY.OPEN_AGAIN' | translate }}</a>
+                </div>
+                <div class="flash-collage" aria-hidden="true">
+                  <span class="flash-tile flash-tile-a"><pm-icon name="camera" [size]="36" /></span>
+                  <span class="flash-tile flash-tile-b"></span>
+                  <span class="flash-tile flash-tile-c"></span>
+                </div>
+              </section>
+            }
+
+            <section class="block">
+              <header class="block-head">
+                <h2 class="block-title">{{ 'TODAY.YOUR_PETS' | translate }}</h2>
+                <a class="block-link" routerLink="/pets">{{ 'TODAY.MANAGE' | translate }}</a>
+              </header>
+              <div class="pets">
+                @for (card of petCards(); track card.pet._id; let first = $first) {
+                  <a class="pet" [routerLink]="['/pets', card.pet._id]">
+                    <span class="pet-photo">
+                      @if (card.pet.avatarUrl) {
+                        <img [src]="card.pet.avatarUrl" alt="" />
+                      } @else {
+                        <pm-pet-art [kind]="card.art" [face]="true" [width]="44" />
+                      }
+                    </span>
+                    <span class="pet-text">
+                      <strong>{{ card.pet.name }}</strong>
+                      <span>{{ card.pet.breed || (card.kindKey | translate) }}</span>
+                    </span>
+                    <span class="pet-tags">
+                      @if (first) {
+                        <span class="tag tag-accent">{{ 'TODAY.DAYS_TOGETHER' | translate: { count: daysTogether() } }}</span>
+                      }
+                      <span class="tag" [class.tag-success]="card.pet.diaryPublic">
+                        {{ (card.pet.diaryPublic ? 'TODAY.DIARY_PUBLIC' : 'TODAY.DIARY_PRIVATE') | translate }}
+                      </span>
+                    </span>
+                  </a>
+                }
+                <a class="pet pet-add" routerLink="/pets">
+                  <span class="pet-add-mark" aria-hidden="true"><pm-icon name="plus" [size]="20" /></span>
+                  <strong>{{ 'TODAY.ADD_PET' | translate }}</strong>
+                </a>
+              </div>
+            </section>
+
+            <section class="block">
+              <header class="block-head">
+                <h2 class="block-title">{{ 'TODAY.LATEST' | translate }}</h2>
+                @if (spotlight(); as pet) {
+                  <a class="block-link" [routerLink]="['/pets', pet._id, 'journal']">{{ 'TODAY.SEE_BOOK' | translate }}</a>
+                }
+              </header>
+              @if (recentCards().length > 0) {
+                <ul class="entries">
+                  @for (row of recentCards(); track row.memory._id) {
+                    <li>
+                      <a class="entry" [routerLink]="['/pets', row.memory.pet, 'journal']">
+                        <span class="entry-mark" aria-hidden="true"><pm-icon name="book" [size]="22" /></span>
+                        <span class="entry-text">
+                          <span class="entry-title">{{ row.memory.title }}</span>
+                          <span class="entry-meta">
+                            {{ row.petName }}
+                            <span aria-hidden="true">·</span>
+                            {{ row.memory.happenedAt | date: 'EEEE, dd.MM' }}
+                            <span aria-hidden="true">·</span>
+                            {{ row.topicKey | translate }}
+                          </span>
+                        </span>
+                        <pm-icon name="chevron" [size]="18" />
+                      </a>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="quiet">{{ 'TODAY.NO_MOMENT' | translate }}</p>
+              }
+            </section>
+          </div>
+
+          <aside class="board-side">
+            <section class="promo">
+              <span class="promo-glow" aria-hidden="true"></span>
+              <span class="promo-eyebrow">{{ 'TODAY.STUDIO' | translate }}</span>
+              <h3 class="promo-title">{{ 'TODAY.STUDIO_PROMO' | translate }}</h3>
+              <a class="promo-go" routerLink="/studio">{{ 'TODAY.STUDIO_OPEN' | translate }}</a>
+            </section>
+
+            @if (spotlight(); as pet) {
+              <a class="side-tile" [routerLink]="['/pets', pet._id, 'photos']">
+                <span class="side-icon" data-tone="amber"><pm-icon name="image" [size]="20" /></span>
+                <span class="side-text">
+                  <strong>{{ 'TODAY.ALBUM' | translate }}</strong>
+                  <span>{{ 'TODAY.ALBUM_SUB' | translate }}</span>
+                </span>
+                <pm-icon name="chevron" [size]="16" />
+              </a>
+              <a class="side-tile" [routerLink]="['/pets', pet._id, 'story']">
+                <span class="side-icon" data-tone="memorial"><pm-icon name="sparkle" [size]="20" /></span>
+                <span class="side-text">
+                  <strong>{{ 'TODAY.STORY' | translate }}</strong>
+                  <span>{{ 'TODAY.STORY_SUB' | translate }}</span>
+                </span>
+                <pm-icon name="chevron" [size]="16" />
+              </a>
+            }
+
+            <a class="side-tile" routerLink="/orders">
+              <span class="side-icon" data-tone="accent"><pm-icon name="truck" [size]="20" /></span>
+              <span class="side-text">
+                <strong>{{ 'TODAY.ORDERS' | translate }}</strong>
+                <span>{{ 'TODAY.ORDERS_SUB' | translate }}</span>
+              </span>
+              <pm-icon name="chevron" [size]="16" />
+            </a>
+          </aside>
+        </div>
+      }
+    }
+  }
+</div>
