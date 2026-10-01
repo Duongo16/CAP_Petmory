@@ -218,14 +218,16 @@ async function makePhoto(where, shift) {
   guest.on('pageerror', (e) => guestBroken.push(String(e)));
   await guest.goto(`${WEB}/diaries`, { waitUntil: 'networkidle' });
   await settle(guest);
-  await guest.waitForSelector('.cards .card', { timeout: 30000 });
-  const names = await guest.locator('.cards .card h2').allInnerTexts();
+  await guest.waitForSelector('.shelf .book', { timeout: 30000 });
+  const names = await guest.locator('.shelf .book .book-name').allInnerTexts();
   ok('Quyen cong khai hien o trang cong dong',
     names.some((one) => one.includes(String(STAMP))), names.slice(0, 3).join(' | '));
   ok('Khong co nut binh luan, tim hay theo doi tren trang cong dong',
     (await guest.locator('button:has-text("Bình luận"), button:has-text("Theo dõi")').count()) === 0);
 
-  await guest.locator(`.cards .card:has-text("${STAMP}")`).click();
+  ok('Moi quyen ghi ro chu nhan',
+    (await guest.locator('.shelf .book-owner-name').count()) === (await guest.locator('.shelf .book').count()));
+  await guest.locator(`.shelf .book:has-text("${STAMP}")`).click();
   await guest.waitForURL('**/diaries/**', { timeout: 20000 });
   await guest.waitForSelector('.book .leaf', { timeout: 30000 });
   await guest.locator('.view-switch button:has-text("Dòng thời gian")').click();

@@ -393,6 +393,8 @@ export interface DiaryCard {
   momentCount: number;
   lastMomentAt: string | null;
   ownerName: string;
+  ownerId: string;
+  ownerAvatarUrl: string;
   slide: { trackCode: string; effect: string; seconds: number };
 }
 

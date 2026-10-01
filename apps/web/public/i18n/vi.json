@@ -807,7 +807,8 @@
     "BACK_TO_LIST": "Về danh sách",
     "MISSING": "Không tìm thấy quyển nhật ký này.",
     "NO_MOMENT": "Quyển này chưa có khoảnh khắc nào.",
-    "HIDE_SHOW": "Đóng trình chiếu"
+    "HIDE_SHOW": "Đóng trình chiếu",
+    "BOOK_OF": "Nhật ký của {{pet}}, do {{owner}} lưu giữ"
   },
   "BOOK": {
     "PAGE_OF": "Trang {{at}}/{{total}}",

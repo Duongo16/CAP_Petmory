@@ -126,7 +126,9 @@ async function run() {
   const hiddenBook = await call(`/diaries/${other.petId}`);
   ok('Quyen rieng tu khong mo duoc tu ben ngoai', hiddenBook.status === 404,
     String(hiddenBook.status));
-  const feed = await call('/diaries');
+  // Tim theo dau thoi gian cua lan chay nay, de quyen khong bi day sang trang sau
+  // boi cac quyen do nhung lan chay truoc de lai.
+  const feed = await call(`/diaries?keyword=${STAMP}`);
   const inFeed = (feed.body?.rows ?? []).some((one) => one.petId === mine.petId);
   const otherInFeed = (feed.body?.rows ?? []).some((one) => one.petId === other.petId);
   ok('Quyen cong khai hien o trang cong dong', inFeed);

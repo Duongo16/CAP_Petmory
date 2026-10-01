@@ -1,6 +1,8 @@
+@use '../../shared/bookshelf';
+
 /*
- * Danh sach cac quyen nhat ky dang de cong khai. Bo cuc nam o lop Tailwind
- * trong mau; o day chi con nen trang, anh dai dien va chip dang chon.
+ * Gia sach cac quyen nhat ky cong khai. Tu, van go va quyen sach bay ra dung
+ * chung voi tu sach cua chu nhan; o day them dong ghi chu nhan tren bia.
  */
 
 :host {
@@ -26,14 +28,56 @@
   color: var(--pm-text-muted);
 }
 
-.face {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  flex: none;
-  object-fit: cover;
+/* Bia cong dong chat hon mot chut de du cho dong chu nhan. */
+.shelf {
+  --row: 286px;
+}
+
+.book {
+  aspect-ratio: 5 / 7;
+}
+
+.book-cover {
+  gap: 4px;
+}
+
+.book-face {
+  width: 66px;
+  height: 66px;
+}
+
+/* Chu nhan quyen nhat ky, ngay duoi anh va ten cua be. */
+.book-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  margin-top: 4px;
+  padding: 3px 8px 3px 3px;
   border-radius: var(--pm-radius-pill);
-  background: var(--pm-accent-soft);
-  color: var(--pm-accent);
+  background: var(--pm-glass-on-accent);
+  border: 1px solid var(--pm-glass-on-accent-line);
+
+  &.big {
+    margin-top: 8px;
+    padding: 4px 12px 4px 4px;
+
+    .book-owner-name {
+      font-size: 14px;
+    }
+  }
+}
+
+.book-owner-name {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .shelf {
+    --row: 246px;
+  }
 }

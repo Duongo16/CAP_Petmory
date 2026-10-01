@@ -807,7 +807,8 @@
     "BACK_TO_LIST": "Back to the list",
     "MISSING": "This diary could not be found.",
     "NO_MOMENT": "This diary has no moments yet.",
-    "HIDE_SHOW": "Close the slideshow"
+    "HIDE_SHOW": "Close the slideshow",
+    "BOOK_OF": "{{pet}}'s diary, kept by {{owner}}"
   },
   "BOOK": {
     "PAGE_OF": "Page {{at}} of {{total}}",

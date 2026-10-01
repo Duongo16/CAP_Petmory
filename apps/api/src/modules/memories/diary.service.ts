@@ -26,8 +26,21 @@ export interface DiaryCard {
   momentCount: number;
   lastMomentAt: Date | null;
   ownerName: string;
+  /** Chi de mo trang cong dong cua chu nhan, trang do tu kiem quyen. */
+  ownerId: string;
+  ownerAvatarUrl: string;
   slide: { trackCode: string; effect: string; seconds: number };
 }
+
+/** Phan cong khai cua chu nhan mot quyen nhat ky. */
+interface OwnerInfo {
+  id: string;
+  fullName: string;
+  avatarUrl: string;
+}
+
+/** Truong can doc cua chu nhan, khong lay them gi khac. */
+const OWNER_FIELDS = { projection: { fullName: 1, avatarUrl: 1 } };
 
 /** Toan bo mot quyen nhat ky cho nguoi doc, kem cac khoanh khac. */
 export interface DiaryBook {
@@ -326,13 +339,14 @@ export class DiaryService {
     const tally = new Map(grouped.map((one) => [one._id.toString(), one]));
     const owners = await this.petModel.db
       .collection('users')
-      .find({ _id: { $in: pets.map((one) => one.owner) } }, { projection: { fullName: 1 } })
+      .find({ _id: { $in: pets.map((one) => one.owner) } }, OWNER_FIELDS)
       .toArray();
-    const nameOfOwner = new Map(owners.map((one) => [String(one._id), String(one.fullName ?? '')]));
+    const ownerOf = new Map(owners.map((one) => [String(one._id), this.ownerInfo(one)]));
 
     return pets.map((pet) => {
       const seen = tally.get(pet._id.toString());
-      return this.cardOf(pet, seen?.count ?? 0, seen?.last ?? null, nameOfOwner.get(pet.owner.toString()) ?? '');
+      const owner = ownerOf.get(pet.owner.toString()) ?? { id: pet.owner.toString(), fullName: '', avatarUrl: '' };
+      return this.cardOf(pet, seen?.count ?? 0, seen?.last ?? null, owner);
     });
   }
 
@@ -342,7 +356,7 @@ export class DiaryService {
    * Chi tra ve nhung gi mot nguoi la duoc phep nhin. Ma chip, ten nguoi cham
    * soc va dia chi nha deu la du lieu dinh danh nen khong bao gio ra khoi day.
    */
-  private cardOf(pet: PetDocument, momentCount: number, lastMomentAt: Date | null, ownerName: string): DiaryCard {
+  private cardOf(pet: PetDocument, momentCount: number, lastMomentAt: Date | null, owner: OwnerInfo): DiaryCard {
     return {
       petId: pet._id.toString(),
       name: pet.name,
@@ -351,12 +365,22 @@ export class DiaryService {
       avatarUrl: pet.avatarUrl,
       momentCount,
       lastMomentAt,
-      ownerName,
+      ownerName: owner.fullName,
+      ownerId: owner.id,
+      ownerAvatarUrl: owner.avatarUrl,
       slide: {
         trackCode: pet.slideSetting.trackCode,
         effect: pet.slideSetting.effect,
         seconds: pet.slideSetting.seconds,
       },
+    };
+  }
+
+  private ownerInfo(row: { _id: unknown; fullName?: unknown; avatarUrl?: unknown }): OwnerInfo {
+    return {
+      id: String(row._id),
+      fullName: String(row.fullName ?? ''),
+      avatarUrl: String(row.avatarUrl ?? ''),
     };
   }
 
@@ -368,7 +392,7 @@ export class DiaryService {
       .exec();
     const owner = await this.petModel.db
       .collection('users')
-      .findOne({ _id: pet.owner }, { projection: { fullName: 1 } });
+      .findOne({ _id: pet.owner }, OWNER_FIELDS);
     const photoIds = [
       ...moments.flatMap((one) => one.photo),
       ...moments.flatMap((one) => one.decor.map((item) => item.photo)),
@@ -378,7 +402,7 @@ export class DiaryService {
       .exec();
     const last = moments[0]?.happenedAt ?? null;
     return {
-      pet: this.cardOf(pet, moments.length, last, String(owner?.fullName ?? '')),
+      pet: this.cardOf(pet, moments.length, last, owner ? this.ownerInfo(owner) : { id: pet.owner.toString(), fullName: '', avatarUrl: '' }),
       moments,
       photo,
     };
