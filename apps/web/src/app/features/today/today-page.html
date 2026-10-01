@@ -15,7 +15,7 @@
         </div>
         @if (spotlight(); as pet) {
           <div class="hello-actions">
-            <a class="btn-ghost" [routerLink]="['/pets', pet._id, 'photos']">
+            <a class="btn-ghost" [routerLink]="['/pets', pet._id, 'journal']" [queryParams]="{ view: 'photos' }">
               <pm-icon name="camera" [size]="17" />
               {{ 'TODAY.UPLOAD' | translate }}
             </a>
@@ -132,7 +132,7 @@
             </section>
 
             @if (spotlight(); as pet) {
-              <a class="side-tile" [routerLink]="['/pets', pet._id, 'photos']">
+              <a class="side-tile" [routerLink]="['/pets', pet._id, 'journal']" [queryParams]="{ view: 'photos' }">
                 <span class="side-icon" data-tone="amber"><pm-icon name="image" [size]="20" /></span>
                 <span class="side-text">
                   <strong>{{ 'TODAY.ALBUM' | translate }}</strong>

@@ -144,8 +144,11 @@ export const routes: Routes = [
           inject(Router).createUrlTree(['/pets'], { queryParams: { open: params['id'] } }),
       },
       {
+        // Anh cua be nay nam trong tab Anh cua nhat ky, nen link cu dua ve do.
         path: 'pets/:id/photos',
-        loadComponent: () => import('./features/photos/photos-page').then((m) => m.PhotosPage),
+        pathMatch: 'full',
+        redirectTo: ({ params }) =>
+          inject(Router).createUrlTree(['/pets', params['id'], 'journal'], { queryParams: { view: 'photos' } }),
       },
       {
         path: 'pets/:id/slideshow',

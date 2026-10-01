@@ -51,24 +51,17 @@
       </header>
 
       <nav class="view-switch tw-tabs self-start" [attr.aria-label]="'BOOK.VIEW_LABEL' | translate">
-        <button
-          type="button"
-          class="tw-tab"
-          [class.on]="asBook()"
-          [attr.aria-pressed]="asBook()"
-          (click)="showBook(true)"
-        >
-          {{ 'BOOK.AS_BOOK' | translate }}
-        </button>
-        <button
-          type="button"
-          class="tw-tab"
-          [class.on]="!asBook()"
-          [attr.aria-pressed]="!asBook()"
-          (click)="showBook(false)"
-        >
-          {{ 'BOOK.AS_LIST' | translate }}
-        </button>
+        @for (tab of tabs; track tab.view) {
+          <button
+            type="button"
+            class="tw-tab"
+            [class.on]="view() === tab.view"
+            [attr.aria-pressed]="view() === tab.view"
+            (click)="show(tab.view)"
+          >
+            {{ tab.key | translate }}
+          </button>
+        }
       </nav>
 
       @if (facade.pageProblem(); as trouble) {
@@ -84,6 +77,9 @@
         />
       }
 
+      @if (view() === 'PHOTOS') {
+        <pm-pet-photos [petId]="petId" (changed)="photosChanged()" />
+      } @else {
       <div class="filters flex flex-wrap items-center gap-2" [class.tucked]="asBook()">
         <label class="tw-label" for="memory-topic-filter">{{ 'MEMORY.FILTER_LABEL' | translate }}</label>
         <select id="memory-topic-filter" class="filter-select tw-select w-auto min-w-56" (change)="chooseFrom($event)">
@@ -104,7 +100,7 @@
             {{ 'MEMORY.ADD' | translate }}
           </button>
         </div>
-      } @else if (!asBook()) {
+      } @else if (view() === 'MAP') {
         <div class="map">
           <svg class="compass" viewBox="0 0 100 100" aria-hidden="true">
             <circle cx="50" cy="50" r="44" class="compass-ring" />
@@ -251,6 +247,7 @@
             </button>
           </nav>
         }
+      }
       }
     }
   }

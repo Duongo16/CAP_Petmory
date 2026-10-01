@@ -1,0 +1,70 @@
+<section class="photos">
+  <div class="bar">
+    <label class="tw-btn-primary add" for="album-file" [class.busy]="facade.uploading()" [class.off]="facade.full()">
+      <pm-icon name="image" [size]="16" />
+      {{ (facade.uploading() ? 'PHOTO.SENDING' : 'PHOTO.ADD') | translate }}
+    </label>
+    <input
+      id="album-file"
+      class="sr-only"
+      type="file"
+      accept="image/png,image/jpeg"
+      multiple
+      [disabled]="facade.uploading() || facade.full()"
+      (change)="pick($event)"
+    />
+    <pm-image-link
+      class="link"
+      boxId="album-link"
+      [disabled]="facade.uploading() || facade.full()"
+      [busy]="facade.uploading()"
+      (picked)="addLink($event)"
+    />
+    <span class="tally">
+      {{ facade.count() }}/{{ facade.limit }}
+      @if (facade.full()) {
+        · {{ 'PHOTO.FULL' | translate }}
+      }
+    </span>
+  </div>
+
+  @if (facade.error(); as message) {
+    <p class="note" role="alert">{{ message | translate }}</p>
+  }
+
+  @switch (facade.status()) {
+    @case ('LOADING') {
+      <p class="centre">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <div class="centre">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="tw-btn-secondary" (click)="facade.reload()">{{ 'COMMON.RETRY' | translate }}</button>
+      </div>
+    }
+    @case ('EMPTY') {
+      <div class="centre tw-empty">
+        <span class="empty-mark" aria-hidden="true"><pm-icon name="image" [size]="32" /></span>
+        <p>{{ 'PHOTO.EMPTY' | translate }}</p>
+        <p class="empty-hint">{{ 'PHOTO.EMPTY_HINT' | translate }}</p>
+      </div>
+    }
+    @case ('HAS_DATA') {
+      <ul class="grid">
+        @for (card of facade.cards(); track card.photo._id) {
+          <li class="shot">
+            <button type="button" class="shot-open" (click)="open(card)" [attr.aria-label]="'PHOTO.VIEW' | translate">
+              @if (card.source) {
+                <img [src]="card.source" alt="" loading="lazy" />
+              }
+            </button>
+            <span class="shot-date">{{ card.photo.createdAt | date: 'dd/MM/yyyy' }}</span>
+            <button type="button" class="shot-drop" (click)="remove(card)" [attr.aria-label]="'COMMON.REMOVE' | translate">
+              <pm-icon name="trash" [size]="14" />
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>

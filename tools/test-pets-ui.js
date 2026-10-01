@@ -165,19 +165,13 @@ async function makePhoto(tint) {
   // Doc qua giao dien chu khong moc token tu bo nho, vi noi cat token la viec
   // rieng cua lop chan yeu cau, bai kiem thu khong nen biet toi.
   await page.locator('.pet-deeds a').first().click();
-  await page.waitForURL('**/photos', { timeout: 20000 });
+  await page.waitForURL('**/journal?view=photos', { timeout: 20000 });
   await settle(page);
   // Anh duoc tai qua duong co kiem tra quyen, nen doi den khi no hien ra.
-  await page.locator('.shot-photo img').first().waitFor({ state: 'visible', timeout: 25000 });
-  const shown = await page.locator('.shot-photo img').count();
+  await page.locator('pm-pet-photos .shot img').first().waitFor({ state: 'visible', timeout: 25000 });
+  const shown = await page.locator('pm-pet-photos .shot img').count();
   ok('Anh da len may chu va hien o trang anh cua be', shown >= 1, `${shown} anh`);
 
-  // Moi anh phai duoc cham diem va noi ro diem yeu neu co.
-  ok('Trang anh co bang tham dinh', (await page.locator('.verdict').count()) === 1);
-  const grades = await page.locator('.shot-grade').count();
-  ok('Moi anh deu duoc cham diem', grades === shown, `${grades}/${shown}`);
-  const share = await page.locator('.verdict-share strong').innerText();
-  ok('Bang tham dinh dem dung so anh', share.endsWith(`/${shown}`), share);
   await page.screenshot({ path: path.join(OUT, 'pets-4-photos.png'), fullPage: true });
 
   await page.goto(`${WEB}/pets`, { waitUntil: 'networkidle' });
@@ -185,7 +179,7 @@ async function makePhoto(tint) {
   await page.waitForTimeout(1200);
 
   // --- Editing reopens the same form, filled in ---
-  await page.locator('.pet-deeds button').first().click();
+  await page.locator('.pet-deeds button', { hasText: 'Sửa' }).first().click();
   await page.waitForSelector('.sheet', { timeout: 15000 });
   ok('Bam sua thi mo lai dung hop thoai do', await page.locator('.sheet').isVisible());
   ok('Ten da duoc dien san',

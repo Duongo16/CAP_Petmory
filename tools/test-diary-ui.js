@@ -82,7 +82,7 @@ async function makePhoto(where, shift) {
   await settle(page);
   await page.fill('#login-email', EMAIL);
   await page.fill('#login-password', PASSWORD);
-  await page.click('.submit');
+  await page.click('button[type=submit]');
   await page.waitForURL('**/home', { timeout: 30000 });
 
   // --- Gui hai anh vao album ---
@@ -90,7 +90,7 @@ async function makePhoto(where, shift) {
     await makePhoto(path.join(OUT, `nk-a-${STAMP}.png`), 0),
     await makePhoto(path.join(OUT, `nk-b-${STAMP}.png`), 40),
   ];
-  await page.goto(`${WEB}/pets/${pet._id}/photos`, { waitUntil: 'networkidle' });
+  await page.goto(`${WEB}/pets/${pet._id}/journal?view=photos`, { waitUntil: 'networkidle' });
   await settle(page);
   await page.setInputFiles('#album-file', files);
   await page.waitForSelector('.edit', { timeout: 20000 });
@@ -98,8 +98,8 @@ async function makePhoto(where, shift) {
     await page.locator('.edit-foot button:has-text("Giữ ảnh gốc")').click();
     await page.waitForTimeout(400);
   }
-  await page.waitForSelector('.shot-photo img', { timeout: 30000 });
-  ok('Album co hai anh', (await page.locator('.shot').count()) === 2);
+  await page.waitForSelector('pm-pet-photos .shot img', { timeout: 30000 });
+  ok('Album co hai anh', (await page.locator('pm-pet-photos .shot').count()) === 2);
 
   // --- Viet mot khoanh khac kem anh ---
   await page.goto(`${WEB}/pets/${pet._id}/journal`, { waitUntil: 'networkidle' });

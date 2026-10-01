@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Icon } from '../../shared/icon/icon';
+import { Icon } from '../../../shared/icon/icon';
 import {
   CropBox,
   Extent,

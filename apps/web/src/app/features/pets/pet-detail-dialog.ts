@@ -119,7 +119,7 @@ export class PetDetailDialog implements OnInit {
   }
 
   openAlbum(): void {
-    this.go(['/pets', this.data.petId, 'photos']);
+    this.go(['/pets', this.data.petId, 'journal'], { view: 'photos' });
   }
 
   private load(id: string): void {

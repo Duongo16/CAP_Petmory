@@ -133,10 +133,10 @@ async function clearAlbum(page, token, petId) {
   await settle(page);
   await page.fill('#login-email', EMAIL);
   await page.fill('#login-password', PASSWORD);
-  await page.click('.submit');
+  await page.click('button[type=submit]');
   await page.waitForURL('**/home', { timeout: 30000 });
 
-  const album = `${WEB}/pets/${pet._id}/photos`;
+  const album = `${WEB}/pets/${pet._id}/journal?view=photos`;
   const file = await makePhoto(path.join(OUT, `crop-source-${STAMP}.png`));
 
   // --- Hop sua anh mo ra truoc khi anh roi may ---

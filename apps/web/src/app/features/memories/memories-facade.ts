@@ -260,7 +260,7 @@ export class MemoriesFacade {
   }
 
   /** Doc album cua be, de hop viet khoanh khac co anh ma chon. */
-  private loadAlbum(): void {
+  loadAlbum(): void {
     this.photos
       .list(this.petId)
       .pipe(

@@ -82,7 +82,7 @@
                 <pm-icon name="eye" [size]="15" />
                 {{ 'PET.VIEW_PROFILE' | translate }}
               </button>
-              <a class="tw-btn-secondary tw-btn-sm" [routerLink]="['/pets', pet._id, 'photos']">
+              <a class="tw-btn-secondary tw-btn-sm" [routerLink]="['/pets', pet._id, 'journal']" [queryParams]="{ view: 'photos' }">
                 <pm-icon name="image" [size]="15" />
                 {{ 'PET.MANAGE_PHOTOS' | translate }}
               </a>

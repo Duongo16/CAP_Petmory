@@ -25,11 +25,27 @@ import { PageEditor, PageEditRequest, PageEditResult } from './book/page-editor'
 import { PaperKind } from '../../shared/diary-art';
 import { Memory, MemoryTopic } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
+import { PetPhotos } from './pet-photos/pet-photos';
+
+/** Ba cach xem nhat ky cua mot be. */
+type DiaryView = 'BOOK' | 'MAP' | 'PHOTOS';
+
+const DIARY_TABS: { view: DiaryView; key: string }[] = [
+  { view: 'BOOK', key: 'BOOK.AS_BOOK' },
+  { view: 'MAP', key: 'BOOK.AS_LIST' },
+  { view: 'PHOTOS', key: 'BOOK.AS_PHOTOS' },
+];
+
+/** Doc tab tu duong dan, chi nhan nhung tab co that. */
+function viewFrom(raw: string | null): DiaryView {
+  const wanted = (raw ?? '').toUpperCase();
+  return DIARY_TABS.find((one) => one.view === wanted)?.view ?? 'BOOK';
+}
 
 @Component({
   selector: 'pm-memories-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, TranslatePipe, DiaryBookView, Icon],
+  imports: [RouterLink, DatePipe, TranslatePipe, DiaryBookView, Icon, PetPhotos],
   providers: [MemoriesFacade],
   templateUrl: './memories-page.html',
   styleUrl: './memories-page.scss',
@@ -45,8 +61,14 @@ export class MemoriesPage implements OnInit {
   private readonly petFaces = inject(PetFaceService);
   private readonly page = inject(DOCUMENT);
 
-  /** Doc theo quyen so lat trang, hay theo dong thoi gian. */
-  readonly asBook = signal(true);
+  /** Dang xem quyen so, ban do thoi gian hay danh sach anh cua be. */
+  readonly view = signal<DiaryView>('BOOK');
+  readonly asBook = computed(() => this.view() === 'BOOK');
+
+  readonly tabs = DIARY_TABS;
+
+  /** Ma cua be dang mo, doc mot lan tu duong dan. */
+  petId = '';
 
   /**
    * Cac mat giay cua quyen so.
@@ -105,8 +127,21 @@ export class MemoriesPage implements OnInit {
     return out;
   });
 
-  showBook(wanted: boolean): void {
-    this.asBook.set(wanted);
+  /** Doi tab va ghi lai vao duong dan, de tai lai trang van mo dung tab. */
+  show(view: DiaryView): void {
+    this.view.set(view);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { view: view === 'BOOK' ? null : view.toLowerCase() },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  /** Album vua doi thi cap nhat anh dai dien va kho anh cua hop viet. */
+  photosChanged(): void {
+    this.petFaces.refresh(this.petId);
+    this.facade.loadAlbum();
   }
 
   /** Mo hop bay tri cho mot trang, roi luu lai nhung gi nguoi dung dat. */
@@ -151,6 +186,8 @@ export class MemoriesPage implements OnInit {
   ngOnInit(): void {
     this.writeOnArrival = this.route.snapshot.queryParamMap.get('write') === '1';
     const id = this.route.snapshot.paramMap.get('id') ?? '';
+    this.petId = id;
+    this.view.set(viewFrom(this.route.snapshot.queryParamMap.get('view')));
     this.petFaces.request(id);
     this.facade.start(id);
   }

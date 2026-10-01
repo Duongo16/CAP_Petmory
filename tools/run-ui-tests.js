@@ -17,7 +17,6 @@ const SUITES = [
   { name: 'roles', file: 'test-roles-ui.js' },
   { name: 'theme', file: 'test-theme-ui.js' },
   { name: 'pets', file: 'test-pets-ui.js' },
-  { name: 'photos', file: 'test-photos-ui.js' },
   { name: 'photo-edit', file: 'test-photo-edit.js' },
   { name: 'diary', file: 'test-diary-ui.js' },
   { name: 'diary-book', file: 'test-diary-book-ui.js' },
