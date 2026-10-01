@@ -20,6 +20,7 @@ import { DiaryPage, Pet, PetPhoto } from '../../core/models/api.model';
 import { genderKeyOf, kindKeyOf } from '../../shared/pet-labels';
 import { Icon } from '../../shared/icon/icon';
 import { PetFace } from '../../shared/pet-face/pet-face';
+import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -58,10 +59,13 @@ export interface PetDetailRequest {
  * The whole of one pet's record, opened over the pets screen: who they are,
  * what they are like, who looks after them, and how much has been kept.
  */
+/** So anh xep chong trong khoi kho bau. */
+const SNAP_COUNT = 3;
+
 @Component({
   selector: 'pm-pet-detail-dialog',
   standalone: true,
-  imports: [PetFace, DatePipe, TranslatePipe, Icon],
+  imports: [PetFace, PetArt, DatePipe, TranslatePipe, Icon],
   templateUrl: './pet-detail-dialog.html',
   styleUrl: './pet-detail-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,6 +84,11 @@ export class PetDetailDialog implements OnInit {
   readonly photoCount = signal(0);
   readonly memoryCount = signal(0);
   readonly milestoneCount = signal(0);
+
+  /** Toi da ba anh dau album, xep thanh chong anh o goc phai khoi kho bau. */
+  readonly snaps = signal<string[]>([]);
+
+  readonly artKind = computed<PetArtKind>(() => (this.pet()?.kind === 'CAT' ? 'cat' : 'dog'));
 
   readonly kindKey = computed(() => {
     const one = this.pet();
@@ -100,6 +109,7 @@ export class PetDetailDialog implements OnInit {
   );
 
   ngOnInit(): void {
+    this.destroyRef.onDestroy(() => this.releaseSnaps());
     this.load(this.data.petId);
   }
 
@@ -149,8 +159,28 @@ export class PetDetailDialog implements OnInit {
           this.memoryCount.set(all.diary.total);
           this.milestoneCount.set(all.diary.milestoneCount);
           this.status.set('DONE');
+          this.loadSnaps(kept.slice(0, SNAP_COUNT));
         },
         error: () => this.status.set('ERROR'),
       });
+  }
+
+  /** Doc noi dung vai anh qua duong co kiem quyen; loi thi chi bo qua hieu ung. */
+  private loadSnaps(rows: PetPhoto[]): void {
+    if (rows.length === 0) {
+      return;
+    }
+    forkJoin(rows.map((row) => this.photos.content(row._id)))
+      .pipe(
+        catchError(() => of<Blob[]>([])),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((blobs) => this.snaps.set(blobs.map((blob) => URL.createObjectURL(blob))));
+  }
+
+  private releaseSnaps(): void {
+    for (const address of this.snaps()) {
+      URL.revokeObjectURL(address);
+    }
   }
 }

@@ -11,7 +11,13 @@ import { PetArt, PetArtKind } from '../pet-art/pet-art';
   standalone: true,
   imports: [PetArt],
   template: `
-    <span class="face" [class.round]="round()" [style.width.px]="size()" [style.height.px]="size()">
+    <span
+      class="face"
+      [class.round]="round()"
+      [class.fill]="fill()"
+      [style.width.px]="fill() ? null : size()"
+      [style.height.px]="fill() ? null : size()"
+    >
       @if (source(); as src) {
         <img [src]="src" [alt]="name()" />
       } @else {
@@ -20,6 +26,7 @@ import { PetArt, PetArtKind } from '../pet-art/pet-art';
     </span>
   `,
   styleUrl: './pet-face.scss',
+  host: { '[class.fill]': 'fill()' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PetFace {
@@ -31,11 +38,13 @@ export class PetFace {
   readonly name = input('');
   readonly size = input(56);
   readonly round = input(false);
+  /** Phu kin khung cha thay vi giu mot co co dinh. */
+  readonly fill = input(false);
   /** Off for someone else's pet, whose album this person may not read. */
   readonly album = input(true);
 
   readonly art = computed<PetArtKind>(() => (this.kind() === 'CAT' ? 'cat' : 'dog'));
-  readonly artWidth = computed(() => Math.round(this.size() * 0.78));
+  readonly artWidth = computed(() => Math.round(this.size() * (this.fill() ? 1 : 0.78)));
 
   readonly source = computed(
     () => this.avatarUrl() || (this.album() ? this.faces.faces()[this.petId()] : '') || '',

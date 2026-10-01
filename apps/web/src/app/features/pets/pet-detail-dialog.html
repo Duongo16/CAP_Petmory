@@ -132,7 +132,22 @@
           </section>
         }
 
-        <section class="treasure flex flex-col gap-3 p-6 rounded-xl bg-night text-on-night">
+        <section class="treasure relative overflow-hidden flex flex-col gap-3 p-6 rounded-xl bg-night text-on-night">
+          <div class="treasure-art" aria-hidden="true">
+            <span class="glow"></span>
+            @if (snaps().length > 0) {
+              @for (src of snaps(); track src; let at = $index) {
+                <span class="snap" [attr.data-at]="at"><img [src]="src" alt="" /></span>
+              }
+            } @else {
+              <span class="snap" data-at="0">
+                <pm-pet-face [petId]="pet._id" [avatarUrl]="pet.avatarUrl" [kind]="pet.kind" [name]="pet.name" [size]="150" [fill]="true" />
+              </span>
+            }
+            <span class="spark spark-a"><pm-icon name="sparkle" [size]="16" [filled]="true" /></span>
+            <span class="spark spark-b"><pm-icon name="heart" [size]="14" [filled]="true" /></span>
+            <span class="spark spark-c"><pm-icon name="sparkle" [size]="11" [filled]="true" /></span>
+          </div>
           <p class="m-0 text-xs font-bold tracking-[0.1em] uppercase treasure-eyebrow">{{ 'PET.TREASURE_EYEBROW' | translate }}</p>
           <h2 class="m-0 font-serif text-2xl font-medium leading-tight">{{ 'PET.TREASURE_TITLE' | translate }}</h2>
           <p class="m-0 max-w-[62ch] text-sm leading-relaxed opacity-80">{{ 'PET.TREASURE_SUB' | translate }}</p>
@@ -164,7 +179,13 @@
           </div>
         </section>
 
-        <section class="flex items-center justify-between gap-4 flex-wrap p-6 rounded-xl bg-amber-soft text-on-amber">
+        <section class="keepsake relative overflow-hidden flex items-center justify-between gap-4 flex-wrap p-6 rounded-xl bg-amber-soft text-on-amber">
+          <div class="keepsake-art" aria-hidden="true">
+            <span class="yarn"><span class="yarn-line"></span></span>
+            <span class="buddy"><pm-pet-art [kind]="artKind()" [width]="128" /></span>
+            <span class="paw paw-a"><pm-icon name="paw" [size]="14" [filled]="true" /></span>
+            <span class="paw paw-b"><pm-icon name="paw" [size]="12" [filled]="true" /></span>
+          </div>
           <div class="flex items-center gap-4 min-w-0">
             <span class="tw-icon-tile bg-card text-amber" aria-hidden="true"><pm-icon name="sparkle" [size]="20" /></span>
             <div class="min-w-0">

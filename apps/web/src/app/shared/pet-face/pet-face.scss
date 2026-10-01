@@ -3,6 +3,12 @@
   flex-shrink: 0;
 }
 
+:host(.fill) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .face {
   display: grid;
   place-items: center;
@@ -10,6 +16,12 @@
   border-radius: 30%;
   background: var(--pm-paper-bloom);
   line-height: 0;
+
+  &.fill {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
 
   &.round {
     border-radius: 50%;

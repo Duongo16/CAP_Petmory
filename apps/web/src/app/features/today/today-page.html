@@ -66,20 +66,26 @@
                 @for (card of petCards(); track card.pet._id; let first = $first) {
                   <a class="pet" routerLink="/pets" [queryParams]="{ open: card.pet._id }">
                     <span class="pet-photo">
-                      <pm-pet-face [petId]="card.pet._id" [avatarUrl]="card.pet.avatarUrl" [kind]="card.pet.kind" [name]="card.pet.name" [size]="52" />
+                      <pm-pet-face [petId]="card.pet._id" [avatarUrl]="card.pet.avatarUrl" [kind]="card.pet.kind" [name]="card.pet.name" [size]="220" [fill]="true" />
+                    </span>
+                    <span class="pet-scrim" aria-hidden="true"></span>
+                    <span class="pet-tags">
+                      @if (first) {
+                        <span class="tag tag-accent">
+                          <pm-icon name="heart" [size]="12" [filled]="true" />
+                          {{ 'TODAY.DAYS_TOGETHER' | translate: { count: daysTogether() } }}
+                        </span>
+                      }
                     </span>
                     <span class="pet-text">
                       <strong>{{ card.pet.name }}</strong>
-                      <span>{{ card.pet.breed || (card.kindKey | translate) }}</span>
-                    </span>
-                    <span class="pet-tags">
-                      @if (first) {
-                        <span class="tag tag-accent">{{ 'TODAY.DAYS_TOGETHER' | translate: { count: daysTogether() } }}</span>
-                      }
-                      <span class="tag" [class.tag-success]="card.pet.diaryPublic">
+                      <span class="pet-breed">{{ card.pet.breed || (card.kindKey | translate) }}</span>
+                      <span class="tag tag-diary" [class.tag-success]="card.pet.diaryPublic">
+                        <pm-icon [name]="card.pet.diaryPublic ? 'eye' : 'lock'" [size]="12" />
                         {{ (card.pet.diaryPublic ? 'TODAY.DIARY_PUBLIC' : 'TODAY.DIARY_PRIVATE') | translate }}
                       </span>
                     </span>
+                    <span class="pet-go" aria-hidden="true"><pm-icon name="chevron" [size]="16" /></span>
                   </a>
                 }
                 <a class="pet pet-add" routerLink="/pets">
