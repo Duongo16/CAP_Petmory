@@ -665,7 +665,8 @@
       "BADGE_PROTECT": "Bảo vệ 100%",
       "BADGE_SACRED": "Kỷ vật thiêng liêng",
       "BADGE_DESK": "Bàn làm việc"
-    }
+    },
+    "NOT_ENOUGH": "Trong kho không còn đủ hàng cho số lượng này."
   },
   "CHECKOUT": {
     "TITLE": "Thông tin nhận hàng",
@@ -698,7 +699,8 @@
     "FULL_NAME_ERROR": "Vui lòng nhập họ tên",
     "ERROR_PHONE": "Số điện thoại gồm 10 chữ số, bắt đầu bằng 0",
     "ERROR_ADDRESS": "Vui lòng nhập địa chỉ đầy đủ",
-    "ERROR_PROVINCE": "Vui lòng nhập tỉnh hoặc thành phố"
+    "ERROR_PROVINCE": "Vui lòng nhập tỉnh hoặc thành phố",
+    "STOCK_CHANGED": "Một số món hàng có sẵn vừa hết, ngừng bán hoặc không còn đủ số lượng. Giỏ hàng vẫn được giữ nguyên, hãy quay lại giỏ để điều chỉnh rồi đặt lại."
   },
   "PAYMENT": {
     "TITLE": "Thanh toán chuyển khoản",
@@ -794,7 +796,11 @@
       "SHIPPING": "Đang giao",
       "COMPLETED": "Hoàn tất",
       "CANCELLED": "Đã hủy"
-    }
+    },
+    "CANCEL": "Huỷ đơn",
+    "CANCEL_CONFIRM": "Bấm lần nữa để huỷ",
+    "CANCELLING": "Đang huỷ…",
+    "CANCEL_FAILED": "Chưa huỷ được đơn này. Có thể đơn vừa được thanh toán, hãy xem lại trạng thái."
   },
   "DIARY": {
     "LIST_TITLE": "Nhật ký cộng đồng",
@@ -1272,7 +1278,11 @@
       "REASON": "Lý do (ghi vào lịch sử)",
       "REASON_SUGGESTION": "Ví dụ: xưởng đã nhận đơn",
       "NONE_STEP": "Đơn đã ở trạng thái cuối, không chuyển tiếp được.",
-      "HISTORY": "Lịch sử thao tác"
+      "HISTORY": "Lịch sử thao tác",
+      "READY_MADE": "Đơn hàng có sẵn",
+      "MIXED": "Đơn có cả hàng có sẵn và hàng cá nhân hóa",
+      "READY_MADE_LINE": "Hàng có sẵn",
+      "ATTENTION": "Đơn này cần người xử lý"
     },
     "RECIPIENT": {
       "ACCOUNT_INFO": "Thông tin tài khoản",
@@ -1483,7 +1493,8 @@
       "NOTE_BLOCKY": "Dáng khối vuông, rất đáng yêu nhưng không giống thật. Cả con chỉ có một vùng màu."
     },
     "GROUP_OPERATE": "Vận hành",
-    "GROUP_CATALOG": "Danh mục & xưởng"
+    "GROUP_CATALOG": "Danh mục & xưởng",
+    "ERROR_ORDER_STALE": "Đơn vừa được cập nhật ở nơi khác. Trang đã tải lại, hãy xem trạng thái mới rồi thao tác tiếp."
   },
   "FOOTER": {
     "TAGLINE": "Không chỉ là một sản phẩm, đó là một phần ký ức…",

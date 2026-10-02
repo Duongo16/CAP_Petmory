@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { BadRequestException } from '@nestjs/common';
-import { Cart, CartDocument, LineKind } from './schemas/cart.schema';
+import { Cart, CartDocument, CartItem, LineKind } from './schemas/cart.schema';
 import { AddGoodsDto, AddToCartDto } from './dto/cart.dto';
 import { CatalogService } from '../catalog/catalog.service';
 import { DesignsService } from '../designs/designs.service';
@@ -173,6 +173,13 @@ export class CartService {
     if (!item) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
+    // Hang co san khong duoc dat qua so dang co trong kho, giong luc them vao gio.
+    if (item.kind === LineKind.READY_MADE) {
+      const found = await this.goods.findVariant(item.goodsCode, item.sku);
+      if (quantity > found.variant.stock) {
+        throw new BadRequestException(`Chi con ${found.variant.stock} mon trong kho`);
+      }
+    }
     item.quantity = quantity;
     await cart.save();
     return this.format(cart);
@@ -194,6 +201,33 @@ export class CartService {
     cart.items = [];
     await cart.save();
     return this.format(cart);
+  }
+
+  /**
+   * Lay het cac dong trong gio ra de dat hang, va lam trong gio trong cung mot buoc.
+   *
+   * Bam dat hang hai lan lien tiep thi hai yeu cau cung den. Chi yeu cau nao
+   * lay duoc gio con hang moi tao duoc don; yeu cau con lai thay gio da trong.
+   */
+  async claimItems(owner: string): Promise<CartItem[]> {
+    const before = await this.model
+      .findOneAndUpdate(
+        { owner: new Types.ObjectId(owner), 'items.0': { $exists: true } },
+        { $set: { items: [] } },
+        { new: false },
+      )
+      .exec();
+    return before ? (before.toObject().items as CartItem[]) : [];
+  }
+
+  /** Tra cac dong vua lay ra ve lai gio, khi don khong dat duoc. */
+  async restoreItems(owner: string, items: CartItem[]): Promise<void> {
+    if (items.length === 0) {
+      return;
+    }
+    await this.model
+      .updateOne({ owner: new Types.ObjectId(owner) }, { $push: { items: { $each: items } } })
+      .exec();
   }
 
   /**

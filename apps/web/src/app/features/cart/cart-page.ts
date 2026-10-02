@@ -44,6 +44,7 @@ export class CartPage implements OnInit {
   readonly suggestions = this.facade.suggestions;
   readonly voucherCode = this.facade.voucherCode;
   readonly voucherRejected = this.facade.voucherRejected;
+  readonly problem = this.facade.problem;
 
   readonly craftSteps = CRAFT_STEPS;
   readonly promises = PROMISES;

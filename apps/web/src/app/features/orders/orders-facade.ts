@@ -64,6 +64,22 @@ export const STAGE_KEYS: string[] = [
   'ORDER.STAGE.PACKING',
 ];
 
+/** Hang co san khong qua xuong, nen chi co ba chang: dat, tra tien, dong goi va giao. */
+const STAGE_KEYS_READY: string[] = [
+  'ORDER.STAGE.PLACED',
+  'ORDER.STAGE.PAID',
+  'ORDER.STAGE.PACKING',
+];
+
+const STAGE_OF_STATUS_READY: Record<OrderStatus, number> = {
+  AWAITING_PAYMENT: 1,
+  PAID: 2,
+  IN_PRODUCTION: 2,
+  SHIPPING: 3,
+  COMPLETED: 3,
+  CANCELLED: 0,
+};
+
 /** One filter pill, carrying how many orders sit behind it. */
 export interface GroupChip {
   group: OrderGroup;
@@ -75,6 +91,7 @@ export interface GroupChip {
 export interface CardRow {
   raw: OrderLine;
   sizeName: string;
+  readyMade: boolean;
 }
 
 /** One order card with everything the view needs already worked out. */
@@ -85,8 +102,11 @@ export interface OrderCard {
   statusTone: string;
   needsPayment: boolean;
   stage: number;
+  stageKeys: string[];
   headline: string;
   finished: boolean;
+  /** Moi dong deu la hang co san: khong co bao hanh len, khong qua xuong. */
+  readyOnly: boolean;
 }
 
 function holdsOf(group: OrderGroup): OrderStatus[] | null {
@@ -125,16 +145,22 @@ export class OrdersFacade {
     const byCode = new Map(this.products().map((p) => [p.code, p]));
     return list.map((raw) => {
       const first = raw.rows[0];
+      const readyOnly = raw.rows.length > 0 && raw.rows.every((row) => row.kind === 'READY_MADE');
       return {
         raw,
         rows: raw.rows.map((row) => {
+          if (row.kind === 'READY_MADE') {
+            return { raw: row, sizeName: row.displayName, readyMade: true };
+          }
           const size = byCode.get(row.productTypeCode)?.sizes.find((one) => one.code === row.sizeCode);
-          return { raw: row, sizeName: size ? size.displayName : row.sizeCode };
+          return { raw: row, sizeName: size ? size.displayName : row.sizeCode, readyMade: false };
         }),
         statusKey: MINE_STATUS_KEY[raw.status],
         statusTone: GROUP_COLOR_STATUS[raw.status],
         needsPayment: NEEDS_PAYMENT.includes(raw.status),
-        stage: STAGE_OF_STATUS[raw.status],
+        stage: (readyOnly ? STAGE_OF_STATUS_READY : STAGE_OF_STATUS)[raw.status],
+        stageKeys: readyOnly ? STAGE_KEYS_READY : STAGE_KEYS,
+        readyOnly,
         headline: first ? first.displayName : raw.orderCode,
         finished: raw.status === 'COMPLETED',
       };
@@ -163,5 +189,43 @@ export class OrdersFacade {
 
   choose(group: OrderGroup): void {
     this.group.set(group);
+  }
+
+  /** Ma don dang cho khach bam lan thu hai de xac nhan huy. */
+  readonly asking = signal<string | null>(null);
+  readonly cancelling = signal<string | null>(null);
+  readonly cancelProblem = signal<string | null>(null);
+
+  /**
+   * Huy mot don chua thanh toan, qua hai lan bam.
+   *
+   * Lan dau chi hoi lai ngay tren nut, lan thu hai moi gui di, de mot cu bam
+   * nham khong lam mat don.
+   */
+  cancel(orderCode: string): void {
+    if (this.cancelling()) {
+      return;
+    }
+    if (this.asking() !== orderCode) {
+      this.asking.set(orderCode);
+      this.cancelProblem.set(null);
+      return;
+    }
+    this.asking.set(null);
+    this.cancelling.set(orderCode);
+    this.service
+      .cancel(orderCode)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (done) => {
+          this.cancelling.set(null);
+          this.all.update((list) => list.map((one) => (one.orderCode === done.orderCode ? done : one)));
+        },
+        error: () => {
+          this.cancelling.set(null);
+          this.cancelProblem.set('ORDER.CANCEL_FAILED');
+          this.load();
+        },
+      });
   }
 }

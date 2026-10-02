@@ -69,7 +69,7 @@ async function signIn(page, email, password) {
   await settle(page);
   await page.fill('#login-email', email);
   await page.fill('#login-password', password);
-  await page.click('.submit');
+  await page.click('button[type=submit]');
   await page.waitForURL('**/home', { timeout: 30000 });
 }
 

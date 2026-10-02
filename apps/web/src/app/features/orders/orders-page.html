@@ -73,7 +73,7 @@
               </header>
 
               <div class="flex flex-col gap-2">
-                <span class="self-start tw-badge tw-badge-muted">{{ 'ORDER.HANDMADE' | translate }}</span>
+                <span class="self-start tw-badge" [class.tw-badge-muted]="!card.readyOnly" [class.tw-badge-success]="card.readyOnly">{{ (card.readyOnly ? 'GOODS.TAG' : 'ORDER.HANDMADE') | translate }}</span>
                 <div class="flex items-baseline justify-between gap-6 flex-wrap">
                   <h2 class="m-0 font-serif text-xl font-medium text-ink">{{ card.headline }}</h2>
                   <strong class="text-lg font-bold whitespace-nowrap text-ink">
@@ -82,9 +82,13 @@
                 </div>
 
                 <ul class="flex flex-col gap-1 m-0 p-0 list-none">
-                  @for (row of card.rows; track row.raw.productTypeCode + row.raw.sizeCode) {
+                  @for (row of card.rows; track $index) {
                     <li class="flex items-center gap-2 flex-wrap text-xs font-medium text-ink-muted">
-                      <span>{{ 'ORDER.KIND' | translate }} {{ row.sizeName }}</span>
+                      @if (row.readyMade) {
+                        <span>{{ row.sizeName }}</span>
+                      } @else {
+                        <span>{{ 'ORDER.KIND' | translate }} {{ row.sizeName }}</span>
+                      }
                       <span class="text-edge-strong" aria-hidden="true">•</span>
                       <span>{{ 'ORDER.QUANTITY' | translate }} ×{{ row.raw.quantity }}</span>
                       @if (row.raw.petName) {
@@ -100,8 +104,10 @@
                     {{ 'ORDER.DELIVERY_DATE' | translate }}:
                     {{ card.raw.estimatedDelivery | date: 'dd/MM/yyyy' }}
                   </span>
-                  <span class="text-edge-strong" aria-hidden="true">•</span>
-                  <span class="font-medium text-success">{{ 'ORDER.WARRANTY' | translate }}</span>
+                  @if (!card.readyOnly) {
+                    <span class="text-edge-strong" aria-hidden="true">•</span>
+                    <span class="font-medium text-success">{{ 'ORDER.WARRANTY' | translate }}</span>
+                  }
                 </p>
               </div>
 
@@ -109,7 +115,7 @@
                 <section class="tw-panel p-4">
                   <h3 class="m-0 mb-3 text-xs font-bold tracking-[0.03em] text-ink">{{ 'ORDER.TRACK_TITLE' | translate }}</h3>
                   <ol class="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-2 m-0 p-0 list-none">
-                    @for (key of stageKeys; track key; let at = $index) {
+                    @for (key of card.stageKeys; track key; let at = $index) {
                       <li
                         class="track-step px-3 py-2 rounded-md text-xs font-medium text-ink-muted transition-colors duration-150"
                         [class.done]="at < card.stage"
@@ -133,6 +139,21 @@
 
                 <span class="flex gap-2 flex-wrap">
                   @if (card.needsPayment) {
+                    <button
+                      type="button"
+                      class="deed-cancel tw-btn-ghost tw-btn-sm"
+                      [class.is-asking]="asking() === card.raw.orderCode"
+                      [disabled]="cancelling() === card.raw.orderCode"
+                      (click)="cancel(card.raw.orderCode)"
+                    >
+                      {{
+                        (cancelling() === card.raw.orderCode
+                          ? 'ORDER.CANCELLING'
+                          : asking() === card.raw.orderCode
+                            ? 'ORDER.CANCEL_CONFIRM'
+                            : 'ORDER.CANCEL') | translate
+                      }}
+                    </button>
                     <a class="deed-solid tw-btn-primary tw-btn-sm" [routerLink]="['/payments', card.raw.orderCode]">
                       {{ 'ORDER.PAYMENT' | translate }}
                     </a>

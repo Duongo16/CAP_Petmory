@@ -110,7 +110,7 @@ export class AdminService {
     return {
       order,
       customer: customer ? this.slimCustomer(customer) : null,
-      nextSteps: this.orders.nextSteps(order.status),
+      nextSteps: this.orders.nextSteps(order),
       history,
     };
   }

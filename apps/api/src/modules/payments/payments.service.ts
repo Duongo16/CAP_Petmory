@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as QRCode from 'qrcode';
@@ -9,7 +9,7 @@ import {
 } from './schemas/payment-notification.schema';
 import { OrdersService } from '../orders/orders.service';
 import { BusinessConfigService } from '../business-config/business-config.service';
-import { OrderStatus } from '../orders/schemas/order.schema';
+import { OrderDocument, OrderStatus } from '../orders/schemas/order.schema';
 import { normalizeContent, buildQrString } from './vietqr';
 
 export interface SePayNotification {
@@ -126,12 +126,51 @@ export class PaymentsService {
       throw error;
     }
 
-    if (result === ReconcileResult.MATCHED && order && order.status === OrderStatus.AWAITING_PAYMENT) {
-      await this.orders.transitionStatus(order, OrderStatus.PAID, null, 'Nhan du tien');
-      this.logger.log(`Don ${order.orderCode} da thanh toan`);
+    if (order && order.status !== OrderStatus.AWAITING_PAYMENT) {
+      // Don da huy hoac da tra roi: tien ve bao nhieu cung la tien phai xem lai de hoan.
+      await this.flagLatePayment(order, transactionId, amount);
+    } else if (result === ReconcileResult.MATCHED && order) {
+      await this.settle(order, transactionId, amount);
     }
 
     return { result };
+  }
+
+  /**
+   * Ghi nhan tien du cho mot don.
+   *
+   * Don dang cho tien thi chuyen sang da thanh toan. Don da huy, hoac da duoc
+   * thanh toan bang mot giao dich khac, thi khong tu dong lam gi them, vi tien
+   * da vao tai khoan va chi nguoi that moi quyet dinh duoc hoan hay giu. Don do
+   * duoc danh dau de nhom Cham soc khach hang xu ly.
+   */
+  private async settle(order: OrderDocument, transactionId: string, amount: string): Promise<void> {
+    if (order.status === OrderStatus.AWAITING_PAYMENT) {
+      try {
+        await this.orders.transitionStatus(order, OrderStatus.PAID, null, 'Nhan du tien');
+        this.logger.log(`Don ${order.orderCode} da thanh toan`);
+        return;
+      } catch (trouble) {
+        if (!(trouble instanceof ConflictException)) {
+          throw trouble;
+        }
+      }
+    }
+    const now = (await this.orders.findByReference(order.reference)) ?? order;
+    if (now.status === OrderStatus.PAID) {
+      // Vua co nguoi xac nhan bang tay dung luc tien ve: day van la mot lan tra.
+      return;
+    }
+    await this.flagLatePayment(now, transactionId, amount);
+  }
+
+  private async flagLatePayment(order: OrderDocument, transactionId: string, amount: string): Promise<void> {
+    await this.orders.flagForAttention(
+      order,
+      `Nhan ${amount} qua giao dich ${transactionId} khi don dang o trang thai ${order.status}. ` +
+        'Can kiem tra de hoan tien cho khach.',
+    );
+    this.logger.warn(`Don ${order.orderCode} nhan tien khi dang ${order.status}`);
   }
 
   listLog(limit = 50) {

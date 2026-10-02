@@ -11,6 +11,7 @@ import {
   UpdateGoodsDto,
 } from './dto/goods.dto';
 import { MSG } from '../../common/constants/messages';
+import { GoodsService } from './goods.service';
 
 /** Ma co so du lieu tra ve khi mot chi muc duy nhat da co nguoi chiem. */
 const DUPLICATE_KEY = 11000;
@@ -32,6 +33,7 @@ export class GoodsAdminService {
     @InjectModel(Goods.name) private readonly model: Model<GoodsDocument>,
     @InjectModel(GoodsCategory.name)
     private readonly categoryModel: Model<GoodsCategoryDocument>,
+    private readonly stock: GoodsService,
   ) {}
 
   async createCategory(dto: GoodsCategoryDto): Promise<GoodsCategoryDocument> {
@@ -82,7 +84,7 @@ export class GoodsAdminService {
     return one.save();
   }
 
-  async createGoods(dto: CreateGoodsDto): Promise<GoodsDocument> {
+  async createGoods(dto: CreateGoodsDto, actor: string): Promise<GoodsDocument> {
     const group = await this.categoryModel
       .findOne({ _id: dto.category, isHidden: false })
       .exec();
@@ -91,12 +93,16 @@ export class GoodsAdminService {
     }
     checkVariants(dto.variant, dto.optionNames ?? []);
     try {
-      return await this.model.create({
+      const made = await this.model.create({
         ...dto,
         code: dto.code.toUpperCase(),
         category: group._id,
         variant: dto.variant.map(asVariant),
       });
+      for (const one of made.variant) {
+        await this.stock.recordOpening(made._id, one.sku, one.stock, actor);
+      }
+      return made;
     } catch (trouble) {
       if (isDuplicate(trouble)) {
         throw new ConflictException('Ma san pham nay da co roi');
@@ -110,9 +116,14 @@ export class GoodsAdminService {
    *
    * Gui kem danh sach to hop thi danh sach cu bi thay han. So ton kho cua
    * nhung to hop van con duoc giu lai, vi ton kho la so hang thuc te trong
-   * kho chu khong phai mot o do nguoi sua go vao.
+   * kho chu khong phai mot o do nguoi sua go vao. To hop con hang thi khong
+   * bo duoc, vi hang that van nam trong kho.
+   *
+   * Lan ghi chi thanh cong khi mon hang chua bi doi ke tu luc doc ra. Mot don
+   * vua tru kho dung luc do thi lan sua bi tu choi, thay vi ghi de so ton cu
+   * len so ton moi.
    */
-  async updateGoods(code: string, dto: UpdateGoodsDto): Promise<GoodsDocument> {
+  async updateGoods(code: string, dto: UpdateGoodsDto, actor: string): Promise<GoodsDocument> {
     const one = await this.model.findOne({ code: code.toUpperCase(), isHidden: false }).exec();
     if (!one) {
       throw new NotFoundException(MSG.NOT_FOUND);
@@ -127,16 +138,42 @@ export class GoodsAdminService {
     }
 
     const fields: Record<string, unknown> = onlyGiven({ ...dto });
+    const opened: { sku: string; stock: number }[] = [];
     if (dto.variant) {
       checkVariants(dto.variant, dto.optionNames ?? one.optionNames);
+      const kept = new Set(dto.variant.map((fresh) => fresh.sku.toUpperCase()));
+      const dropped = one.variant.filter((old) => !kept.has(old.sku) && old.stock > 0);
+      if (dropped.length > 0) {
+        throw new BadRequestException(
+          `To hop ${dropped.map((old) => old.sku).join(', ')} van con hang trong kho. ` +
+            'Hay tat to hop do, hoac dieu chinh ton ve 0 truoc khi bo.',
+        );
+      }
       const stockOf = new Map(one.variant.map((old) => [old.sku, old.stock]));
-      fields['variant'] = dto.variant.map((fresh) => ({
-        ...asVariant(fresh),
-        stock: stockOf.get(fresh.sku.toUpperCase()) ?? fresh.stock ?? 0,
-      }));
+      fields['variant'] = dto.variant.map((fresh) => {
+        const sku = fresh.sku.toUpperCase();
+        const had = stockOf.get(sku);
+        if (had === undefined) {
+          opened.push({ sku, stock: fresh.stock ?? 0 });
+        }
+        return { ...asVariant(fresh), stock: had ?? fresh.stock ?? 0 };
+      });
     }
-    one.set(fields);
-    return one.save();
+
+    const saved = await this.model
+      .findOneAndUpdate(
+        { _id: one._id, __v: one.__v },
+        { $set: fields, $inc: { __v: 1 } },
+        { new: true, runValidators: true },
+      )
+      .exec();
+    if (!saved) {
+      throw new ConflictException('Mon hang vua thay doi o noi khac, hay tai lai roi luu lai');
+    }
+    for (const fresh of opened) {
+      await this.stock.recordOpening(saved._id, fresh.sku, fresh.stock, actor);
+    }
+    return saved;
   }
 
   /** An mot mon hang. Don cu van giu nguyen ten va gia da chot. */

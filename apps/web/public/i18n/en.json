@@ -665,7 +665,8 @@
       "BADGE_PROTECT": "Bảo vệ 100%",
       "BADGE_SACRED": "Kỷ vật thiêng liêng",
       "BADGE_DESK": "Bàn làm việc"
-    }
+    },
+    "NOT_ENOUGH": "There is not enough left in stock for this quantity."
   },
   "CHECKOUT": {
     "TITLE": "Thông tin nhận hàng",
@@ -698,7 +699,8 @@
     "FULL_NAME_ERROR": "Vui lòng nhập họ tên",
     "ERROR_PHONE": "Số điện thoại gồm 10 chữ số, bắt đầu bằng 0",
     "ERROR_ADDRESS": "Vui lòng nhập địa chỉ đầy đủ",
-    "ERROR_PROVINCE": "Vui lòng nhập tỉnh hoặc thành phố"
+    "ERROR_PROVINCE": "Vui lòng nhập tỉnh hoặc thành phố",
+    "STOCK_CHANGED": "Some ready-made items have just sold out, been withdrawn or no longer have enough stock. Your cart is unchanged, go back to it to adjust and order again."
   },
   "PAYMENT": {
     "TITLE": "Thanh toán chuyển khoản",
@@ -794,7 +796,11 @@
       "SHIPPING": "On the way",
       "COMPLETED": "Completed",
       "CANCELLED": "Cancelled"
-    }
+    },
+    "CANCEL": "Cancel order",
+    "CANCEL_CONFIRM": "Press again to cancel",
+    "CANCELLING": "Cancelling…",
+    "CANCEL_FAILED": "This order could not be cancelled. It may have just been paid, please check its status."
   },
   "DIARY": {
     "LIST_TITLE": "Community diaries",
@@ -1272,7 +1278,11 @@
       "REASON": "Reason (recorded in history)",
       "REASON_SUGGESTION": "e.g. workshop picked up the order",
       "NONE_STEP": "This order is in a final state.",
-      "HISTORY": "Activity history"
+      "HISTORY": "Activity history",
+      "READY_MADE": "Ready-made order",
+      "MIXED": "Ready-made and personalised items",
+      "READY_MADE_LINE": "Ready-made",
+      "ATTENTION": "This order needs someone to look at it"
     },
     "RECIPIENT": {
       "ACCOUNT_INFO": "Account",
@@ -1483,7 +1493,8 @@
       "NOTE_BLOCKY": "Cube shaped and very cute, but not lifelike. The whole animal has a single colour zone."
     },
     "GROUP_OPERATE": "Operations",
-    "GROUP_CATALOG": "Catalogue & workshop"
+    "GROUP_CATALOG": "Catalogue & workshop",
+    "ERROR_ORDER_STALE": "This order was just changed elsewhere. The page has reloaded, check the new status and carry on."
   },
   "FOOTER": {
     "TAGLINE": "More than a product — a piece of memory.",

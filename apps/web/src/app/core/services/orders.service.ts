@@ -29,6 +29,11 @@ export class OrdersService {
     return this.http.post<Order>(`${this.base}/orders`, input);
   }
 
+  /** Khach tu huy mot don con dang cho thanh toan. */
+  cancel(orderCode: string): Observable<Order> {
+    return this.http.post<Order>(`${this.base}/orders/${orderCode}/cancel`, {});
+  }
+
   maQr(orderCode: string): Observable<PaymentQr> {
     return this.http.get<PaymentQr>(`${this.base}/payments/qr/${orderCode}`);
   }

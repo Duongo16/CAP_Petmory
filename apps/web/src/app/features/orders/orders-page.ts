@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { OrderGroup, OrdersFacade, STAGE_KEYS } from './orders-facade';
+import { OrderGroup, OrdersFacade } from './orders-facade';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { Icon } from '../../shared/icon/icon';
 
@@ -23,8 +23,9 @@ export class OrdersPage implements OnInit {
   readonly chosen = this.facade.chosen;
   readonly cards = this.facade.cards;
   readonly emptyGroup = this.facade.emptyGroup;
-
-  readonly stageKeys = STAGE_KEYS;
+  readonly asking = this.facade.asking;
+  readonly cancelling = this.facade.cancelling;
+  readonly cancelProblem = this.facade.cancelProblem;
 
   ngOnInit(): void {
     this.facade.load();
@@ -36,5 +37,9 @@ export class OrdersPage implements OnInit {
 
   choose(group: OrderGroup): void {
     this.facade.choose(group);
+  }
+
+  cancel(orderCode: string): void {
+    this.facade.cancel(orderCode);
   }
 }

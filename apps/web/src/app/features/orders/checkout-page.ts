@@ -118,8 +118,14 @@ export class CheckoutPage implements OnInit {
           this.cartService.reset();
           void this.router.navigate(['/payments', order.orderCode]);
         },
-        error: () => {
+        error: (trouble: { status?: number }) => {
           this.pendingSend.set(false);
+          if (trouble.status === 409) {
+            // Gio duoc may chu tra lai nguyen ven; doc lai de thay dung so luong va gia.
+            this.error.set('CHECKOUT.STOCK_CHANGED');
+            this.cartService.reload().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => undefined });
+            return;
+          }
           this.error.set('COMMON.GENERIC_ERROR');
         },
       });

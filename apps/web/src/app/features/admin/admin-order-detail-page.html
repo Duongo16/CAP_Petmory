@@ -20,7 +20,7 @@
           <span class="status-chip large" [attr.data-group]="facade.groupColor()">
             {{ facade.keyStatus() | translate }}
           </span>
-          <span class="header-note">{{ 'ADMIN.ORDER.MADE_TO_ORDER' | translate }}</span>
+          <span class="header-note">{{ facade.kindKey() | translate }}</span>
           @if (isManager()) {
             <a class="pm-button-secondary" [routerLink]="['/admin/orders', order.orderCode, 'production-file']">
               {{ 'ADMIN.PROFILE.OPEN' | translate }}
@@ -30,6 +30,13 @@
 
         @if (facade.error(); as codeError) {
           <p class="error" role="alert">{{ codeError | translate }}</p>
+        }
+
+        @if (order.needsAttention) {
+          <div class="attention" role="alert">
+            <strong>{{ 'ADMIN.ORDER.ATTENTION' | translate }}</strong>
+            <span>{{ order.attentionNote }}</span>
+          </div>
         }
 
         <div class="two-column-grid">
@@ -49,9 +56,14 @@
                 </tr>
               </thead>
               <tbody>
-                @for (line of order.rows; track line.sizeCode) {
+                @for (line of order.rows; track $index) {
                   <tr>
-                    <td>{{ line.displayName }}</td>
+                    <td>
+                      {{ line.displayName }}
+                      @if (line.kind === 'READY_MADE') {
+                        <span class="line-kind">{{ 'ADMIN.ORDER.READY_MADE_LINE' | translate }} · {{ line.sku }}</span>
+                      }
+                    </td>
                     <td class="right">{{ line.quantity }}</td>
                     <td class="right">{{ line.unitPrice | amount: order.currency }}</td>
                   </tr>

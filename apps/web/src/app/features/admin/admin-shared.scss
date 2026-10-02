@@ -1491,3 +1491,24 @@ tr.picked {
   font-weight: 700;
   color: var(--pm-text-body);
 }
+
+/* Don can nguoi that xu ly: hang khong con du, tien ve cho don da huy... */
+.attention {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--pm-amber);
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+  font-size: var(--pm-text-sm);
+}
+
+.line-kind {
+  display: block;
+  margin-top: 2px;
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-xs);
+}

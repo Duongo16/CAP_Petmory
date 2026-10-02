@@ -145,7 +145,8 @@ export class GoodsService {
           isHidden: false,
           variant: { $elemMatch: { sku: skuCode, stock: { $gte: quantity } } },
         },
-        { $inc: { 'variant.$.stock': -quantity } },
+        // Moi lan doi ton cung nang phien ban, de mot lan sua mon hang dang mo do khong ghi de len.
+        { $inc: { 'variant.$.stock': -quantity, __v: 1 } },
         { new: true },
       )
       .exec();
@@ -165,24 +166,29 @@ export class GoodsService {
     return true;
   }
 
-  /** Tra hang ve kho khi mot don bi huy. */
+  /**
+   * Tra hang ve kho khi mot don bi huy.
+   *
+   * Tra ve false khi to hop khong con trong danh muc, de don do duoc danh dau
+   * cho nguoi that dem hang ve kho bang tay.
+   */
   async giveBackStock(
     goodsCode: string,
     sku: string,
     quantity: number,
     orderCode: string,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const code = goodsCode.toUpperCase();
     const skuCode = sku.toUpperCase();
     const done = await this.model
       .findOneAndUpdate(
         { code, isHidden: false, 'variant.sku': skuCode },
-        { $inc: { 'variant.$.stock': quantity } },
+        { $inc: { 'variant.$.stock': quantity, __v: 1 } },
         { new: true },
       )
       .exec();
     if (!done) {
-      return;
+      return false;
     }
     const after = done.variant.find((one) => one.sku === skuCode)?.stock ?? 0;
     await this.writeMove({
@@ -194,6 +200,7 @@ export class GoodsService {
       reason: StockReason.ORDER_CANCELLED,
       orderCode,
     });
+    return true;
   }
 
   /** Lich su thay doi ton kho cua mot to hop, moi nhat truoc. */
@@ -228,7 +235,7 @@ export class GoodsService {
         : { code, isHidden: false, 'variant.sku': skuCode };
 
     const done = await this.model
-      .findOneAndUpdate(match, { $inc: { 'variant.$.stock': delta } }, { new: true })
+      .findOneAndUpdate(match, { $inc: { 'variant.$.stock': delta, __v: 1 } }, { new: true })
       .exec();
     if (!done) {
       throw new BadRequestException('Khong du hang trong kho de tru di bang nay');
@@ -245,6 +252,28 @@ export class GoodsService {
       actor,
     });
     return done;
+  }
+
+  /**
+   * Ghi so ton ban dau cua mot to hop vua tao.
+   *
+   * Hang nhap lan dau cung la mot lan ton kho thay doi, nen phai co dong trong
+   * so; khong co thi doi soat se thay hang tu nhien xuat hien.
+   */
+  async recordOpening(goods: Types.ObjectId, sku: string, stock: number, actor: string): Promise<void> {
+    if (stock <= 0) {
+      return;
+    }
+    await this.writeMove({
+      goods,
+      sku: sku.toUpperCase(),
+      delta: stock,
+      before: 0,
+      after: stock,
+      reason: StockReason.MANUAL,
+      note: 'Ton dau khi tao to hop',
+      actor,
+    });
   }
 
   /** Ghi mot dong vao so ton kho. So nay chi them, khong bao gio sua. */

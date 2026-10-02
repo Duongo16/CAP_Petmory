@@ -79,6 +79,16 @@ export class AdminOrderDetailFacade {
   readonly reason = signal('');
 
   readonly order = computed(() => this.data()?.order ?? null);
+
+  /** Don gom toan hang co san, toan hang lam theo yeu cau, hay ca hai. */
+  readonly kindKey = computed(() => {
+    const rows = this.order()?.rows ?? [];
+    const ready = rows.filter((one) => one.kind === 'READY_MADE').length;
+    if (ready === 0) {
+      return 'ADMIN.ORDER.MADE_TO_ORDER';
+    }
+    return ready === rows.length ? 'ADMIN.ORDER.READY_MADE' : 'ADMIN.ORDER.MIXED';
+  });
   readonly customer = computed(() => this.data()?.customer ?? null);
 
   /** Which of the four stages the order has reached, zero once cancelled. */
@@ -191,6 +201,10 @@ export class AdminOrderDetailFacade {
         error: (e: { status?: number }) => {
           this.saving.set(false);
           this.error.set(this.stepError(e.status, next));
+          // Don da doi o noi khac thi doc lai, de cac nut buoc tiep theo dung voi hien trang.
+          if (e.status === 409) {
+            this.reload();
+          }
         },
       });
   }
@@ -213,6 +227,9 @@ export class AdminOrderDetailFacade {
     }
     if (status === 400) {
       return 'ADMIN.ERROR_STEP_NOT_VALID';
+    }
+    if (status === 409) {
+      return 'ADMIN.ERROR_ORDER_STALE';
     }
     return 'COMMON.GENERIC_ERROR';
   }

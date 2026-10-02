@@ -56,6 +56,9 @@
         <div class="grid relative grid-cols-1 nav:grid-cols-[minmax(0,1fr)_373px] gap-8 items-start">
           <!-- Left column: cart lines -->
           <section class="lines flex flex-col gap-6 min-w-0">
+            @if (problem(); as message) {
+              <p class="m-0 px-4 py-3 rounded-md bg-danger-soft text-on-danger-soft text-sm font-medium" role="alert">{{ message | translate }}</p>
+            }
             <ul class="line-list flex flex-col gap-4 m-0 p-0 list-none">
               @for (card of cards(); track card.raw.id) {
                 <li class="line tw-card flex gap-6 p-6 max-[600px]:p-4 max-[600px]:gap-4">

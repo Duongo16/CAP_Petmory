@@ -66,12 +66,15 @@ export class CartFacade {
   private readonly products = signal<ProductType[]>([]);
   private readonly voucher = signal('');
   private readonly voucherTried = signal(false);
+  private readonly lineTrouble = signal<string | null>(null);
 
   readonly status = this.state.asReadonly();
   readonly cart = this.cartService.cart;
   readonly voucherCode = this.voucher.asReadonly();
   /** The shop takes no codes yet, so an attempt says so rather than pretending. */
   readonly voucherRejected = this.voucherTried.asReadonly();
+  /** Mot dong khong doi duoc so luong hay khong bo duoc, noi ngay tren trang. */
+  readonly problem = this.lineTrouble.asReadonly();
 
   readonly empty = computed(() => this.cart().items.length === 0);
 
@@ -144,17 +147,22 @@ export class CartFacade {
     if (next === item.quantity) {
       return;
     }
+    this.lineTrouble.set(null);
     this.cartService
       .changeQuantity(item.id, next)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ error: () => this.state.set('ERROR') });
+      .subscribe({
+        error: (trouble: { status?: number }) =>
+          this.lineTrouble.set(trouble.status === 400 ? 'CART.NOT_ENOUGH' : 'COMMON.GENERIC_ERROR'),
+      });
   }
 
   remove(item: CartLine): void {
+    this.lineTrouble.set(null);
     this.cartService
       .removeItem(item.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ error: () => this.state.set('ERROR') });
+      .subscribe({ error: () => this.lineTrouble.set('COMMON.GENERIC_ERROR') });
   }
 
   setVoucher(code: string): void {

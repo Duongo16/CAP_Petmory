@@ -352,6 +352,10 @@ export type OrderStatus =
   | 'CANCELLED';
 
 export interface OrderLine {
+  /** Hang lam theo yeu cau hay hang co san trong kho. */
+  kind?: 'MADE_TO_ORDER' | 'READY_MADE';
+  goodsCode?: string;
+  sku?: string;
   productTypeCode: string;
   sizeCode: string;
   displayName: string;
@@ -478,6 +482,10 @@ export interface Order {
   createdAt: string;
   /** Phieu kiem tra chat luong, lap khi don buoc vao khau kiem dinh. */
   qualityCheck: QualityTick[];
+  /** Don can nguoi that xu ly, vi du hang khong con du hay tien ve cho don da huy. */
+  needsAttention?: boolean;
+  attentionNote?: string;
+  reasonDestroy?: string;
 }
 
 export interface PaymentQr {

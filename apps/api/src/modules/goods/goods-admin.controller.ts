@@ -105,7 +105,7 @@ export class GoodsAdminController {
   @Roles(Role.MANAGER)
   @Post()
   async make(@Body() dto: CreateGoodsDto, @CurrentUser() user: AuthUser) {
-    const made = await this.manage.createGoods(dto);
+    const made = await this.manage.createGoods(dto, user.userId);
     await this.audit.write({
       actor: user.userId,
       action: 'GOODS_CREATED',
@@ -130,7 +130,7 @@ export class GoodsAdminController {
     @CurrentUser() user: AuthUser,
   ) {
     const before = await this.service.detail(code, true);
-    const after = await this.manage.updateGoods(code, dto);
+    const after = await this.manage.updateGoods(code, dto, user.userId);
     await this.audit.write({
       actor: user.userId,
       action: 'GOODS_UPDATED',
