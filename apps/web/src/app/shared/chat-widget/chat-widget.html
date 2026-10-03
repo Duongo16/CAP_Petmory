@@ -1,22 +1,25 @@
-<button
-  type="button"
-  class="open-button"
-  [attr.aria-expanded]="pendingOpen()"
-  aria-controls="assistant-panel"
-  (click)="toggle()"
->
-  <pm-icon name="comment" [size]="20" />
-  <span class="button-text">{{ 'ASSISTANT.TITLE' | translate }}</span>
-</button>
-
 @if (pendingOpen()) {
-  <section id="assistant-panel" class="frame" [attr.aria-label]="'ASSISTANT.TITLE' | translate">
-    <header class="panel-header">
-      <span class="panel-mark" aria-hidden="true"><pm-icon name="comment" [size]="18" /></span>
-      <h2>{{ 'ASSISTANT.TITLE' | translate }}</h2>
-      <button type="button" class="close-button" (click)="toggle()">
-        <pm-icon name="close" [size]="16" />
-        <span class="sr-only">{{ 'COMMON.CLOSE' | translate }}</span>
+  <section id="assistant-panel" class="panel" role="dialog" [attr.aria-label]="'ASSISTANT.TITLE' | translate">
+    <header class="panel-head">
+      <span class="avatar big" aria-hidden="true"><img src="/img/logo-mark.png" alt="" /></span>
+      <div class="head-text">
+        <h2 class="head-title">{{ 'ASSISTANT.NAME' | translate }}</h2>
+        @if (signedIn()) {
+          <p class="head-state" [attr.data-state]="state()">
+            <span class="dot" aria-hidden="true"></span>
+            {{ stateKey() | translate }}
+          </p>
+        }
+      </div>
+      @if (canRestart()) {
+        <button type="button" class="icon-button" (click)="startFresh()"
+          [attr.aria-label]="'ASSISTANT.START_FRESH' | translate" [attr.title]="'ASSISTANT.START_FRESH' | translate">
+          <pm-icon name="plus" [size]="17" />
+        </button>
+      }
+      <button type="button" class="icon-button" (click)="toggle()"
+        [attr.aria-label]="'COMMON.CLOSE' | translate" [attr.title]="'COMMON.CLOSE' | translate">
+        <pm-icon name="close" [size]="17" />
       </button>
     </header>
 
@@ -25,70 +28,142 @@
         <span class="sign-in-mark" aria-hidden="true"><pm-icon name="lock" [size]="20" /></span>
         <p class="sign-in-title">{{ 'ASSISTANT.SIGN_IN_TITLE' | translate }}</p>
         <p class="sign-in-text">{{ 'ASSISTANT.SIGN_IN_TEXT' | translate }}</p>
-        <button type="button" class="send-button" (click)="goSignIn()">{{ 'ASSISTANT.SIGN_IN' | translate }}</button>
+        <button type="button" class="primary-button" (click)="goSignIn()">{{ 'ASSISTANT.SIGN_IN' | translate }}</button>
       </div>
     } @else {
-    <p class="state-line" [class]="state()">{{ stateKey() | translate }}</p>
-    <div class="disclaimer">{{ 'ASSISTANT.DISCLAIMER' | translate }}</div>
+      <div class="log" #log role="log" aria-live="polite">
+        @for (message of history(); track message.id) {
+          <div class="row" [attr.data-side]="message.side">
+            @if (message.side !== 'USER') {
+              <span class="avatar" [class.staff]="message.side === 'STAFF'" aria-hidden="true">
+                @if (message.side === 'STAFF') {
+                  <pm-icon name="user" [size]="15" />
+                } @else {
+                  <img src="/img/logo-mark.png" alt="" />
+                }
+              </span>
+            }
+            <div class="stack">
+              @if (message.side === 'STAFF') {
+                <span class="who">{{ 'ASSISTANT.FROM_STAFF' | translate }}</span>
+              }
+              <p class="bubble">{{ message.content }}</p>
 
-    <div class="history" role="log" aria-live="polite">
-      @for (message of history(); track message.id) {
-        <div class="message" [class.from-customer]="message.side === 'USER'">
-          @if (message.side === 'STAFF') {
-            <p class="who">{{ 'ASSISTANT.FROM_STAFF' | translate }}</p>
-          }
-          <p class="bubble" [class.from-staff]="message.side === 'STAFF'">{{ message.content }}</p>
-          @if (message.path) {
-            <button type="button" class="goto-button" (click)="openPath(message.path)">
-              {{ 'ASSISTANT.GO_TO' | translate }}
-            </button>
+              @if (message.cards.length > 0) {
+                <ul class="cards">
+                  @for (card of message.cards; track card.code) {
+                    <li>
+                      <button type="button" class="card" (click)="openPath(card.link)">
+                        <span class="card-photo">
+                          @if (card.image) {
+                            <img [src]="card.image" alt="" loading="lazy" />
+                          } @else {
+                            <pm-icon name="paw" [size]="18" />
+                          }
+                        </span>
+                        <span class="card-text">
+                          <span class="card-name">{{ card.name }}</span>
+                          @if (card.priceFrom) {
+                            <span class="card-price">{{ 'ASSISTANT.FROM' | translate }} {{ card.priceFrom }}</span>
+                          }
+                        </span>
+                        <pm-icon name="chevron" [size]="14" />
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+
+              @if (message.path) {
+                <button type="button" class="go-button" (click)="openPath(message.path)">
+                  {{ message.pathKey | translate }}
+                  <pm-icon name="arrow" [size]="13" />
+                </button>
+              }
+              <span class="time">{{ message.at | date: 'HH:mm' }}</span>
+            </div>
+          </div>
+        }
+
+        @if (waiting()) {
+          <div class="row" data-side="BOT">
+            <span class="avatar" aria-hidden="true"><img src="/img/logo-mark.png" alt="" /></span>
+            <p class="bubble typing" role="status">
+              <span class="sr-only">{{ 'ASSISTANT.PENDING_ANSWER' | translate }}</span>
+              <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+            </p>
+          </div>
+        }
+
+        @if (state() === 'WAITING') {
+          <p class="notice">
+            <span class="spinner" aria-hidden="true"></span>
+            {{ 'ASSISTANT.WAITING_NOTE' | translate }}
+          </p>
+        }
+      </div>
+
+      @if (suggestions().length > 0 && state() === 'BOT' && !waiting()) {
+        <div class="suggestions" [class.fresh]="fresh()" role="group" [attr.aria-label]="'ASSISTANT.SUGGESTED' | translate">
+          @for (one of suggestions(); track one) {
+            <button type="button" class="chip" (click)="selectSuggestion(one)">{{ one }}</button>
           }
         </div>
       }
-      @if (waiting()) {
-        <p class="typing">{{ 'ASSISTANT.PENDING_ANSWER' | translate }}</p>
-      }
-    </div>
 
-    @if (suggestions().length > 0 && state() === 'BOT') {
-      <div class="suggestion-row">
-        @for (one of suggestions(); track one) {
-          <button type="button" class="chip" (click)="selectSuggestion(one)">
-            {{ one }}
-          </button>
+      <footer class="composer">
+        @if (closed()) {
+          <div class="closed-row">
+            <p>{{ 'ASSISTANT.STATE_CLOSED' | translate }}</p>
+            <button type="button" class="primary-button" (click)="startFresh()">{{ 'ASSISTANT.START_FRESH' | translate }}</button>
+          </div>
+        } @else {
+          <form class="input-row" (ngSubmit)="sendFromInput()">
+            <label class="sr-only" for="assistant-input">{{ 'ASSISTANT.INPUT' | translate }}</label>
+            <input
+              #questionBox
+              id="assistant-input"
+              type="text"
+              autocomplete="off"
+              maxlength="1000"
+              [placeholder]="'ASSISTANT.INPUT' | translate"
+              [ngModel]="contentInput()"
+              (ngModelChange)="contentInput.set($event)"
+              name="question"
+            />
+            <button type="submit" class="send-button" [disabled]="!canSend()"
+              [attr.aria-label]="'ASSISTANT.SEND' | translate">
+              <pm-icon name="send" [size]="18" />
+            </button>
+          </form>
+          <div class="foot-line">
+            <span class="disclaimer">{{ 'ASSISTANT.DISCLAIMER_SHORT' | translate }}</span>
+            @if (canHandover()) {
+              <button type="button" class="handover-link" [disabled]="waiting()" (click)="askForPerson()">
+                <pm-icon name="user" [size]="13" />
+                {{ 'ASSISTANT.ASK_PERSON' | translate }}
+              </button>
+            }
+          </div>
         }
-      </div>
-    }
-
-    @if (closed()) {
-      <div class="closed-row">
-        <button type="button" class="send-button" (click)="startFresh()">
-          {{ 'ASSISTANT.START_FRESH' | translate }}
-        </button>
-      </div>
-    } @else {
-      <form class="input-row" (ngSubmit)="sendFromInput()">
-        <label class="sr-only" for="assistant-input">{{ 'ASSISTANT.INPUT' | translate }}</label>
-        <input
-          id="assistant-input"
-          type="text"
-          autocomplete="off"
-          [placeholder]="'ASSISTANT.INPUT' | translate"
-          [ngModel]="contentInput()"
-          (ngModelChange)="contentInput.set($event)"
-          name="question"
-        />
-        <button type="submit" class="send-button" [disabled]="waiting()">
-          {{ 'ASSISTANT.SEND' | translate }}
-        </button>
-      </form>
-
-      @if (canHandover()) {
-        <button type="button" class="handover-button" (click)="askForPerson()">
-          {{ 'ASSISTANT.ASK_PERSON' | translate }}
-        </button>
-      }
-    }
+      </footer>
     }
   </section>
 }
+
+<button
+  type="button"
+  class="launcher"
+  [class.open]="pendingOpen()"
+  [attr.aria-expanded]="pendingOpen()"
+  aria-controls="assistant-panel"
+  [attr.aria-label]="(pendingOpen() ? 'COMMON.CLOSE' : 'ASSISTANT.TITLE') | translate"
+  (click)="toggle()"
+>
+  @if (pendingOpen()) {
+    <pm-icon name="close" [size]="22" />
+  } @else {
+    <pm-icon name="comment" [size]="22" />
+    <span class="launcher-text">{{ 'ASSISTANT.TITLE' | translate }}</span>
+  }
+</button>

@@ -1127,7 +1127,21 @@
     "START_FRESH": "Bắt đầu cuộc mới",
     "SIGN_IN_TITLE": "Đăng nhập để trò chuyện",
     "SIGN_IN_TEXT": "Trợ lý PETMORY dành cho thành viên. Đăng nhập để được tư vấn sản phẩm, giá và theo dõi đơn hàng.",
-    "SIGN_IN": "Đăng nhập"
+    "SIGN_IN": "Đăng nhập",
+    "NAME": "Trợ lý PETMORY",
+    "FROM": "Từ",
+    "SUGGESTED": "Câu hỏi gợi ý",
+    "WAITING_NOTE": "Đang chờ tư vấn viên nhận cuộc trò chuyện…",
+    "DISCLAIMER_SHORT": "Trợ lý AI có thể chưa chính xác.",
+    "GO": {
+      "STUDIO": "Mở Studio 3D",
+      "READY": "Xem hàng có sẵn",
+      "SHOP": "Xem cửa hàng",
+      "ORDERS": "Đơn hàng của tôi",
+      "PETS": "Hồ sơ thú cưng",
+      "RESTORE": "Phục hồi ảnh",
+      "JOURNALS": "Mở nhật ký"
+    }
   },
   "ADMIN": {
     "TILE": {

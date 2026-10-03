@@ -39,6 +39,7 @@ const PATHS: Record<string, string> = {
   calendar: 'M4 5h16v15H4V5Zm0 5h16M9 3v4m6-4v4',
   users: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 9a6 6 0 0 1 12 0m1-15a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 6',
   pencil: 'M4 20h4L19 9l-4-4L4 16v4Zm9-13 4 4',
+  send: 'M4 12 20 4l-6 16-3-7-7-1Zm7 1 9-9',
   lock: 'M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z',
   eye: 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
   bell: 'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Zm4 4a2 2 0 0 0 4 0',

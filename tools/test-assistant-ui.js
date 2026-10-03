@@ -77,39 +77,42 @@ async function signIn(page, email) {
   const customer = await browser.newPage({ viewport: { width: 1280, height: 860 } });
   watch(customer);
   await signIn(customer, 'khachhang@petmory.local');
-  await customer.locator('pm-chat-widget .open-button').click();
+  await customer.locator('pm-chat-widget .launcher').click();
   await customer.waitForSelector('#assistant-input', { timeout: 15000 });
-  const fresh = customer.locator('pm-chat-widget button', { hasText: 'Bắt đầu cuộc mới' });
+  // Doi phien cu tai xong roi moi xet co can bat dau cuoc moi khong.
+  await customer.waitForSelector('pm-chat-widget .row', { timeout: 15000 });
+  await customer.waitForTimeout(500);
+  const fresh = customer.locator('pm-chat-widget .panel-head .icon-button[aria-label="Bắt đầu cuộc mới"]');
   if (await fresh.count()) {
     await fresh.click();
   }
-  await customer.waitForSelector('.suggestion-row .chip', { timeout: 15000 });
-  const chips = await customer.locator('.suggestion-row .chip').allInnerTexts();
+  await customer.locator('pm-chat-widget .suggestions .chip', { hasText: 'Giá sản phẩm' }).waitFor({ timeout: 15000 });
+  const chips = await customer.locator('pm-chat-widget .suggestions .chip').allInnerTexts();
   ok('Cau goi y lay tu kho tri thuc', chips.some((one) => one.includes('Giá sản phẩm')), chips.slice(0, 3).join(' | '));
   const before = await customer.locator('pm-chat-widget .bubble').count();
-  await customer.locator('.suggestion-row .chip', { hasText: 'Giá sản phẩm' }).click();
+  await customer.locator('pm-chat-widget .suggestions .chip', { hasText: 'Giá sản phẩm' }).click();
   // Cho luot tra loi cua tro ly (co the do mo hinh that viet, nen khong so nguyen van).
   await customer.waitForFunction((n) => {
-    const all = [...document.querySelectorAll('pm-chat-widget .message')];
-    return all.length >= n + 2 && !all[all.length - 1].classList.contains('from-customer');
+    const all = [...document.querySelectorAll('pm-chat-widget .row')];
+    return all.length >= n + 2 && all[all.length - 1].dataset.side !== 'USER' && !document.querySelector('pm-chat-widget .typing');
   }, before, { timeout: 30000 });
   const priceText = (await customer.locator('pm-chat-widget .bubble').last().innerText()).trim();
   ok('Bam goi y thi tro ly tra loi bang gia that', /\d{3}\.\d{3} VND/.test(priceText), priceText.slice(0, 80));
   await customer.fill('#assistant-input', 'còn cỡ lớn thì sao?');
-  await customer.locator('pm-chat-widget .input-row button[type=submit]').click();
+  await customer.locator('pm-chat-widget .send-button').click();
   await customer.waitForTimeout(6000);
   ok('Hoi tiep van nhan duoc cau tra loi', /lớn/i.test(await customer.locator('pm-chat-widget .bubble').last().innerText()));
   await customer.screenshot({ path: path.join(OUT, 'assistant-1-chat.png') });
-  await customer.locator('pm-chat-widget .goto-button').last().click();
+  await customer.locator('pm-chat-widget .go-button').last().click();
   await customer.waitForURL('**/shop**', { timeout: 10000 });
   ok('Nut dan huong mo dung trang', customer.url().includes('/shop'), customer.url());
 
-  await customer.locator('pm-chat-widget .open-button').click();
-  await customer.waitForSelector('pm-chat-widget .handover-button');
+  await customer.locator('pm-chat-widget .launcher').click();
+  await customer.waitForSelector('pm-chat-widget .handover-link');
   await customer.fill('#assistant-input', HANDOVER_NOTE);
-  await customer.locator('pm-chat-widget .handover-button').click();
+  await customer.locator('pm-chat-widget .handover-link').click();
   await customer.waitForTimeout(1500);
-  ok('Khach chuyen duoc sang tu van vien', (await customer.locator('.state-line').innerText()).includes('chờ'));
+  ok('Khach chuyen duoc sang tu van vien', (await customer.locator('pm-chat-widget .head-state').innerText()).includes('chờ'));
 
   // --- Nhom Cham soc khach hang tren trang truc ---
   const support = await browser.newPage({ viewport: { width: 1280, height: 860 } });
@@ -132,7 +135,7 @@ async function signIn(page, email) {
   await support.screenshot({ path: path.join(OUT, 'assistant-2-desk.png') });
 
   await customer.waitForTimeout(7000);
-  ok('Khach thay cau tra loi cua tu van vien', (await customer.locator('pm-chat-widget .bubble.from-staff').count()) >= 1);
+  ok('Khach thay cau tra loi cua tu van vien', (await customer.locator('pm-chat-widget .row[data-side="STAFF"] .bubble').count()) >= 1);
   await support.locator('#chat-close').click();
   await support.waitForTimeout(800);
 

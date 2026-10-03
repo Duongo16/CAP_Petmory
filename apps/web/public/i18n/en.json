@@ -1127,7 +1127,21 @@
     "START_FRESH": "Start a new conversation",
     "SIGN_IN_TITLE": "Sign in to chat",
     "SIGN_IN_TEXT": "The PETMORY assistant is for members. Sign in for advice on products, prices and your orders.",
-    "SIGN_IN": "Sign in"
+    "SIGN_IN": "Sign in",
+    "NAME": "PETMORY assistant",
+    "FROM": "From",
+    "SUGGESTED": "Suggested questions",
+    "WAITING_NOTE": "Waiting for an advisor to pick up…",
+    "DISCLAIMER_SHORT": "The AI assistant may be inaccurate.",
+    "GO": {
+      "STUDIO": "Open 3D Studio",
+      "READY": "See ready-made goods",
+      "SHOP": "Go to the shop",
+      "ORDERS": "My orders",
+      "PETS": "Pet profiles",
+      "RESTORE": "Restore a photo",
+      "JOURNALS": "Open the diary"
+    }
   },
   "ADMIN": {
     "TILE": {

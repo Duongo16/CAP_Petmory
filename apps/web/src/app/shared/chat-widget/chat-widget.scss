@@ -1,332 +1,615 @@
+/*
+ * Khung tro ly hoi nhanh: nut mo o goc phai duoi, khung chat mo len phia tren.
+ * Tren dien thoai khung chiem tron man hinh de go phim khong bi che.
+ */
+
 :host {
   position: fixed;
   right: 20px;
   bottom: 20px;
-  z-index: 50;
+  z-index: 60;
   display: flex;
-  /* The button sits at the bottom and the chat panel opens upwards, so it never overflows the screen. */
-  flex-direction: column-reverse;
+  flex-direction: column;
   align-items: flex-end;
-  gap: 12px;
+  gap: 14px;
 }
 
-.open-button {
+/* ---------- Nut mo ---------- */
+
+.launcher {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  min-height: 48px;
+  min-width: 56px;
+  height: 56px;
   padding: 0 20px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--pm-radius-pill);
   background: var(--pm-accent);
   color: var(--pm-on-accent);
   font: inherit;
   font-size: var(--pm-text-sm);
   font-weight: 700;
-  cursor: pointer;
   box-shadow: var(--pm-accent-glow);
-  transition: transform 0.15s ease;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease;
 
   &:hover {
     transform: translate3d(0, -2px, 0);
   }
+
+  &:focus-visible {
+    outline: 3px solid var(--pm-accent-soft);
+    outline-offset: 3px;
+  }
+
+  &.open {
+    width: 56px;
+    padding: 0;
+    background: var(--pm-night);
+    color: var(--pm-on-night);
+  }
 }
 
-.frame {
+/* ---------- Khung chat ---------- */
+
+.panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  overflow: hidden;
   box-sizing: border-box;
-  width: min(380px, calc(100vw - 32px));
-  max-height: min(580px, calc(100vh - 140px));
-  padding: 18px;
+  width: min(400px, calc(100vw - 32px));
+  height: min(640px, calc(100vh - 120px));
   border: 1px solid var(--pm-border);
-  border-radius: 20px;
-  background: var(--pm-bg-card);
+  border-radius: 24px;
+  background: var(--pm-bg);
   box-shadow: var(--pm-shadow-lifted);
+  transform-origin: bottom right;
+  animation: panel-in 180ms ease-out;
 }
 
-.panel-header {
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.panel-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-
-  h2 {
-    flex: 1 1 auto;
-    margin: 0;
-    font-family: var(--pm-font-display);
-    font-size: 1.125rem;
-    font-weight: 500;
-  }
-}
-
-.panel-mark {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: var(--pm-accent-soft);
-  color: var(--pm-accent);
-}
-
-.close-button {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 999px;
-  background: var(--pm-bg-muted);
-  color: var(--pm-text-body);
-  font: inherit;
-  cursor: pointer;
-  transition: background 130ms ease, color 130ms ease;
-
-  &:hover {
-    background: var(--pm-danger-soft);
-    color: var(--pm-danger);
-  }
-}
-
-.disclaimer {
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--pm-bg-muted);
-  color: var(--pm-text-muted);
-  font-size: var(--pm-text-xs);
-  line-height: 1.5;
-}
-
-.history {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 10px;
-  overflow-y: auto;
-  min-height: 120px;
-}
-
-.message {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-
-  &.from-customer {
-    align-items: flex-end;
-  }
-}
-
-.bubble {
-  max-width: 86%;
-  margin: 0;
-  padding: 10px 14px;
-  border-radius: 16px 16px 16px 4px;
-  background: var(--pm-bg-muted);
-  color: var(--pm-text);
-  font-size: var(--pm-text-sm);
-  line-height: 1.5;
-  white-space: pre-line;
-}
-
-.from-customer .bubble {
-  border-radius: 16px 16px 4px 16px;
-  background: var(--pm-accent);
+  gap: 12px;
+  padding: 14px 14px 14px 16px;
+  background: linear-gradient(135deg, var(--pm-accent), var(--pm-accent-dark));
   color: var(--pm-on-accent);
 }
 
-.bubble.from-staff {
-  background: var(--pm-amber-soft);
-  color: var(--pm-on-amber);
+.head-text {
+  flex: 1;
+  min-width: 0;
 }
 
-.goto-button,
-.chip {
-  min-height: 32px;
-  padding: 0 12px;
-  border: 1px solid var(--pm-border);
-  border-radius: 999px;
-  background: var(--pm-bg-card);
-  color: var(--pm-accent);
-  font: inherit;
-  font-size: var(--pm-text-xs);
+.head-title {
+  margin: 0;
+  font-family: var(--pm-font-display);
+  font-size: 1.05rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: background 130ms ease, border-color 130ms ease;
+  line-height: 1.2;
+}
 
-  &:hover {
-    border-color: var(--pm-accent);
-    background: var(--pm-accent-soft);
+.head-state {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0 0;
+  font-size: var(--pm-text-xs);
+  opacity: 0.92;
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--pm-success-soft);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pm-on-accent) 35%, transparent);
+  }
+
+  &[data-state='WAITING'] .dot {
+    background: var(--pm-amber-soft);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  &[data-state='CLOSED'] .dot {
+    background: var(--pm-border-strong);
   }
 }
 
-.typing {
-  margin: 0;
-  color: var(--pm-text-muted);
-  font-size: var(--pm-text-sm);
+.icon-button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pm-on-accent) 16%, transparent);
+  color: var(--pm-on-accent);
+  cursor: pointer;
+  transition: background 140ms ease;
+
+  &:hover,
+  &:focus-visible {
+    background: color-mix(in srgb, var(--pm-on-accent) 28%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pm-on-accent);
+    outline-offset: 2px;
+  }
 }
 
-.suggestion-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--pm-bg-card);
+  border: 1px solid var(--pm-border);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &.big {
+    width: 42px;
+    height: 42px;
+    border: 2px solid color-mix(in srgb, var(--pm-on-accent) 60%, transparent);
+  }
+
+  &.staff {
+    background: var(--pm-amber-soft);
+    color: var(--pm-on-amber);
+  }
 }
 
-.input-row {
+/* ---------- Tin nhan ---------- */
+
+.log {
   display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 14px 8px;
+  background: var(--pm-bg-sunken);
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
   gap: 8px;
 
-  input {
-    flex: 1;
-    min-width: 0;
-    min-height: 44px;
-    box-sizing: border-box;
-    padding: 0 14px;
-    border: 1.5px solid var(--pm-border);
-    border-radius: 12px;
-    background: var(--pm-bg-card);
-    color: var(--pm-text);
-    font: inherit;
-    font-size: var(--pm-text-sm);
-    outline: none;
-    transition: border-color 140ms ease, box-shadow 140ms ease;
+  &[data-side='USER'] {
+    justify-content: flex-end;
 
-    &:focus {
-      border-color: var(--pm-accent);
-      box-shadow: 0 0 0 4px var(--pm-accent-soft);
+    .stack {
+      align-items: flex-end;
     }
   }
 }
 
-.send-button {
-  min-height: 44px;
-  padding: 0 18px;
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: 82%;
+  min-width: 0;
+}
+
+.who {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pm-on-amber);
+}
+
+.bubble {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 18px 18px 18px 6px;
+  background: var(--pm-bg-card);
+  border: 1px solid var(--pm-border);
+  color: var(--pm-text);
+  font-size: var(--pm-text-sm);
+  line-height: 1.55;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+[data-side='USER'] .bubble {
   border: none;
-  border-radius: 12px;
+  border-radius: 18px 18px 6px 18px;
   background: var(--pm-accent);
   color: var(--pm-on-accent);
-  font: inherit;
-  font-size: var(--pm-text-sm);
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 130ms ease;
+}
 
-  &:hover:not(:disabled) {
-    background: var(--pm-accent-dark);
+[data-side='STAFF'] .bubble {
+  border-color: transparent;
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+}
+
+.time {
+  padding: 0 4px;
+  font-size: 10px;
+  color: var(--pm-text-muted);
+}
+
+/* Ba cham dang soan cau tra loi. */
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.typing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pm-text-muted);
+  animation: bounce 1.2s ease-in-out infinite;
+
+  &:nth-child(3) {
+    animation-delay: 0.15s;
   }
 
-  &:disabled {
-    opacity: 0.6;
-    cursor: default;
+  &:nth-child(4) {
+    animation-delay: 0.3s;
   }
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
+@keyframes bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.4;
+    transform: translate3d(0, 0, 0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ---------- The san pham va nut dan huong ---------- */
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 220px;
+  padding: 8px 10px 8px 8px;
+  border: 1px solid var(--pm-border);
+  border-radius: 14px;
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, transform 140ms ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--pm-accent);
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+.card-photo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
   overflow: hidden;
-  clip-path: inset(50%);
+  border-radius: 10px;
+  background: var(--pm-paper-bloom);
+  color: var(--pm-accent);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.card-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.card-name {
+  overflow: hidden;
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Dong bao phien dang o buoc nao. */
-.state-line {
-  margin: 0;
-  padding: 0 2px 10px;
+.card-price {
   font-size: var(--pm-text-xs);
-  color: var(--pm-text-soft);
-  border-bottom: 1px solid var(--pm-border);
+  color: var(--pm-accent-dark);
+}
 
-  &.WAITING,
-  &.WITH_STAFF {
-    color: var(--pm-accent);
-    font-weight: 600;
+.go-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--pm-accent);
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-card);
+  color: var(--pm-accent-dark);
+  font: inherit;
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 140ms ease;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--pm-accent-soft);
   }
 }
 
-/* Ai dang noi, chi hien khi la mot nguoi that. */
-.who {
-  margin: 0;
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+  margin: 4px 0;
+  padding: 8px 14px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
   font-size: var(--pm-text-xs);
-  font-weight: 700;
-  color: var(--pm-amber);
+  font-weight: 600;
 }
 
-.handover-button {
-  min-height: 40px;
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Goi y ---------- */
+
+.suggestions {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 14px;
+  border-top: 1px solid var(--pm-border);
+  background: var(--pm-bg);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Luc moi mo khung, goi y xep nhieu dong de khach thay het va chon ngay. */
+  &.fresh {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+.chip {
+  flex: none;
+  min-height: 34px;
   padding: 0 14px;
-  border: 1.5px solid var(--pm-border);
-  border-radius: 12px;
-  background: transparent;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-card);
   color: var(--pm-text);
   font: inherit;
-  font-size: var(--pm-text-sm);
+  font-size: var(--pm-text-xs);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
-  transition: border-color 130ms ease, color 130ms ease;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     border-color: var(--pm-accent);
-    color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+}
+
+/* ---------- O nhap ---------- */
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--pm-border);
+  background: var(--pm-bg-card);
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 16px;
+  border: 1.5px solid var(--pm-border);
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg);
+  transition: border-color 140ms ease;
+
+  &:focus-within {
+    border-color: var(--pm-accent);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: var(--pm-text);
+    font: inherit;
+    font-size: var(--pm-text-sm);
+    outline: none;
+  }
+}
+
+.send-button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  cursor: pointer;
+  transition: opacity 140ms ease, transform 140ms ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.06);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.foot-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.disclaimer {
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--pm-text-muted);
+}
+
+.handover-link {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 4px;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--pm-accent-dark);
+  font: inherit;
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--pm-accent-soft);
   }
 }
 
 .closed-row {
   display: flex;
-  justify-content: center;
-  padding: 8px 0;
-}
-
-/*
- * Tren dien thoai, nut nay phai nam tren thanh dieu huong duoi day. De nguyen
- * sat day thi no che mat hai cho den ben phai cua thanh do.
- *
- * Ngoai ra nut thu lai thanh hinh tron chi con bieu tuong. Nut dai co chu chiem
- * mot mang rong o goc man hinh, va mang do luon nam de len mot nut nao do cua
- * trang ben duoi.
- */
-@media (max-width: 900px) {
-  :host {
-    bottom: calc(76px + env(safe-area-inset-bottom));
-    right: 14px;
-  }
-
-  .open-button {
-    width: 52px;
-    height: 52px;
-    padding: 0;
-    justify-content: center;
-  }
-
-  .button-text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-}
-
-/* Khach chua dang nhap: loi moi dang nhap thay cho khung tro chuyen. */
-.sign-in-card {
-  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 28px 20px;
+  padding: 4px 0;
+
+  p {
+    margin: 0;
+    font-size: var(--pm-text-xs);
+    color: var(--pm-text-muted);
+  }
+}
+
+.primary-button {
+  min-height: 40px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  font: inherit;
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- Chua dang nhap ---------- */
+
+.sign-in-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 24px;
   text-align: center;
 }
 
 .sign-in-mark {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--pm-accent-soft);
   color: var(--pm-accent);
@@ -343,4 +626,53 @@
   font-size: var(--pm-text-sm);
   line-height: 1.5;
   color: var(--pm-text-muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Dien thoai: khung chiem tron man hinh ---------- */
+
+@media (max-width: 600px) {
+  :host {
+    right: 14px;
+    bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+
+  .launcher-text {
+    display: none;
+  }
+
+  .launcher {
+    width: 56px;
+    padding: 0;
+  }
+
+  .panel {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    border: none;
+    border-radius: 0;
+  }
+
+  .launcher.open {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .typing-dot,
+  .spinner,
+  .head-state .dot {
+    animation: none;
+  }
 }

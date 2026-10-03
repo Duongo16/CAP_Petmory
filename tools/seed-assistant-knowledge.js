@@ -108,7 +108,7 @@ const ENTRIES = [
   {
     code: 'MEMORIAL', topic: 'PRODUCT', sortOrder: 110,
     question: 'Bé nhà tôi đã mất, có làm được không?',
-    keywords: ['da mat', 'qua doi', 'mat roi', 'khong con nua', 'tuong nho', 'ra di', 'cau vong'],
+    keywords: ['da mat', 'moi mat', 'vua mat', 'qua doi', 'mat roi', 'khong con nua', 'tuong nho', 'ra di', 'cau vong', 'giu ky niem'],
     answer: 'Mình rất tiếc về sự mất mát của bạn. Rất nhiều khách đến với PETMORY để giữ lại hình ảnh của bé. Bạn chỉ cần những tấm ảnh còn giữ được, kể cả ảnh cũ hay hơi mờ. Hộp kỷ niệm có thể khắc tên, ngày tưởng nhớ và một lời nhắn cho bé.',
     link: '/studio', followUp: ['PHOTO', 'SIZES'],
   },
