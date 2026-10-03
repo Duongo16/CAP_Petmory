@@ -1,4 +1,4 @@
-export type Role = 'MANAGER' | 'ADMIN' | 'CUSTOMER';
+export type Role = 'MANAGER' | 'ADMIN' | 'SUPPORT' | 'CUSTOMER';
 
 /** Mot tai khoan, nhin tu man hinh quan ly tai khoan. */
 export interface Account {

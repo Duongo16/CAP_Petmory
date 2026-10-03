@@ -104,6 +104,17 @@ export class ChatSession {
   @Prop({ type: Date, default: () => new Date(), index: true })
   lastAt!: Date;
 
+  /**
+   * Dieu tro ly dang nho trong phien: san pham vua noi toi va muc vua tra loi.
+   * Dung khi chua goi duoc mo hinh ngon ngu, de cau hoi tiep van hieu dung y.
+   */
+  @Prop({
+    type: { productTypeCode: { type: String, default: '' }, lastCode: { type: String, default: '' } },
+    default: () => ({ productTypeCode: '', lastCode: '' }),
+    _id: false,
+  })
+  focus!: { productTypeCode: string; lastCode: string };
+
   /** Cau hoi khach go khi xin gap nguoi, de nhan vien biet ngay viec gi. */
   @Prop({ trim: true, default: '', maxlength: 500 })
   handoverNote!: string;

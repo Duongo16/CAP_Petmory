@@ -65,8 +65,9 @@ export class ChatSessionService {
     private readonly goods: GoodsService,
   ) {}
 
-  /** Mo mot phien moi. Khach chua dang nhap cung mo duoc. */
+  /** Mo mot phien moi cho nguoi dang dang nhap. */
   async open(owner: string | null): Promise<ChatSessionDocument> {
+    const starters = await this.basic.suggestions();
     return this.model.create({
       code: `${randomUUID()}${randomUUID().replace(/-/g, '')}`,
       owner: owner ? new Types.ObjectId(owner) : null,
@@ -75,7 +76,7 @@ export class ChatSessionService {
         {
           side: ChatSide.BOT,
           text: HELLO,
-          suggestion: this.basic.getInitialSuggestions(),
+          suggestion: starters,
           path: '',
           productCode: [],
           goodsCode: [],
@@ -106,17 +107,13 @@ export class ChatSessionService {
   /**
    * Doc mot phien.
    *
-   * Ma phien la chia khoa, nen ai co ma thi doc duoc. Voi phien co chu, kiem
-   * them chu so huu: mot nguoi dang nhap khong duoc doc phien cua tai khoan
-   * khac ngay ca khi ho co ma.
+   * Chi chu phien moi doc duoc, ke ca khi nguoi khac biet ma phien. Phien cu
+   * cua khach vang lai khong co chu nen khong ai doc lai duoc nua.
    */
   async findFor(code: string, owner: string | null): Promise<ChatSessionDocument> {
     const one = await this.model.findOne({ code }).exec();
-    if (!one) {
+    if (!one || !owner || one.owner?.toString() !== owner) {
       throw new NotFoundException(MSG.NOT_FOUND);
-    }
-    if (one.owner && one.owner.toString() !== owner) {
-      throw new ForbiddenException(MSG.NOT_FOUND);
     }
     return one;
   }
@@ -283,7 +280,11 @@ export class ChatSessionService {
     if (live) {
       return live;
     }
-    const basic = await this.basic.ask(question);
+    const basic = await this.basic.ask(question, {
+      productTypeCode: one.focus?.productTypeCode ?? '',
+      lastCode: one.focus?.lastCode ?? '',
+    });
+    one.focus = basic.focus;
     return {
       text: basic.content,
       suggestion: basic.suggestion,
@@ -320,10 +321,14 @@ export class ChatSessionService {
       return null;
     }
 
-    const shop = await this.shopWords();
+    const [shop, known] = await Promise.all([this.shopWords(), this.basic.knowledgeText()]);
     const answer = await this.client.ask({
       system: systemWords(),
       prompt: [
+        'KHO TRI THỨC CỦA CỬA HÀNG (chính sách và câu trả lời chuẩn):',
+        known,
+        '',
+        'DANH MỤC ĐANG BÁN:',
         shop.text,
         '',
         'Cuộc trò chuyện đến lúc này:',
@@ -348,7 +353,7 @@ export class ChatSessionService {
     );
     return {
       text: answer.text.trim(),
-      suggestion: this.basic.getInitialSuggestions(),
+      suggestion: await this.basic.suggestions(),
       path: '',
       productCode: pickCodes(answer.text, shop.kindCode),
       goodsCode: pickCodes(answer.text, shop.goodsCode),
@@ -403,11 +408,16 @@ interface ShopWords {
 /** Loi dan dat, dat gioi han cua cau tra loi. */
 function systemWords(): string {
   return [
-    'Bạn là tư vấn viên của PETMORY, một xưởng làm thú nhồi bông thủ công từ len tái chế theo ảnh thú cưng.',
-    'Chỉ nói về những sản phẩm có trong danh mục được cung cấp. Không được nghĩ ra sản phẩm, giá hay thời gian nào khác.',
-    'Không biết thì nói không biết và mời khách gặp tư vấn viên.',
-    'Trả lời bằng tiếng Việt, ngắn gọn, không quá 150 chữ.',
-    'Không hỏi và không nhắc lại số điện thoại, địa chỉ hay bất kỳ thông tin riêng nào của khách.',
+    'Bạn là trợ lý tư vấn của PETMORY, xưởng làm sản phẩm len chọc thủ công theo ảnh thú cưng (tượng len, móc khóa, tranh len, hộp kỷ niệm), và bán kèm một số sản phẩm có sẵn cho thú cưng.',
+    'Giọng thân thiện, ấm áp, xưng "mình" và gọi khách là "bạn". Trả lời bằng ngôn ngữ khách dùng; mặc định tiếng Việt có dấu.',
+    'Chỉ dùng giá, kích cỡ, thời gian, chính sách và sản phẩm có trong KHO TRI THỨC và DANH MỤC được cung cấp. Tuyệt đối không tự nghĩ ra con số, sản phẩm, chương trình khuyến mãi hay chính sách khác.',
+    'Không chắc hoặc không có trong dữ liệu thì nói thật là mình chưa có thông tin, và mời khách bấm "Gặp tư vấn viên".',
+    'Khi phù hợp, gợi ý đúng tên và mã sản phẩm có trong danh mục, và gợi ý khách vào Studio 3D để tự phối màu cho bé.',
+    'Gợi ý chuyển sang tư vấn viên khi khách muốn gặp người, khiếu nại, hỏi về một đơn hàng cụ thể, hoặc hỏi về hoàn tiền, đổi trả.',
+    'Với câu hỏi sức khỏe thú cưng, chỉ trả lời rất chung và khuyên đưa bé tới bác sĩ thú y.',
+    'Nếu khách nhắc tới thú cưng đã mất, hãy chia buồn nhẹ nhàng trước khi tư vấn.',
+    'Không bao giờ hỏi, nhắc lại hay lưu mật khẩu, mã OTP, số thẻ, số tài khoản; không hỏi địa chỉ hay số điện thoại của khách.',
+    'Trả lời ngắn gọn, dưới 150 chữ, có thể xuống dòng hoặc gạch đầu dòng cho dễ đọc. Không dùng định dạng markdown như dấu sao hay dấu thăng.',
   ].join(' ');
 }
 

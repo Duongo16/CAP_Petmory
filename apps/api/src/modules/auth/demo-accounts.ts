@@ -37,6 +37,12 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
     roles: ['ADMIN'],
   },
   {
+    email: 'cskh@petmory.local',
+    password: PASSWORD_INTERNAL,
+    labelKey: 'AUTH.QUICK.SUPPORT',
+    roles: ['SUPPORT'],
+  },
+  {
     email: 'khachhang@petmory.local',
     password: PASSWORD_CUSTOMER,
     labelKey: 'AUTH.QUICK.CUSTOMER',

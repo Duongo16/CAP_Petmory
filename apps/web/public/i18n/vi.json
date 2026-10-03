@@ -53,7 +53,8 @@
     "ACCOUNTS": "Tài khoản",
     "MODELS": "Mẫu 3D",
     "JOURNALS": "Nhật ký",
-    "SHOP": "Cửa hàng"
+    "SHOP": "Cửa hàng",
+    "ASSISTANT_KNOWLEDGE": "Kho tri thức trợ lý"
   },
   "AUTH": {
     "QUICK": {
@@ -61,7 +62,8 @@
       "NOTE": "Chỉ hiện khi máy chủ chạy ở chế độ phát triển. Bản dùng thật không có khối này.",
       "MANAGER": "Quản lý",
       "CUSTOMER": "Khách hàng",
-      "ADMIN": "Quản trị viên"
+      "ADMIN": "Quản trị viên",
+      "SUPPORT": "Chăm sóc KH"
     },
     "TITLE": "Đăng nhập",
     "EMAIL": "Email",
@@ -1102,28 +1104,21 @@
   "ASSISTANT": {
     "TITLE": "Hỏi nhanh",
     "GREETING": "Chào bạn. Mình giúp bạn tìm hiểu về sản phẩm thủ công làm từ ảnh thú cưng. Bạn muốn biết gì?",
-    "DISCLAIMER": "Đây là trợ lý trả lời sẵn theo dữ liệu của cửa hàng. Câu hỏi ngoài phạm vi sẽ được chuyển cho tư vấn viên.",
+    "DISCLAIMER": "Trợ lý trả lời theo dữ liệu của cửa hàng và có thể chưa chính xác. Cần hỗ trợ kỹ hơn, bạn bấm \"Gặp tư vấn viên\".",
     "INPUT": "Nhập câu hỏi",
     "SEND": "Gửi",
     "PENDING_ANSWER": "Đang trả lời…",
     "GO_TO": "Mở trang liên quan",
-    "SUGGESTION": {
-      "PRICE": "Giá bao nhiêu?",
-      "LEAD_TIME": "Làm mất bao lâu?",
-      "SIZES": "Có những kích cỡ nào?",
-      "MATERIAL": "Làm bằng chất liệu gì?",
-      "PROCESS": "Đặt hàng như thế nào?",
-      "PHOTO": "Cần gửi ảnh thế nào?",
-      "PAYMENT": "Thanh toán bằng cách nào?",
-      "OTHER": "Hỏi thêm"
-    },
     "STATE_BOT": "Đang trò chuyện với trợ lý tự động",
     "STATE_WAITING": "Đang chờ tư vấn viên nhận",
     "STATE_WITH_STAFF": "Đang trò chuyện với tư vấn viên",
     "STATE_CLOSED": "Cuộc trò chuyện đã kết thúc",
     "FROM_STAFF": "Tư vấn viên",
     "ASK_PERSON": "Gặp tư vấn viên",
-    "START_FRESH": "Bắt đầu cuộc mới"
+    "START_FRESH": "Bắt đầu cuộc mới",
+    "SIGN_IN_TITLE": "Đăng nhập để trò chuyện",
+    "SIGN_IN_TEXT": "Trợ lý PETMORY dành cho thành viên. Đăng nhập để được tư vấn sản phẩm, giá và theo dõi đơn hàng.",
+    "SIGN_IN": "Đăng nhập"
   },
   "ADMIN": {
     "TILE": {
@@ -1470,7 +1465,8 @@
       "EMAIL_BAD": "Địa chỉ thư điện tử chưa đúng dạng.",
       "PASSWORD_SHORT": "Mật khẩu cần ít nhất 8 ký tự.",
       "ACTIVE_LABEL": "Cho phép tài khoản này đăng nhập",
-      "SAVED": "Đã lưu thay đổi cho tài khoản."
+      "SAVED": "Đã lưu thay đổi cho tài khoản.",
+      "ROLE_SUPPORT": "Chăm sóc khách hàng"
     },
     "MODELS": {
       "EYEBROW": "CHỌN DÁNG SẢN PHẨM",
@@ -1815,5 +1811,47 @@
     "SUB": "Kỷ vật làm riêng theo ảnh của bé, và những món có sẵn để mang về ngay.",
     "CUSTOM": "Kỷ vật làm theo ảnh",
     "READY": "Hàng có sẵn"
+  },
+  "KNOWLEDGE": {
+    "TITLE": "Kho tri thức trợ lý",
+    "HINT": "Câu hỏi thường gặp và câu trả lời chuẩn của cửa hàng. Trợ lý dùng kho này để trả lời khách, và đưa vào lời dặn khi gọi mô hình AI. Các nút chèn số liệu bên dưới ô câu trả lời sẽ được điền bằng giá, kích cỡ và thời gian thật lúc trả lời.",
+    "ADD_TITLE": "Thêm mục hỏi đáp",
+    "EDIT_TITLE": "Sửa mục hỏi đáp",
+    "CODE": "Mã mục",
+    "CODE_LOCKED": "Mã không đổi được sau khi tạo.",
+    "CODE_ERROR": "Mã gồm chữ không dấu, số, gạch ngang, từ 2 đến 40 ký tự.",
+    "CODE_TAKEN": "Mã mục này đã có rồi.",
+    "TOPIC_LABEL": "Chủ đề",
+    "QUESTION": "Câu hỏi mẫu",
+    "QUESTION_NOTE": "Cũng là chữ hiện trên nút gợi ý cho khách.",
+    "KEYWORDS": "Từ khóa",
+    "KEYWORDS_NOTE": "Cách nhau bằng dấu phẩy. Gõ có dấu hay không dấu đều được, hệ thống tự bỏ dấu khi so khớp.",
+    "ANSWER": "Câu trả lời",
+    "SLOTS": "Chèn số liệu thật:",
+    "LINK": "Đường dẫn",
+    "LINK_ERROR": "Chỉ nhận đường dẫn trong trang, bắt đầu bằng dấu /.",
+    "SORT": "Thứ tự",
+    "FOLLOW_UP": "Gợi ý hỏi tiếp sau câu trả lời này",
+    "STARTER": "Hiện ngay khi khách mở khung chat",
+    "STARTER_SHORT": "Gợi ý mở đầu",
+    "ENABLED": "Đang dùng",
+    "OFF": "Đang tắt",
+    "TURN_ON": "Bật",
+    "TURN_OFF": "Tắt",
+    "HIDE": "Ẩn",
+    "COUNT_ENABLED": "Mục đang dùng",
+    "COUNT_STARTER": "Gợi ý mở đầu",
+    "SEARCH": "Tìm theo câu hỏi, câu trả lời, từ khóa",
+    "EMPTY": "Chưa có mục nào khớp.",
+    "TOPIC": {
+      "PRODUCT": "Sản phẩm",
+      "SIZE": "Kích cỡ",
+      "LEAD_TIME": "Thời gian làm",
+      "ORDER": "Đặt hàng",
+      "PAYMENT": "Thanh toán",
+      "SHIPPING": "Vận chuyển",
+      "POLICY": "Chính sách",
+      "OTHER": "Khác"
+    }
   }
 }

@@ -17,7 +17,12 @@ const CORE_STOPS: Stop[] = [
   { path: '/admin/customers', key: 'NAV.CUSTOMER', icon: 'user' },
   { path: '/admin/chats', key: 'NAV.CHAT_DESK', icon: 'comment' },
   { path: '/admin/payment-log', key: 'NAV.LOG_PAYMENT', icon: 'tag' },
+];
+
+/** Chi nhom Quan ly: hang co san va kho tri thuc cua tro ly. */
+const MANAGER_STOPS: Stop[] = [
   { path: '/admin/goods', key: 'NAV.GOODS_STOCK', icon: 'bookmark' },
+  { path: '/admin/assistant', key: 'NAV.ASSISTANT_KNOWLEDGE', icon: 'bulb' },
 ];
 
 /** Phan xuong va tham so, cung thuoc nhom Quan ly. */
@@ -61,7 +66,10 @@ export class AdminShell {
    * Nhom Quan ly thay phan van hanh, nhom Quan tri vien thay phan tai khoan.
    * Day chi la viec an hien: may chu kiem lai quyen o moi yeu cau.
    */
-  readonly coreStops = computed(() => (this.isManager() ? CORE_STOPS : []));
+  readonly coreStops = computed(() => [
+    ...(this.auth.isDesk() ? CORE_STOPS : []),
+    ...(this.isManager() ? MANAGER_STOPS : []),
+  ]);
   readonly workshopStops = computed(() => (this.isManager() ? WORKSHOP_STOPS : []));
   readonly accountStops = computed(() => (this.isAccountAdmin() ? ACCOUNT_STOPS : []));
   readonly who = computed(() => this.auth.user()?.fullName ?? '');

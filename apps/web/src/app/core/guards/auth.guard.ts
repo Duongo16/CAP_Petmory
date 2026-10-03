@@ -40,6 +40,13 @@ export const managerGuard: CanActivateFn = () => {
 };
 
 /** Man hinh quan ly tai khoan chi mo cho nhom Quan tri vien. */
+/** Quan ly va Cham soc khach hang: don, khach hang, hoi thoai, nhat ky thanh toan. */
+export const deskGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.isDesk() ? true : router.createUrlTree(['/home']);
+};
+
 export const accountAdminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);

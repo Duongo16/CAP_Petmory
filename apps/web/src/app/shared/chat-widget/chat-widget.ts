@@ -3,6 +3,8 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  effect,
+  untracked,
   computed,
   inject,
   signal,
@@ -35,24 +37,6 @@ interface Bubble {
   content: string;
   path: string;
 }
-
-/**
- * Tra key ban dich cho cac cau goi y may chu tra ve.
- *
- * Khai ra tung key mot de tim duoc bang tim kiem chu. Khong bao gio ghep
- * key tu chuoi.
- */
-const KEY_SUGGESTION: Record<string, string> = {
-  PRICE: 'ASSISTANT.SUGGESTION.PRICE',
-  LEAD_TIME: 'ASSISTANT.SUGGESTION.LEAD_TIME',
-  SIZES: 'ASSISTANT.SUGGESTION.SIZES',
-  MATERIAL: 'ASSISTANT.SUGGESTION.MATERIAL',
-  PROCESS: 'ASSISTANT.SUGGESTION.PROCESS',
-  PHOTO: 'ASSISTANT.SUGGESTION.PHOTO',
-  PAYMENT: 'ASSISTANT.SUGGESTION.PAYMENT',
-};
-
-const KEY_SUGGESTION_OTHER = 'ASSISTANT.SUGGESTION.OTHER';
 
 /** Tra key ban dich cho tung trang thai cua phien. */
 const KEY_STATE: Record<ChatState, string> = {
@@ -96,12 +80,24 @@ export class ChatWidget implements OnInit {
   readonly contentInput = signal('');
   readonly session = signal<ChatSession | null>(null);
 
-  private readonly suggestion = signal<string[]>([]);
+  /**
+   * Cac cau hoi goi y. Day la noi dung kho tri thuc do nhom Quan ly soan, nen
+   * hien nguyen van chu khong qua tep ban dich.
+   */
+  readonly suggestions = signal<string[]>([]);
 
-  /** Tinh san key ban dich cho tung cau goi y, de khung nhin khong goi ham. */
-  readonly suggestions = computed(() =>
-    this.suggestion().map((code) => ({ code, key: KEY_SUGGESTION[code] ?? KEY_SUGGESTION_OTHER })),
-  );
+  /** Tro ly chi danh cho nguoi da dang nhap. */
+  readonly signedIn = this.auth.isSignedIn;
+
+  /** Dang xuat thi bo phien dang mo, de nguoi dang nhap sau khong thay cuoc tro chuyen cu. */
+  protected readonly forgetOnSignOut = effect(() => {
+    if (!this.signedIn()) {
+      untracked(() => {
+        this.session.set(null);
+        this.suggestions.set([]);
+      });
+    }
+  });
 
   /** Cac bong chu hien tren man hinh. */
   readonly history = computed<Bubble[]>(() =>
@@ -125,14 +121,6 @@ export class ChatWidget implements OnInit {
   readonly closed = computed(() => this.state() === 'CLOSED');
 
   ngOnInit(): void {
-    this.service
-      .initialSuggestions()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (got) => this.suggestion.set(got.suggestion),
-        error: () => undefined,
-      });
-
     /*
      * Cac cau hoi di lan luot chu khong song song. Bam gui hai lan that nhanh
      * thi cau thu hai cho cau thu nhat xong, nen khong cau nao bi bo qua va
@@ -161,13 +149,19 @@ export class ChatWidget implements OnInit {
   toggle(): void {
     const open = !this.pendingOpen();
     this.pendingOpen.set(open);
-    if (open && !this.session()) {
+    if (open && this.signedIn() && !this.session()) {
       this.start();
     }
   }
 
-  selectSuggestion(key: string): void {
-    this.getText(key, (text) => this.outbox.next(text));
+  selectSuggestion(text: string): void {
+    this.outbox.next(text);
+  }
+
+  /** Dua khach chua dang nhap toi trang dang nhap, roi quay lai dung trang nay. */
+  goSignIn(): void {
+    this.pendingOpen.set(false);
+    void this.router.navigate(['/login'], { queryParams: { continue: this.router.url } });
   }
 
   sendFromInput(): void {
@@ -180,7 +174,8 @@ export class ChatWidget implements OnInit {
 
   openPath(path: string): void {
     this.pendingOpen.set(false);
-    void this.router.navigate([path]);
+    // Duong dan co the kem tham so (vi du /shop?tab=ready), nen mo bang ca chuoi.
+    void this.router.navigateByUrl(path);
   }
 
   /** Xin gap tu van vien that. */
@@ -218,14 +213,10 @@ export class ChatWidget implements OnInit {
   /**
    * Mo phien.
    *
-   * Nguoi da dang nhap duoc noi lai phien cu dang mo, nen mo lai trang khong
-   * lam mat mach hoi thoai. Khach chua dang nhap luon bat dau mot cuoc moi.
+   * Phien cu dang mo duoc noi lai, nen mo lai trang khong lam mat mach hoi
+   * thoai. Cac cau goi y lay tu cau tra loi gan nhat, hoac tu loi chao.
    */
   private start(): void {
-    if (!this.auth.isSignedIn()) {
-      this.openNew();
-      return;
-    }
     this.service
       .mySession()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -233,6 +224,7 @@ export class ChatWidget implements OnInit {
         next: (found) => {
           if (found) {
             this.session.set(found);
+            this.suggestions.set(lastSuggestions(found));
           } else {
             this.openNew();
           }
@@ -246,7 +238,10 @@ export class ChatWidget implements OnInit {
       .openSession()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (made) => this.session.set(made),
+        next: (made) => {
+          this.session.set(made);
+          this.suggestions.set(lastSuggestions(made));
+        },
         error: () =>
           this.getText('COMMON.GENERIC_ERROR', (text) => this.showLocalNote(text)),
       });
@@ -266,7 +261,7 @@ export class ChatWidget implements OnInit {
         this.session.set(got);
         const last = got.turn[got.turn.length - 1];
         if (last?.suggestion?.length) {
-          this.suggestion.set(last.suggestion);
+          this.suggestions.set(last.suggestion);
         }
       }),
       catchError(() => {
@@ -352,4 +347,14 @@ export class ChatWidget implements OnInit {
       .pipe(take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe((text: string) => use(text));
   }
+}
+
+/** Cac cau goi y cua luot tra loi gan nhat co goi y. */
+function lastSuggestions(one: ChatSession): string[] {
+  for (let at = one.turn.length - 1; at >= 0; at -= 1) {
+    if (one.turn[at].suggestion?.length) {
+      return one.turn[at].suggestion;
+    }
+  }
+  return [];
 }

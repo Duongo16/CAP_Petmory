@@ -1,19 +1,20 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ChatbotService } from './chatbot.service';
 import { AskDto } from './dto/chatbot.dto';
-import { Public } from '../../common/decorators/public.decorator';
 
+/**
+ * Tro ly ban co ban. Chi danh cho nguoi da dang nhap, giong moi chuc nang
+ * tri tue nhan tao khac cua he thong.
+ */
 @Controller('assistant')
 export class ChatbotController {
   constructor(private readonly service: ChatbotService) {}
 
-  @Public()
   @Get('suggestions')
   suggestion() {
-    return { suggestion: this.service.getInitialSuggestions() };
+    return this.service.suggestions().then((suggestion) => ({ suggestion }));
   }
 
-  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('ask')
   ask(@Body() dto: AskDto) {

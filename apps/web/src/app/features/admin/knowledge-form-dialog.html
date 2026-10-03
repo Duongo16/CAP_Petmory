@@ -1,0 +1,102 @@
+<form class="sheet" [formGroup]="form" (ngSubmit)="save()">
+  <header class="sheet-head">
+    <div>
+      <p class="eyebrow">{{ 'KNOWLEDGE.TITLE' | translate }}</p>
+      <h2 class="sheet-title">{{ (editing ? 'KNOWLEDGE.EDIT_TITLE' : 'KNOWLEDGE.ADD_TITLE') | translate }}</h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="sheet-body">
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="kb-code">{{ 'KNOWLEDGE.CODE' | translate }}</label>
+        <input id="kb-code" type="text" maxlength="40" formControlName="code" />
+        @if (editing) {
+          <p class="field-note">{{ 'KNOWLEDGE.CODE_LOCKED' | translate }}</p>
+        } @else if (form.controls.code.touched && form.controls.code.invalid) {
+          <p class="field-error">{{ 'KNOWLEDGE.CODE_ERROR' | translate }}</p>
+        }
+      </div>
+      <div class="field">
+        <label class="field-name" for="kb-topic">{{ 'KNOWLEDGE.TOPIC_LABEL' | translate }}</label>
+        <select id="kb-topic" formControlName="topic">
+          @for (one of topics; track one.topic) {
+            <option [value]="one.topic">{{ one.key | translate }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="kb-question">{{ 'KNOWLEDGE.QUESTION' | translate }}</label>
+      <input id="kb-question" type="text" maxlength="160" formControlName="question" />
+      <p class="field-note">{{ 'KNOWLEDGE.QUESTION_NOTE' | translate }}</p>
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="kb-keywords">{{ 'KNOWLEDGE.KEYWORDS' | translate }}</label>
+      <input id="kb-keywords" type="text" formControlName="keywords" />
+      <p class="field-note">{{ 'KNOWLEDGE.KEYWORDS_NOTE' | translate }}</p>
+    </div>
+
+    <div class="field">
+      <label class="field-name" for="kb-answer">{{ 'KNOWLEDGE.ANSWER' | translate }}</label>
+      <textarea id="kb-answer" rows="6" maxlength="2000" formControlName="answer"></textarea>
+      <div class="slot-row">
+        <span class="field-note">{{ 'KNOWLEDGE.SLOTS' | translate }}</span>
+        @for (slot of slots; track slot) {
+          <button type="button" class="pm-chip slot" (click)="addSlot(slot)">{{ slot }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="kb-link">{{ 'KNOWLEDGE.LINK' | translate }}</label>
+        <input id="kb-link" type="text" maxlength="200" placeholder="/shop" formControlName="link" />
+        @if (form.controls.link.invalid) {
+          <p class="field-error">{{ 'KNOWLEDGE.LINK_ERROR' | translate }}</p>
+        }
+      </div>
+      <div class="field">
+        <label class="field-name" for="kb-order">{{ 'KNOWLEDGE.SORT' | translate }}</label>
+        <input id="kb-order" type="number" min="0" max="9999" formControlName="sortOrder" />
+      </div>
+    </div>
+
+    @if (others.length > 0) {
+      <fieldset class="field follow">
+        <legend class="field-name">{{ 'KNOWLEDGE.FOLLOW_UP' | translate }}</legend>
+        <div class="follow-row">
+          @for (chip of followChips(); track chip.code) {
+            <button
+              type="button"
+              class="pm-chip"
+              [class.is-selected]="chip.on"
+              [attr.aria-pressed]="chip.on"
+              (click)="toggleFollowUp(chip.code)"
+            >
+              {{ chip.code }}
+            </button>
+          }
+        </div>
+      </fieldset>
+    }
+
+    <div class="ticks">
+      <label class="tick"><input type="checkbox" formControlName="starter" /> {{ 'KNOWLEDGE.STARTER' | translate }}</label>
+      <label class="tick"><input type="checkbox" formControlName="enabled" /> {{ 'KNOWLEDGE.ENABLED' | translate }}</label>
+    </div>
+  </div>
+
+  <footer class="sheet-foot">
+    <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
+    <button type="submit" class="strong" id="kb-save">
+      {{ 'COMMON.SAVE' | translate }}
+      <pm-icon name="check" [size]="15" />
+    </button>
+  </footer>
+</form>

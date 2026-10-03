@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Anthropic from '@anthropic-ai/sdk';
+import { ApiError, FinishReason, GoogleGenAI, Part } from '@google/genai';
 import { AiMode } from './schemas/ai-usage.schema';
 
 /** Mot buc anh gui kem cau hoi. */
@@ -50,12 +51,98 @@ const NO_KEY = 'Chua cau hinh khoa dich vu';
 /** Ly do ghi vao so khi cau dao dang mo. */
 const BREAK_OPEN = 'Cau dao dang mo sau nhieu lan goi hong';
 
+const PROVIDER_GEMINI = 'gemini';
+const PROVIDER_ANTHROPIC = 'anthropic';
+
+/** Mo hinh mac dinh cua tung nha cung cap, khi khong dat AI_MODEL. */
+const MODEL_DEFAULT: Record<string, string> = {
+  [PROVIDER_GEMINI]: 'gemini-2.5-flash',
+  [PROVIDER_ANTHROPIC]: 'claude-opus-5',
+};
+
+/** Do dai toi da mac dinh cua cau tra loi. */
+const WORDS_DEFAULT = 2000;
+
+/** Cau tra loi bi dich vu chan vi ly do an toan noi dung. */
+class BlockedAnswer extends Error {
+  constructor() {
+    super('blocked');
+    this.name = 'BlockedAnswer';
+  }
+}
+
+/** Mot cach goi ra mot nha cung cap cu the. */
+interface ModelCaller {
+  readonly provider: string;
+  call(request: AiAsk, model: string): Promise<string>;
+}
+
+/** Goi Claude qua thu vien chinh thuc cua Anthropic. */
+class AnthropicCaller implements ModelCaller {
+  readonly provider = PROVIDER_ANTHROPIC;
+  private readonly client: Anthropic;
+
+  constructor(key: string, timeout: number) {
+    this.client = new Anthropic({ apiKey: key, timeout, maxRetries: RETRY });
+  }
+
+  async call(request: AiAsk, model: string): Promise<string> {
+    const reply = await this.client.messages.create({
+      model,
+      max_tokens: request.maxWords ?? WORDS_DEFAULT,
+      system: request.system,
+      messages: [{ role: 'user', content: anthropicContent(request) }],
+    });
+    return reply.content
+      .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+      .map((block) => block.text)
+      .join('\n')
+      .trim();
+  }
+}
+
+/** Goi Gemini qua thu vien chinh thuc cua Google. */
+class GeminiCaller implements ModelCaller {
+  readonly provider = PROVIDER_GEMINI;
+  private readonly client: GoogleGenAI;
+
+  constructor(key: string, timeout: number) {
+    this.client = new GoogleGenAI({ apiKey: key, httpOptions: { timeout } });
+  }
+
+  async call(request: AiAsk, model: string): Promise<string> {
+    const parts: Part[] = (request.picture ?? []).map((one) => ({
+      inlineData: { mimeType: mediaOf(one.kind), data: one.data },
+    }));
+    parts.push({ text: request.prompt });
+
+    const reply = await this.client.models.generateContent({
+      model,
+      contents: [{ role: 'user', parts }],
+      config: {
+        systemInstruction: request.system,
+        maxOutputTokens: request.maxWords ?? WORDS_DEFAULT,
+        temperature: 0.6,
+        // Dong flash tra loi nhanh hon khi tat buoc suy nghi rieng; dong pro khong cho tat.
+        ...(model.includes('flash') ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+      },
+    });
+
+    const reason = reply.candidates?.[0]?.finishReason;
+    if (reply.promptFeedback?.blockReason || reason === FinishReason.SAFETY) {
+      throw new BlockedAnswer();
+    }
+    return (reply.text ?? '').trim();
+  }
+}
+
 /**
  * Cho duy nhat trong he thong goi ra dich vu mo hinh ngon ngu.
  *
- * Moi chuc nang dung tri tue nhan tao deu di qua day, nen thoi gian cho, so
- * lan thu lai va cau dao chi phai dat mot cho. Khoa dich vu doc tu bien moi
- * truong va khong bao gio duoc ghi ra nhat ky hay tra ve cho nguoi dung.
+ * Moi chuc nang dung tri tue nhan tao deu di qua day, nen nha cung cap, thoi
+ * gian cho, so lan thu lai va cau dao chi phai dat mot cho. Nha cung cap chon
+ * bang AI_PROVIDER; de trong thi chon theo khoa dang co, uu tien Gemini. Khoa
+ * doc tu bien moi truong va khong bao gio duoc ghi ra nhat ky hay tra ve.
  *
  * Khong lan goi nao o day nem loi ra ngoai. Khi dich vu that khong dung duoc,
  * ket qua tra ve mang dau SAMPLE kem ly do, va ben goi tu quyet dinh dung loi
@@ -64,7 +151,7 @@ const BREAK_OPEN = 'Cau dao dang mo sau nhieu lan goi hong';
 @Injectable()
 export class AiClientService {
   private readonly logger = new Logger(AiClientService.name);
-  private readonly client: Anthropic | null;
+  private readonly caller: ModelCaller | null;
   private readonly model: string;
 
   /** So lan goi hong lien tiep tinh den luc nay. */
@@ -74,25 +161,35 @@ export class AiClientService {
   private openUntil = 0;
 
   constructor(config: ConfigService) {
-    const key = config.get<string>('ai.apiKey') ?? '';
-    this.model = config.get<string>('ai.model') ?? 'claude-opus-5';
     const timeout = config.get<number>('ai.timeoutMs') ?? 45_000;
+    const keys: Record<string, string> = {
+      [PROVIDER_GEMINI]: (config.get<string>('ai.geminiKey') ?? '').trim(),
+      [PROVIDER_ANTHROPIC]: (config.get<string>('ai.apiKey') ?? '').trim(),
+    };
+    const wanted = config.get<string>('ai.provider') ?? '';
+    const provider =
+      wanted in keys ? wanted : keys[PROVIDER_ANTHROPIC] && !keys[PROVIDER_GEMINI] ? PROVIDER_ANTHROPIC : PROVIDER_GEMINI;
+    const key = keys[provider];
 
-    this.client =
-      key.trim() === ''
-        ? null
-        : new Anthropic({ apiKey: key, timeout, maxRetries: RETRY });
+    this.model = config.get<string>('ai.model') || MODEL_DEFAULT[provider];
+    if (!key) {
+      this.caller = null;
+    } else if (provider === PROVIDER_GEMINI) {
+      this.caller = new GeminiCaller(key, timeout);
+    } else {
+      this.caller = new AnthropicCaller(key, timeout);
+    }
 
     this.logger.log(
-      this.client
-        ? `Dich vu tri tue nhan tao: goi that, mo hinh ${this.model}`
-        : 'Dich vu tri tue nhan tao: chua co khoa, chay bang bo tra loi mau',
+      this.caller
+        ? `Dich vu tri tue nhan tao: goi that qua ${provider}, mo hinh ${this.model}`
+        : `Dich vu tri tue nhan tao: chua co khoa ${provider}, chay bang bo tra loi mau`,
     );
   }
 
   /** He thong co dang goi dich vu that hay khong. */
   live(): boolean {
-    return this.client !== null && Date.now() >= this.openUntil;
+    return this.caller !== null && Date.now() >= this.openUntil;
   }
 
   /**
@@ -108,14 +205,9 @@ export class AiClientService {
     }
 
     try {
-      const reply = await this.client!.messages.create({
-        model: this.model,
-        max_tokens: request.maxWords ?? 2000,
-        system: request.system,
-        messages: [{ role: 'user', content: contentOf(request) }],
-      });
+      const text = await this.caller!.call(request, this.model);
       this.failInRow = 0;
-      return { text: textOf(reply), mode: AiMode.LIVE, problem: '' };
+      return { text, mode: AiMode.LIVE, problem: '' };
     } catch (trouble) {
       return { text: '', mode: AiMode.SAMPLE, problem: this.noteFailure(trouble) };
     }
@@ -146,7 +238,7 @@ export class AiClientService {
 
   /** Vi sao chua goi duoc, hoac rong neu goi duoc. */
   private whyBlocked(): string {
-    if (!this.client) {
+    if (!this.caller) {
       return NO_KEY;
     }
     return Date.now() < this.openUntil ? BREAK_OPEN : '';
@@ -156,10 +248,15 @@ export class AiClientService {
    * Ghi nhan mot lan goi hong va mo cau dao khi hong lien tiep qua nhieu.
    *
    * Ly do duoc rut gon truoc khi ghi nhat ky, va khong bao gio kem khoa dich
-   * vu, vi nhat ky may chu nhieu nguoi doc duoc.
+   * vu, vi nhat ky may chu nhieu nguoi doc duoc. Cau tra loi bi chan vi an toan
+   * khong tinh la dich vu hong, nen khong day cau dao.
    */
   private noteFailure(trouble: unknown): string {
     const why = shortReason(trouble);
+    if (trouble instanceof BlockedAnswer) {
+      this.logger.warn(`Cau tra loi bi chan: ${why}`);
+      return why;
+    }
     this.failInRow += 1;
     if (this.failInRow >= BREAK_AFTER) {
       this.openUntil = Date.now() + BREAK_MS;
@@ -172,8 +269,8 @@ export class AiClientService {
   }
 }
 
-/** Phan noi dung gui di, gom anh truoc roi den cau hoi. */
-function contentOf(request: AiAsk): Anthropic.ContentBlockParam[] {
+/** Phan noi dung gui cho Claude, gom anh truoc roi den cau hoi. */
+function anthropicContent(request: AiAsk): Anthropic.ContentBlockParam[] {
   const out: Anthropic.ContentBlockParam[] = [];
   for (const one of request.picture ?? []) {
     out.push({
@@ -198,15 +295,6 @@ function mediaOf(kind: string): 'image/jpeg' | 'image/png' | 'image/gif' | 'imag
     return 'image/webp';
   }
   return 'image/png';
-}
-
-/** Gop cac doan chu trong cau tra loi lai thanh mot chuoi. */
-function textOf(reply: Anthropic.Message): string {
-  return reply.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
-    .map((block) => block.text)
-    .join('\n')
-    .trim();
 }
 
 /**
@@ -241,8 +329,20 @@ function between(raw: string): string {
  * nhat ky, vi loi goc co the keo theo noi dung yeu cau da gui di.
  */
 function shortReason(trouble: unknown): string {
-  if (trouble instanceof Anthropic.APIError) {
-    return `Dich vu tra ve ma ${trouble.status ?? 'khong ro'}`;
+  if (trouble instanceof BlockedAnswer) {
+    return 'Cau tra loi bi dich vu chan vi ly do an toan noi dung';
+  }
+  const status =
+    trouble instanceof Anthropic.APIError
+      ? trouble.status
+      : trouble instanceof ApiError
+        ? trouble.status
+        : undefined;
+  if (status === 429) {
+    return 'Dich vu bao het han muc hoac goi qua nhanh (429)';
+  }
+  if (status !== undefined) {
+    return `Dich vu tra ve ma ${status ?? 'khong ro'}`;
   }
   if (trouble instanceof Error) {
     return trouble.name === 'AbortError' ? 'Goi dich vu qua lau' : trouble.name;

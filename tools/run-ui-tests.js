@@ -28,6 +28,7 @@ const SUITES = [
   { name: 'goods', file: 'test-goods-ui.js' },
   { name: 'goods-flow', file: 'test-goods-flow-ui.js' },
   { name: 'community', file: 'test-community-ui.js' },
+  { name: 'assistant', file: 'test-assistant-ui.js' },
   { name: 'admin', file: 'test-admin-ui.js' },
   { name: 'reports', file: 'test-reports-ui.js' },
   { name: 'ai', file: 'test-ai-ui.js' },

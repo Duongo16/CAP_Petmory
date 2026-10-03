@@ -7,7 +7,7 @@ import { TokenStore } from './token-store';
 import { DemoAccount, LoginResult, Role } from '../models/api.model';
 
 /** Cac nhom duoc tinh la nguoi cua PETMORY. */
-const INTERNAL: Role[] = ['MANAGER', 'ADMIN'];
+const INTERNAL: Role[] = ['MANAGER', 'ADMIN', 'SUPPORT'];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -32,6 +32,12 @@ export class AuthService {
 
   /** Nhom Quan tri vien: chi quan ly tai khoan. */
   readonly isAccountAdmin = computed(() => (this.user()?.roles ?? []).includes('ADMIN'));
+
+  /** Duoc vao ban dieu phoi: xem don, khach hang, truc hoi thoai. Quan ly va Cham soc khach hang. */
+  readonly isDesk = computed(() => {
+    const roles = this.user()?.roles ?? [];
+    return roles.includes('MANAGER') || roles.includes('SUPPORT');
+  });
 
   /**
    * Cac tai khoan mau de dang nhap nhanh khi dang lam o may ca nhan.
