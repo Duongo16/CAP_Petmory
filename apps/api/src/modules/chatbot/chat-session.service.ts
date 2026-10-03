@@ -321,7 +321,17 @@ export class ChatSessionService {
       return null;
     }
 
-    const [shop, known] = await Promise.all([this.shopWords(), this.basic.knowledgeText()]);
+    /*
+     * Do kho tri thuc song song voi luc goi mo hinh: cau tra loi lay loi van
+     * cua mo hinh, nhung nut dan huong, cau goi y tiep va dieu dang nho trong
+     * phien van lay tu muc kho khop nhat, de hai che do hanh xu giong nhau.
+     */
+    const focus = { productTypeCode: one.focus?.productTypeCode ?? '', lastCode: one.focus?.lastCode ?? '' };
+    const [shop, known, guide] = await Promise.all([
+      this.shopWords(),
+      this.basic.knowledgeText(),
+      this.basic.ask(question, focus),
+    ]);
     const answer = await this.client.ask({
       system: systemWords(),
       prompt: [
@@ -351,12 +361,13 @@ export class ChatSessionService {
       one.code,
       '',
     );
+    one.focus = guide.focus;
     return {
       text: answer.text.trim(),
-      suggestion: await this.basic.suggestions(),
-      path: '',
-      productCode: pickCodes(answer.text, shop.kindCode),
-      goodsCode: pickCodes(answer.text, shop.goodsCode),
+      suggestion: guide.understood && guide.suggestion.length > 0 ? guide.suggestion : await this.basic.suggestions(),
+      path: guide.understood ? guide.path ?? '' : '',
+      productCode: pickCodes(answer.text, shop.kinds),
+      goodsCode: pickCodes(answer.text, shop.goods),
     };
   }
 
@@ -392,17 +403,23 @@ export class ChatSessionService {
         'Sản phẩm có sẵn bán kèm:',
         ...goodsLine,
       ].join('\n'),
-      kindCode: kind.map((one) => one.code),
-      goodsCode: ready.rows.map((one) => one.code),
+      kinds: kind.map((one) => ({ code: one.code, name: one.name })),
+      goods: ready.rows.map((one) => ({ code: one.code, name: one.name })),
     };
   }
+}
+
+/** Mot mon trong danh muc: ma de luu, ten de nhan ra trong cau tra loi. */
+interface Named {
+  code: string;
+  name: string;
 }
 
 /** Danh muc that, kem cac ma de doi chieu lai cau tra loi. */
 interface ShopWords {
   text: string;
-  kindCode: string[];
-  goodsCode: string[];
+  kinds: Named[];
+  goods: Named[];
 }
 
 /** Loi dan dat, dat gioi han cua cau tra loi. */
@@ -417,6 +434,8 @@ function systemWords(): string {
     'Với câu hỏi sức khỏe thú cưng, chỉ trả lời rất chung và khuyên đưa bé tới bác sĩ thú y.',
     'Nếu khách nhắc tới thú cưng đã mất, hãy chia buồn nhẹ nhàng trước khi tư vấn.',
     'Không bao giờ hỏi, nhắc lại hay lưu mật khẩu, mã OTP, số thẻ, số tài khoản; không hỏi địa chỉ hay số điện thoại của khách.',
+    'Chỉ chào ở lượt trả lời đầu tiên của cuộc trò chuyện; các lượt sau đi thẳng vào nội dung, không mở đầu bằng "Chào bạn".',
+    'Gọi sản phẩm bằng tên đầy đủ đúng như trong danh mục; không ghi mã sản phẩm (dạng PT-01, G-...) trong câu trả lời.',
     'Trả lời ngắn gọn, dưới 150 chữ, có thể xuống dòng hoặc gạch đầu dòng cho dễ đọc. Không dùng định dạng markdown như dấu sao hay dấu thăng.',
   ].join(' ');
 }
@@ -435,9 +454,12 @@ function recallWords(one: ChatSessionDocument): string {
  * Doi chieu lai voi danh muc that chu khong tin cau tra loi, de man hinh
  * khong bao gio dung the cho mot mon hang khong ton tai.
  */
-function pickCodes(text: string, known: string[]): string[] {
+function pickCodes(text: string, known: Named[]): string[] {
   const upper = text.toUpperCase();
-  return known.filter((code) => upper.includes(code.toUpperCase()));
+  const low = text.toLowerCase();
+  return known
+    .filter((one) => upper.includes(one.code.toUpperCase()) || low.includes(one.name.toLowerCase()))
+    .map((one) => one.code);
 }
 
 /** So tien viet cho nguoi doc. */

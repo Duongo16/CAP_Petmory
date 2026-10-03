@@ -86,17 +86,19 @@ async function signIn(page, email) {
   await customer.waitForSelector('.suggestion-row .chip', { timeout: 15000 });
   const chips = await customer.locator('.suggestion-row .chip').allInnerTexts();
   ok('Cau goi y lay tu kho tri thuc', chips.some((one) => one.includes('Giá sản phẩm')), chips.slice(0, 3).join(' | '));
+  const before = await customer.locator('pm-chat-widget .bubble').count();
   await customer.locator('.suggestion-row .chip', { hasText: 'Giá sản phẩm' }).click();
-  await customer.waitForFunction(() => {
-    const all = [...document.querySelectorAll('pm-chat-widget .bubble')];
-    return all.length > 0 && all[all.length - 1].textContent.includes('Giá theo');
-  }, null, { timeout: 15000 });
+  // Cho luot tra loi cua tro ly (co the do mo hinh that viet, nen khong so nguyen van).
+  await customer.waitForFunction((n) => {
+    const all = [...document.querySelectorAll('pm-chat-widget .message')];
+    return all.length >= n + 2 && !all[all.length - 1].classList.contains('from-customer');
+  }, before, { timeout: 30000 });
   const priceText = (await customer.locator('pm-chat-widget .bubble').last().innerText()).trim();
   ok('Bam goi y thi tro ly tra loi bang gia that', /\d{3}\.\d{3} VND/.test(priceText), priceText.slice(0, 80));
   await customer.fill('#assistant-input', 'còn cỡ lớn thì sao?');
   await customer.locator('pm-chat-widget .input-row button[type=submit]').click();
-  await customer.waitForTimeout(2500);
-  ok('Hoi tiep van nhan duoc cau tra loi', (await customer.locator('pm-chat-widget .bubble').last().innerText()).includes('Lớn'));
+  await customer.waitForTimeout(6000);
+  ok('Hoi tiep van nhan duoc cau tra loi', /lớn/i.test(await customer.locator('pm-chat-widget .bubble').last().innerText()));
   await customer.screenshot({ path: path.join(OUT, 'assistant-1-chat.png') });
   await customer.locator('pm-chat-widget .goto-button').last().click();
   await customer.waitForURL('**/shop**', { timeout: 10000 });

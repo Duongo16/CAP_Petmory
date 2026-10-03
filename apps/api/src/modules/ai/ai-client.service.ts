@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Anthropic from '@anthropic-ai/sdk';
-import { ApiError, FinishReason, GoogleGenAI, Part } from '@google/genai';
+import { ApiError, FinishReason, GoogleGenAI, Part, ThinkingConfig, ThinkingLevel } from '@google/genai';
 import { AiMode } from './schemas/ai-usage.schema';
 
 /** Mot buc anh gui kem cau hoi. */
@@ -56,7 +56,8 @@ const PROVIDER_ANTHROPIC = 'anthropic';
 
 /** Mo hinh mac dinh cua tung nha cung cap, khi khong dat AI_MODEL. */
 const MODEL_DEFAULT: Record<string, string> = {
-  [PROVIDER_GEMINI]: 'gemini-2.5-flash',
+  // Dong 2.5 khong con mo cho tai khoan moi; ban lite tra loi trong khoang mot giay.
+  [PROVIDER_GEMINI]: 'gemini-3.5-flash-lite',
   [PROVIDER_ANTHROPIC]: 'claude-opus-5',
 };
 
@@ -123,8 +124,7 @@ class GeminiCaller implements ModelCaller {
         systemInstruction: request.system,
         maxOutputTokens: request.maxWords ?? WORDS_DEFAULT,
         temperature: 0.6,
-        // Dong flash tra loi nhanh hon khi tat buoc suy nghi rieng; dong pro khong cho tat.
-        ...(model.includes('flash') ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+        ...thinkingOf(model),
       },
     });
 
@@ -267,6 +267,22 @@ export class AiClientService {
     this.logger.warn(`Goi dich vu tri tue nhan tao hong: ${why}`);
     return why;
   }
+}
+
+/**
+ * Giam buoc suy nghi rieng cua mo hinh de tra loi nhanh.
+ *
+ * Dong 2.5 dung so luot suy nghi, dong 3 dung muc suy nghi; dong pro khong cho
+ * tat nen de mac dinh. Hoi dap ban hang khong can suy luan dai.
+ */
+function thinkingOf(model: string): { thinkingConfig?: ThinkingConfig } {
+  if (model.includes('pro')) {
+    return {};
+  }
+  if (model.startsWith('gemini-2')) {
+    return { thinkingConfig: { thinkingBudget: 0 } };
+  }
+  return { thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL } };
 }
 
 /** Phan noi dung gui cho Claude, gom anh truoc roi den cau hoi. */

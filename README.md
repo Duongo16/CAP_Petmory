@@ -57,7 +57,7 @@ Mọi tính năng AI chỉ dành cho người đã đăng nhập và đi qua m�
 | `AI_PROVIDER` | `gemini` hoặc `anthropic`. Để trống thì tự chọn theo khóa đang có, ưu tiên Gemini. |
 | `GEMINI_API_KEY` | Khóa Gemini lấy từ Google AI Studio. Không commit, không dán vào nơi công khai. |
 | `ANTHROPIC_API_KEY` | Khóa Claude, nếu dùng Anthropic. |
-| `AI_MODEL` | Để trống để dùng mặc định: `gemini-2.5-flash` hoặc `claude-opus-5`. |
+| `AI_MODEL` | Để trống để dùng mặc định: `gemini-3.5-flash-lite` hoặc `claude-opus-5`. |
 | `AI_TIMEOUT_MS` | Thời gian chờ mỗi lần gọi, mặc định 45000. |
 
 Không có khóa hoặc dịch vụ lỗi thì trợ lý vẫn chạy bằng **kho tri thức** (trang *Kho tri thức trợ lý* của nhóm Quản lý) và vẫn nhớ sản phẩm vừa nói tới trong phiên. Nạp kho tri thức mẫu: `node tools/seed-assistant-knowledge.js`.

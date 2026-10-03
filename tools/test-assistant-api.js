@@ -124,10 +124,14 @@ async function run() {
   ok('Loi chao co cau goi y lay tu kho', (opened.body.turn[0].suggestion ?? []).length >= 3,
     (opened.body.turn[0].suggestion ?? []).slice(0, 3).join(' | '));
 
+  // Tro ly co ban luon doc thang kho tri thuc, nen kiem noi dung nguyen van o day.
+  const basic = await call('/assistant/ask', send(customer, { question: `cho mình hỏi ${TEST_WORD} nhé` }));
+  const basicText = basic.body?.content ?? '';
+  ok('Tra loi dung muc vua them vao kho', basicText.includes('câu trả lời kiểm thử'), basicText.slice(0, 80));
+  ok('O thoi gian duoc dien bang so lieu that', /\d+ (đến \d+ )?ngày/.test(basicText) && !basicText.includes('{{'));
+  // Trong phien (co hay khong co mo hinh that), nut dan huong van lay tu muc kho khop nhat.
   const fromKb = await ask(customer, code, `cho mình hỏi ${TEST_WORD} nhé`);
-  ok('Tra loi dung muc vua them vao kho', (fromKb.last?.text ?? '').includes('câu trả lời kiểm thử'), (fromKb.last?.text ?? '').slice(0, 80));
-  ok('O thoi gian duoc dien bang so lieu that', /\d+ (đến \d+ )?ngày/.test(fromKb.last?.text ?? '') && !(fromKb.last?.text ?? '').includes('{{'));
-  ok('Cau tra loi kem duong dan dan huong', fromKb.last?.path === '/shop?tab=ready', fromKb.last?.path);
+  ok('Cau tra loi trong phien kem duong dan dan huong', fromKb.last?.path === '/shop?tab=ready', fromKb.last?.path);
 
   await call(`/admin/assistant/knowledge/${TEST_CODE}`, send(boss, { enabled: false }, 'PATCH'));
   await new Promise((done) => setTimeout(done, 400));
