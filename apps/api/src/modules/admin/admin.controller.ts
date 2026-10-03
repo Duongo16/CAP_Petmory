@@ -14,7 +14,7 @@ import { HideDiaryDto } from '../memories/dto/diary.dto';
 import { DiaryService } from '../memories/diary.service';
 import { AuditService } from '../../common/audit.service';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/constants/roles';
+import { DESK, Role } from '../../common/constants/roles';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
 
 /** Loai tai nguyen ghi vao nhat ky he thong khi an mot quyen nhat ky. */
@@ -36,13 +36,13 @@ export class AdminController {
     private readonly audit: AuditService,
   ) {}
 
-  @Roles(Role.MANAGER)
+  @Roles(...DESK)
   @Get('orders/stats')
   stats() {
     return this.service.countByStatus();
   }
 
-  @Roles(Role.MANAGER)
+  @Roles(...DESK)
   @Get('orders')
   listOrder(@Query() filter: OrderFilterDto) {
     return this.service.listOrder(filter);
@@ -72,7 +72,7 @@ export class AdminController {
     res.send(data);
   }
 
-  @Roles(Role.MANAGER)
+  @Roles(...DESK)
   @Get('orders/:orderCode')
   detailOrder(@Param('orderCode') orderCode: string) {
     return this.service.detailOrder(orderCode);
@@ -138,13 +138,13 @@ export class AdminController {
     return pet;
   }
 
-  @Roles(Role.MANAGER)
+  @Roles(...DESK)
   @Get('customers')
   listCustomers(@Query() filter: CustomerSearchDto) {
     return this.service.listCustomers(filter);
   }
 
-  @Roles(Role.MANAGER)
+  @Roles(...DESK)
   @Get('customers/:id')
   customerDetail(@Param('id') id: string) {
     return this.service.customerDetail(id);

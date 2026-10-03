@@ -1,231 +1,269 @@
 import { Injectable } from '@nestjs/common';
 import { CatalogService } from '../catalog/catalog.service';
 import { BusinessConfigService } from '../business-config/business-config.service';
+import { GoodsService } from '../goods/goods.service';
+import { KnowledgeService, plain } from './knowledge.service';
+import { AssistantKnowledgeDocument } from './schemas/assistant-knowledge.schema';
 
-/** One answer node. Its score is the sum of the keywords that matched. */
-interface AnswerNode {
-  code: string;
-  keyword: string[];
-  /** Builds the answer. Allowed to read live data so it never invents a number. */
-  composeAnswer: (ctx: AnswerContext) => Promise<string> | string;
-  suggestion: string[];
-  path?: string;
-}
-
-interface AnswerContext {
-  catalog: CatalogService;
-  config: BusinessConfigService;
+/**
+ * Dieu tro ly dang nho trong mot phien: san pham vua duoc nhac toi va muc vua
+ * tra loi. Nho vay cau hoi tiep theo kieu "con co lon thi sao" van hieu dung.
+ */
+export interface ChatFocus {
+  productTypeCode: string;
+  lastCode: string;
 }
 
 export interface Answer {
   code: string;
   content: string;
+  /** Cac cau hoi goi y tiep theo, viet san de hien thang len nut. */
   suggestion: string[];
   path: string | null;
-  /** Tells the UI the assistant did not understand, so it can offer a human. */
+  /** Bao cho giao dien biet tro ly khong hieu, de moi gap tu van vien. */
   understood: boolean;
+  focus: ChatFocus;
 }
 
-/** Strips Vietnamese accents so matching does not depend on how the user typed. */
-function normalize(str: string): string {
-  return str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd');
+/** Mot loai san pham tuy bien, rut gon cho viec tra loi. */
+interface Kind {
+  code: string;
+  name: string;
+  material: string;
+  /** Cac cach goi ngan, da bo dau, de nhan ra trong cau hoi. */
+  alias: string[];
+  sizes: { name: string; dimensions: string; price: bigint; days: number }[];
 }
 
-function formatMoney(str: string): string {
-  return `${new Intl.NumberFormat('vi-VN').format(Number(str))} VND`;
+/** Cau hoi ngan toi muc nay thi duoc coi la hoi tiep y truoc. */
+const FOLLOW_UP_WORDS = 8;
+
+/** Dau hieu cua mot cau hoi noi tiep cau truoc. */
+const FOLLOW_UP_HINTS = ['thi sao', 'con ', 'the con', 'vay con', 'loai do', 'cai do', 'mau do'];
+
+const NO_FOCUS: ChatFocus = { productTypeCode: '', lastCode: '' };
+
+const UNKNOWN_WORDS =
+  'Mình chưa hiểu ý bạn. Bạn thử hỏi về giá, kích cỡ, thời gian làm, cách đặt hàng hoặc sản phẩm có sẵn nhé. Nếu cần trao đổi kỹ hơn, bạn bấm "Gặp tư vấn viên".';
+
+function money(value: bigint): string {
+  return `${new Intl.NumberFormat('vi-VN').format(value)} VND`;
 }
 
-const GENERAL_SUGGESTIONS = ['PRICE', 'LEAD_TIME', 'SIZES', 'MATERIAL', 'PROCESS'];
+function wholeOf(raw: unknown): bigint {
+  return BigInt(String(raw ?? '0').split('.')[0] || '0');
+}
 
 /**
- * Basic conversational assistant.
+ * Tro ly ban co ban.
  *
- * Calls no language model. Answers are composed from the product catalog and the
- * business settings in the database, so it never invents a price or a lead time.
- * The trade-off is that it only understands common questions; anything outside
- * that range hands the customer over to a person.
+ * Khong goi mo hinh ngon ngu nao. Cau tra loi lay tu kho tri thuc do nhom Quan
+ * ly soan, va moi con so (gia, kich co, thoi gian) duoc dien vao tu danh muc
+ * that luc tra loi, nen khong bao gio bia ra mot con so.
  */
 @Injectable()
 export class ChatbotService {
-  private readonly buttons: AnswerNode[] = [
-    {
-      code: 'GREETING',
-      keyword: ['xin chao', 'chao', 'hello', 'hi', 'alo'],
-      composeAnswer: () =>
-        'Chào bạn. Mình giúp bạn tìm hiểu về sản phẩm thủ công làm từ ảnh thú cưng. Bạn muốn biết gì?',
-      suggestion: GENERAL_SUGGESTIONS,
-    },
-    {
-      code: 'PRICE',
-      keyword: ['price', 'bao nhieu tien', 'bao nhieu', 'chi phi', 'gia ca', 'mac khong'],
-      composeAnswer: async ({ catalog }) => {
-        const ds = await catalog.listProductType(true);
-        const line = ds.map((kind) => {
-          const price = kind.sizes
-            .filter((s) => s.enabled)
-            .map((s) => BigInt(s.price.toString().split('.')[0]));
-          if (price.length === 0) {
-            return `· ${kind.name}: đang cập nhật`;
-          }
-          const lowest = price.reduce((a, b) => (a < b ? a : b));
-          const highest = price.reduce((a, b) => (a > b ? a : b));
-          const range =
-            lowest === highest
-              ? formatMoney(lowest.toString())
-              : `${formatMoney(lowest.toString())} đến ${formatMoney(highest.toString())}`;
-          return `· ${kind.name}: ${range}`;
-        });
-        return `Giá theo từng loại sản phẩm và kích cỡ:\n${line.join('\n')}\n\nGiá thay đổi theo kích cỡ vì kích cỡ lớn hơn thì làm được nhiều chi tiết hơn.`;
-      },
-      suggestion: ['SIZES', 'LEAD_TIME', 'PROCESS'],
-      path: '/products',
-    },
-    {
-      code: 'LEAD_TIME',
-      keyword: ['bao lau', 'thoi gian', 'may ngay', 'khi nao nhan', 'lau khong', 'giao hang'],
-      composeAnswer: async ({ catalog, config }) => {
-        const ds = await catalog.listProductType(true);
-        const day = ds.flatMap((l) => l.sizes.filter((s) => s.enabled).map((s) => s.productionDays));
-        const cf = await config.get();
-        if (day.length === 0) {
-          return 'Thời gian sản xuất đang được cập nhật. Bạn để lại liên hệ, tư vấn viên sẽ báo lại.';
-        }
-        const min = Math.min(...day);
-        const max = Math.max(...day);
-        return `Thời gian làm từ ${min} đến ${max} ngày tùy kích cỡ, cộng khoảng ${cf.estimatedShippingDays} ngày vận chuyển. Vì là hàng làm tay từng cái một nên không rút ngắn được nhiều.`;
-      },
-      suggestion: ['PRICE', 'PROCESS'],
-    },
-    {
-      code: 'SIZES',
-      keyword: ['kich co', 'kich thuoc', 'size', 'to nho', 'bao to', 'cao bao nhieu'],
-      composeAnswer: async ({ catalog }) => {
-        const ds = await catalog.listProductType(true);
-        const line = ds.flatMap((kind) =>
-          kind.sizes
-            .filter((s) => s.enabled)
-            .map((s) => `· ${kind.name} — ${s.displayName}: ${s.dimensions}`),
-        );
-        return `Các kích cỡ đang có:\n${line.join('\n')}\n\nKích cỡ lớn hơn thể hiện được nhiều chi tiết hơn, ví dụ các đốm lông nhỏ và biểu cảm mắt.`;
-      },
-      suggestion: ['PRICE', 'MATERIAL'],
-      path: '/products',
-    },
-    {
-      code: 'MATERIAL',
-      keyword: ['chat lieu', 'lam bang gi', 'vai gi', 'nguyen lieu', 'tai che'],
-      composeAnswer: async ({ catalog }) => {
-        const ds = await catalog.listProductType(true);
-        const line = [...new Set(ds.map((l) => l.material).filter(Boolean))];
-        return `Sản phẩm làm thủ công từ ${line.join(', ').toLowerCase()}. Mỗi món một bản, không cái nào giống cái nào.`;
-      },
-      suggestion: ['PRICE', 'PROCESS'],
-    },
-    {
-      code: 'PROCESS',
-      keyword: ['quy trinh', 'dat hang', 'mua hang', 'cach dat', 'lam sao de', 'buoc nao', 'cach mua'],
-      composeAnswer: () =>
-        'Bốn bước:\n1. Tải ảnh thú cưng lên, nên đủ bốn góc để xưởng nhìn được toàn bộ chi tiết\n2. Tùy biến mẫu, đổi màu từng phần\n3. Chọn kích cỡ rồi thanh toán bằng mã QR\n4. Xưởng làm tay rồi gửi tận nơi',
-      suggestion: ['PHOTO', 'PAYMENT', 'PRICE'],
-      path: '/studio',
-    },
-    {
-      code: 'PHOTO',
-      keyword: ['photo', 'hinh', 'capture', 'upload', 'tai anh', 'anh mo', 'anh cu', 'may goc'],
-      composeAnswer: () =>
-        'Bạn tải ảnh định dạng JPG hoặc PNG. Nên chụp đủ bốn góc là chính diện, nghiêng trái, nghiêng phải và phía sau, để nghệ nhân nhìn được toàn bộ chi tiết.\n\nẢnh cũ hoặc hơi mờ thì hệ thống có chức năng phục hồi giúp làm nét và chỉnh sáng. Nếu chỉ còn vài tấm thì vẫn đặt được, xưởng sẽ liên hệ trao đổi thêm.',
-      suggestion: ['PROCESS', 'LEAD_TIME'],
-      path: '/pets',
-    },
-    {
-      code: 'PAYMENT',
-      keyword: ['thanh toan', 'tra tien', 'chuyen khoan', 'qr', 'coc', 'dat coc', 'tra gop'],
-      composeAnswer: () =>
-        'Thanh toán một lần toàn bộ giá sản phẩm bằng mã QR chuyển khoản. Không đặt cọc, không chia nhiều đợt.\n\nPhí vận chuyển do đơn vị giao hàng thu trực tiếp khi giao, không nằm trong số tiền này.',
-      suggestion: ['PRICE', 'PROCESS'],
-    },
-    {
-      code: 'MEMORIAL',
-      keyword: ['da mat', 'qua doi', 'mat roi', 'khong con', 'tuong nho', 'ky niem'],
-      composeAnswer: () =>
-        'Mình rất tiếc về sự mất mát của bạn.\n\nRất nhiều khách đến với PETMORY trong hoàn cảnh này. Bạn chỉ cần những tấm ảnh còn giữ được, kể cả ảnh cũ hay hơi mờ, hệ thống có chức năng phục hồi. Nếu ảnh không đủ bốn góc thì vẫn làm được, xưởng sẽ trao đổi thêm với bạn.',
-      suggestion: ['PHOTO', 'SIZES'],
-      path: '/pets',
-    },
-    {
-      code: 'VET',
-      keyword: ['benh', 'om', 'thuoc', 'bac si', 'thu y', 'not', 'kham'],
-      composeAnswer: () =>
-        'Phần này ngoài chuyên môn của mình. Bạn nên đưa bé tới bác sĩ thú y để được khám và tư vấn đúng.\n\nPETMORY chỉ làm sản phẩm thủ công từ ảnh thú cưng.',
-      suggestion: GENERAL_SUGGESTIONS,
-    },
-    {
-      code: 'MERCHANDISE',
-      keyword: ['ban do an', 'thuc an', 'vong co that', 'do choi', 'phu kien that', 'ban gi khac'],
-      composeAnswer: () =>
-        'PETMORY không bán thức ăn, phụ kiện hay đồ dùng cho thú cưng.\n\nBên mình chỉ làm một thứ: sản phẩm thủ công độc bản từ ảnh thú cưng của bạn.',
-      suggestion: ['PRICE', 'PROCESS'],
-    },
-  ];
-
   constructor(
     private readonly catalog: CatalogService,
     private readonly config: BusinessConfigService,
+    private readonly goods: GoodsService,
+    private readonly knowledge: KnowledgeService,
   ) {}
 
-  async ask(question: string): Promise<Answer> {
-    const prepare = normalize(question);
-    const node = this.findNodeBestMatch(prepare);
+  async ask(question: string, focus: ChatFocus = NO_FOCUS): Promise<Answer> {
+    const said = plain(question);
+    const [rows, kinds] = await Promise.all([this.knowledge.active(), this.kinds()]);
 
-    if (!node) {
+    const mentioned = kinds.find((kind) => kind.alias.some((one) => said.includes(one)));
+    const product = mentioned?.code ?? focus.productTypeCode;
+
+    let entry = bestMatch(rows, said);
+    if (!entry && looksLikeFollowUp(said) && focus.lastCode) {
+      entry = rows.find((one) => one.code === focus.lastCode) ?? null;
+    }
+
+    if (!entry && mentioned) {
       return {
-        code: 'UNKNOWN',
-        content:
-          'Mình chưa hiểu ý bạn. Bạn thử hỏi về giá, kích cỡ, thời gian làm, chất liệu hoặc cách đặt hàng.\n\nNếu cần trao đổi kỹ hơn, bạn để lại số điện thoại, tư vấn viên sẽ gọi lại.',
-        suggestion: GENERAL_SUGGESTIONS,
-        path: null,
-        understood: false,
+        code: 'PRODUCT_INFO',
+        content: this.describe(mentioned),
+        suggestion: await this.starters(rows),
+        path: `/shop?tab=custom&product=${mentioned.code}`,
+        understood: true,
+        focus: { productTypeCode: mentioned.code, lastCode: focus.lastCode },
       };
     }
 
+    if (!entry) {
+      return {
+        code: 'UNKNOWN',
+        content: UNKNOWN_WORDS,
+        suggestion: await this.starters(rows),
+        path: null,
+        understood: false,
+        focus: { productTypeCode: product, lastCode: focus.lastCode },
+      };
+    }
+
+    const chosen = kinds.filter((kind) => !product || kind.code === product);
     return {
-      code: node.code,
-      content: await node.composeAnswer({ catalog: this.catalog, config: this.config }),
-      suggestion: node.suggestion,
-      path: node.path ?? null,
+      code: entry.code,
+      content: await this.fill(entry.answer, chosen.length > 0 ? chosen : kinds),
+      suggestion: entry.followUp
+        .map((code) => rows.find((one) => one.code === code)?.question)
+        .filter((one): one is string => Boolean(one)),
+      path: entry.link || null,
       understood: true,
+      focus: { productTypeCode: product, lastCode: entry.code },
     };
   }
 
-  /** Suggested questions shown when the chat panel first opens. */
-  getInitialSuggestions(): string[] {
-    return GENERAL_SUGGESTIONS;
+  /** Cac cau hoi hien san khi khach vua mo khung chat. */
+  async suggestions(): Promise<string[]> {
+    return this.starters(await this.knowledge.active());
+  }
+
+  /** Cac muc hoi dap dang bat, de dua vao loi dan cho mo hinh ngon ngu. */
+  async knowledgeText(): Promise<string> {
+    const [rows, kinds] = await Promise.all([this.knowledge.active(), this.kinds()]);
+    const parts: string[] = [];
+    for (const one of rows) {
+      parts.push(`Hỏi: ${one.question}\nĐáp: ${await this.fill(one.answer, kinds)}`);
+    }
+    return parts.join('\n\n');
+  }
+
+  private async starters(rows: AssistantKnowledgeDocument[]): Promise<string[]> {
+    return rows.filter((one) => one.starter).slice(0, 6).map((one) => one.question);
   }
 
   /**
-   * Picks the node with the strongest keyword match. Longer keywords win, so
-   * "da mat" beats a plain "mat" appearing inside other phrases.
+   * Dien cac o co san trong cau tra loi bang so lieu that.
+   *
+   * Khi khach dang hoi ve mot san pham cu the thi bang gia, kich co va thoi
+   * gian chi noi ve san pham do.
    */
-  private findNodeBestMatch(prepare: string): AnswerNode | null {
-    let best: AnswerNode | null = null;
-    let bestScore = 0;
-
-    for (const node of this.buttons) {
-      let point = 0;
-      for (const word of node.keyword) {
-        if (prepare.includes(word)) {
-          point += word.length;
-        }
-      }
-      if (point > bestScore) {
-        bestScore = point;
-        best = node;
+  private async fill(text: string, kinds: Kind[]): Promise<string> {
+    if (!text.includes('{{')) {
+      return text;
+    }
+    const cf = await this.config.get();
+    const values: Record<string, () => Promise<string> | string> = {
+      BANG_GIA: () => priceTable(kinds),
+      KICH_CO: () => sizeTable(kinds),
+      THOI_GIAN: () => leadTime(kinds, cf.estimatedShippingDays),
+      CHAT_LIEU: () => {
+        const list = [...new Set(kinds.map((kind) => kind.material).filter(Boolean))];
+        return list.length > 0 ? list.join(', ').toLowerCase() : 'len chọc thủ công';
+      },
+      SO_NGAY_GIAO: () => String(cf.estimatedShippingDays),
+      HANG_CO_SAN: () => this.goodsTable(),
+    };
+    let out = text;
+    for (const [name, make] of Object.entries(values)) {
+      const slot = `{{${name}}}`;
+      if (out.includes(slot)) {
+        out = out.split(slot).join(await make());
       }
     }
-    return best;
+    return out;
   }
+
+  private describe(kind: Kind): string {
+    const sizes = kind.sizes.map((one) => `· ${one.name} (${one.dimensions}): ${money(one.price)}, làm trong ${one.days} ngày`);
+    return sizes.length > 0
+      ? `${kind.name}:\n${sizes.join('\n')}\n\nBạn có thể tự phối màu cho bé trong Studio 3D trước khi đặt.`
+      : `${kind.name} đang được cập nhật giá. Bạn bấm "Gặp tư vấn viên" để được báo giá nhé.`;
+  }
+
+  private async goodsTable(): Promise<string> {
+    const page = await this.goods.list({ page: 1 });
+    const lines = page.rows.map((one) => {
+      const prices = one.variant.filter((each) => each.enabled).map((each) => wholeOf(each.price));
+      const low = prices.reduce((a: bigint | null, b) => (a === null || b < a ? b : a), null);
+      return `· ${one.name}: ${low === null ? 'đang cập nhật' : `từ ${money(low)}`}`;
+    });
+    return lines.length > 0 ? lines.join('\n') : '· Hiện chưa có món nào';
+  }
+
+  private async kinds(): Promise<Kind[]> {
+    const list = await this.catalog.listProductType(true);
+    return list.map((kind) => {
+      const name = plain(kind.name);
+      const words = name.split(' ');
+      return {
+        code: kind.code,
+        name: kind.name,
+        material: kind.material ?? '',
+        alias: [...new Set([name, words.slice(0, 2).join(' ')].filter((one) => one.length >= 5))],
+        sizes: kind.sizes
+          .filter((size) => size.enabled)
+          .map((size) => ({
+            name: size.displayName,
+            dimensions: size.dimensions,
+            price: wholeOf(size.price),
+            days: size.productionDays,
+          })),
+      };
+    });
+  }
+}
+
+/**
+ * Chon muc khop nhat. Tu khoa dai duoc tinh diem cao hon, nen "da mat" thang
+ * mot chu "mat" tinh co nam trong cau khac.
+ */
+function bestMatch(rows: AssistantKnowledgeDocument[], said: string): AssistantKnowledgeDocument | null {
+  let best: AssistantKnowledgeDocument | null = null;
+  let bestScore = 0;
+  for (const one of rows) {
+    let score = 0;
+    for (const word of one.keywords) {
+      if (word && said.includes(word)) {
+        score += word.length;
+      }
+    }
+    if (plain(one.question) === said) {
+      score += 100;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      best = one;
+    }
+  }
+  return best;
+}
+
+function looksLikeFollowUp(said: string): boolean {
+  return said.split(' ').length <= FOLLOW_UP_WORDS && FOLLOW_UP_HINTS.some((hint) => said.includes(hint));
+}
+
+function priceTable(kinds: Kind[]): string {
+  return kinds
+    .map((kind) => {
+      if (kind.sizes.length === 0) {
+        return `· ${kind.name}: đang cập nhật`;
+      }
+      const prices = kind.sizes.map((one) => one.price);
+      const low = prices.reduce((a, b) => (a < b ? a : b));
+      const high = prices.reduce((a, b) => (a > b ? a : b));
+      return `· ${kind.name}: ${low === high ? money(low) : `${money(low)} đến ${money(high)}`}`;
+    })
+    .join('\n');
+}
+
+function sizeTable(kinds: Kind[]): string {
+  return kinds
+    .flatMap((kind) => kind.sizes.map((one) => `· ${kind.name} — ${one.name}: ${one.dimensions}, ${money(one.price)}`))
+    .join('\n');
+}
+
+function leadTime(kinds: Kind[], shipping: number): string {
+  const days = kinds.flatMap((kind) => kind.sizes.map((one) => one.days));
+  if (days.length === 0) {
+    return 'đang được cập nhật';
+  }
+  const low = Math.min(...days);
+  const high = Math.max(...days);
+  const make = low === high ? `${low} ngày` : `${low} đến ${high} ngày`;
+  return `${make} làm tay, cộng khoảng ${shipping} ngày vận chuyển`;
 }

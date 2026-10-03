@@ -18,7 +18,11 @@ export interface AppConfig {
     maxSizeMb: number;
   };
   ai: {
+    /** Nha cung cap: gemini hoac anthropic. Rong thi chon theo khoa dang co. */
+    provider: string;
     apiKey: string;
+    geminiKey: string;
+    /** Rong thi dung mo hinh mac dinh cua nha cung cap. */
     model: string;
     timeoutMs: number;
   };
@@ -58,8 +62,10 @@ export default (): AppConfig => ({
     maxSizeMb: Number(process.env.UPLOAD_MAX_SIZE_MB ?? 10),
   },
   ai: {
+    provider: (process.env.AI_PROVIDER ?? '').trim().toLowerCase(),
     apiKey: process.env.ANTHROPIC_API_KEY ?? '',
-    model: process.env.AI_MODEL ?? 'claude-opus-5',
+    geminiKey: process.env.GEMINI_API_KEY ?? '',
+    model: (process.env.AI_MODEL ?? '').trim(),
     timeoutMs: Number(process.env.AI_TIMEOUT_MS ?? 45000),
   },
   storage: {

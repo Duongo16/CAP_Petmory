@@ -15,11 +15,16 @@
 export enum Role {
   MANAGER = 'MANAGER',
   ADMIN = 'ADMIN',
+  /** Cham soc khach hang: truc hoi thoai, xem don va khach, khong sua gi. */
+  SUPPORT = 'SUPPORT',
   CUSTOMER = 'CUSTOMER',
 }
 
 /** Cac nhom duoc tinh la nguoi cua PETMORY. */
-export const INTERNAL: Role[] = [Role.MANAGER, Role.ADMIN];
+export const INTERNAL: Role[] = [Role.MANAGER, Role.ADMIN, Role.SUPPORT];
+
+/** Nhung nhom duoc xem don, khach hang va truc hoi thoai. */
+export const DESK: Role[] = [Role.MANAGER, Role.SUPPORT];
 
 export const ROLES_KEY = 'roles';
 export const IS_PUBLIC_KEY = 'isPublic';

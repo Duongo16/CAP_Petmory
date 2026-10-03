@@ -33,6 +33,7 @@ type ScreenState = 'LOADING' | 'READY' | 'ERROR';
 const KEY_ROLE: Record<string, string> = {
   MANAGER: 'ADMIN.ACCOUNT.ROLE_MANAGER',
   ADMIN: 'ADMIN.ACCOUNT.ROLE_ADMIN',
+  SUPPORT: 'ADMIN.ACCOUNT.ROLE_SUPPORT',
   CUSTOMER: 'ADMIN.ACCOUNT.ROLE_CUSTOMER',
 };
 
@@ -40,7 +41,7 @@ const KEY_ROLE: Record<string, string> = {
 const ROLE_FALLBACK: Role = 'CUSTOMER';
 
 /** Ba nhom quyen, viet ra day du de man hinh khong phai doan. */
-const ROLES: Role[] = ['MANAGER', 'ADMIN', ROLE_FALLBACK];
+const ROLES: Role[] = ['MANAGER', 'SUPPORT', 'ADMIN', ROLE_FALLBACK];
 
 /** Kich thuoc hop thoai, giong cac hop thoai khac trong trang. */
 const SHEET = { width: 'min(560px, 96vw)', maxHeight: '94vh', panelClass: 'pm-dialog' };

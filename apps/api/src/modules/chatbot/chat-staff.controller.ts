@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestj
 import { ChatSessionService } from './chat-session.service';
 import { StaffReplyDto } from './dto/chat-session.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/constants/roles';
+import { DESK } from '../../common/constants/roles';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
 
 /**
@@ -11,7 +11,7 @@ import { AuthUser, CurrentUser } from '../../common/decorators/current-user.deco
  * Viec truc va tra loi hoi thoai thuoc nhom Quan ly, cung nhom lo don hang va
  * san pham, vi nguoi truc thuong phai tra loi ngay ve gia va tien do.
  */
-@Roles(Role.MANAGER)
+@Roles(...DESK)
 @Controller('admin/chats')
 export class ChatStaffController {
   constructor(private readonly service: ChatSessionService) {}

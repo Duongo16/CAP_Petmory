@@ -53,7 +53,8 @@
     "ACCOUNTS": "Accounts",
     "MODELS": "3D models",
     "JOURNALS": "Diaries",
-    "SHOP": "Shop"
+    "SHOP": "Shop",
+    "ASSISTANT_KNOWLEDGE": "Assistant knowledge"
   },
   "AUTH": {
     "QUICK": {
@@ -61,7 +62,8 @@
       "NOTE": "Only shown while the server runs in development. The real build has none of this.",
       "MANAGER": "Manager",
       "CUSTOMER": "Customer",
-      "ADMIN": "Account admin"
+      "ADMIN": "Account admin",
+      "SUPPORT": "Customer care"
     },
     "ROLE_RESTRICTED": "Your account is not eligible for customer features. Redirected to your management desk.",
     "TITLE": "Sign in",
@@ -1111,28 +1113,21 @@
   "ASSISTANT": {
     "TITLE": "Quick questions",
     "GREETING": "Hello. I can tell you about our handmade pieces made from pet photos. What would you like to know?",
-    "DISCLAIMER": "This assistant answers from the shop's own data. Anything outside that is passed to a human.",
+    "DISCLAIMER": "The assistant answers from the shop data and may not always be accurate. For more help, choose Talk to a person.",
     "INPUT": "Type a question",
     "SEND": "Send",
     "PENDING_ANSWER": "Answering…",
     "GO_TO": "Open related page",
-    "SUGGESTION": {
-      "PRICE": "How much does it cost?",
-      "LEAD_TIME": "How long does it take?",
-      "SIZES": "What sizes are there?",
-      "MATERIAL": "What is it made of?",
-      "PROCESS": "How do I order?",
-      "PHOTO": "What photos do you need?",
-      "PAYMENT": "How do I pay?",
-      "OTHER": "Ask more"
-    },
     "STATE_BOT": "Talking to the automated assistant",
     "STATE_WAITING": "Waiting for an adviser to pick this up",
     "STATE_WITH_STAFF": "Talking to an adviser",
     "STATE_CLOSED": "This conversation has ended",
     "FROM_STAFF": "Adviser",
     "ASK_PERSON": "Talk to a person",
-    "START_FRESH": "Start a new conversation"
+    "START_FRESH": "Start a new conversation",
+    "SIGN_IN_TITLE": "Sign in to chat",
+    "SIGN_IN_TEXT": "The PETMORY assistant is for members. Sign in for advice on products, prices and your orders.",
+    "SIGN_IN": "Sign in"
   },
   "ADMIN": {
     "TILE": {
@@ -1513,7 +1508,8 @@
       "EMAIL_BAD": "That does not look like an email address.",
       "PASSWORD_SHORT": "The password needs at least 8 characters.",
       "ACTIVE_LABEL": "Let this account sign in",
-      "SAVED": "The changes to the account have been saved."
+      "SAVED": "The changes to the account have been saved.",
+      "ROLE_SUPPORT": "Customer care"
     },
     "MODELS": {
       "EYEBROW": "CHOOSE THE PRODUCT SHAPE",
@@ -1858,5 +1854,47 @@
     "SUB": "Keepsakes made from your pet’s photos, and ready-made pieces to take home now.",
     "CUSTOM": "Made from your photos",
     "READY": "Ready-made"
+  },
+  "KNOWLEDGE": {
+    "TITLE": "Assistant knowledge",
+    "HINT": "Frequent questions and the shop standard answers. The assistant uses them to reply and adds them to the AI prompt. The data buttons under the answer box are filled with live prices, sizes and lead times when the assistant replies.",
+    "ADD_TITLE": "Add an entry",
+    "EDIT_TITLE": "Edit entry",
+    "CODE": "Code",
+    "CODE_LOCKED": "The code cannot change after creation.",
+    "CODE_ERROR": "Letters, digits and dashes, 2 to 40 characters.",
+    "CODE_TAKEN": "This code is already used.",
+    "TOPIC_LABEL": "Topic",
+    "QUESTION": "Sample question",
+    "QUESTION_NOTE": "Also shown on the suggestion button.",
+    "KEYWORDS": "Keywords",
+    "KEYWORDS_NOTE": "Separate with commas. Accents are ignored when matching.",
+    "ANSWER": "Answer",
+    "SLOTS": "Insert live data:",
+    "LINK": "Link",
+    "LINK_ERROR": "Only in-site links starting with /.",
+    "SORT": "Order",
+    "FOLLOW_UP": "Suggest these next",
+    "STARTER": "Show when the chat opens",
+    "STARTER_SHORT": "Opening suggestion",
+    "ENABLED": "In use",
+    "OFF": "Off",
+    "TURN_ON": "Turn on",
+    "TURN_OFF": "Turn off",
+    "HIDE": "Hide",
+    "COUNT_ENABLED": "Entries in use",
+    "COUNT_STARTER": "Opening suggestions",
+    "SEARCH": "Search questions, answers, keywords",
+    "EMPTY": "No matching entries.",
+    "TOPIC": {
+      "PRODUCT": "Products",
+      "SIZE": "Sizes",
+      "LEAD_TIME": "Lead time",
+      "ORDER": "Ordering",
+      "PAYMENT": "Payment",
+      "SHIPPING": "Shipping",
+      "POLICY": "Policy",
+      "OTHER": "Other"
+    }
   }
 }

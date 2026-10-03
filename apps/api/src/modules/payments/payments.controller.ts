@@ -3,7 +3,7 @@ import { PaymentsService, SePayNotification } from './payments.service';
 import { WebhookGuard } from './webhook.guard';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/constants/roles';
+import { DESK, Role } from '../../common/constants/roles';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @Controller('payments')
@@ -27,7 +27,7 @@ export class PaymentsController {
     return this.service.receiveNotification(message);
   }
 
-  @Roles(Role.MANAGER)
+  @Roles(...DESK)
   @Get('log')
   log(@Query('limit') limit?: string) {
     return this.service.listLog(Number(limit ?? 50));

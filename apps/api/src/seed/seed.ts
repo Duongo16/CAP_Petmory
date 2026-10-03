@@ -34,6 +34,11 @@ const ACCOUNT_INTERNAL: { email: string; fullName: string; roles: Role[] }[] = [
     fullName: 'Quan tri tai khoan',
     roles: [Role.ADMIN],
   },
+  {
+    email: 'cskh@petmory.local',
+    fullName: 'Cham soc khach hang',
+    roles: [Role.SUPPORT],
+  },
 ];
 
 async function loadColor(model: Model<ColorCodeDocument>): Promise<void> {
