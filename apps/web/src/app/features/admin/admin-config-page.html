@@ -152,11 +152,17 @@
                   </div>
                   <div class="bank-mock-card">
                     <div class="mock-top">
-                      <span class="mock-bank">{{ form.get('bankName')?.value || 'NGÂN HÀNG' }}</span>
+                      <div class="flex items-center gap-2">
+                        <img src="img/logo-mark.png" alt="Petmory" class="mock-logo" />
+                        <span class="mock-bank">{{ form.get('bankName')?.value || 'NGÂN HÀNG' }}</span>
+                      </div>
                       <span class="mock-code">BIN: {{ form.get('bankCode')?.value || '------' }}</span>
                     </div>
                     <div class="mock-account">{{ form.get('accountNumber')?.value || '•••• •••• ••••' }}</div>
-                    <div class="mock-holder">{{ form.get('accountHolder')?.value || 'CHỦ TÀI KHOẢN' }}</div>
+                    <div class="mock-bottom">
+                      <span class="mock-holder">{{ form.get('accountHolder')?.value || 'CHỦ TÀI KHOẢN' }}</span>
+                      <img src="img/logo-word-clear.png" alt="Petmory" class="mock-brand-word" />
+                    </div>
                   </div>
                 </div>
               </section>
