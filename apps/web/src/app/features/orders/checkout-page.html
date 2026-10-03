@@ -9,7 +9,7 @@
       <div class="pm-center"><p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
     }
     @case ('READY') {
-      @if (cart().items.length === 0) {
+      @if (filteredItems().length === 0) {
         <div class="pm-center blank tw-empty">
           <h1 class="pm-page-title tw-page-title">{{ 'CHECKOUT.TITLE' | translate }}</h1>
           <p class="pm-empty m-0">{{ 'CART.EMPTY' | translate }}</p>
@@ -135,7 +135,7 @@
             <header class="bill-head flex items-center justify-between gap-4 pb-4 border-b border-edge">
               <h2 class="bill-title m-0 font-serif text-lg font-medium text-ink">{{ 'CHECKOUT.ORDER_OF_VERSION' | translate }}</h2>
               <span class="count-chip tw-badge tw-badge-accent">
-                {{ 'CHECKOUT.COUNT_ITEM' | translate: { count: cart().countItem } }}
+                {{ 'CHECKOUT.COUNT_ITEM' | translate: { count: orderCount() } }}
               </span>
             </header>
 
@@ -162,7 +162,7 @@
             <dl class="bill-rows flex flex-col gap-3 m-0 py-4 border-y border-edge">
               <div class="flex items-start justify-between gap-4">
                 <dt class="text-sm text-body">{{ 'CART.SUBTOTAL' | translate }}</dt>
-                <dd class="m-0 text-sm font-semibold text-ink">{{ cart().total | amount: cart().currency }}</dd>
+                <dd class="m-0 text-sm font-semibold text-ink">{{ orderTotal() | amount: cart().currency }}</dd>
               </div>
               <div class="flex items-start justify-between gap-4">
                 <dt class="text-sm text-body">
@@ -175,7 +175,7 @@
 
             <div class="bill-total flex items-center justify-between flex-wrap gap-x-4 gap-y-1 text-base font-bold text-ink">
               <span>{{ 'CHECKOUT.TOTAL' | translate }}</span>
-              <strong class="ml-auto font-serif text-2xl font-bold whitespace-nowrap text-accent-dark">{{ cart().total | amount: cart().currency }}</strong>
+              <strong class="ml-auto font-serif text-2xl font-bold whitespace-nowrap text-accent-dark">{{ orderTotal() | amount: cart().currency }}</strong>
             </div>
             <p class="bill-total-note tw-hint -mt-2">{{ 'CART.SHIPPING_FEE_NOTE' | translate }}</p>
 

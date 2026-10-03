@@ -3,18 +3,31 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  computed,
   inject,
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
+import { filter } from 'rxjs';
 import { AdminService } from '../../core/services/admin.service';
 import { AuthService } from '../../core/services/auth.service';
-import { BusinessConfig } from '../../core/models/api.model';
+import { CatalogService } from '../../core/services/catalog.service';
+import { BusinessConfig, ColorCode, ColorGroup } from '../../core/models/api.model';
+import { Icon } from '../../shared/icon/icon';
+import {
+  MaterialFormDialog,
+  MaterialFormInput,
+  MaterialFormResult,
+} from './material-form-dialog';
 
+export type ConfigTab = 'system' | 'ai' | 'materials' | 'qc';
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
+type MaterialsScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
 /** Uppercase unaccented letters, digits and spaces only, matching the server rule. */
 const COLOR_ACCOUNT_HOLDER = /^[A-Z0-9 ]{2,100}$/;
@@ -24,6 +37,27 @@ const COLOR_MONEY = /^\d{1,12}(\.\d{1,2})?$/;
 
 /** Dau xuong dong, dung de tach phieu kiem tra thanh tung muc. */
 const LINE_BREAK = String.fromCharCode(10);
+
+const KEY_GROUP: Record<ColorGroup, string> = {
+  FUR: 'PALETTE.GROUP.FUR',
+  EYES_NOSE: 'PALETTE.GROUP.EYES_NOSE',
+  ACCESSORY: 'PALETTE.GROUP.ACCESSORY',
+};
+
+const GROUP_ORDER: ColorGroup[] = ['FUR', 'EYES_NOSE', 'ACCESSORY'];
+const SAVE_FAILED = 'PALETTE.SAVE_FAILED';
+const SHEET = { width: 'min(620px, 96vw)', maxHeight: '94vh', panelClass: 'pm-dialog' };
+
+export interface ColorRow {
+  raw: ColorCode;
+  groupKey: string;
+}
+
+export interface TabItem {
+  id: ConfigTab;
+  labelKey: string;
+  icon: string;
+}
 
 /** Tach mot o nhieu dong thanh danh sach muc, bo cac dong trong. */
 function asLines(typed: string): string[] {
@@ -36,22 +70,74 @@ function asLines(typed: string): string[] {
 @Component({
   selector: 'pm-admin-config-page',
   standalone: true,
-  imports: [ReactiveFormsModule, MatProgressSpinnerModule, TranslatePipe],
+  imports: [
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    TranslatePipe,
+    Icon,
+  ],
   templateUrl: './admin-config-page.html',
-  styleUrl: './admin-shared.scss',
+  styleUrls: ['./admin-shared.scss', './admin-config-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminConfigPage implements OnInit {
   private readonly service = inject(AdminService);
+  private readonly catalog = inject(CatalogService);
+  private readonly dialog = inject(MatDialog);
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly isManager = inject(AuthService).isManager;
+
+  // Tabs
+  readonly activeTab = signal<ConfigTab>('system');
+  readonly tabs: TabItem[] = [
+    { id: 'system', labelKey: 'ADMIN.CONFIG.TAB_SYSTEM', icon: 'cart' },
+    { id: 'ai', labelKey: 'ADMIN.CONFIG.TAB_AI', icon: 'sparkle' },
+    { id: 'materials', labelKey: 'ADMIN.CONFIG.TAB_MATERIALS', icon: 'paw' },
+    { id: 'qc', labelKey: 'ADMIN.CONFIG.TAB_QC', icon: 'check' },
+  ];
+
+  // Config State
   readonly status = signal<ScreenState>('LOADING');
   readonly error = signal<string | null>(null);
   readonly saved = signal(false);
   readonly saving = signal(false);
   readonly lastEditedBy = signal<string | null>(null);
+  readonly qcChecklistRaw = signal('');
+
+  // Materials State
+  readonly materialsStatus = signal<MaterialsScreenState>('LOADING');
+  readonly materialsError = signal<string | null>(null);
+  readonly materialsSending = signal(false);
+  private readonly colors = signal<ColorCode[]>([]);
+  readonly groupFilter = signal<ColorGroup | null>(null);
+  readonly materialSearch = signal('');
+
+  readonly groupTabs = GROUP_ORDER.map((group) => ({ group, key: KEY_GROUP[group] }));
+
+  readonly materialRows = computed<ColorRow[]>(() => {
+    const group = this.groupFilter();
+    const query = this.materialSearch().trim().toLowerCase();
+    return this.colors()
+      .filter((c) => {
+        if (group && c.group !== group) return false;
+        if (query) {
+          const matchName = c.displayName.toLowerCase().includes(query);
+          const matchCode = c.code.toLowerCase().includes(query);
+          if (!matchName && !matchCode) return false;
+        }
+        return true;
+      })
+      .map((raw) => ({ raw, groupKey: KEY_GROUP[raw.group] }));
+  });
+
+  readonly countEnabled = computed(() => this.colors().filter((c) => c.enabled).length);
+  readonly countTotal = computed(() => this.colors().length);
+
+  readonly qcPreviewLines = computed(() => asLines(this.qcChecklistRaw()));
 
   /**
    * These rules deliberately mirror the server's, so the user sees a mistake while
@@ -91,7 +177,34 @@ export class AdminConfigPage implements OnInit {
   });
 
   ngOnInit(): void {
+    const qTab = this.route.snapshot.queryParamMap.get('tab') as ConfigTab | null;
+    if (qTab && ['system', 'ai', 'materials', 'qc'].includes(qTab)) {
+      this.activeTab.set(qTab);
+    }
+
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const tab = params.get('tab') as ConfigTab | null;
+      if (tab && ['system', 'ai', 'materials', 'qc'].includes(tab) && tab !== this.activeTab()) {
+        this.activeTab.set(tab);
+      }
+    });
+
+    this.form.controls.qcChecklist.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((val) => this.qcChecklistRaw.set(val));
+
     this.reload();
+    this.loadColors();
+  }
+
+  setTab(tab: ConfigTab): void {
+    this.activeTab.set(tab);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   reload(): void {
@@ -167,12 +280,98 @@ export class AdminConfigPage implements OnInit {
       });
   }
 
+  loadColors(): void {
+    this.materialsStatus.set('LOADING');
+    this.catalog
+      .allColors()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (list) => {
+          this.colors.set(list);
+          this.materialsStatus.set('DONE');
+        },
+        error: () => this.materialsStatus.set('ERROR'),
+      });
+  }
+
+  filterGroup(group: ColorGroup | null): void {
+    this.groupFilter.set(this.groupFilter() === group ? null : group);
+  }
+
+  onSearchMaterials(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.materialSearch.set(input.value);
+  }
+
+  addMaterial(): void {
+    this.openMaterialSheet(null);
+  }
+
+  editMaterial(row: ColorRow): void {
+    this.openMaterialSheet(row.raw);
+  }
+
+  toggleMaterial(row: ColorRow): void {
+    this.catalog
+      .toggleColorEnabled(row.raw.code, !row.raw.enabled)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (updated) =>
+          this.colors.update((list) =>
+            list.map((c) => (c.code === updated.code ? updated : c)),
+          ),
+        error: () => this.materialsError.set(SAVE_FAILED),
+      });
+  }
+
+  private openMaterialSheet(color: ColorCode | null): void {
+    this.materialsError.set(null);
+    const input: MaterialFormInput = { color, groupTabs: this.groupTabs };
+    this.dialog
+      .open<MaterialFormDialog, MaterialFormInput, MaterialFormResult | undefined>(
+        MaterialFormDialog,
+        { ...SHEET, data: input },
+      )
+      .afterClosed()
+      .pipe(
+        filter((result): result is MaterialFormResult => result !== undefined),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((result) => this.saveMaterial(color, result));
+  }
+
+  private saveMaterial(before: ColorCode | null, result: MaterialFormResult): void {
+    this.materialsSending.set(true);
+    const fields = {
+      displayName: result.displayName,
+      swatch: result.swatch,
+      group: result.group,
+      note: result.note,
+    };
+    const call = before
+      ? this.catalog.updateColor(before.code, fields)
+      : this.catalog.createColor({ ...fields, code: result.code });
+
+    call.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.materialsSending.set(false);
+        this.loadColors();
+      },
+      error: () => {
+        this.materialsSending.set(false);
+        this.materialsError.set(SAVE_FAILED);
+      },
+    });
+  }
+
   private fillForm(cf: BusinessConfig): void {
     const quota = cf.aiQuota?.restorePhoto;
     const suggest = cf.aiQuota?.designSuggestion;
     const story = cf.aiQuota?.storyWriting;
     const chat = cf.aiQuota?.chatReply;
     const price = cf.aiUnitPrice;
+    const qc = (cf.qcChecklist ?? []).join(LINE_BREAK);
+    this.qcChecklistRaw.set(qc);
     this.form.patchValue({
       defaultPetProfileLimit: cf.defaultPetProfileLimit,
       qrExpiryHours: cf.qrExpiryHours,
@@ -196,7 +395,7 @@ export class AdminConfigPage implements OnInit {
       priceDesignSuggestion: price?.designSuggestion?.$numberDecimal ?? '0',
       priceStoryWriting: price?.storyWriting?.$numberDecimal ?? '0',
       priceChatReply: price?.chatReply?.$numberDecimal ?? '0',
-      qcChecklist: (cf.qcChecklist ?? []).join(LINE_BREAK),
+      qcChecklist: qc,
       bankCode: cf.bankCode,
       bankName: cf.bankName,
       accountNumber: cf.accountNumber,

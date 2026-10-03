@@ -8,48 +8,80 @@
   <div class="flex items-center gap-4 max-w-[1180px] mx-auto px-6 py-3 box-border">
 
     <!-- Brand -->
-    <a class="inline-flex items-center flex-shrink-0 no-underline" routerLink="/home">
+    <a class="inline-flex items-center flex-shrink-0 no-underline" [routerLink]="brandRoute()">
       <pm-brand size="md" />
     </a>
 
-    <!-- Desktop nav -->
-    <nav
-      class="hidden nav:flex items-center gap-0.5 flex-[0_0_auto]"
-      [attr.aria-label]="'NAV.MAIN' | translate"
-    >
-      @for (item of menu; track item.path) {
-        <a
-          class="px-3 py-2 rounded-full text-ink-muted no-underline text-sm font-medium whitespace-nowrap
-                 transition-colors duration-150
-                 hover:text-ink hover:bg-muted
-                 [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
-          [routerLink]="item.path" routerLinkActive="selected"
-        >{{ item.key | translate }}</a>
-      }
-    </nav>
+    <!-- Desktop nav: Khach hang thay menu mua sam, Nhan vien thay menu ban dieu hanh -->
+    @if (!isInternal()) {
+      <nav
+        class="hidden nav:flex items-center gap-0.5 flex-[0_0_auto]"
+        [attr.aria-label]="'NAV.MAIN' | translate"
+      >
+        @for (item of menu; track item.path) {
+          <a
+            class="px-3 py-2 rounded-full text-ink-muted no-underline text-sm font-medium whitespace-nowrap
+                   transition-colors duration-150
+                   hover:text-ink hover:bg-muted
+                   [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
+            [routerLink]="item.path" routerLinkActive="selected"
+          >{{ item.key | translate }}</a>
+        }
+      </nav>
+    } @else {
+      <nav
+        class="hidden nav:flex items-center gap-0.5 flex-[0_0_auto]"
+        [attr.aria-label]="'NAV.STAFF_AREA' | translate"
+      >
+        @if (isManager()) {
+          @for (item of managerMenu; track item.path) {
+            <a
+              class="px-3 py-2 rounded-full text-ink-muted no-underline text-sm font-medium whitespace-nowrap
+                     transition-colors duration-150
+                     hover:text-ink hover:bg-muted
+                     [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
+              [routerLink]="item.path" routerLinkActive="selected"
+            >{{ item.key | translate }}</a>
+          }
+        }
+        @if (isAccountAdmin()) {
+          @for (item of staffAccountMenu; track item.path) {
+            <a
+              class="px-3 py-2 rounded-full text-ink-muted no-underline text-sm font-medium whitespace-nowrap
+                     transition-colors duration-150
+                     hover:text-ink hover:bg-muted
+                     [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
+              [routerLink]="item.path" routerLinkActive="selected"
+            >{{ item.key | translate }}</a>
+          }
+        }
+      </nav>
+    }
 
     <!-- Actions -->
     <div class="flex items-center gap-2 flex-shrink-0 ml-auto">
       <pm-theme-toggle />
 
-      <!-- Cart -->
-      <a
-        class="relative inline-grid place-items-center w-10 h-10 rounded-full text-ink no-underline
-               transition-colors duration-150
-               hover:bg-accent-soft hover:text-accent-dark
-               [&.selected]:bg-accent-soft"
-        routerLink="/cart" routerLinkActive="selected"
-        [attr.aria-label]="'NAV.CART' | translate"
-      >
-        <pm-icon name="cart" />
-        @if (cartItemCount() > 0) {
-          <span
-            class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full
-                   bg-accent text-on-accent text-[0.65rem] font-bold leading-[18px] text-center"
-            role="status"
-          >{{ cartItemCount() }}</span>
-        }
-      </a>
+      <!-- Cart: Chi hien cho khach hang -->
+      @if (!isInternal()) {
+        <a
+          class="relative inline-grid place-items-center w-10 h-10 rounded-full text-ink no-underline
+                 transition-colors duration-150
+                 hover:bg-accent-soft hover:text-accent-dark
+                 [&.selected]:bg-accent-soft"
+          routerLink="/cart" routerLinkActive="selected"
+          [attr.aria-label]="'NAV.CART' | translate"
+        >
+          <pm-icon name="cart" />
+          @if (cartItemCount() > 0) {
+            <span
+              class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full
+                     bg-accent text-on-accent text-[0.65rem] font-bold leading-[18px] text-center"
+              role="status"
+            >{{ cartItemCount() }}</span>
+          }
+        </a>
+      }
 
       <!-- Account button -->
       @if (user(); as u) {
@@ -75,15 +107,17 @@
               class="absolute top-[calc(100%+8px)] right-0 z-20 flex flex-col min-w-[200px] p-2 rounded-lg bg-card border border-edge shadow-elevated"
               role="menu"
             >
-              <!-- Nav items shown only on mobile (narrow) -->
-              @for (item of menu; track item.path) {
-                <a
-                  class="hidden max-nav:block px-3 py-2 rounded-md no-underline text-ink text-sm
-                         transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
-                  role="menuitem"
-                  [routerLink]="item.path" routerLinkActive="selected"
-                  (click)="closeMenu()"
-                >{{ item.key | translate }}</a>
+              <!-- Nav items shown only on mobile (narrow) for customer -->
+              @if (!isInternal()) {
+                @for (item of menu; track item.path) {
+                  <a
+                    class="hidden max-nav:block px-3 py-2 rounded-md no-underline text-ink text-sm
+                           transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
+                    role="menuitem"
+                    [routerLink]="item.path" routerLinkActive="selected"
+                    (click)="closeMenu()"
+                  >{{ item.key | translate }}</a>
+                }
               }
 
               <!-- Staff section -->
@@ -113,18 +147,17 @@
                     >{{ item.key | translate }}</a>
                   }
                 }
-                <p class="mx-3 mt-2 mb-1 text-ink-muted text-[0.65rem] font-bold tracking-widest uppercase">
-                  {{ 'NAV.ACCOUNT' | translate }}
-                </p>
               }
 
-              <!-- My profile -->
-              <a
-                class="px-3 py-2 rounded-md no-underline text-ink text-sm transition-colors hover:bg-muted"
-                role="menuitem"
-                [routerLink]="['/community/users', u.id]"
-                (click)="closeMenu()"
-              >{{ 'NAV.MY_PROFILE' | translate }}</a>
+              <!-- My profile (khach hang) -->
+              @if (!isInternal()) {
+                <a
+                  class="px-3 py-2 rounded-md no-underline text-ink text-sm transition-colors hover:bg-muted"
+                  role="menuitem"
+                  [routerLink]="['/community/users', u.id]"
+                  (click)="closeMenu()"
+                >{{ 'NAV.MY_PROFILE' | translate }}</a>
+              }
 
               <!-- Logout -->
               <button
@@ -148,44 +181,46 @@
   <router-outlet />
 </main>
 
-<!-- ───── Footer ───── -->
-<footer class="mt-16 bg-night text-on-night">
-  <div class="grid gap-10 max-w-[1180px] mx-auto px-6 pt-12 pb-8 box-border [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
+<!-- ───── Footer (Chi hien cho khach hang) ───── -->
+@if (!isInternal()) {
+  <footer class="mt-16 bg-night text-on-night">
+    <div class="grid gap-10 max-w-[1180px] mx-auto px-6 pt-12 pb-8 box-border [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
 
-    <!-- Brand column -->
-    <div class="flex flex-col items-start gap-3">
-      <pm-brand size="md" />
-      <p class="m-0 font-serif italic text-base leading-relaxed">{{ 'FOOTER.TAGLINE' | translate }}</p>
-      <p class="m-0 text-sm text-on-night/70">{{ 'FOOTER.SLOGAN' | translate }}</p>
-    </div>
-
-    <!-- Explore nav -->
-    <nav class="flex flex-col items-start gap-2.5" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
-      <h2 class="m-0 mb-2 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
-        {{ 'FOOTER.EXPLORE' | translate }}
-      </h2>
-      <div class="grid grid-cols-2 gap-x-8 gap-y-2.5">
-        @for (item of footerMenu; track item.path) {
-          <a
-            class="text-on-night/85 no-underline text-sm transition-colors hover:text-on-night hover:underline"
-            [routerLink]="item.path"
-          >{{ item.key | translate }}</a>
-        }
+      <!-- Brand column -->
+      <div class="flex flex-col items-start gap-3">
+        <pm-brand size="md" />
+        <p class="m-0 font-serif italic text-base leading-relaxed">{{ 'FOOTER.TAGLINE' | translate }}</p>
+        <p class="m-0 text-sm text-on-night/70">{{ 'FOOTER.SLOGAN' | translate }}</p>
       </div>
-    </nav>
 
-    <!-- Social links -->
-    <div class="footer-contact flex flex-col items-start gap-3">
-      <h2 class="m-0 mb-1 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
-        {{ 'FOOTER.FOLLOW' | translate }}
-      </h2>
-      <pm-social-links variant="full" />
+      <!-- Explore nav -->
+      <nav class="flex flex-col items-start gap-2.5" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
+        <h2 class="m-0 mb-2 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
+          {{ 'FOOTER.EXPLORE' | translate }}
+        </h2>
+        <div class="grid grid-cols-2 gap-x-8 gap-y-2.5">
+          @for (item of footerMenu; track item.path) {
+            <a
+              class="text-on-night/85 no-underline text-sm transition-colors hover:text-on-night hover:underline"
+              [routerLink]="item.path"
+            >{{ item.key | translate }}</a>
+          }
+        </div>
+      </nav>
+
+      <!-- Social links -->
+      <div class="footer-contact flex flex-col items-start gap-3">
+        <h2 class="m-0 mb-1 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
+          {{ 'FOOTER.FOLLOW' | translate }}
+        </h2>
+        <pm-social-links variant="full" />
+      </div>
     </div>
-  </div>
-  <div class="max-w-[1180px] mx-auto px-6 pb-8 box-border">
-    <p class="m-0 pt-5 border-t border-on-night/15 text-xs text-on-night/60">{{ 'FOOTER.RIGHTS' | translate }}</p>
-  </div>
-</footer>
+    <div class="max-w-[1180px] mx-auto px-6 pb-8 box-border">
+      <p class="m-0 pt-5 border-t border-on-night/15 text-xs text-on-night/60">{{ 'FOOTER.RIGHTS' | translate }}</p>
+    </div>
+  </footer>
 
-<pm-chat-widget />
-<pm-bottom-nav />
+  <pm-chat-widget />
+  <pm-bottom-nav />
+}

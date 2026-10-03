@@ -209,15 +209,38 @@ export class CartService {
    * Bam dat hang hai lan lien tiep thi hai yeu cau cung den. Chi yeu cau nao
    * lay duoc gio con hang moi tao duoc don; yeu cau con lai thay gio da trong.
    */
-  async claimItems(owner: string): Promise<CartItem[]> {
-    const before = await this.model
-      .findOneAndUpdate(
-        { owner: new Types.ObjectId(owner), 'items.0': { $exists: true } },
-        { $set: { items: [] } },
-        { new: false },
-      )
-      .exec();
-    return before ? (before.toObject().items as CartItem[]) : [];
+  async claimItems(owner: string, itemIds?: string[]): Promise<CartItem[]> {
+    if (!itemIds || itemIds.length === 0) {
+      const before = await this.model
+        .findOneAndUpdate(
+          { owner: new Types.ObjectId(owner), 'items.0': { $exists: true } },
+          { $set: { items: [] } },
+          { new: false },
+        )
+        .exec();
+      return before ? (before.toObject().items as CartItem[]) : [];
+    }
+
+    const cart = await this.model.findOne({ owner: new Types.ObjectId(owner) }).exec();
+    if (!cart || cart.items.length === 0) {
+      return [];
+    }
+    const idSet = new Set(itemIds);
+    const claimed: CartItem[] = [];
+    const remaining: CartItem[] = [];
+    for (const item of cart.items) {
+      if (idSet.has(item._id.toString())) {
+        claimed.push(item);
+      } else {
+        remaining.push(item);
+      }
+    }
+    if (claimed.length === 0) {
+      return [];
+    }
+    cart.items = remaining as any;
+    await cart.save();
+    return claimed;
   }
 
   /** Tra cac dong vua lay ra ve lai gio, khi don khong dat duoc. */

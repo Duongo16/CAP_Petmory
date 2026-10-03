@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -47,6 +47,9 @@ export class Shell implements OnInit {
   readonly isManager = this.auth.isManager;
   readonly isAccountAdmin = this.auth.isAccountAdmin;
 
+  readonly brandRoute = computed(() =>
+    this.isInternal() ? this.auth.getManagementRoute() : '/home',
+  );
 
   /** Whether the account menu is open. */
   readonly menuOpen = signal(false);
@@ -77,7 +80,6 @@ export class Shell implements OnInit {
     { path: '/admin/orders', key: 'NAV.DISPATCH_ORDER' },
     { path: '/admin/customers', key: 'NAV.CUSTOMER' },
     { path: '/admin/payment-log', key: 'NAV.LOG_PAYMENT' },
-    { path: '/admin/materials', key: 'NAV.MATERIAL' },
     { path: '/admin/settings', key: 'NAV.SETTINGS' },
   ];
 
@@ -85,7 +87,9 @@ export class Shell implements OnInit {
   readonly staffAccountMenu: MenuItem[] = [{ path: '/admin/accounts', key: 'NAV.ACCOUNTS' }];
 
   ngOnInit(): void {
-    this.cart.reload().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => undefined });
+    if (!this.isInternal()) {
+      this.cart.reload().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => undefined });
+    }
   }
 
   toggleMenu(): void {

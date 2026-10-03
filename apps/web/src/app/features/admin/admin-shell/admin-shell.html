@@ -47,7 +47,9 @@
           <strong>{{ who() }}</strong>
           <span>{{ 'ADMIN.DESK_ROLE' | translate }}</span>
         </span>
-        <a class="rail-out" routerLink="/home">{{ 'ADMIN.BACK_TO_SHOP' | translate }}</a>
+        <button type="button" class="rail-out border-0 bg-transparent cursor-pointer p-0 text-left font-[inherit]" (click)="logout()">
+          {{ 'NAV.LOGOUT' | translate }}
+        </button>
       </div>
     </div>
   </aside>

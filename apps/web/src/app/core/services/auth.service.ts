@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, Injector, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { API_BASE } from './api-base';
@@ -14,7 +14,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly base = inject(API_BASE);
   private readonly store = inject(TokenStore);
-  private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
 
   readonly user = this.store.user.asReadonly();
   readonly isSignedIn = computed(() => this.user() !== null);
@@ -32,6 +32,28 @@ export class AuthService {
 
   /** Nhom Quan tri vien: chi quan ly tai khoan. */
   readonly isAccountAdmin = computed(() => (this.user()?.roles ?? []).includes('ADMIN'));
+
+  /** Khach hang thong thuong. */
+  readonly isCustomer = computed(() => !this.isInternal());
+
+  /** Trang quan ly tuong ung theo role cua tai khoan noi bo. */
+  getManagementRoute(): string {
+    if (this.isManager()) {
+      return '/admin/orders';
+    }
+    if (this.isAccountAdmin()) {
+      return '/admin/accounts';
+    }
+    return '/home';
+  }
+
+  /** Trang mac dinh sau dang nhap hoac khi vao ung dung theo role. */
+  getDefaultRoute(): string {
+    if (this.isInternal()) {
+      return this.getManagementRoute();
+    }
+    return '/home';
+  }
 
   /**
    * Cac tai khoan mau de dang nhap nhanh khi dang lam o may ca nhan.
@@ -67,6 +89,6 @@ export class AuthService {
 
   logout(): void {
     this.store.remove();
-    void this.router.navigate(['/login']);
+    void this.injector.get(Router).navigate(['/login']);
   }
 }

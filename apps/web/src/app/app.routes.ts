@@ -5,7 +5,8 @@ import {
   authGuard,
   managerGuard,
   accountAdminGuard,
-  customerGuard,
+  customerOnlyGuard,
+  guestGuard,
   internalGuard,
 } from './core/guards/auth.guard';
 
@@ -13,22 +14,28 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: () => (inject(AuthService).isSignedIn() ? 'home' : 'landing'),
+    redirectTo: () => {
+      const auth = inject(AuthService);
+      if (!auth.isSignedIn()) {
+        return 'landing';
+      }
+      return auth.getDefaultRoute().replace(/^\//, '');
+    },
   },
   {
     path: 'landing',
-    canActivate: [customerGuard],
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/home/guest-home-page').then((m) => m.GuestHomePage),
   },
   {
     path: 'login',
-    canActivate: [customerGuard],
+    canActivate: [guestGuard],
     loadComponent: () => import('./features/auth/login').then((m) => m.LoginPage),
   },
   {
     path: 'register',
-    canActivate: [customerGuard],
+    canActivate: [guestGuard],
     loadComponent: () => import('./features/auth/register').then((m) => m.RegisterPage),
   },
   /*
@@ -58,10 +65,12 @@ export const routes: Routes = [
     children: [
       {
         path: 'home',
+        canActivate: [customerOnlyGuard],
         loadComponent: () => import('./features/today/today-page').then((m) => m.TodayPage),
       },
       {
         path: 'community',
+        canActivate: [customerOnlyGuard],
         loadComponent: () =>
           import('./features/community/community-page').then((m) => m.CommunityPage),
       },
@@ -74,11 +83,13 @@ export const routes: Routes = [
       },
       {
         path: 'community/users/:id',
+        canActivate: [customerOnlyGuard],
         loadComponent: () =>
           import('./features/community/profile-page').then((m) => m.CommunityProfilePage),
       },
       {
         path: 'shop',
+        canActivate: [customerOnlyGuard],
         loadComponent: () => import('./features/shop/shop-page').then((m) => m.ShopPage),
       },
       // Products and ready-made goods now share the shop, and details open as a popup there.
@@ -104,37 +115,45 @@ export const routes: Routes = [
       },
       {
         path: 'cart',
+        canActivate: [customerOnlyGuard],
         loadComponent: () => import('./features/cart/cart-page').then((m) => m.CartPage),
       },
       {
         path: 'checkout',
+        canActivate: [customerOnlyGuard],
         loadComponent: () =>
           import('./features/orders/checkout-page').then((m) => m.CheckoutPage),
       },
       {
         path: 'payments/:orderCode',
+        canActivate: [customerOnlyGuard],
         loadComponent: () => import('./features/orders/payment-page').then((m) => m.PaymentPage),
       },
       {
         path: 'orders',
+        canActivate: [customerOnlyGuard],
         loadComponent: () => import('./features/orders/orders-page').then((m) => m.OrdersPage),
       },
       {
         path: 'studio',
+        canActivate: [customerOnlyGuard],
         loadComponent: () => import('./features/studio/studio-page').then((m) => m.StudioPage),
       },
       {
         path: 'suggest',
+        canActivate: [customerOnlyGuard],
         loadComponent: () =>
           import('./features/studio/suggest-page').then((m) => m.SuggestPage),
       },
       {
         path: 'restore',
+        canActivate: [customerOnlyGuard],
         loadComponent: () =>
           import('./features/restore/restore-page').then((m) => m.RestorePage),
       },
       {
         path: 'pets',
+        canActivate: [customerOnlyGuard],
         loadComponent: () => import('./features/pets/pets-page').then((m) => m.PetsPage),
       },
       { path: 'today', redirectTo: 'home', pathMatch: 'full' },
@@ -154,16 +173,19 @@ export const routes: Routes = [
       },
       {
         path: 'pets/:id/slideshow',
+        canActivate: [customerOnlyGuard],
         loadComponent: () =>
           import('./features/memories/slideshow-page').then((m) => m.SlideshowPage),
       },
       {
         path: 'journals',
+        canActivate: [customerOnlyGuard],
         loadComponent: () =>
           import('./features/memories/bookshelf/bookshelf-page').then((m) => m.BookshelfPage),
       },
       {
         path: 'pets/:id/journal',
+        canActivate: [customerOnlyGuard],
         loadComponent: () =>
           import('./features/memories/memories-page').then((m) => m.MemoriesPage),
       },
@@ -240,15 +262,14 @@ export const routes: Routes = [
           },
           {
             path: 'materials',
-            canActivate: [managerGuard],
-            loadComponent: () =>
-              import('./features/admin/admin-materials-page').then((m) => m.AdminMaterialsPage),
+            redirectTo: () =>
+              inject(Router).createUrlTree(['/admin/settings'], {
+                queryParams: { tab: 'materials' },
+              }),
           },
           {
             path: 'models',
-            canActivate: [managerGuard],
-            loadComponent: () =>
-              import('./features/admin/admin-models-page').then((m) => m.AdminModelsPage),
+            redirectTo: 'settings',
           },
           {
             path: 'settings',
@@ -287,9 +308,16 @@ export const routes: Routes = [
       },
       {
         path: 'colors',
+        canActivate: [customerOnlyGuard],
         loadComponent: () => import('./features/catalog/colors-page').then((m) => m.ColorsPage),
       },
     ],
   },
-  { path: '**', redirectTo: 'home' },
+  {
+    path: '**',
+    redirectTo: () => {
+      const auth = inject(AuthService);
+      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'home';
+    },
+  },
 ];

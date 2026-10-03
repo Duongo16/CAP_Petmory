@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, of } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -59,6 +59,7 @@ export class CheckoutPage implements OnInit {
   private readonly orders = inject(OrdersService);
   private readonly catalog = inject(CatalogService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly status = signal<ScreenState>('LOADING');
@@ -69,12 +70,41 @@ export class CheckoutPage implements OnInit {
 
   private readonly products = signal<ProductType[]>([]);
 
+  readonly selectedItemIds = computed<string[]>(() => {
+    const raw = this.route.snapshot.queryParamMap.get('items');
+    if (!raw) return [];
+    return raw.split(',').filter(Boolean);
+  });
+
+  readonly filteredItems = computed<CartLine[]>(() => {
+    const all = this.cart().items;
+    const selected = this.selectedItemIds();
+    if (selected.length === 0) {
+      return all;
+    }
+    const set = new Set(selected);
+    const filtered = all.filter((i) => set.has(i.id));
+    return filtered.length > 0 ? filtered : all;
+  });
+
   readonly lines = computed<BillLine[]>(() => {
     const byCode = new Map(this.products().map((p) => [p.code, p]));
-    return this.cart().items.map((raw) => ({
+    return this.filteredItems().map((raw) => ({
       raw,
       imageUrl: byCode.get(raw.productTypeCode)?.imageUrl ?? null,
     }));
+  });
+
+  readonly orderTotal = computed(() => {
+    let sum = 0n;
+    for (const item of this.filteredItems()) {
+      sum += BigInt(item.unitPrice) * BigInt(item.quantity);
+    }
+    return sum.toString();
+  });
+
+  readonly orderCount = computed(() => {
+    return this.filteredItems().reduce((acc, item) => acc + item.quantity, 0);
   });
 
   readonly form = this.fb.nonNullable.group({
@@ -101,21 +131,24 @@ export class CheckoutPage implements OnInit {
   }
 
   send(): void {
-    if (this.form.invalid || this.pendingSend() || this.cart().items.length === 0) {
+    if (this.form.invalid || this.pendingSend() || this.filteredItems().length === 0) {
       this.form.markAllAsTouched();
       return;
     }
     this.pendingSend.set(true);
     this.error.set(null);
 
+    const selected = this.selectedItemIds();
+    const itemIds = selected.length > 0 ? selected : undefined;
+
     this.orders
-      .create(this.form.getRawValue())
+      .create({ ...this.form.getRawValue(), itemIds })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (order) => {
           this.pendingSend.set(false);
-          // The server emptied the cart when the order was created, so refresh it here.
-          this.cartService.reset();
+          // Reload cart so remaining items stay in cart
+          this.cartService.reload().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => undefined });
           void this.router.navigate(['/payments', order.orderCode]);
         },
         error: (trouble: { status?: number }) => {

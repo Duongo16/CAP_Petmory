@@ -233,13 +233,8 @@ html {
   --pm-shadow-lifted: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.42);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    @include pm-dark-tokens;
-  }
-}
-
 :root[data-theme='dark'] {
+  color-scheme: dark;
   @include pm-dark-tokens;
 }
 
@@ -653,3 +648,18 @@ h1.pm-page-title,
 .tw-page {
   animation: pm-fade-in 220ms ease-out;
 }
+
+/* ---- Snackbar thong bao ---- */
+.pm-snackbar-warning.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: var(--pm-night);
+  --mdc-snackbar-supporting-text-color: var(--pm-on-night);
+  --mat-snack-bar-button-color: var(--pm-amber-bright);
+
+  .mat-mdc-snackbar-surface {
+    border-radius: var(--pm-radius);
+    border: 1px solid var(--pm-border-strong);
+    box-shadow: var(--pm-shadow-lifted);
+    font-weight: 500;
+  }
+}
+

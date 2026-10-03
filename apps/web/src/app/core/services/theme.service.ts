@@ -14,7 +14,7 @@ function isChoice(value: string | null): value is ThemeChoice {
 /**
  * Holds whether the interface is light or dark.
  *
- * On a first visit the setting of the operating system decides, after which the
+ * On a first visit the default theme is LIGHT, after which the
  * reader is in charge and the pick is kept in browser storage. Storage can throw
  * in a private window, so every access is guarded.
  */
@@ -65,7 +65,7 @@ export class ThemeService {
       if (isChoice(saved)) {
         return saved;
       }
-      return view?.matchMedia('(prefers-color-scheme: dark)').matches ? 'DARK' : 'LIGHT';
+      return 'LIGHT';
     } catch {
       return 'LIGHT';
     }

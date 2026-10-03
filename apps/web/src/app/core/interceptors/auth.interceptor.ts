@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { Injector, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { TokenStore } from '../services/token-store';
@@ -10,7 +10,7 @@ import { TokenStore } from '../services/token-store';
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const store = inject(TokenStore);
-  const router = inject(Router);
+  const injector = inject(Injector);
   const token = store.getAccessToken();
 
   const request = token
@@ -21,6 +21,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && store.getAccessToken()) {
         store.remove();
+        const router = injector.get(Router);
         void router.navigate(['/login']);
       }
       return throwError(() => error);

@@ -5,6 +5,27 @@
     <p class="description">{{ 'ADMIN.CONFIG.DESCRIPTION' | translate }}</p>
   </header>
 
+  <!-- Segmented Navigation Tabs -->
+  <nav class="config-tabs-nav" aria-label="Cấu hình tham số">
+    @for (t of tabs; track t.id) {
+      <button
+        type="button"
+        class="config-tab-btn"
+        [class.active]="activeTab() === t.id"
+        (click)="setTab(t.id)"
+      >
+        <pm-icon [name]="t.icon" [size]="18" />
+        <span>{{ t.labelKey | translate }}</span>
+        @if (t.id === 'materials') {
+          <span class="tab-badge">{{ countEnabled() }}/{{ countTotal() }}</span>
+        }
+        @if (t.id === 'qc') {
+          <span class="tab-badge">{{ qcPreviewLines().length }}</span>
+        }
+      </button>
+    }
+  </nav>
+
   @switch (status()) {
     @case ('LOADING') {
       <div class="pm-center"><mat-spinner diameter="40" /></div>
@@ -29,222 +50,483 @@
         <p class="saved" role="status">{{ 'ADMIN.CONFIG.SAVED' | translate }}</p>
       }
 
+      <!-- Form for System, AI, and QC Settings -->
       <form [formGroup]="form" (ngSubmit)="save()">
-        <section class="card">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.CONFIG.ORDERS_GROUP' | translate }}</h2>
-              <p class="group-sub">{{ 'ADMIN.CONFIG.ORDERS_GROUP_SUB' | translate }}</p>
+        <!-- TAB 1: SYSTEM & ORDERS -->
+        <div [hidden]="activeTab() !== 'system'">
+          <div class="config-two-col">
+            <!-- Left: Orders & Photo Rules -->
+            <div class="col-stack">
+              <section class="card card-compact">
+                <div class="card-head">
+                  <div>
+                    <h2>{{ 'ADMIN.CONFIG.ORDERS_GROUP' | translate }}</h2>
+                    <p class="group-sub">{{ 'ADMIN.CONFIG.ORDERS_GROUP_SUB' | translate }}</p>
+                  </div>
+                  <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 3 } }}</span>
+                </div>
+                <div class="field-grid-compact">
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.PET_LIMIT' | translate }}</span>
+                    <input type="number" formControlName="defaultPetProfileLimit" min="1" max="100" />
+                    <small>{{ 'ADMIN.CONFIG.PET_LIMIT_HINT' | translate }}</small>
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.QR_EXPIRY' | translate }}</span>
+                    <input type="number" formControlName="qrExpiryHours" min="1" max="720" />
+                    <small>{{ 'ADMIN.CONFIG.QR_EXPIRY_HINT' | translate }}</small>
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.SHIPPING_DAYS' | translate }}</span>
+                    <input type="number" formControlName="estimatedShippingDays" min="1" max="60" />
+                    <small>{{ 'ADMIN.CONFIG.SHIPPING_DAYS_HINT' | translate }}</small>
+                  </label>
+                </div>
+              </section>
+
+              <section class="card card-compact">
+                <div class="card-head">
+                  <div>
+                    <h2>{{ 'ADMIN.CONFIG.PHOTOS_GROUP' | translate }}</h2>
+                    <p class="group-sub">{{ 'ADMIN.CONFIG.PHOTOS_GROUP_SUB' | translate }}</p>
+                  </div>
+                  <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 3 } }}</span>
+                </div>
+                <div class="field-grid-compact">
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.GOOD_THRESHOLD' | translate }}</span>
+                    <input type="number" formControlName="goodShortEdgePx" min="200" max="8000" />
+                    <small>{{ 'ADMIN.CONFIG.GOOD_THRESHOLD_HINT' | translate }}</small>
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.WARN_THRESHOLD' | translate }}</span>
+                    <input type="number" formControlName="warnShortEdgePx" min="100" max="8000" />
+                    <small>{{ 'ADMIN.CONFIG.WARN_THRESHOLD_HINT' | translate }}</small>
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.MAX_FILE_SIZE' | translate }}</span>
+                    <input type="number" formControlName="maxPhotoSizeMb" min="1" max="50" />
+                    <small>{{ 'ADMIN.CONFIG.FILE_SIZE_HINT' | translate }}</small>
+                  </label>
+                </div>
+              </section>
             </div>
-            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 3 } }}</span>
-          </div>
-          <div class="field-grid">
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PET_LIMIT' | translate }}</span>
-              <input type="number" formControlName="defaultPetProfileLimit" min="1" max="100" />
-              <small>{{ 'ADMIN.CONFIG.PET_LIMIT_HINT' | translate }}</small>
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.QR_EXPIRY' | translate }}</span>
-              <input type="number" formControlName="qrExpiryHours" min="1" max="720" />
-              <small>{{ 'ADMIN.CONFIG.QR_EXPIRY_HINT' | translate }}</small>
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.SHIPPING_DAYS' | translate }}</span>
-              <input type="number" formControlName="estimatedShippingDays" min="1" max="60" />
-              <small>{{ 'ADMIN.CONFIG.SHIPPING_DAYS_HINT' | translate }}</small>
-            </label>
-          </div>
-        </section>
 
-        <section class="card">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.CONFIG.PHOTOS_GROUP' | translate }}</h2>
-              <p class="group-sub">{{ 'ADMIN.CONFIG.PHOTOS_GROUP_SUB' | translate }}</p>
-            </div>
-            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 3 } }}</span>
-          </div>
-          <div class="field-grid">
-            <label>
-              <span>{{ 'ADMIN.CONFIG.GOOD_THRESHOLD' | translate }}</span>
-              <input type="number" formControlName="goodShortEdgePx" min="200" max="8000" />
-              <small>{{ 'ADMIN.CONFIG.GOOD_THRESHOLD_HINT' | translate }}</small>
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.WARN_THRESHOLD' | translate }}</span>
-              <input type="number" formControlName="warnShortEdgePx" min="100" max="8000" />
-              <small>{{ 'ADMIN.CONFIG.WARN_THRESHOLD_HINT' | translate }}</small>
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.MAX_FILE_SIZE' | translate }}</span>
-              <input type="number" formControlName="maxPhotoSizeMb" min="1" max="50" />
-              <small>{{ 'ADMIN.CONFIG.FILE_SIZE_HINT' | translate }}</small>
-            </label>
-          </div>
-        </section>
+            <!-- Right: Bank / Payment Account -->
+            <div class="col-stack">
+              <section class="card card-compact">
+                <div class="card-head">
+                  <div>
+                    <h2>{{ 'ADMIN.CONFIG.BANK_GROUP' | translate }}</h2>
+                    <p class="group-sub">{{ 'ADMIN.CONFIG.BANK_WARNING' | translate }}</p>
+                  </div>
+                  <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 4 } }}</span>
+                </div>
+                <div class="field-grid-compact">
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.BANK_CODE' | translate }}</span>
+                    <input type="text" formControlName="bankCode" inputmode="numeric" maxlength="6" />
+                    <small>{{ 'ADMIN.CONFIG.BANK_CODE_HINT' | translate }}</small>
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.BANK_NAME' | translate }}</span>
+                    <input type="text" formControlName="bankName" maxlength="100" />
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.ACCOUNT_NUMBER' | translate }}</span>
+                    <input type="text" formControlName="accountNumber" inputmode="numeric" maxlength="20" />
+                    <small>{{ 'ADMIN.CONFIG.ACCOUNT_NUMBER_HINT' | translate }}</small>
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.ACCOUNT_HOLDER' | translate }}</span>
+                    <input type="text" formControlName="accountHolder" maxlength="100" />
+                    <small>{{ 'ADMIN.CONFIG.ACCOUNT_HOLDER_HINT' | translate }}</small>
+                  </label>
+                </div>
 
-        <section class="card">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.CONFIG.QUOTA_GROUP' | translate }}</h2>
-            </div>
-            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 12 } }}</span>
-          </div>
-          <p class="note">{{ 'ADMIN.CONFIG.QUOTA_HINT' | translate }}</p>
-
-          <h3 class="sub-head">{{ 'ADMIN.CONFIG.PRICE_RESTORE_PHOTO' | translate }}</h3>
-          <div class="field-grid">
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
-              <input type="number" formControlName="quotaDay" min="0" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</span>
-              <input type="number" formControlName="quotaMonth" min="0" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</span>
-              <input type="number" formControlName="quotaYear" min="0" />
-            </label>
-          </div>
-
-          <h3 class="sub-head">{{ 'ADMIN.CONFIG.PRICE_DESIGN_SUGGESTION' | translate }}</h3>
-          <div class="field-grid">
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
-              <input type="number" id="quota-suggest-day" formControlName="suggestDay" min="0" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</span>
-              <input type="number" formControlName="suggestMonth" min="0" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</span>
-              <input type="number" formControlName="suggestYear" min="0" />
-            </label>
-          </div>
-
-          <h3 class="sub-head">{{ 'ADMIN.CONFIG.PRICE_STORY_WRITING' | translate }}</h3>
-          <div class="field-grid">
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
-              <input type="number" id="quota-story-day" formControlName="storyDay" min="0" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</span>
-              <input type="number" formControlName="storyMonth" min="0" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</span>
-              <input type="number" formControlName="storyYear" min="0" />
-            </label>
-          </div>
-
-          <h3 class="sub-head">{{ 'ADMIN.CONFIG.PRICE_CHAT_REPLY' | translate }}</h3>
-          <div class="field-grid">
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</span>
-              <input type="number" id="quota-chat-day" formControlName="chatDay" min="0" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</span>
-              <input type="number" formControlName="chatMonth" min="0" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</span>
-              <input type="number" formControlName="chatYear" min="0" />
-            </label>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.CONFIG.AI_PRICE_GROUP' | translate }}</h2>
-              <p class="card-note">{{ 'ADMIN.CONFIG.AI_PRICE_NOTE' | translate }}</p>
-            </div>
-            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 4 } }}</span>
-          </div>
-          <div class="field-grid">
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PRICE_RESTORE_PHOTO' | translate }}</span>
-              <input type="text" formControlName="priceRestorePhoto" inputmode="decimal" maxlength="15" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PRICE_DESIGN_SUGGESTION' | translate }}</span>
-              <input type="text" formControlName="priceDesignSuggestion" inputmode="decimal" maxlength="15" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PRICE_STORY_WRITING' | translate }}</span>
-              <input type="text" formControlName="priceStoryWriting" inputmode="decimal" maxlength="15" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.PRICE_CHAT_REPLY' | translate }}</span>
-              <input type="text" formControlName="priceChatReply" inputmode="decimal" maxlength="15" />
-            </label>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.CONFIG.QC_GROUP' | translate }}</h2>
-              <p class="card-note">{{ 'ADMIN.CONFIG.QC_NOTE' | translate }}</p>
+                <!-- Visual Card Preview -->
+                <div class="bank-preview-box">
+                  <div class="preview-label">
+                    <pm-icon name="tag" [size]="14" />
+                    <span>Thẻ thụ hưởng thanh toán</span>
+                  </div>
+                  <div class="bank-mock-card">
+                    <div class="mock-top">
+                      <span class="mock-bank">{{ form.get('bankName')?.value || 'NGÂN HÀNG' }}</span>
+                      <span class="mock-code">BIN: {{ form.get('bankCode')?.value || '------' }}</span>
+                    </div>
+                    <div class="mock-account">{{ form.get('accountNumber')?.value || '•••• •••• ••••' }}</div>
+                    <div class="mock-holder">{{ form.get('accountHolder')?.value || 'CHỦ TÀI KHOẢN' }}</div>
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
-          <label class="wide">
-            <span>{{ 'ADMIN.CONFIG.QC_LIST' | translate }}</span>
-            <textarea formControlName="qcChecklist" rows="8" maxlength="4000"></textarea>
-            <small>{{ 'ADMIN.CONFIG.QC_HINT' | translate }}</small>
-          </label>
-        </section>
+        </div>
 
-        <section class="card">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.CONFIG.BANK_GROUP' | translate }}</h2>
+        <!-- TAB 2: ARTIFICIAL INTELLIGENCE (AI) MATRIX -->
+        <div [hidden]="activeTab() !== 'ai'">
+          <section class="card card-compact">
+            <div class="card-head">
+              <div>
+                <h2>{{ 'ADMIN.CONFIG.AI_MATRIX_TITLE' | translate }}</h2>
+                <p class="group-sub">{{ 'ADMIN.CONFIG.AI_MATRIX_SUB' | translate }}</p>
+              </div>
+              <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 16 } }}</span>
             </div>
-            <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 4 } }}</span>
-          </div>
-          <p class="note warn">{{ 'ADMIN.CONFIG.BANK_WARNING' | translate }}</p>
-          <div class="field-grid">
-            <label>
-              <span>{{ 'ADMIN.CONFIG.BANK_CODE' | translate }}</span>
-              <input type="text" formControlName="bankCode" inputmode="numeric" maxlength="6" />
-              <small>{{ 'ADMIN.CONFIG.BANK_CODE_HINT' | translate }}</small>
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.BANK_NAME' | translate }}</span>
-              <input type="text" formControlName="bankName" maxlength="100" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.ACCOUNT_NUMBER' | translate }}</span>
-              <input type="text" formControlName="accountNumber" inputmode="numeric" maxlength="20" />
-              <small>{{ 'ADMIN.CONFIG.ACCOUNT_NUMBER_HINT' | translate }}</small>
-            </label>
-            <label>
-              <span>{{ 'ADMIN.CONFIG.ACCOUNT_HOLDER' | translate }}</span>
-              <input type="text" formControlName="accountHolder" maxlength="100" />
-              <small>{{ 'ADMIN.CONFIG.ACCOUNT_HOLDER_HINT' | translate }}</small>
-            </label>
-          </div>
-        </section>
+            <p class="note" style="margin-bottom: var(--pm-space-3);">{{ 'ADMIN.CONFIG.QUOTA_HINT' | translate }}</p>
 
-        @if (isManager()) {
-          <div class="button-row">
-            <button class="pm-button-primary" type="submit" [disabled]="saving()">
-              {{ 'COMMON.SAVE' | translate }}
-            </button>
-            <button class="pm-button-secondary" type="button" (click)="reload()">
-              {{ 'ADMIN.CONFIG.DISCARD_CHANGES' | translate }}
-            </button>
-            @if (form.invalid && form.touched) {
-              <span class="field-error">{{ 'ADMIN.CONFIG.INVALID_FIELDS' | translate }}</span>
+            <div class="ai-matrix-wrap">
+              <table class="ai-matrix-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{{ 'ADMIN.CONFIG.AI_FEATURE' | translate }}</th>
+                    <th scope="col" class="col-num">{{ 'ADMIN.CONFIG.AI_UNIT_PRICE' | translate }}</th>
+                    <th scope="col" class="col-num">{{ 'ADMIN.CONFIG.PER_DAY' | translate }}</th>
+                    <th scope="col" class="col-num">{{ 'ADMIN.CONFIG.PER_MONTH' | translate }}</th>
+                    <th scope="col" class="col-num">{{ 'ADMIN.CONFIG.PER_YEAR' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Row 1: Restore Photo -->
+                  <tr>
+                    <td>
+                      <div class="feature-cell">
+                        <div class="feature-icon"><pm-icon name="image" [size]="18" /></div>
+                        <div>
+                          <span>{{ 'ADMIN.CONFIG.PRICE_RESTORE_PHOTO' | translate }}</span>
+                          <div class="sub">Phục hồi và làm rõ ảnh thú cưng</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        class="matrix-input"
+                        formControlName="priceRestorePhoto"
+                        inputmode="decimal"
+                        maxlength="15"
+                      />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="quotaDay" min="0" />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="quotaMonth" min="0" />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="quotaYear" min="0" />
+                    </td>
+                  </tr>
+
+                  <!-- Row 2: Design Suggestion -->
+                  <tr>
+                    <td>
+                      <div class="feature-cell">
+                        <div class="feature-icon"><pm-icon name="sparkle" [size]="18" /></div>
+                        <div>
+                          <span>{{ 'ADMIN.CONFIG.PRICE_DESIGN_SUGGESTION' | translate }}</span>
+                          <div class="sub">Gợi ý tạo mẫu phối màu len</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        class="matrix-input"
+                        formControlName="priceDesignSuggestion"
+                        inputmode="decimal"
+                        maxlength="15"
+                      />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="suggestDay" min="0" />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="suggestMonth" min="0" />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="suggestYear" min="0" />
+                    </td>
+                  </tr>
+
+                  <!-- Row 3: Story Writing -->
+                  <tr>
+                    <td>
+                      <div class="feature-cell">
+                        <div class="feature-icon"><pm-icon name="book" [size]="18" /></div>
+                        <div>
+                          <span>{{ 'ADMIN.CONFIG.PRICE_STORY_WRITING' | translate }}</span>
+                          <div class="sub">Viết câu chuyện kỷ niệm thú cưng</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        class="matrix-input"
+                        formControlName="priceStoryWriting"
+                        inputmode="decimal"
+                        maxlength="15"
+                      />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="storyDay" min="0" />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="storyMonth" min="0" />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="storyYear" min="0" />
+                    </td>
+                  </tr>
+
+                  <!-- Row 4: Chat Reply -->
+                  <tr>
+                    <td>
+                      <div class="feature-cell">
+                        <div class="feature-icon"><pm-icon name="comment" [size]="18" /></div>
+                        <div>
+                          <span>{{ 'ADMIN.CONFIG.PRICE_CHAT_REPLY' | translate }}</span>
+                          <div class="sub">Hội thoại tư vấn chăm sóc khách hàng</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        class="matrix-input"
+                        formControlName="priceChatReply"
+                        inputmode="decimal"
+                        maxlength="15"
+                      />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="chatDay" min="0" />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="chatMonth" min="0" />
+                    </td>
+                    <td>
+                      <input type="number" class="matrix-input" formControlName="chatYear" min="0" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <!-- TAB 4: QC QUALITY CHECKLIST -->
+        <div [hidden]="activeTab() !== 'qc'">
+          <div class="qc-split-grid">
+            <!-- Left: Textarea Editor -->
+            <section class="card card-compact">
+              <div class="card-head">
+                <div>
+                  <h2>{{ 'ADMIN.CONFIG.QC_GROUP' | translate }}</h2>
+                  <p class="group-sub">{{ 'ADMIN.CONFIG.QC_NOTE' | translate }}</p>
+                </div>
+                <span class="group-count">{{ qcPreviewLines().length }} TIÊU CHÍ</span>
+              </div>
+              <label class="wide">
+                <span>{{ 'ADMIN.CONFIG.QC_LIST' | translate }}</span>
+                <textarea
+                  formControlName="qcChecklist"
+                  rows="9"
+                  maxlength="4000"
+                  placeholder="Ví dụ: Kiểm tra mắt mũi đính chắc chắn&#10;Kiểm tra mã màu chuẩn mẫu khách duyệt&#10;Đóng gói kèm thư cảm ơn"
+                ></textarea>
+                <small>{{ 'ADMIN.CONFIG.QC_HINT' | translate }}</small>
+              </label>
+            </section>
+
+            <!-- Right: Live Artisan Preview -->
+            <div class="qc-preview-card">
+              <div class="preview-head">
+                <div>
+                  <h3>{{ 'ADMIN.CONFIG.QC_PREVIEW_TITLE' | translate }}</h3>
+                  <p class="group-sub">{{ 'ADMIN.CONFIG.QC_PREVIEW_SUB' | translate }}</p>
+                </div>
+                <span class="status-chip" data-group="good">Đạt chuẩn xuất xưởng</span>
+              </div>
+
+              <ul class="qc-items-list">
+                @for (item of qcPreviewLines(); track item; let i = $index) {
+                  <li>
+                    <span class="qc-check-sim">
+                      <pm-icon name="check" [size]="13" />
+                    </span>
+                    <span>{{ item }}</span>
+                  </li>
+                } @empty {
+                  <li class="muted">Chưa có tiêu chí nào. Hãy nhập ít nhất một dòng bên trái.</li>
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Config Save / Discard Actions Bar (for System, AI, and QC tabs) -->
+        @if (activeTab() !== 'materials' && isManager()) {
+          <div class="config-actions-bar">
+            <div class="action-buttons">
+              <button class="pm-button-primary" type="submit" [disabled]="saving()">
+                {{ 'COMMON.SAVE' | translate }}
+              </button>
+              <button class="pm-button-secondary" type="button" (click)="reload()">
+                {{ 'ADMIN.CONFIG.DISCARD_CHANGES' | translate }}
+              </button>
+              @if (form.invalid && form.touched) {
+                <span class="field-error">{{ 'ADMIN.CONFIG.INVALID_FIELDS' | translate }}</span>
+              }
+            </div>
+            @if (lastEditedBy(); as editor) {
+              <div class="audit-meta">
+                <span>Cập nhật gần nhất bởi: <strong>{{ editor }}</strong></span>
+              </div>
             }
           </div>
         }
       </form>
+
+      <!-- TAB 3: MATERIALS MANAGEMENT (Merged from /admin/materials) -->
+      <div [hidden]="activeTab() !== 'materials'">
+        <div class="materials-toolbar">
+          <div class="filter-chips">
+            <button
+              type="button"
+              class="pm-chip"
+              [attr.aria-pressed]="groupFilter() === null"
+              (click)="filterGroup(null)"
+            >
+              {{ 'PALETTE.ALL' | translate }}
+            </button>
+            @for (tab of groupTabs; track tab.group) {
+              <button
+                type="button"
+                class="pm-chip"
+                [attr.aria-pressed]="groupFilter() === tab.group"
+                (click)="filterGroup(tab.group)"
+              >
+                {{ tab.key | translate }}
+              </button>
+            }
+          </div>
+
+          <div class="toolbar-right">
+            <div class="search-box">
+              <pm-icon name="search" [size]="16" />
+              <input
+                type="text"
+                [placeholder]="'ADMIN.CONFIG.MATERIALS_SEARCH' | translate"
+                (input)="onSearchMaterials($event)"
+              />
+            </div>
+
+            <div class="materials-counter-badge">
+              <span>Đang bật: <strong>{{ countEnabled() }}</strong> / {{ countTotal() }}</span>
+            </div>
+
+            @if (isManager()) {
+              <button
+                type="button"
+                class="pm-button-primary"
+                id="color-new"
+                [disabled]="materialsSending()"
+                (click)="addMaterial()"
+              >
+                + {{ 'PALETTE.ADD_TITLE' | translate }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (materialsError(); as key) {
+          <p class="pm-status" data-tone="bad" role="alert">{{ key | translate }}</p>
+        }
+
+        @switch (materialsStatus()) {
+          @case ('LOADING') {
+            <div class="pm-center"><mat-spinner diameter="36" /></div>
+          }
+          @case ('ERROR') {
+            <div class="pm-center">
+              <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+              <button type="button" class="pm-button-secondary" (click)="loadColors()">
+                {{ 'COMMON.RETRY' | translate }}
+              </button>
+            </div>
+          }
+          @default {
+            <div class="table-wrap pm-card">
+              <table class="table" id="color-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="num-col">#</th>
+                    <th scope="col">{{ 'PALETTE.SWATCH' | translate }}</th>
+                    <th scope="col">{{ 'PALETTE.CODE' | translate }}</th>
+                    <th scope="col">{{ 'PALETTE.NAME' | translate }}</th>
+                    <th scope="col">{{ 'PALETTE.GROUP_LABEL' | translate }}</th>
+                    <th scope="col">{{ 'PALETTE.STATE' | translate }}</th>
+                    @if (isManager()) {
+                      <th scope="col" class="right"><span class="sr-only">{{ 'COMMON.EDIT' | translate }}</span></th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of materialRows(); track row.raw.code; let i = $index) {
+                    <tr [class.is-off]="!row.raw.enabled">
+                      <td class="num-col muted">{{ i + 1 }}</td>
+                      <td>
+                        <span class="swatch-cell" [style.background-color]="row.raw.swatch"></span>
+                      </td>
+                      <td><code class="small-code">{{ row.raw.code }}</code></td>
+                      <td><strong>{{ row.raw.displayName }}</strong></td>
+                      <td>
+                        <span class="status-chip">{{ row.groupKey | translate }}</span>
+                      </td>
+                      <td>
+                        <span class="pm-status" [attr.data-tone]="row.raw.enabled ? 'good' : ''">
+                          {{ (row.raw.enabled ? 'PALETTE.ON' : 'PALETTE.OFF') | translate }}
+                        </span>
+                      </td>
+                      @if (isManager()) {
+                        <td class="action-cell">
+                          <button
+                            type="button"
+                            class="plain"
+                            [disabled]="materialsSending()"
+                            (click)="editMaterial(row)"
+                          >
+                            {{ 'COMMON.EDIT' | translate }}
+                          </button>
+                          <button
+                            type="button"
+                            class="plain"
+                            [class.danger]="row.raw.enabled"
+                            (click)="toggleMaterial(row)"
+                          >
+                            {{ (row.raw.enabled ? 'PALETTE.TURN_OFF' : 'PALETTE.TURN_ON') | translate }}
+                          </button>
+                        </td>
+                      }
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="7" class="pm-empty" style="text-align: center; padding: 32px;">
+                        Không tìm thấy vật liệu phù hợp với điều kiện lọc.
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <p class="pm-empty note" style="margin-top: 12px;">{{ 'PALETTE.ORDER_SAFE' | translate }}</p>
+          }
+        }
+      </div>
     }
   }
 </div>

@@ -10,6 +10,7 @@ export interface CreateOrderInput {
   address: string;
   province: string;
   note?: string;
+  itemIds?: string[];
 }
 
 @Injectable({ providedIn: 'root' })

@@ -98,7 +98,7 @@ export class OrdersService {
    * duoc thi gio duoc tra lai nguyen ven.
    */
   async createFromCart(customer: string, dto: CreateOrderDto): Promise<OrderDocument> {
-    const claimed = await this.cart.claimItems(customer);
+    const claimed = await this.cart.claimItems(customer, dto.itemIds);
     if (claimed.length === 0) {
       throw new BadRequestException('Gio hang dang trong');
     }

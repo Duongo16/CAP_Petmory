@@ -23,8 +23,6 @@ const CORE_STOPS: Stop[] = [
 /** Phan xuong va tham so, cung thuoc nhom Quan ly. */
 const WORKSHOP_STOPS: Stop[] = [
   { path: '/admin/reports', key: 'NAV.REPORT', icon: 'tag' },
-  { path: '/admin/materials', key: 'NAV.MATERIAL', icon: 'paw' },
-  { path: '/admin/models', key: 'NAV.MODELS', icon: 'star' },
   { path: '/admin/settings', key: 'NAV.SETTINGS', icon: 'bulb' },
 ];
 
@@ -66,4 +64,8 @@ export class AdminShell {
   readonly accountStops = computed(() => (this.isAccountAdmin() ? ACCOUNT_STOPS : []));
   readonly who = computed(() => this.auth.user()?.fullName ?? '');
   readonly avatar = computed(() => this.auth.user()?.avatarUrl ?? null);
+
+  logout(): void {
+    this.auth.logout();
+  }
 }

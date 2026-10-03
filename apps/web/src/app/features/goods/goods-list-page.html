@@ -1,32 +1,20 @@
-<div class="tw-page flex flex-col gap-6 max-[600px]:px-4">
-  <header class="tw-page-head mb-0">
-    <div>
-      <p class="tw-eyebrow m-0 mb-1">{{ 'GOODS.EYEBROW' | translate }}</p>
-      <h1 class="tw-page-title">{{ 'GOODS.TITLE' | translate }}</h1>
-      <p class="tw-page-sub">{{ 'GOODS.SUB' | translate }}</p>
-    </div>
-    <a class="tw-link inline-flex gap-1 items-center text-sm" routerLink="/shop" [queryParams]="{ tab: 'custom' }">
-      {{ 'GOODS.SEE_MADE_TO_ORDER' | translate }}
-      <pm-icon name="chevron" [size]="13" />
-    </a>
-  </header>
-
-  <section class="tw-card flex flex-col gap-4 p-4">
-    <div class="flex flex-wrap gap-3 items-center">
-      <form class="flex flex-1 min-w-[240px] max-[600px]:min-w-full gap-2" [formGroup]="form" (ngSubmit)="search()">
+<div class="tw-page pt-6 flex flex-col gap-6 max-[600px]:px-4">
+  <section class="flex flex-col gap-3">
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+      <form class="find flex items-center gap-2 w-72 max-[600px]:w-full" [formGroup]="form" (ngSubmit)="search()">
         <input
           id="goods-search"
           type="search"
           formControlName="keyword"
-          class="tw-input flex-1"
+          class="tw-input flex-1 h-10 py-1.5 text-sm"
           [placeholder]="'GOODS.SEARCH_HINT' | translate"
         />
-        <button type="submit" class="tw-btn-primary">{{ 'GOODS.SEARCH' | translate }}</button>
+        <button type="submit" class="tw-btn-primary h-10 px-3.5 text-xs font-semibold whitespace-nowrap">{{ 'GOODS.SEARCH' | translate }}</button>
       </form>
 
-      <label class="flex gap-2 items-center tw-label text-ink-muted">
+      <label class="flex gap-2 items-center text-xs font-semibold text-ink-muted">
         <span class="whitespace-nowrap">{{ 'GOODS.SORT' | translate }}</span>
-        <select class="tw-select w-auto min-w-44" [value]="sort()" (change)="chooseSort($event)">
+        <select class="tw-select w-auto min-w-36 h-10 py-1 text-xs font-semibold" [value]="sort()" (change)="chooseSort($event)">
           @for (one of sorts; track one.value) {
             <option [value]="one.value">{{ one.key | translate }}</option>
           }

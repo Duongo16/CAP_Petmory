@@ -46,6 +46,15 @@ export class CartPage implements OnInit {
   readonly voucherRejected = this.facade.voucherRejected;
   readonly problem = this.facade.problem;
 
+  readonly isAllSelected = this.facade.isAllSelected;
+  readonly isSomeSelected = this.facade.isSomeSelected;
+  readonly selectedCount = this.facade.selectedCount;
+  readonly selectedLinesCount = this.facade.selectedLinesCount;
+  readonly selectedTotal = this.facade.selectedTotal;
+  readonly selectedDaysMax = this.facade.selectedDaysMax;
+  readonly canCheckout = this.facade.canCheckout;
+  readonly checkoutQueryParams = this.facade.checkoutQueryParams;
+
   readonly craftSteps = CRAFT_STEPS;
   readonly promises = PROMISES;
 
@@ -55,6 +64,18 @@ export class CartPage implements OnInit {
 
   reload(): void {
     this.facade.load();
+  }
+
+  toggleSelect(id: string): void {
+    this.facade.toggleSelect(id);
+  }
+
+  toggleAll(): void {
+    this.facade.toggleAll();
+  }
+
+  removeSelected(): void {
+    this.facade.removeSelected();
   }
 
   changeQuantity(item: CartLine, step: number): void {

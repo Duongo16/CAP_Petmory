@@ -1,22 +1,85 @@
 <div class="admin-page">
-  <header class="page-head tw-page-head">
+  <!-- ───── Header ───── -->
+  <header class="page-head tw-page-head flex flex-wrap justify-between items-start gap-4">
     <div>
       <h1 class="pm-page-title">{{ 'ADMIN.REPORT.TITLE' | translate }}</h1>
       <p class="page-sub tw-page-sub">{{ 'ADMIN.REPORT.SUB' | translate }}</p>
     </div>
+
+    <!-- View Mode Switcher -->
+    <div class="report-header-actions">
+      <div class="report-view-toggle">
+        <button
+          type="button"
+          class="toggle-btn"
+          [class.active]="viewMode() === 'CHARTS'"
+          (click)="setViewMode('CHARTS')"
+        >
+          <pm-icon name="sparkle" [size]="16" />
+          {{ 'ADMIN.REPORT.VIEW_CHARTS' | translate }}
+        </button>
+        <button
+          type="button"
+          class="toggle-btn"
+          [class.active]="viewMode() === 'TABLES'"
+          (click)="setViewMode('TABLES')"
+        >
+          <pm-icon name="bookmark" [size]="16" />
+          {{ 'ADMIN.REPORT.VIEW_TABLES' | translate }}
+        </button>
+      </div>
+    </div>
   </header>
 
-  <form class="period" [formGroup]="form" (ngSubmit)="read()">
-    <label>
-      <span>{{ 'ADMIN.REPORT.FROM' | translate }}</span>
-      <input id="report-from" type="date" formControlName="from" />
-    </label>
-    <label>
-      <span>{{ 'ADMIN.REPORT.TO' | translate }}</span>
-      <input id="report-to" type="date" formControlName="to" />
-    </label>
-    <button class="pm-button-primary" type="submit">{{ 'ADMIN.REPORT.SHOW' | translate }}</button>
-  </form>
+  <!-- ───── Filter & Presets Toolbar ───── -->
+  <div class="report-toolbar">
+    <div class="preset-chips">
+      <button
+        type="button"
+        class="chip-btn"
+        [class.selected]="activePreset() === '7d'"
+        (click)="applyPreset('7d')"
+      >
+        {{ 'ADMIN.REPORT.PRESET_7D' | translate }}
+      </button>
+      <button
+        type="button"
+        class="chip-btn"
+        [class.selected]="activePreset() === '30d'"
+        (click)="applyPreset('30d')"
+      >
+        {{ 'ADMIN.REPORT.PRESET_30D' | translate }}
+      </button>
+      <button
+        type="button"
+        class="chip-btn"
+        [class.selected]="activePreset() === 'month'"
+        (click)="applyPreset('month')"
+      >
+        {{ 'ADMIN.REPORT.PRESET_MONTH' | translate }}
+      </button>
+      <button
+        type="button"
+        class="chip-btn"
+        [class.selected]="activePreset() === 'year'"
+        (click)="applyPreset('year')"
+      >
+        {{ 'ADMIN.REPORT.PRESET_YEAR' | translate }}
+      </button>
+    </div>
+
+    <form class="period-inline-form" [formGroup]="form" (ngSubmit)="read()">
+      <label>
+        <span>{{ 'ADMIN.REPORT.FROM' | translate }}</span>
+        <input id="report-from" type="date" formControlName="from" />
+      </label>
+      <label>
+        <span>{{ 'ADMIN.REPORT.TO' | translate }}</span>
+        <input id="report-to" type="date" formControlName="to" />
+      </label>
+      <button class="pm-button-primary" type="submit">{{ 'ADMIN.REPORT.SHOW' | translate }}</button>
+    </form>
+  </div>
 
   @if (fileLink(); as link) {
     <p class="ready-file">
@@ -26,14 +89,19 @@
     </p>
   }
 
+  <!-- ───── Content States ───── -->
   @switch (status()) {
     @case ('LOADING') {
-      <p class="note">{{ 'COMMON.LOADING' | translate }}</p>
+      <div class="pm-center">
+        <p class="note">{{ 'COMMON.LOADING' | translate }}</p>
+      </div>
     }
     @case ('ERROR') {
-      <div class="note">
+      <div class="note pm-center">
         <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
-        <button type="button" class="plain" (click)="read()">{{ 'COMMON.RETRY' | translate }}</button>
+        <button type="button" class="pm-button-secondary" (click)="read()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
       </div>
     }
     @case ('READY') {
@@ -41,158 +109,358 @@
         <p class="note">{{ 'ADMIN.REPORT.MONEY_HIDDEN' | translate }}</p>
       }
 
-      @if (revenue(); as money) {
-        <section class="card" id="report-revenue">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.REPORT.REVENUE' | translate }}</h2>
-              <p class="card-note">{{ 'ADMIN.REPORT.REVENUE_NOTE' | translate }}</p>
+      <!-- ───── 1. Executive Evaluation KPI Cards ───── -->
+      @if (seesMoney()) {
+        <div class="kpi-grid">
+          <!-- Total Revenue -->
+          <div class="kpi-card accent-card">
+            <div class="kpi-icon">
+              <pm-icon name="tag" [size]="24" />
             </div>
-            <button type="button" class="plain" (click)="fetchFile('revenue')">
-              {{ 'ADMIN.REPORT.CSV' | translate }}
-            </button>
+            <div class="kpi-body">
+              <span class="kpi-label">{{ 'ADMIN.REPORT.REVENUE' | translate }}</span>
+              <span class="kpi-value">{{ (revenue()?.total ?? '0') | amount }}</span>
+              <span class="kpi-sub">
+                {{ revenue()?.orderCount ?? 0 }} {{ 'ADMIN.REPORT.ORDER_COUNT' | translate }} ({{ 'ADMIN.REPORT.REVENUE_NOTE' | translate }})
+              </span>
+            </div>
           </div>
 
-          <dl class="info-pair">
-            <dt>{{ 'ADMIN.REPORT.ORDER_COUNT' | translate }}</dt>
-            <dd>{{ money.orderCount }}</dd>
-            <dt>{{ 'ADMIN.REPORT.TOTAL' | translate }}</dt>
-            <dd class="accent big-number">{{ money.total | amount }}</dd>
-          </dl>
+          <!-- Average Order Value (AOV) -->
+          <div class="kpi-card">
+            <div class="kpi-icon">
+              <pm-icon name="cart" [size]="24" />
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">{{ 'ADMIN.REPORT.AOV' | translate }}</span>
+              <span class="kpi-value">{{ averageOrderValue() | amount }}</span>
+              <span class="kpi-sub">{{ 'ADMIN.REPORT.EVALUATION' | translate }}</span>
+            </div>
+          </div>
 
-          <h3>{{ 'ADMIN.REPORT.BY_KIND' | translate }}</h3>
-          <div class="table-wrap">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>{{ 'ADMIN.REPORT.NAME' | translate }}</th>
-                  <th>{{ 'ADMIN.REPORT.QUANTITY' | translate }}</th>
-                  <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (one of kindRows(); track one.raw.name) {
-                  <tr>
-                    <td>{{ one.key | translate }}</td>
-                    <td>{{ one.raw.count }}</td>
-                    <td>{{ one.raw.amount | amount }}</td>
-                  </tr>
+          <!-- AI Operational Cost -->
+          <div class="kpi-card">
+            <div class="kpi-icon">
+              <pm-icon name="sparkle" [size]="24" />
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">{{ 'ADMIN.REPORT.AI_COST' | translate }}</span>
+              <span class="kpi-value">{{ (aiCost()?.total ?? '0') | amount }}</span>
+              <span class="kpi-sub" [class.text-amber]="+aiRevenuePercent() > 5">
+                {{ aiRevenuePercent() }}% {{ 'ADMIN.REPORT.AI_MARGIN' | translate }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Production On-Time SLA Rate -->
+          <div class="kpi-card" [class.danger-card]="(progress()?.lateCount ?? 0) > 0">
+            <div class="kpi-icon">
+              <pm-icon name="truck" [size]="24" />
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">{{ 'ADMIN.REPORT.ON_TIME_RATE' | translate }}</span>
+              <span class="kpi-value">{{ onTimeRate() }}%</span>
+              <span class="kpi-sub">
+                @if ((progress()?.lateCount ?? 0) > 0) {
+                  <span class="text-danger font-bold">{{ progress()?.lateCount }} đơn trễ hạn</span>
+                } @else {
+                  <span class="text-success font-semibold">{{ 'ADMIN.REPORT.HEALTH_NORMAL' | translate }}</span>
                 }
-              </tbody>
-            </table>
+              </span>
+            </div>
           </div>
-
-          <h3>{{ 'ADMIN.REPORT.BY_PRODUCT' | translate }}</h3>
-          <div class="table-wrap">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>{{ 'ADMIN.REPORT.NAME' | translate }}</th>
-                  <th>{{ 'ADMIN.REPORT.QUANTITY' | translate }}</th>
-                  <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (one of money.byProduct; track one.name) {
-                  <tr>
-                    <td>{{ one.name }}</td>
-                    <td>{{ one.count }}</td>
-                    <td>{{ one.amount | amount }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </section>
+        </div>
       }
 
-      @if (aiCost(); as cost) {
-        <section class="card" id="report-ai">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.REPORT.AI_COST' | translate }}</h2>
-              <p class="card-note">{{ 'ADMIN.REPORT.AI_NOTE' | translate }}</p>
-            </div>
-            <button type="button" class="plain" (click)="fetchFile('ai-cost')">
-              {{ 'ADMIN.REPORT.CSV' | translate }}
-            </button>
-          </div>
+      <!-- ───── 2. CHARTS VIEW ───── -->
+      @if (viewMode() === 'CHARTS') {
+        <div class="charts-grid">
 
-          <div class="table-wrap">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>{{ 'ADMIN.REPORT.AI_KIND' | translate }}</th>
-                  <th>{{ 'ADMIN.REPORT.USES' | translate }}</th>
-                  <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (one of aiRows(); track one.raw.kind) {
-                  <tr>
-                    <td>{{ one.key | translate }}</td>
-                    <td>{{ one.raw.count }}</td>
-                    <td>{{ one.raw.cost | amount }}</td>
-                  </tr>
+          <!-- Row 1: Daily Revenue Trend (Line Chart) -->
+          @if (seesMoney()) {
+            <section class="chart-card col-12">
+              <div class="chart-head">
+                <h3>
+                  <pm-icon name="tag" [size]="18" />
+                  {{ 'ADMIN.REPORT.TREND_REVENUE' | translate }}
+                </h3>
+                <span class="chart-badge">
+                  {{ revenue()?.from | date: 'dd/MM/yyyy' }} — {{ revenue()?.to | date: 'dd/MM/yyyy' }}
+                </span>
+              </div>
+              <div class="chart-canvas-wrap tall">
+                <canvas #trendCanvas id="chart-revenue-trend"></canvas>
+              </div>
+            </section>
+
+            <!-- Row 2 Left: Revenue Share by Kind (Donut Chart) -->
+            <section class="chart-card col-6">
+              <div class="chart-head">
+                <h3>
+                  <pm-icon name="bookmark" [size]="18" />
+                  {{ 'ADMIN.REPORT.REVENUE_BY_KIND_TITLE' | translate }}
+                </h3>
+                <button type="button" class="plain" (click)="fetchFile('revenue')">
+                  <pm-icon name="download" [size]="15" /> {{ 'ADMIN.REPORT.CSV' | translate }}
+                </button>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas #kindCanvas id="chart-revenue-kind"></canvas>
+              </div>
+              <div class="chart-legend-grid">
+                @for (item of kindRows(); track item.raw.name) {
+                  <div class="legend-item">
+                    <span class="color-dot" [style.background-color]="item.color"></span>
+                    <div class="legend-info">
+                      <span class="legend-name">{{ item.key | translate }}</span>
+                      <span class="legend-val">{{ item.raw.amount | amount }} ({{ item.raw.count }} món)</span>
+                    </div>
+                    <span class="legend-percent">{{ item.percent }}%</span>
+                  </div>
                 }
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </section>
 
-          <dl class="info-pair">
-            <dt>{{ 'ADMIN.REPORT.TOTAL' | translate }}</dt>
-            <dd class="accent big-number">{{ cost.total | amount }}</dd>
-          </dl>
-        </section>
-      }
-
-      @if (progress(); as made) {
-        <section class="card" id="report-progress">
-          <div class="card-head">
-            <div>
-              <h2>{{ 'ADMIN.REPORT.PROGRESS' | translate }}</h2>
-              <p class="card-note">{{ 'ADMIN.REPORT.PROGRESS_NOTE' | translate }}</p>
-            </div>
-            <button type="button" class="plain" (click)="fetchFile('progress')">
-              {{ 'ADMIN.REPORT.CSV' | translate }}
-            </button>
-          </div>
-
-          <div class="table-wrap">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>{{ 'ADMIN.REPORT.STATUS' | translate }}</th>
-                  <th>{{ 'ADMIN.REPORT.ORDER_COUNT' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (one of statusRows(); track one.raw.status) {
-                  <tr>
-                    <td>{{ one.key | translate }}</td>
-                    <td>{{ one.raw.count }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-          <h3 class="late-name">
-            {{ 'ADMIN.REPORT.LATE' | translate: { count: made.lateCount } }}
-          </h3>
-          @if (made.late.length === 0) {
-            <p class="note">{{ 'ADMIN.REPORT.NO_LATE' | translate }}</p>
-          } @else {
-            <ul class="late-list">
-              @for (one of made.late; track one.orderCode) {
-                <li>
-                  <strong>{{ one.orderCode }}</strong>
-                  <span>{{ one.status }}</span>
-                </li>
-              }
-            </ul>
+            <!-- Row 2 Right: Top Products (Horizontal Bar Chart) -->
+            <section class="chart-card col-6">
+              <div class="chart-head">
+                <h3>
+                  <pm-icon name="star" [size]="18" />
+                  {{ 'ADMIN.REPORT.TOP_PRODUCTS' | translate }}
+                </h3>
+                <span class="chart-badge">{{ (revenue()?.byProduct?.length ?? 0) }} sản phẩm</span>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas #productsCanvas id="chart-top-products"></canvas>
+              </div>
+            </section>
           }
-        </section>
+
+          <!-- Row 3 Left: Order Pipeline & Status Distribution -->
+          <section class="chart-card" [class.col-6]="seesMoney()" [class.col-12]="!seesMoney()">
+            <div class="chart-head">
+              <h3>
+                <pm-icon name="truck" [size]="18" />
+                {{ 'ADMIN.REPORT.STATUS_DISTRIBUTION' | translate }}
+              </h3>
+              <button type="button" class="plain" (click)="fetchFile('progress')">
+                <pm-icon name="download" [size]="15" /> {{ 'ADMIN.REPORT.CSV' | translate }}
+              </button>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas #statusCanvas id="chart-order-status"></canvas>
+            </div>
+          </section>
+
+          <!-- Row 3 Right: AI Cost & Usage Breakdown -->
+          @if (seesMoney()) {
+            <section class="chart-card col-6">
+              <div class="chart-head">
+                <h3>
+                  <pm-icon name="sparkle" [size]="18" />
+                  {{ 'ADMIN.REPORT.AI_BREAKDOWN' | translate }}
+                </h3>
+                <button type="button" class="plain" (click)="fetchFile('ai-cost')">
+                  <pm-icon name="download" [size]="15" /> {{ 'ADMIN.REPORT.CSV' | translate }}
+                </button>
+              </div>
+              <div class="chart-canvas-wrap">
+                <canvas #aiCanvas id="chart-ai-cost"></canvas>
+              </div>
+            </section>
+          }
+
+          <!-- Row 4: Late Orders Evaluation -->
+          @if (progress(); as made) {
+            <section class="late-orders-banner" [class.has-late]="made.lateCount > 0">
+              <div class="banner-head">
+                <h3>
+                  <pm-icon name="bulb" [size]="20" />
+                  {{ 'ADMIN.REPORT.LATE' | translate: { count: made.lateCount } }}
+                </h3>
+                @if (made.lateCount > 0) {
+                  <span class="status-pill">{{ 'ADMIN.REPORT.HEALTH_ATTENTION' | translate }}</span>
+                }
+              </div>
+
+              @if (made.late.length === 0) {
+                <p class="note m-0">{{ 'ADMIN.REPORT.NO_LATE' | translate }}</p>
+              } @else {
+                <div class="late-grid">
+                  @for (one of made.late; track one.orderCode) {
+                    <div class="late-card">
+                      <div>
+                        <strong>{{ one.orderCode }}</strong>
+                        <div class="text-xs text-ink-muted">
+                          {{ 'ADMIN.REPORT.ESTIMATED_DELIVERY' | translate }}: {{ one.estimatedDelivery | date: 'dd/MM/yyyy' }}
+                        </div>
+                      </div>
+                      <span class="status-pill">{{ one.status }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </section>
+          }
+
+        </div>
+      }
+
+      <!-- ───── 3. DETAILED TABLES VIEW ───── -->
+      @if (viewMode() === 'TABLES') {
+        @if (revenue(); as money) {
+          <section class="card mb-6" id="report-revenue">
+            <div class="card-head">
+              <div>
+                <h2>{{ 'ADMIN.REPORT.REVENUE' | translate }}</h2>
+                <p class="card-note">{{ 'ADMIN.REPORT.REVENUE_NOTE' | translate }}</p>
+              </div>
+              <button type="button" class="plain" (click)="fetchFile('revenue')">
+                <pm-icon name="download" [size]="15" /> {{ 'ADMIN.REPORT.CSV' | translate }}
+              </button>
+            </div>
+
+            <dl class="info-pair">
+              <dt>{{ 'ADMIN.REPORT.ORDER_COUNT' | translate }}</dt>
+              <dd>{{ money.orderCount }}</dd>
+              <dt>{{ 'ADMIN.REPORT.TOTAL' | translate }}</dt>
+              <dd class="accent big-number">{{ money.total | amount }}</dd>
+            </dl>
+
+            <h3>{{ 'ADMIN.REPORT.BY_KIND' | translate }}</h3>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{{ 'ADMIN.REPORT.NAME' | translate }}</th>
+                    <th>{{ 'ADMIN.REPORT.QUANTITY' | translate }}</th>
+                    <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (one of kindRows(); track one.raw.name) {
+                    <tr>
+                      <td>{{ one.key | translate }}</td>
+                      <td>{{ one.raw.count }}</td>
+                      <td>{{ one.raw.amount | amount }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <h3>{{ 'ADMIN.REPORT.BY_PRODUCT' | translate }}</h3>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{{ 'ADMIN.REPORT.NAME' | translate }}</th>
+                    <th>{{ 'ADMIN.REPORT.QUANTITY' | translate }}</th>
+                    <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (one of money.byProduct; track one.name) {
+                    <tr>
+                      <td>{{ one.name }}</td>
+                      <td>{{ one.count }}</td>
+                      <td>{{ one.amount | amount }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+
+        @if (aiCost(); as cost) {
+          <section class="card mb-6" id="report-ai">
+            <div class="card-head">
+              <div>
+                <h2>{{ 'ADMIN.REPORT.AI_COST' | translate }}</h2>
+                <p class="card-note">{{ 'ADMIN.REPORT.AI_NOTE' | translate }}</p>
+              </div>
+              <button type="button" class="plain" (click)="fetchFile('ai-cost')">
+                <pm-icon name="download" [size]="15" /> {{ 'ADMIN.REPORT.CSV' | translate }}
+              </button>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{{ 'ADMIN.REPORT.AI_KIND' | translate }}</th>
+                    <th>{{ 'ADMIN.REPORT.USES' | translate }}</th>
+                    <th>{{ 'ADMIN.REPORT.AMOUNT' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (one of aiRows(); track one.raw.kind) {
+                    <tr>
+                      <td>{{ one.key | translate }}</td>
+                      <td>{{ one.raw.count }}</td>
+                      <td>{{ one.raw.cost | amount }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <dl class="info-pair">
+              <dt>{{ 'ADMIN.REPORT.TOTAL' | translate }}</dt>
+              <dd class="accent big-number">{{ cost.total | amount }}</dd>
+            </dl>
+          </section>
+        }
+
+        @if (progress(); as made) {
+          <section class="card" id="report-progress">
+            <div class="card-head">
+              <div>
+                <h2>{{ 'ADMIN.REPORT.PROGRESS' | translate }}</h2>
+                <p class="card-note">{{ 'ADMIN.REPORT.PROGRESS_NOTE' | translate }}</p>
+              </div>
+              <button type="button" class="plain" (click)="fetchFile('progress')">
+                <pm-icon name="download" [size]="15" /> {{ 'ADMIN.REPORT.CSV' | translate }}
+              </button>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{{ 'ADMIN.REPORT.STATUS' | translate }}</th>
+                    <th>{{ 'ADMIN.REPORT.ORDER_COUNT' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (one of statusRows(); track one.raw.status) {
+                    <tr>
+                      <td>{{ one.key | translate }}</td>
+                      <td>{{ one.raw.count }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="late-name">
+              {{ 'ADMIN.REPORT.LATE' | translate: { count: made.lateCount } }}
+            </h3>
+            @if (made.late.length === 0) {
+              <p class="note">{{ 'ADMIN.REPORT.NO_LATE' | translate }}</p>
+            } @else {
+              <ul class="late-list">
+                @for (one of made.late; track one.orderCode) {
+                  <li>
+                    <strong>{{ one.orderCode }}</strong>
+                    <span>{{ one.status }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
       }
     }
   }

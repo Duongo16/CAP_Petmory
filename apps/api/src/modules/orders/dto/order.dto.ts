@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class CreateOrderDto {
   @IsString() @MinLength(2) @MaxLength(100)
@@ -16,4 +16,9 @@ export class CreateOrderDto {
 
   @IsOptional() @IsString() @MaxLength(500)
   note?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  itemIds?: string[];
 }

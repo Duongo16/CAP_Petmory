@@ -6,20 +6,20 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "tsc -p tsconfig.build.json",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start": "node dist/main.js",
+    "start:dev": "tsc -p tsconfig.build.json && concurrently -k \"tsc -p tsconfig.build.json -w --preserveWatchOutput\" \"node --watch dist/main.js\"",
+    "start:debug": "tsc -p tsconfig.build.json && concurrently -k \"tsc -p tsconfig.build.json -w --preserveWatchOutput\" \"node --inspect --watch dist/main.js\"",
+    "start:prod": "node dist/main.js",
     "lint": "oxlint src/ test/",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
-    "seed": "nest build && node dist/seed/seed.js"
+    "seed": "tsc -p tsconfig.build.json && node dist/seed/seed.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.129.0",

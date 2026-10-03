@@ -158,6 +158,12 @@ export interface ReportMoneyRow {
   amount: string;
 }
 
+export interface DailyRevenueRow {
+  date: string;
+  orderCount: number;
+  revenue: string;
+}
+
 /** Bao cao doanh thu trong mot khoang thoi gian. */
 export interface RevenueReport {
   from: string;
@@ -166,6 +172,7 @@ export interface RevenueReport {
   total: string;
   byKind: ReportMoneyRow[];
   byProduct: ReportMoneyRow[];
+  daily?: DailyRevenueRow[];
 }
 
 /** Mot loai luot dung tri tue nhan tao, kem so luot va chi phi. */

@@ -149,7 +149,7 @@ function run() {
 
   const lightAt = text.indexOf(':root {');
   const darkAt = text.indexOf('@mixin pm-dark-tokens');
-  const darkEnd = text.indexOf('@media (prefers-color-scheme: dark)');
+  const darkEnd = text.indexOf(":root[data-theme='dark']");
   if (lightAt < 0 || darkAt < 0) {
     console.error('Khong tim thay khoi bien mau trong tep kieu dang chung.');
     process.exit(1);

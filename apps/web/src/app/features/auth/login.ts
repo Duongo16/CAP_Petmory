@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -32,6 +32,7 @@ export class LoginPage implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly drafts = inject(PetDraftService);
 
   /** The pet profile started on the welcome page, waiting for this account. */
@@ -100,7 +101,18 @@ export class LoginPage implements OnInit {
       .subscribe({
         next: () => {
           this.pendingSend.set(false);
-          void this.router.navigate(['/home']);
+          const continueUrl = this.route.snapshot.queryParamMap.get('continue');
+          if (continueUrl) {
+            if (this.auth.isInternal() && continueUrl.startsWith('/admin')) {
+              void this.router.navigateByUrl(continueUrl);
+              return;
+            }
+            if (!this.auth.isInternal() && !continueUrl.startsWith('/admin')) {
+              void this.router.navigateByUrl(continueUrl);
+              return;
+            }
+          }
+          void this.router.navigate([this.auth.getDefaultRoute()]);
         },
         error: () => {
           this.pendingSend.set(false);

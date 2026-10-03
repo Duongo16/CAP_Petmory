@@ -35,6 +35,12 @@ export interface MoneyRow {
   amount: string;
 }
 
+export interface DailyRevenueRow {
+  date: string;
+  orderCount: number;
+  revenue: string;
+}
+
 export interface RevenueReport {
   from: string;
   to: string;
@@ -42,6 +48,7 @@ export interface RevenueReport {
   total: string;
   byKind: MoneyRow[];
   byProduct: MoneyRow[];
+  daily: DailyRevenueRow[];
 }
 
 export interface AiCostReport {
@@ -85,21 +92,39 @@ export class ReportsService {
         status: { $in: EARNED_STATES },
         paidAt: { $gte: period.from, $lte: period.to },
       })
-      .select('rows total')
+      .select('rows total paidAt')
       .exec();
 
     let total = 0n;
     const byKind = new Map<string, { count: number; amount: bigint }>();
     const byProduct = new Map<string, { count: number; amount: bigint }>();
+    const dailyMap = new Map<string, { count: number; amount: bigint }>();
 
     for (const order of orders) {
+      let orderTotal = 0n;
       for (const line of order.rows) {
         const money = asWholeDong(line.unitPrice.toString()) * BigInt(line.quantity);
         total += money;
+        orderTotal += money;
         addTo(byKind, String(line.kind ?? LineKind.MADE_TO_ORDER), line.quantity, money);
         addTo(byProduct, nameOfLine(line), line.quantity, money);
       }
+      if (order.paidAt) {
+        const d = order.paidAt.toISOString().slice(0, 10);
+        const cur = dailyMap.get(d) ?? { count: 0, amount: 0n };
+        cur.count += 1;
+        cur.amount += orderTotal;
+        dailyMap.set(d, cur);
+      }
     }
+
+    const daily: DailyRevenueRow[] = [...dailyMap.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, val]) => ({
+        date,
+        orderCount: val.count,
+        revenue: val.amount.toString(),
+      }));
 
     return {
       from: period.from.toISOString(),
@@ -108,6 +133,7 @@ export class ReportsService {
       total: total.toString(),
       byKind: asRows(byKind),
       byProduct: asRows(byProduct),
+      daily,
     };
   }
 
