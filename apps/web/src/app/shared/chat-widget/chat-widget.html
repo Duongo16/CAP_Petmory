@@ -20,6 +20,14 @@
       </button>
     </header>
 
+    @if (!signedIn()) {
+      <div class="sign-in-card">
+        <span class="sign-in-mark" aria-hidden="true"><pm-icon name="lock" [size]="20" /></span>
+        <p class="sign-in-title">{{ 'ASSISTANT.SIGN_IN_TITLE' | translate }}</p>
+        <p class="sign-in-text">{{ 'ASSISTANT.SIGN_IN_TEXT' | translate }}</p>
+        <button type="button" class="send-button" (click)="goSignIn()">{{ 'ASSISTANT.SIGN_IN' | translate }}</button>
+      </div>
+    } @else {
     <p class="state-line" [class]="state()">{{ stateKey() | translate }}</p>
     <div class="disclaimer">{{ 'ASSISTANT.DISCLAIMER' | translate }}</div>
 
@@ -44,9 +52,9 @@
 
     @if (suggestions().length > 0 && state() === 'BOT') {
       <div class="suggestion-row">
-        @for (one of suggestions(); track one.code) {
-          <button type="button" class="chip" (click)="selectSuggestion(one.key)">
-            {{ one.key | translate }}
+        @for (one of suggestions(); track one) {
+          <button type="button" class="chip" (click)="selectSuggestion(one)">
+            {{ one }}
           </button>
         }
       </div>
@@ -80,6 +88,7 @@
           {{ 'ASSISTANT.ASK_PERSON' | translate }}
         </button>
       }
+    }
     }
   </section>
 }

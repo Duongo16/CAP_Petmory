@@ -26,7 +26,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/?replicaSet=rs0
+      # Noi thang vao container mongo. Replica set ghi ten may la localhost, ten do chi
+      # dung duoc tu may that, con trong container nay no tro ve chinh container.
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/?directConnection=true
       ME_CONFIG_BASICAUTH: "false"
 
 volumes:

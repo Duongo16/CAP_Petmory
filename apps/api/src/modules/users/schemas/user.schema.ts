@@ -49,3 +49,18 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+/**
+ * Ma bam mat khau khong bao gio duoc ra khoi may chu.
+ *
+ * Bo truong nay moi khi ban ghi duoc doi sang JSON, nen khong duong nao tra ve
+ * ca ban ghi nguoi dung lam lo duoc no. Buoc kiem mat khau van doc thang tren
+ * ban ghi nen khong bi anh huong.
+ */
+UserSchema.set('toJSON', {
+  transform: (_doc, out) => {
+    const plain = out as unknown as Record<string, unknown>;
+    delete plain['passwordHash'];
+    return plain;
+  },
+});

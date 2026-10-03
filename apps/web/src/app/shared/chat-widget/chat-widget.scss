@@ -311,3 +311,36 @@
     white-space: nowrap;
   }
 }
+
+/* Khach chua dang nhap: loi moi dang nhap thay cho khung tro chuyen. */
+.sign-in-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 28px 20px;
+  text-align: center;
+}
+
+.sign-in-mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent);
+}
+
+.sign-in-title {
+  margin: 4px 0 0;
+  font-weight: 700;
+  color: var(--pm-text);
+}
+
+.sign-in-text {
+  margin: 0 0 8px;
+  font-size: var(--pm-text-sm);
+  line-height: 1.5;
+  color: var(--pm-text-muted);
+}

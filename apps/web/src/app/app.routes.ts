@@ -4,6 +4,7 @@ import { AuthService } from './core/services/auth.service';
 import {
   authGuard,
   managerGuard,
+  deskGuard,
   accountAdminGuard,
   customerOnlyGuard,
   guestGuard,
@@ -207,17 +208,17 @@ export const routes: Routes = [
              */
             path: '',
             pathMatch: 'full',
-            redirectTo: () => (inject(AuthService).isManager() ? 'orders' : 'accounts'),
+            redirectTo: () => (inject(AuthService).isDesk() ? 'orders' : 'accounts'),
           },
           {
             path: 'orders',
-            canActivate: [managerGuard],
+            canActivate: [deskGuard],
             loadComponent: () =>
               import('./features/admin/admin-orders-page').then((m) => m.AdminOrdersPage),
           },
           {
             path: 'orders/:orderCode',
-            canActivate: [managerGuard],
+            canActivate: [deskGuard],
             loadComponent: () =>
               import('./features/admin/admin-order-detail-page').then(
                 (m) => m.AdminOrderDetailPage,
@@ -231,13 +232,13 @@ export const routes: Routes = [
           },
           {
             path: 'customers',
-            canActivate: [managerGuard],
+            canActivate: [deskGuard],
             loadComponent: () =>
               import('./features/admin/admin-customers-page').then((m) => m.AdminCustomersPage),
           },
           {
             path: 'customers/:id',
-            canActivate: [managerGuard],
+            canActivate: [deskGuard],
             loadComponent: () =>
               import('./features/admin/admin-customer-detail-page').then(
                 (m) => m.AdminCustomerDetailPage,
@@ -253,6 +254,12 @@ export const routes: Routes = [
             canActivate: [managerGuard],
             loadComponent: () =>
               import('./features/admin/admin-reports-page').then((m) => m.AdminReportsPage),
+          },
+          {
+            path: 'assistant',
+            canActivate: [managerGuard],
+            loadComponent: () =>
+              import('./features/admin/admin-knowledge-page').then((m) => m.AdminKnowledgePage),
           },
           {
             path: 'goods',
@@ -284,13 +291,13 @@ export const routes: Routes = [
              * can, dung nhu may chu cho phep.
              */
             path: 'chats',
-            canActivate: [managerGuard],
+            canActivate: [deskGuard],
             loadComponent: () =>
               import('./features/admin/admin-chats-page').then((m) => m.AdminChatsPage),
           },
           {
             path: 'payment-log',
-            canActivate: [managerGuard],
+            canActivate: [deskGuard],
             loadComponent: () =>
               import('./features/admin/admin-payments-page').then((m) => m.AdminPaymentsPage),
           },

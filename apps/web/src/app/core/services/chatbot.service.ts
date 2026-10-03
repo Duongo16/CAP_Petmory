@@ -13,13 +13,9 @@ export class ChatbotService {
     return this.http.post<AssistantAnswer>(`${this.base}/assistant/ask`, { question });
   }
 
-  initialSuggestions(): Observable<{ suggestion: string[] }> {
-    return this.http.get<{ suggestion: string[] }>(`${this.base}/assistant/suggestions`);
-  }
-
   // --- Muc 18: ban day du, co nho ngu canh va chuyen duoc sang nguoi that ---
 
-  /** Mo mot phien moi. Khach chua dang nhap cung mo duoc. */
+  /** Mo mot phien moi cho nguoi dang dang nhap. */
   openSession(): Observable<ChatSession> {
     return this.http.post<ChatSession>(`${this.base}/assistant/sessions`, {});
   }

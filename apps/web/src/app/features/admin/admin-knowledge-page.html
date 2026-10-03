@@ -1,0 +1,88 @@
+<div class="pm-page">
+  <div class="pm-page-head">
+    <div class="pm-page-head-text">
+      <h1 class="title pm-page-title">{{ 'KNOWLEDGE.TITLE' | translate }}</h1>
+      <p class="pm-page-description">{{ 'KNOWLEDGE.HINT' | translate }}</p>
+    </div>
+    <div class="pm-page-head-actions">
+      <button type="button" class="pm-button-primary" id="kb-new" [disabled]="sending()" (click)="add()">
+        <pm-icon name="plus" [size]="15" />
+        {{ 'KNOWLEDGE.ADD_TITLE' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="counter-board">
+    <div class="counter-tile">
+      <span class="number">{{ countEnabled() }}</span>
+      <span class="tile-name">{{ 'KNOWLEDGE.COUNT_ENABLED' | translate }}</span>
+    </div>
+    <div class="counter-tile">
+      <span class="number">{{ countStarter() }}</span>
+      <span class="tile-name">{{ 'KNOWLEDGE.COUNT_STARTER' | translate }}</span>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <label class="sr-only" for="kb-search">{{ 'KNOWLEDGE.SEARCH' | translate }}</label>
+    <input id="kb-search" class="tw-input search" type="search" [placeholder]="'KNOWLEDGE.SEARCH' | translate" (input)="search($event)" />
+    @for (tab of topicTabs; track tab.topic) {
+      <button type="button" class="pm-chip" [attr.aria-pressed]="topic() === tab.topic" (click)="chooseTopic(tab.topic)">
+        {{ tab.key | translate }}
+      </button>
+    }
+  </div>
+
+  @if (problem(); as key) {
+    <p class="pm-status" data-tone="bad" role="alert">{{ key | translate }}</p>
+  }
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="pm-center pm-empty">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="pm-button-secondary" (click)="load()">{{ 'COMMON.RETRY' | translate }}</button>
+      </div>
+    }
+    @default {
+      @if (rows().length === 0) {
+        <p class="pm-center pm-empty">{{ 'KNOWLEDGE.EMPTY' | translate }}</p>
+      } @else {
+        <ul class="kb-list">
+          @for (row of rows(); track row.raw.code) {
+            <li class="kb-item pm-card" [class.is-off]="!row.raw.enabled">
+              <div class="kb-head">
+                <code class="kb-code">{{ row.raw.code }}</code>
+                <span class="pm-status">{{ row.topicKey | translate }}</span>
+                @if (row.raw.starter) {
+                  <span class="pm-status" data-tone="success">{{ 'KNOWLEDGE.STARTER_SHORT' | translate }}</span>
+                }
+                @if (!row.raw.enabled) {
+                  <span class="pm-status">{{ 'KNOWLEDGE.OFF' | translate }}</span>
+                }
+                <span class="kb-actions">
+                  <button type="button" class="pm-chip" [disabled]="sending()" (click)="edit(row)">{{ 'COMMON.EDIT' | translate }}</button>
+                  <button type="button" class="pm-chip" [disabled]="sending()" (click)="toggle(row)">
+                    {{ (row.raw.enabled ? 'KNOWLEDGE.TURN_OFF' : 'KNOWLEDGE.TURN_ON') | translate }}
+                  </button>
+                  <button type="button" class="pm-chip danger" [disabled]="sending()" (click)="hide(row)">{{ 'KNOWLEDGE.HIDE' | translate }}</button>
+                </span>
+              </div>
+              <p class="kb-question">{{ row.raw.question }}</p>
+              <p class="kb-answer">{{ row.raw.answer }}</p>
+              <p class="kb-meta">
+                <span>{{ 'KNOWLEDGE.KEYWORDS' | translate }}: {{ row.keywordText }}</span>
+                @if (row.raw.link) {
+                  <span>· {{ 'KNOWLEDGE.LINK' | translate }}: <code>{{ row.raw.link }}</code></span>
+                }
+              </p>
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</div>

@@ -29,9 +29,10 @@ npm run dev          # chạy song song API và web
 
 | Tài khoản | Nhóm quyền |
 |---|---|
-| `quanly@petmory.local` | Quản lý và Quản trị — toàn quyền |
-| `xuong@petmory.local` | Quản trị — điều phối đơn, không sửa được tham số |
-| `cskh@petmory.local` | Chăm sóc khách hàng — chỉ xem |
+| `quanly@petmory.local` | Quản lý: đơn hàng, sản phẩm, kho, tham số, kho tri thức trợ lý, báo cáo |
+| `quantri@petmory.local` | Quản trị viên: quản lý tài khoản |
+| `cskh@petmory.local` | Chăm sóc khách hàng: trực hội thoại, xem đơn, khách hàng và nhật ký thanh toán, không sửa |
+| `khachhang@petmory.local` | Khách hàng mẫu |
 
 ### Lệnh khác
 
@@ -46,6 +47,22 @@ npm run dev          # chạy song song API và web
 | `node tools/test-studio-full-ui.js` | Chạy kiểm thử luồng tùy biến trên trình duyệt thật |
 | `npm run db:check` | Kiểm tra cơ sở dữ liệu đang trỏ tới đâu và chỉ mục đã đủ chưa |
 | `npm run test:integration` | Chạy 132 mục kiểm thử tích hợp |
+
+### Trí tuệ nhân tạo (trợ lý hội thoại, gợi ý thiết kế)
+
+Mọi tính năng AI chỉ dành cho người đã đăng nhập và đi qua một lớp gọi chung (`apps/api/src/modules/ai/ai-client.service.ts`). Cấu hình trong `.env`:
+
+| Biến | Ý nghĩa |
+|---|---|
+| `AI_PROVIDER` | `gemini` hoặc `anthropic`. Để trống thì tự chọn theo khóa đang có, ưu tiên Gemini. |
+| `GEMINI_API_KEY` | Khóa Gemini lấy từ Google AI Studio. Không commit, không dán vào nơi công khai. |
+| `ANTHROPIC_API_KEY` | Khóa Claude, nếu dùng Anthropic. |
+| `AI_MODEL` | Để trống để dùng mặc định: `gemini-3.5-flash-lite` hoặc `claude-opus-5`. |
+| `AI_TIMEOUT_MS` | Thời gian chờ mỗi lần gọi, mặc định 45000. |
+
+Không có khóa hoặc dịch vụ lỗi thì trợ lý vẫn chạy bằng **kho tri thức** (trang *Kho tri thức trợ lý* của nhóm Quản lý) và vẫn nhớ sản phẩm vừa nói tới trong phiên. Nạp kho tri thức mẫu: `node tools/seed-assistant-knowledge.js`.
+
+> Gói miễn phí của Gemini cho phép Google dùng nội dung gửi lên để cải thiện sản phẩm của họ. Dùng được cho bản trình diễn; khi chạy với dữ liệu khách thật nên chuyển sang gói trả phí.
 
 ---
 
