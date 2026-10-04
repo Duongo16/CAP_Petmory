@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, of } from 'rxjs';
 import { CartService } from '../../core/services/cart.service';
 import { CatalogService } from '../../core/services/catalog.service';
-import { CartLine, ProductType } from '../../core/models/api.model';
+import { CartDesign, CartLine, ProductType } from '../../core/models/api.model';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -18,6 +18,10 @@ export interface CartCard {
   /** Dong hang co san hay dong hang lam theo anh cua be. */
   readyMade: boolean;
   selected: boolean;
+  /** Ban thiet ke cua dong hang, rong voi hang co san va hang khong kem thiet ke. */
+  design: CartDesign | null;
+  /** Mo lai ban thiet ke trong ban len 3D. */
+  designQuery: Record<string, string> | null;
 }
 
 /** One suggestion under the cart, taken from the real catalogue. */
@@ -99,6 +103,8 @@ export class CartFacade {
           productQuery: { tab: 'ready', goods: raw.goodsCode ?? '' },
           readyMade: true,
           selected: isSelected,
+          design: null,
+          designQuery: null,
         };
       }
       const product = byCode.get(raw.productTypeCode);
@@ -112,6 +118,8 @@ export class CartFacade {
         productQuery: { tab: 'custom', product: raw.productTypeCode ?? '' },
         readyMade: false,
         selected: isSelected,
+        design: raw.design,
+        designQuery: raw.design && !raw.design.missing ? { draft: raw.design.id } : null,
       };
     });
   });

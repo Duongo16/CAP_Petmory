@@ -54,7 +54,8 @@
     "MODELS": "Mẫu 3D",
     "JOURNALS": "Nhật ký",
     "SHOP": "Cửa hàng",
-    "ASSISTANT_KNOWLEDGE": "Kho tri thức trợ lý"
+    "ASSISTANT_KNOWLEDGE": "Kho tri thức trợ lý",
+    "DESIGNS": "Thiết kế của tôi"
   },
   "AUTH": {
     "QUICK": {
@@ -546,7 +547,9 @@
       }
     },
     "CREDIT": "Mô hình 3D: {{author}} · {{licence}}",
-    "CREDIT_SOURCE": "Xem nguồn"
+    "CREDIT_SOURCE": "Xem nguồn",
+    "MANAGE_DESIGNS": "Xem trong Thiết kế của tôi",
+    "SAVED_DESIGNS": "Thiết kế đã lưu"
   },
   "HOME": {
     "BADGE": "THỦ CÔNG • VẬT LIỆU TÁI CHẾ • 100% CÁ NHÂN HÓA",
@@ -729,7 +732,10 @@
       "BADGE_SACRED": "Kỷ vật thiêng liêng",
       "BADGE_DESK": "Bàn làm việc"
     },
-    "NOT_ENOUGH": "Trong kho không còn đủ hàng cho số lượng này."
+    "NOT_ENOUGH": "Trong kho không còn đủ hàng cho số lượng này.",
+    "DESIGN_LABEL": "Thiết kế:",
+    "DESIGN_EDIT": "Sửa thiết kế",
+    "DESIGN_MISSING": "Bản thiết kế của dòng này đã bị xoá. Hãy bỏ dòng này hoặc thiết kế lại."
   },
   "CHECKOUT": {
     "TITLE": "Thông tin nhận hàng",
@@ -1963,5 +1969,38 @@
       "POLICY": "Chính sách",
       "OTHER": "Khác"
     }
+  },
+  "DESIGNS": {
+    "EYEBROW": "Bàn len của bé",
+    "TITLE": "Thiết kế của tôi",
+    "SUB": "Các bản bạn đã lưu từ Tùy biến 3D. Mở lại để chỉnh, hoặc thêm thẳng vào giỏ.",
+    "COUNT": "{{count}}/{{max}} bản",
+    "NEW": "Thiết kế mới",
+    "EMPTY_TITLE": "Chưa có bản thiết kế nào",
+    "EMPTY_TEXT": "Chọn một bé, tô màu, khắc tên rồi lưu lại, bản thiết kế sẽ nằm ở đây.",
+    "START": "Bắt đầu thiết kế",
+    "STATUS": {
+      "DRAFT": "Nháp",
+      "READY": "Sẵn sàng đặt",
+      "IN_CART": "Đang trong giỏ"
+    },
+    "MODEL": "Mẫu",
+    "PRODUCT": "Sản phẩm",
+    "NO_PRODUCT": "Chưa chọn",
+    "STAND": "Đế",
+    "ENGRAVED": "Khắc tên",
+    "UPDATED": "Sửa lần cuối",
+    "OPEN": "Mở trong studio",
+    "ADD_TO_CART": "Thêm vào giỏ",
+    "VIEW_CART": "Xem giỏ hàng",
+    "PICK_PRODUCT": "Tiếp tục thiết kế",
+    "RENAME": "Đổi tên",
+    "NAME_LABEL": "Tên bản thiết kế",
+    "SAVE": "Lưu",
+    "CANCEL": "Huỷ",
+    "DELETE": "Xoá",
+    "DELETE_CONFIRM": "Xoá bản thiết kế này?",
+    "ERROR_IN_CART": "Bản thiết kế đang nằm trong giỏ hàng. Hãy bỏ khỏi giỏ trước rồi mới xoá.",
+    "ADDED": "Đã thêm vào giỏ hàng."
   }
 }

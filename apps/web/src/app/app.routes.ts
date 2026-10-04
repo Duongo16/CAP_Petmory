@@ -142,6 +142,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/studio/studio-page').then((m) => m.StudioPage),
       },
       {
+        path: 'designs',
+        canActivate: [customerOnlyGuard],
+        loadComponent: () => import('./features/designs/designs-page').then((m) => m.DesignsPage),
+      },
+      {
         path: 'suggest',
         canActivate: [customerOnlyGuard],
         loadComponent: () =>

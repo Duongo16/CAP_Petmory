@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { randomUUID } from 'crypto';
@@ -12,6 +12,7 @@ import {
 } from './schemas/design.schema';
 import { SaveDesignDto, COUNT_DESIGN_MAX } from './dto/design.dto';
 import { CatalogService } from '../catalog/catalog.service';
+import { Cart, CartDocument } from '../cart/schemas/cart.schema';
 import { MSG } from '../../common/constants/messages';
 import { StorageFolder, StorageService } from '../../common/storage/storage.service';
 
@@ -25,6 +26,7 @@ export class DesignsService {
 
   constructor(
     @InjectModel(Design.name) private readonly model: Model<DesignDocument>,
+    @InjectModel(Cart.name) private readonly carts: Model<CartDocument>,
     private readonly catalog: CatalogService,
     private readonly storage: StorageService,
   ) {}
@@ -32,6 +34,8 @@ export class DesignsService {
   listMine(owner: string) {
     return this.model
       .find({ owner: new Types.ObjectId(owner), isHidden: false })
+      // Chuoi mau tung mat rat dai va danh sach khong can, nen bo di cho nhe.
+      .select('-paint')
       .sort({ updatedAt: -1 })
       .exec();
   }
@@ -70,9 +74,21 @@ export class DesignsService {
     return tk.save();
   }
 
+  /** Chi doi ten, khong dung toi mau da to hay anh xem truoc. */
+  async rename(id: string, owner: string, name: string): Promise<DesignDocument> {
+    const tk = await this.findOwned(id, owner);
+    tk.name = name;
+    return tk.save();
+  }
+
   /** Soft delete: the record is kept in case the customer disputes a placed order. */
   async hide(id: string, owner: string): Promise<DesignDocument> {
     const tk = await this.findOwned(id, owner);
+    // Dang nam trong gio thi khong cho xoa, vi luc dat hang xuong can ban thiet ke nay.
+    const inCart = await this.carts.exists({ owner: tk.owner, 'items.designId': tk._id });
+    if (inCart) {
+      throw new ConflictException('Ban thiet ke dang co trong gio hang. Hay bo khoi gio truoc khi xoa');
+    }
     tk.isHidden = true;
     return tk.save();
   }

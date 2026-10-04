@@ -108,6 +108,21 @@
                   </div>
 
                   <!-- 2. Product Thumbnail (Compact & clickable) -->
+                  @if (card.design && card.designQuery && card.design.previewAngle) {
+                    <a
+                      class="line-thumb line-thumb-design"
+                      routerLink="/studio"
+                      [queryParams]="card.designQuery"
+                      [attr.title]="'CART.DESIGN_EDIT' | translate"
+                    >
+                      <pm-design-preview
+                        [designId]="card.design.id"
+                        [angle]="card.design.previewAngle"
+                        [version]="card.design.updatedAt ?? ''"
+                        [alt]="card.design.name"
+                      />
+                    </a>
+                  } @else {
                   <a
                     class="line-thumb"
                     [routerLink]="card.productLink"
@@ -125,6 +140,7 @@
                       </div>
                     }
                   </a>
+                  }
 
                   <!-- 3. Details: Title, Badges, Specs & Redirect Link -->
                   <div class="line-info">
@@ -137,6 +153,25 @@
                         {{ card.raw.displayName }}
                       </a>
                     </h2>
+
+                    @if (card.design; as design) {
+                      @if (design.missing) {
+                        <p class="line-design missing" role="note">
+                          <pm-icon name="sparkle" [size]="13" />
+                          {{ 'CART.DESIGN_MISSING' | translate }}
+                        </p>
+                      } @else {
+                        <p class="line-design">
+                          <pm-icon name="sparkle" [size]="13" />
+                          <span>{{ 'CART.DESIGN_LABEL' | translate }}</span>
+                          <strong class="line-design-name">{{ design.name }}</strong>
+                          <a class="line-link" routerLink="/studio" [queryParams]="card.designQuery">
+                            <pm-icon name="pencil" [size]="12" />
+                            <span>{{ 'CART.DESIGN_EDIT' | translate }}</span>
+                          </a>
+                        </p>
+                      }
+                    }
 
                     <div class="line-meta">
                       @if (card.raw.petName) {

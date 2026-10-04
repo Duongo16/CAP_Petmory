@@ -379,3 +379,40 @@
 }
 
 
+
+// Dong hang kem ban thiet ke: ten ban thiet ke va loi tat mo lai de sua.
+.line-design {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin: 2px 0 6px;
+  font-size: 0.8125rem;
+  color: var(--pm-text-muted);
+
+  &.missing {
+    padding: 4px 10px;
+    border-radius: 10px;
+    background: var(--pm-danger-soft);
+    color: var(--pm-on-danger-soft);
+  }
+
+  .line-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--pm-accent);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--pm-accent-dark);
+      text-decoration: underline;
+    }
+  }
+}
+
+.line-design-name {
+  color: var(--pm-ink);
+}

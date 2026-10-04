@@ -86,6 +86,7 @@ export class Shell implements OnInit {
   /** Personal destinations, kept behind the account button so the bar stays on one line. */
   readonly accountMenu: MenuItem[] = [
     { path: '/orders', key: 'NAV.ORDER' },
+    { path: '/designs', key: 'NAV.DESIGNS' },
     { path: '/pets', key: 'NAV.PET' },
     { path: '/restore', key: 'NAV.RESTORE' },
     { path: '/colors', key: 'NAV.PALETTE' },

@@ -159,7 +159,12 @@ async function run() {
       headers: { Authorization: `Bearer ${await page.evaluate(() => localStorage.getItem('petmory.access'))}` },
     });
     const designs = designsRes.ok() ? await designsRes.json() : [];
-    const design = Array.isArray(designs) ? designs[0] : null;
+    // Danh sach bo phan mau to cho nhe, nen doc ban day du qua trang chi tiet.
+    const first = Array.isArray(designs) ? designs[0] : null;
+    const detailRes = first ? await page.request.get(`${API}/designs/${first._id}`, {
+      headers: { Authorization: `Bearer ${await page.evaluate(() => localStorage.getItem('petmory.access'))}` },
+    }) : null;
+    const design = detailRes?.ok() ? await detailRes.json() : null;
     res.push(check('The server stores the design name', design?.name === 'Ban thiet ke cua Mun', design?.name));
     res.push(check('The server stores all six preview angles', design?.preview?.length === 6,
       `${design?.preview?.length} photo`));

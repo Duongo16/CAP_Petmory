@@ -1,0 +1,18 @@
+:host {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  background: var(--pm-bg-3d);
+}
+
+img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  color: var(--pm-border-strong);
+}

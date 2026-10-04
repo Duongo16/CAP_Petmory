@@ -6,6 +6,7 @@ import {
   DesignSuggestionSchema,
 } from './schemas/design-suggestion.schema';
 import { DesignsService } from './designs.service';
+import { Cart, CartSchema } from '../cart/schemas/cart.schema';
 import { DesignSuggestService } from './design-suggest.service';
 import { ModelLibraryService } from './model-library.service';
 import { DesignsController } from './designs.controller';
@@ -19,6 +20,8 @@ import { PhotosModule } from '../photos/photos.module';
     MongooseModule.forFeature([
       { name: Design.name, schema: DesignSchema },
       { name: DesignSuggestion.name, schema: DesignSuggestionSchema },
+      // Chi de kiem ban thiet ke con nam trong gio truoc khi cho xoa.
+      { name: Cart.name, schema: CartSchema },
     ]),
     CatalogModule,
     PetsModule,

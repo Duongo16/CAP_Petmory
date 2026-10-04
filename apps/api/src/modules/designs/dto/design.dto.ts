@@ -145,6 +145,14 @@ export class SaveDesignDto {
   pet?: string;
 }
 
+/** Doi ten mot ban thiet ke. */
+export class RenameDesignDto {
+  @IsString()
+  @MaxLength(100)
+  @Matches(/\S/, { message: 'Ten ban thiet ke khong duoc de trong' })
+  name!: string;
+}
+
 export class UploadPreviewDto {
   @IsEnum(PreviewAngle)
   angle!: PreviewAngle;

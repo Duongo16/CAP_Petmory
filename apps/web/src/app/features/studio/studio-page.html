@@ -134,6 +134,9 @@
                   <a [href]="one.source" target="_blank" rel="noopener noreferrer">{{ 'STUDIO.CREDIT_SOURCE' | translate }}</a>
                 </p>
               }
+              <a class="suggest-link" routerLink="/designs">
+                <pm-icon name="bookmark" [size]="15" />{{ 'STUDIO.SAVED_DESIGNS' | translate }}
+              </a>
               <a class="suggest-link" routerLink="/suggest">
                 <pm-icon name="bulb" [size]="15" />{{ 'STUDIO.SUGGEST_LINK' | translate }}
               </a>
@@ -349,7 +352,10 @@
                 <p class="note danger" role="alert">{{ codeError | translate }}</p>
               }
               @if (facade.statusSave() === 'SAVED') {
-                <p class="note ok" role="status">{{ 'STUDIO.SAVED' | translate }}</p>
+                <p class="note ok" role="status">
+                  {{ 'STUDIO.SAVED' | translate }}
+                  <a class="tw-link" routerLink="/designs">{{ 'STUDIO.MANAGE_DESIGNS' | translate }}</a>
+                </p>
               }
               @if (facade.addedToCart()) {
                 <p class="note ok" role="status">

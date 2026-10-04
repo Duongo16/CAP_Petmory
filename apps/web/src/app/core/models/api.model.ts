@@ -326,11 +326,26 @@ export interface CartLine {
   petName: string;
   displayBaseCode: string;
   displayBaseName: string;
+  /** Ban thiet ke gan voi dong hang tuy bien, rong voi hang co san. */
+  designId: string | null;
+  design: CartDesign | null;
   quantity: number;
   /** Unit price as an integer string in dong, because a number type would drift. */
   unitPrice: string;
   currency: string;
   productionDays: number;
+}
+
+/** Ban tom tat ban thiet ke cua mot dong hang. */
+export interface CartDesign {
+  id: string;
+  name: string;
+  modelCode: string;
+  /** Goc anh xem truoc nen hien, rong khi chua co anh. */
+  previewAngle: string;
+  updatedAt: string | null;
+  /** Ban thiet ke da bi xoa. */
+  missing: boolean;
 }
 
 export interface Cart {

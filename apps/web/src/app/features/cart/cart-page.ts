@@ -5,6 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { CartFacade } from './cart-facade';
 import { CartLine } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
+import { DesignPreview } from '../../shared/design-preview/design-preview';
 import { Icon } from '../../shared/icon/icon';
 
 /** One tile of the workshop timeline, with its wording and colour written out. */
@@ -28,7 +29,7 @@ const PROMISES: string[] = ['CART.PROMISE_CHECK', 'CART.PROMISE_WARRANTY', 'CART
 @Component({
   selector: 'pm-cart-page',
   standalone: true,
-  imports: [RouterLink, FormsModule, TranslatePipe, MoneyPipe, Icon],
+  imports: [RouterLink, FormsModule, TranslatePipe, MoneyPipe, Icon, DesignPreview],
   templateUrl: './cart-page.html',
   styleUrl: './cart-page.scss',
   providers: [CartFacade],

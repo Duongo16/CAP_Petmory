@@ -35,6 +35,22 @@ export class DesignsService {
     return this.http.patch<Design>(`${this.base}/designs/${id}`, than);
   }
 
+  /** Chi doi ten, khong gui lai mau da to. */
+  rename(id: string, name: string): Observable<Design> {
+    return this.http.patch<Design>(`${this.base}/designs/${id}/name`, { name });
+  }
+
+  /**
+   * Anh xem truoc cua mot goc, doc bang tai khoan dang nhap nen phai tai qua
+   * HttpClient. Phien ban la moc sua gan nhat, de luu lai la co anh moi.
+   */
+  previewBlob(id: string, angle: string, version = ''): Observable<Blob> {
+    return this.http.get(`${this.base}/designs/${id}/preview/${angle}`, {
+      params: version ? new HttpParams().set('v', version) : undefined,
+      responseType: 'blob',
+    });
+  }
+
   hide(id: string): Observable<Design> {
     return this.http.delete<Design>(`${this.base}/designs/${id}`);
   }

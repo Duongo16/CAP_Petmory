@@ -54,7 +54,8 @@
     "MODELS": "3D models",
     "JOURNALS": "Diaries",
     "SHOP": "Shop",
-    "ASSISTANT_KNOWLEDGE": "Assistant knowledge"
+    "ASSISTANT_KNOWLEDGE": "Assistant knowledge",
+    "DESIGNS": "My designs"
   },
   "AUTH": {
     "QUICK": {
@@ -546,7 +547,9 @@
       }
     },
     "CREDIT": "3D model: {{author}} · {{licence}}",
-    "CREDIT_SOURCE": "View source"
+    "CREDIT_SOURCE": "View source",
+    "MANAGE_DESIGNS": "See it in My designs",
+    "SAVED_DESIGNS": "Saved designs"
   },
   "HOME": {
     "BADGE": "HANDMADE • RECYCLED MATERIAL • 100% PERSONALISED",
@@ -729,7 +732,10 @@
       "BADGE_SACRED": "Kỷ vật thiêng liêng",
       "BADGE_DESK": "Bàn làm việc"
     },
-    "NOT_ENOUGH": "There is not enough left in stock for this quantity."
+    "NOT_ENOUGH": "There is not enough left in stock for this quantity.",
+    "DESIGN_LABEL": "Design:",
+    "DESIGN_EDIT": "Edit design",
+    "DESIGN_MISSING": "The design for this line was deleted. Remove the line or design it again."
   },
   "CHECKOUT": {
     "TITLE": "Thông tin nhận hàng",
@@ -1963,5 +1969,38 @@
       "POLICY": "Policy",
       "OTHER": "Other"
     }
+  },
+  "DESIGNS": {
+    "EYEBROW": "The little yarn table",
+    "TITLE": "My designs",
+    "SUB": "Everything you saved from the 3D customiser. Open one to keep editing, or add it straight to the cart.",
+    "COUNT": "{{count}}/{{max}} designs",
+    "NEW": "New design",
+    "EMPTY_TITLE": "No designs yet",
+    "EMPTY_TEXT": "Pick a pet, paint it, engrave a name and save. Your design will show up here.",
+    "START": "Start designing",
+    "STATUS": {
+      "DRAFT": "Draft",
+      "READY": "Ready to order",
+      "IN_CART": "In cart"
+    },
+    "MODEL": "Model",
+    "PRODUCT": "Product",
+    "NO_PRODUCT": "Not chosen",
+    "STAND": "Stand",
+    "ENGRAVED": "Engraving",
+    "UPDATED": "Last edited",
+    "OPEN": "Open in studio",
+    "ADD_TO_CART": "Add to cart",
+    "VIEW_CART": "View cart",
+    "PICK_PRODUCT": "Keep designing",
+    "RENAME": "Rename",
+    "NAME_LABEL": "Design name",
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "DELETE": "Delete",
+    "DELETE_CONFIRM": "Delete this design?",
+    "ERROR_IN_CART": "This design is in your cart. Remove it from the cart before deleting it.",
+    "ADDED": "Added to cart."
   }
 }

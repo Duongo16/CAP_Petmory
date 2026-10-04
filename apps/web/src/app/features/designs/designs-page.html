@@ -1,0 +1,138 @@
+<div class="tw-page flex flex-col gap-6 max-[600px]:px-4">
+  <header class="tw-page-head mb-0">
+    <div>
+      <p class="tw-eyebrow m-0 text-accent">{{ 'DESIGNS.EYEBROW' | translate }}</p>
+      <h1 class="tw-page-title mt-1 pm-page-title">{{ 'DESIGNS.TITLE' | translate }}</h1>
+      <p class="sub">{{ 'DESIGNS.SUB' | translate }}</p>
+    </div>
+    <div class="head-actions">
+      @if (status() === 'READY') {
+        <span class="count">{{ 'DESIGNS.COUNT' | translate: { count: facade.count(), max: facade.limit } }}</span>
+      }
+      <a class="tw-btn-primary small" routerLink="/studio">
+        <pm-icon name="plus" [size]="16" />{{ 'DESIGNS.NEW' | translate }}
+      </a>
+    </div>
+  </header>
+
+  @if (facade.problem(); as problem) {
+    <p class="notice danger" role="alert">{{ problem | translate }}</p>
+  }
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="tw-empty"><p class="m-0">{{ 'COMMON.LOADING' | translate }}</p></div>
+    }
+    @case ('ERROR') {
+      <div class="tw-empty">
+        <p class="m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="tw-btn-secondary" (click)="facade.load()">{{ 'COMMON.RETRY' | translate }}</button>
+      </div>
+    }
+    @case ('READY') {
+      @if (cards().length === 0) {
+        <div class="tw-empty">
+          <span class="empty-mark" aria-hidden="true"><pm-icon name="sparkle" [size]="30" /></span>
+          <p class="empty-title">{{ 'DESIGNS.EMPTY_TITLE' | translate }}</p>
+          <p class="m-0">{{ 'DESIGNS.EMPTY_TEXT' | translate }}</p>
+          <a class="tw-btn-primary" routerLink="/studio">{{ 'DESIGNS.START' | translate }}</a>
+        </div>
+      } @else {
+        <ul class="grid">
+          @for (card of cards(); track card.raw._id) {
+            <li class="card" [class.busy]="card.busy" [attr.data-design]="card.raw._id">
+              <a class="thumb" routerLink="/studio" [queryParams]="{ draft: card.raw._id }"
+                [attr.aria-label]="'DESIGNS.OPEN' | translate">
+                <pm-design-preview [designId]="card.raw._id" [angle]="card.previewAngle" [version]="card.version"
+                  [alt]="card.raw.name" />
+                <span class="stage" [attr.data-stage]="card.stage">{{ card.stageKey | translate }}</span>
+              </a>
+
+              <div class="body">
+                @if (card.editing) {
+                  <form class="rename" (submit)="saveName(card.raw._id, $event)">
+                    <label class="sr-only" [for]="'name-' + card.raw._id">{{ 'DESIGNS.NAME_LABEL' | translate }}</label>
+                    <input class="tw-input" name="name" maxlength="100" [id]="'name-' + card.raw._id"
+                      [value]="card.raw.name" required />
+                    <button type="submit" class="tw-btn-primary small">{{ 'DESIGNS.SAVE' | translate }}</button>
+                    <button type="button" class="tw-btn-secondary small" (click)="facade.cancelRename()">
+                      {{ 'DESIGNS.CANCEL' | translate }}
+                    </button>
+                  </form>
+                } @else {
+                  <h2 class="name">{{ card.raw.name }}</h2>
+                }
+
+                <dl class="facts">
+                  <dt>{{ 'DESIGNS.MODEL' | translate }}</dt>
+                  <dd>{{ card.modelName }}</dd>
+                  <dt>{{ 'DESIGNS.PRODUCT' | translate }}</dt>
+                  <dd>{{ card.productLabel || ('DESIGNS.NO_PRODUCT' | translate) }}</dd>
+                  @if (card.standLabel) {
+                    <dt>{{ 'DESIGNS.STAND' | translate }}</dt>
+                    <dd>{{ card.standLabel }}</dd>
+                  }
+                  @if (card.engravedName) {
+                    <dt>{{ 'DESIGNS.ENGRAVED' | translate }}</dt>
+                    <dd>{{ card.engravedName }}</dd>
+                  }
+                </dl>
+                <p class="updated">{{ 'DESIGNS.UPDATED' | translate }} {{ card.raw.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+
+                @if (card.confirming) {
+                  <div class="confirm" role="alertdialog" [attr.aria-label]="'DESIGNS.DELETE_CONFIRM' | translate">
+                    <span>{{ 'DESIGNS.DELETE_CONFIRM' | translate }}</span>
+                    <button type="button" class="danger-button" [disabled]="card.busy" (click)="facade.remove(card.raw._id)">
+                      {{ 'DESIGNS.DELETE' | translate }}
+                    </button>
+                    <button type="button" class="tw-btn-secondary small" (click)="facade.cancelRemove()">
+                      {{ 'DESIGNS.CANCEL' | translate }}
+                    </button>
+                  </div>
+                } @else {
+                  <div class="actions">
+                    @switch (card.stage) {
+                      @case ('READY') {
+                        <button type="button" class="tw-btn-primary small" [disabled]="card.busy" (click)="facade.addToCart(card.raw)">
+                          <pm-icon name="cart" [size]="15" />{{ 'DESIGNS.ADD_TO_CART' | translate }}
+                        </button>
+                      }
+                      @case ('IN_CART') {
+                        <a class="tw-btn-primary small" routerLink="/cart">
+                          <pm-icon name="cart" [size]="15" />{{ 'DESIGNS.VIEW_CART' | translate }}
+                        </a>
+                      }
+                      @default {
+                        <a class="tw-btn-primary small" routerLink="/studio" [queryParams]="{ draft: card.raw._id }">
+                          {{ 'DESIGNS.PICK_PRODUCT' | translate }}
+                        </a>
+                      }
+                    }
+                    @if (card.stage !== 'DRAFT') {
+                      <a class="tw-btn-secondary small" routerLink="/studio" [queryParams]="{ draft: card.raw._id }">
+                        <pm-icon name="pencil" [size]="14" />{{ 'DESIGNS.OPEN' | translate }}
+                      </a>
+                    }
+                    <span class="spacer"></span>
+                    <button type="button" class="icon-button rename-button" (click)="facade.startRename(card.raw._id)"
+                      [attr.aria-label]="'DESIGNS.RENAME' | translate" [attr.title]="'DESIGNS.RENAME' | translate">
+                      <pm-icon name="tag" [size]="16" />
+                    </button>
+                    <button type="button" class="icon-button delete-button" (click)="facade.askRemove(card.raw._id)"
+                      [attr.aria-label]="'DESIGNS.DELETE' | translate" [attr.title]="'DESIGNS.DELETE' | translate">
+                      <pm-icon name="trash" [size]="16" />
+                    </button>
+                  </div>
+                }
+
+                @if (facade.justAdded() === card.raw._id) {
+                  <p class="notice ok" role="status">{{ 'DESIGNS.ADDED' | translate }}</p>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</div>

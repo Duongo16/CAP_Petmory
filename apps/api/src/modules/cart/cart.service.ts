@@ -9,6 +9,18 @@ import { DesignsService } from '../designs/designs.service';
 import { GoodsService } from '../goods/goods.service';
 import { MSG } from '../../common/constants/messages';
 
+/** Ban tom tat ban thiet ke gan voi mot dong hang, de gio hang cho biet dang mua mau nao. */
+export interface CartDesignView {
+  id: string;
+  name: string;
+  modelCode: string;
+  /** Goc anh xem truoc nen hien, rong khi ban thiet ke chua co anh nao. */
+  previewAngle: string;
+  updatedAt: Date | null;
+  /** Ban thiet ke da bi xoa hoac khong con tim thay. */
+  missing: boolean;
+}
+
 export interface CartView {
   items: unknown[];
   countItem: number;
@@ -28,6 +40,11 @@ const DUPLICATE_KEY = 11000;
 /** True when the failure is the database refusing a second row for one owner. */
 function isDuplicate(trouble: unknown): boolean {
   return (trouble as { code?: number } | null)?.code === DUPLICATE_KEY;
+}
+
+/** Dong hang tro toi mot ban thiet ke khong con doc duoc. */
+function missingDesign(id: string): CartDesignView {
+  return { id, name: '', modelCode: '', previewAngle: '', updatedAt: null, missing: true };
 }
 
 function addMoney(price: Types.Decimal128, delta?: Types.Decimal128 | null): Types.Decimal128 {
@@ -289,7 +306,8 @@ export class CartService {
    * Totals are summed as integer strings to avoid floating point drift.
    * Money in this system is always a whole number of dong.
    */
-  private format(cart: CartDocument): CartView {
+  private async format(cart: CartDocument): Promise<CartView> {
+    const designs = await this.designSummaries(cart);
     let total = 0n;
     let maxDays = 0;
     for (const m of cart.items) {
@@ -310,6 +328,7 @@ export class CartService {
         displayBaseCode: m.displayBaseCode,
         displayBaseName: m.displayBaseName,
         designId: m.designId?.toString() ?? null,
+        design: m.designId ? (designs.get(m.designId.toString()) ?? missingDesign(m.designId.toString())) : null,
         quantity: m.quantity,
         unitPrice: m.unitPrice.toString(),
         currency: m.currency,
@@ -321,4 +340,31 @@ export class CartService {
       productionDaysMax: maxDays,
     };
   }
+
+  /** Doc mot lan tat ca ban thiet ke trong gio, bo phan mau to vi gio hang khong can. */
+  private async designSummaries(cart: CartDocument): Promise<Map<string, CartDesignView>> {
+    const ids = [...new Set(cart.items.flatMap((m) => (m.designId ? [m.designId.toString()] : [])))];
+    if (ids.length === 0) {
+      return new Map();
+    }
+    const found = await this.designs.findByIds(ids);
+    const out = new Map<string, CartDesignView>();
+    for (const one of found) {
+      // Ban thiet ke cua nguoi khac thi coi nhu khong co, khong lo ten ra ngoai.
+      if (one.owner.toString() !== cart.owner.toString()) {
+        continue;
+      }
+      const angles = one.preview.map((p) => p.angle as string);
+      out.set(one._id.toString(), {
+        id: one._id.toString(),
+        name: one.name,
+        modelCode: one.modelCode,
+        previewAngle: angles.includes('ISO') ? 'ISO' : (angles[0] ?? ''),
+        updatedAt: (one as unknown as { updatedAt?: Date }).updatedAt ?? null,
+        missing: one.isHidden,
+      });
+    }
+    return out;
+  }
 }
+

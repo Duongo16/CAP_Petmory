@@ -208,6 +208,8 @@ async function run() {
     // --- Save, then the cart line carries the stand at the server price ---
     await page.locator('.drawer-foot .tw-btn-secondary').click();
     await page.waitForSelector('.note.ok', { timeout: 40000 });
+    res.push(check('After saving, the studio points to My designs',
+      (await page.locator('.note.ok a[href="/designs"]').count()) === 1));
     const token = await page.evaluate(() => localStorage.getItem('petmory.access'));
     const auth = { headers: { Authorization: `Bearer ${token}` } };
     const designs = await (await page.request.get(`${API}/designs`, auth)).json();

@@ -14,7 +14,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { DesignsService } from './designs.service';
-import { SaveDesignDto, UploadPreviewDto } from './dto/design.dto';
+import { RenameDesignDto, SaveDesignDto, UploadPreviewDto } from './dto/design.dto';
 import { PreviewAngle } from './schemas/design.schema';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -63,6 +63,12 @@ export class DesignsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: SaveDesignDto, @CurrentUser() user: AuthUser) {
     return this.service.update(id, user.userId, dto);
+  }
+
+  /** Doi ten rieng, de khong phai gui lai ca ban thiet ke va lo xoa mat mau da to. */
+  @Patch(':id/name')
+  rename(@Param('id') id: string, @Body() dto: RenameDesignDto, @CurrentUser() user: AuthUser) {
+    return this.service.rename(id, user.userId, dto.name.trim());
   }
 
   @Post(':id/preview')
