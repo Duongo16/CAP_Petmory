@@ -1,8 +1,7 @@
 import * as THREE from 'three';
-import { applyFelt } from './felt-material';
 import { StandDecoration, StandToneOption, StandView, STAND_DECORATION_MAX } from './stand-options';
 
-/** Mau cua do trang tri bang len. Day la mau tren mo hinh, khong phai mau giao dien. */
+/** Mau cua do trang tri. Day la mau tren mo hinh, khong phai mau giao dien. */
 const DECOR_COLOR = {
   stem: '#7fae6e',
   petals: ['#f4a7b9', '#fff3e2', '#c9b6e4'],
@@ -26,7 +25,7 @@ const STAND_HEIGHT = 0.12;
 const SQUARE_BEVEL = 0.014;
 
 /**
- * Dung de trung bay bang go cho mau len: than de, chu khac o mat truoc va do
+ * Dung de trung bay bang go cho be: than de, chu khac o mat truoc va do
  * trang tri dat quanh chan be.
  *
  * Than de va do trang tri chi dung lai khi doi hinh, mau go hay do trang tri.
@@ -350,10 +349,8 @@ function makeWoodMaterial(tone: StandToneOption, ringsOnTop: boolean): THREE.Mes
   });
 }
 
-function felt(color: string): THREE.MeshStandardMaterial {
-  const material = new THREE.MeshStandardMaterial({ color });
-  applyFelt(material);
-  return material;
+function plain(color: string): THREE.MeshStandardMaterial {
+  return new THREE.MeshStandardMaterial({ color, roughness: 0.75 });
 }
 
 function heartShape(size: number): THREE.Shape {
@@ -374,10 +371,10 @@ function makeDecoration(code: StandDecoration): THREE.Group {
   switch (code) {
     case 'FLOWERS':
       [[-0.022, 0.06, 0], [0.02, 0.045, 0.012], [0.004, 0.035, -0.022]].forEach(([x, h, z], i) => {
-        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.0035, h, 6), felt(DECOR_COLOR.stem));
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.0035, h, 6), plain(DECOR_COLOR.stem));
         stem.position.set(x, h / 2, z);
         g.add(stem);
-        const petal = felt(DECOR_COLOR.petals[i % DECOR_COLOR.petals.length]);
+        const petal = plain(DECOR_COLOR.petals[i % DECOR_COLOR.petals.length]);
         for (let k = 0; k < 5; k += 1) {
           const a = (k / 5) * Math.PI * 2;
           const p = new THREE.Mesh(new THREE.SphereGeometry(0.011, 10, 8), petal);
@@ -385,7 +382,7 @@ function makeDecoration(code: StandDecoration): THREE.Group {
           p.position.set(x + Math.cos(a) * 0.013, h, z + Math.sin(a) * 0.013);
           g.add(p);
         }
-        const heart = new THREE.Mesh(new THREE.SphereGeometry(0.008, 10, 8), felt(DECOR_COLOR.flowerHeart));
+        const heart = new THREE.Mesh(new THREE.SphereGeometry(0.008, 10, 8), plain(DECOR_COLOR.flowerHeart));
         heart.position.set(x, h + 0.004, z);
         g.add(heart);
       });
@@ -400,14 +397,14 @@ function makeDecoration(code: StandDecoration): THREE.Group {
         curveSegments: 16,
       });
       geometry.center();
-      const heart = new THREE.Mesh(geometry, felt(DECOR_COLOR.heart));
+      const heart = new THREE.Mesh(geometry, plain(DECOR_COLOR.heart));
       heart.position.y = 0.04;
       heart.rotation.z = 0.15;
       g.add(heart);
       break;
     }
     case 'BONE': {
-      const material = felt(DECOR_COLOR.bone);
+      const material = plain(DECOR_COLOR.bone);
       const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.07, 12), material);
       shaft.rotation.z = Math.PI / 2;
       shaft.position.y = 0.012;
@@ -422,25 +419,25 @@ function makeDecoration(code: StandDecoration): THREE.Group {
       break;
     }
     case 'FISH': {
-      const body = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 12), felt(DECOR_COLOR.fish));
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 12), plain(DECOR_COLOR.fish));
       body.scale.set(1.5, 0.85, 0.45);
       body.position.y = 0.03;
       g.add(body);
-      const tail = new THREE.Mesh(new THREE.ConeGeometry(0.022, 0.034, 3), felt(DECOR_COLOR.fishFin));
+      const tail = new THREE.Mesh(new THREE.ConeGeometry(0.022, 0.034, 3), plain(DECOR_COLOR.fishFin));
       tail.rotation.z = Math.PI / 2;
       tail.scale.set(1, 1, 0.4);
       tail.position.set(-0.054, 0.03, 0);
       g.add(tail);
-      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.004, 8, 6), felt(DECOR_COLOR.eye));
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.004, 8, 6), plain(DECOR_COLOR.eye));
       eye.position.set(0.03, 0.036, 0.012);
       g.add(eye);
       break;
     }
     case 'YARN_BALL': {
-      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.03, 20, 16), felt(DECOR_COLOR.yarn));
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.03, 20, 16), plain(DECOR_COLOR.yarn));
       ball.position.y = 0.03;
       g.add(ball);
-      const line = felt(DECOR_COLOR.yarnLine);
+      const line = plain(DECOR_COLOR.yarnLine);
       [[0.3, 0.2], [1.2, -0.4], [-0.6, 1.1]].forEach(([rx, rz]) => {
         const ring = new THREE.Mesh(new THREE.TorusGeometry(0.0295, 0.0022, 6, 40), line);
         ring.rotation.set(rx, 0, rz);
@@ -457,17 +454,17 @@ function makeDecoration(code: StandDecoration): THREE.Group {
       break;
     }
     case 'MUSHROOM': {
-      const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.013, 0.032, 12), felt(DECOR_COLOR.stalk));
+      const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.013, 0.032, 12), plain(DECOR_COLOR.stalk));
       stalk.position.y = 0.016;
       g.add(stalk);
       const cap = new THREE.Mesh(
         new THREE.SphereGeometry(0.03, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2),
-        felt(DECOR_COLOR.cap),
+        plain(DECOR_COLOR.cap),
       );
       cap.scale.set(1, 0.8, 1);
       cap.position.y = 0.03;
       g.add(cap);
-      const dot = felt(DECOR_COLOR.dot);
+      const dot = plain(DECOR_COLOR.dot);
       [[0.012, 0.012], [-0.014, 0.006], [0.002, -0.016], [-0.004, 0.018]].forEach(([x, z]) => {
         const spot = new THREE.Mesh(new THREE.SphereGeometry(0.0045, 8, 6), dot);
         const y = 0.03 + Math.sqrt(Math.max(0, 0.03 * 0.03 - x * x - z * z)) * 0.8;

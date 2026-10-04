@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Painter, PaintMode, PaintState } from './painter';
-import { applyFelt, softenNormals } from './felt-material';
 import { StandBuilder } from './stand-builder';
 import { StandView } from './stand-options';
 
@@ -129,8 +128,7 @@ export class Engine3d {
         // Bake the texture colours into vertex colours so the model can be painted directly.
     this.painter = new Painter(this.angle);
     this.groupMaterialByZone(this.angle);
-    // Sau buoc tach vat lieu, vi ban sao cua vat lieu khong mang theo doan ma to bong.
-    this.makeFelted(this.angle);
+    this.refreshBounds(this.angle);
     this.angle.rotation.y = THREE.MathUtils.degToRad(rotateYDegrees);
     this.angle.updateMatrixWorld(true);
     const countVertex = this.countVertex(this.angle);
@@ -362,21 +360,12 @@ export class Engine3d {
     }
   }
 
-  /** Khoac chat len cho moi mang cua be va lam mem cac canh gay. */
-  private makeFelted(angle: THREE.Object3D): void {
+  /** Tinh lai khung bao tu dinh that, vi khung bao ghi san trong tep co khi sai ma khung nay dung de can co mo hinh. */
+  private refreshBounds(angle: THREE.Object3D): void {
     angle.traverse((node) => {
-      if (!(node instanceof THREE.Mesh)) {
-        return;
-      }
-      softenNormals(node.geometry);
-      // Khung bao ghi san trong tep co khi sai, ma khung nay dung de can co mo hinh.
-      node.geometry.computeBoundingBox();
-      node.geometry.computeBoundingSphere();
-      const list = Array.isArray(node.material) ? node.material : [node.material];
-      for (const material of list) {
-        if (material instanceof THREE.MeshStandardMaterial) {
-          applyFelt(material);
-        }
+      if (node instanceof THREE.Mesh) {
+        node.geometry.computeBoundingBox();
+        node.geometry.computeBoundingSphere();
       }
     });
   }

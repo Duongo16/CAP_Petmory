@@ -63,12 +63,6 @@
       "required": false
     },
     {
-      "name": "Nose",
-      "labelDisplay": "PET.ZONE.NOSE",
-      "colorGroupAllowed": "EYES_NOSE",
-      "required": false
-    },
-    {
       "name": "Eyes",
       "labelDisplay": "PET.ZONE.EYES",
       "colorGroupAllowed": "EYES_NOSE",
@@ -129,74 +123,8 @@
       "required": false
     },
     {
-      "name": "body",
-      "labelDisplay": "PET.ZONE.MAIN_FUR",
-      "colorGroupAllowed": "FUR",
-      "required": false
-    },
-    {
-      "name": "white",
-      "labelDisplay": "PET.ZONE.BELLY_FUR",
-      "colorGroupAllowed": "FUR",
-      "required": false
-    },
-    {
-      "name": "ear",
-      "labelDisplay": "PET.ZONE.EARS",
-      "colorGroupAllowed": "FUR",
-      "required": false
-    },
-    {
-      "name": "mat16",
-      "labelDisplay": "PET.ZONE.MAIN_FUR",
-      "colorGroupAllowed": "FUR",
-      "required": false
-    },
-    {
-      "name": "mat21",
-      "labelDisplay": "PET.ZONE.BELLY_FUR",
-      "colorGroupAllowed": "FUR",
-      "required": false
-    },
-    {
-      "name": "mat23",
-      "labelDisplay": "PET.ZONE.EYES",
-      "colorGroupAllowed": "EYES_NOSE",
-      "required": false
-    },
-    {
-      "name": "DD9944",
-      "labelDisplay": "PET.ZONE.MAIN_FUR",
-      "colorGroupAllowed": "FUR",
-      "required": false
-    },
-    {
-      "name": "FFCC88",
-      "labelDisplay": "PET.ZONE.BELLY_FUR",
-      "colorGroupAllowed": "FUR",
-      "required": false
-    },
-    {
-      "name": "BA68C8",
-      "labelDisplay": "PET.ZONE.NOSE",
-      "colorGroupAllowed": "EYES_NOSE",
-      "required": false
-    },
-    {
-      "name": "1A1A1A",
-      "labelDisplay": "PET.ZONE.EYES",
-      "colorGroupAllowed": "EYES_NOSE",
-      "required": false
-    },
-    {
       "name": "lambert2SG",
       "labelDisplay": "PET.ZONE.MAIN_FUR",
-      "colorGroupAllowed": "FUR",
-      "required": false
-    },
-    {
-      "name": "795548",
-      "labelDisplay": "PET.ZONE.EARS",
       "colorGroupAllowed": "FUR",
       "required": false
     },
@@ -220,81 +148,6 @@
     }
   ],
   "baseModel": [
-    {
-      "code": "CAT-SIT-GINGER",
-      "name": "Mèo mướp ngồi",
-      "kind": "CAT",
-      "pose": "SITTING",
-      "file": "cat-sitting-ginger.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": -90,
-      "credit": {
-        "author": "elkiotbear",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/ovFy5UldDq"
-      }
-    },
-    {
-      "code": "CAT-SIT-GREY",
-      "name": "Mèo xám ngồi",
-      "kind": "CAT",
-      "pose": "SITTING",
-      "file": "cat-sitting-grey.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": -90,
-      "credit": {
-        "author": "Corentin Fatus",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/axMUjC7xwSa"
-      }
-    },
-    {
-      "code": "CAT-KITTEN",
-      "name": "Mèo con tròn",
-      "kind": "CAT",
-      "pose": "SITTING",
-      "file": "cat-kitten-round.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": -90,
-      "credit": {
-        "author": "jeremy",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/dXyLRVNOalM"
-      }
-    },
-    {
-      "code": "CAT-SIAMESE",
-      "name": "Mèo Xiêm",
-      "kind": "CAT",
-      "pose": "STANDING",
-      "file": "cat-siamese.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "Poly by Google",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/dBJgGEu5bHW"
-      }
-    },
-    {
-      "code": "DOG-PUPPY-SIT",
-      "name": "Cún con ngồi",
-      "kind": "DOG",
-      "pose": "SITTING",
-      "file": "dog-puppy-sitting.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": -90,
-      "credit": {
-        "author": "Poly by Google",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/07qH3gO5K8L"
-      }
-    },
     {
       "code": "DOG-GOLDEN",
       "name": "Cún lông vàng",
@@ -523,31 +376,6 @@
     "animal-fish.glb": {
       "colormap": "MAIN_FUR"
     },
-    "cat-sitting-ginger.glb": {
-      "body": "MAIN_FUR",
-      "white": "BELLY_FUR",
-      "ear": "EAR"
-    },
-    "cat-sitting-grey.glb": {
-      "mat16": "MAIN_FUR",
-      "mat21": "BELLY_FUR",
-      "mat23": "EYE"
-    },
-    "cat-kitten-round.glb": {
-      "DD9944": "MAIN_FUR",
-      "FFCC88": "BELLY_FUR",
-      "BA68C8": "NOSE",
-      "1A1A1A": "EYE"
-    },
-    "cat-siamese.glb": {
-      "lambert2SG": "MAIN_FUR"
-    },
-    "dog-puppy-sitting.glb": {
-      "795548": "EAR",
-      "DD9944": "MAIN_FUR",
-      "FFCC88": "BELLY_FUR",
-      "1A1A1A": "EYE"
-    },
     "dog-golden-puppy.glb": {
       "lambert2SG": "MAIN_FUR"
     },
@@ -574,9 +402,7 @@
     "F-FOX-ROUND": "Q-FOX",
     "Q-WOLF": "Q-HUSKY",
     "Q-DEER": "Q-FOX",
-    "TEMP-CAT": "CAT-SIT-GINGER",
-    "TEMP-DOG": "DOG-PUPPY-SIT",
     "TEMP-FOX": "Q-FOX",
-    "TEMP-TIGER": "CAT-SIT-GINGER"
+    "TEMP-DOG": "DOG-GOLDEN"
   }
 }
