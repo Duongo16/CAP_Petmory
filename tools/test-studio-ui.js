@@ -147,6 +147,32 @@ async function run() {
       (await page.locator('input[formcontrolname="name"]').inputValue()).length > 0));
     await page.screenshot({ path: path.join(OUT, 'studio-3-engrave.png') });
 
+    // --- The display stand on the same tab ---
+    res.push(check('No stand is chosen by default, so nothing is added to the price',
+      (await page.locator('.base.on[data-base="BASE-NONE"]').count()) === 1));
+    await page.locator('.angle').nth(1).click();
+    await page.waitForTimeout(700);
+    const beforeStand = await fingerprint(page);
+    await page.locator('.base[data-base="BASE-ROUND"]').click();
+    await page.fill('input[formcontrolname="memorialDate"]', '2019-05-20');
+    await page.waitForTimeout(900);
+    res.push(check('Choosing a round stand draws it under the plush', (await fingerprint(page)) !== beforeStand));
+    res.push(check('With a stand the name tag preview gives way to the stand',
+      (await page.locator('.tag-preview').count()) === 0));
+    res.push(check('Wood colours are offered', (await page.locator('.tone').count()) === 6));
+    const beforeTone = await fingerprint(page);
+    await page.locator('.tone').nth(1).click();
+    await page.waitForTimeout(700);
+    res.push(check('Changing the wood colour repaints the stand', (await fingerprint(page)) !== beforeTone));
+    for (const code of ['FLOWERS', 'HEART', 'YARN_BALL', 'MUSHROOM']) {
+      await page.locator(`.decor[data-decor="${code}"]`).click();
+    }
+    res.push(check('At most four decorations fit on the stand',
+      await page.locator('.decor[data-decor="BONE"]').isDisabled()));
+    await page.locator('.angle').first().click();
+    await page.waitForTimeout(800);
+    await page.screenshot({ path: path.join(OUT, 'studio-3b-stand.png') });
+
     // --- Tab 4: wrap up, photos are taken by themselves ---
     await page.locator('.tab').nth(3).click();
     await page.waitForSelector('.photo', { timeout: 15000 });
@@ -161,9 +187,43 @@ async function run() {
       await page.waitForSelector('.quote', { timeout: 10000 });
     }
     res.push(check('Choosing a product and size shows the price', (await page.locator('.quote').count()) === 1));
+    res.push(check('The stand price is shown as its own line',
+      (await page.locator('.base-line').innerText()).includes('120.000')));
     const extra = await page.evaluate(() => document.scrollingElement.scrollHeight - window.innerHeight);
     res.push(check('The last tab still fits on one screen', extra <= 2, `${extra}px extra`));
     await page.screenshot({ path: path.join(OUT, 'studio-4-finish.png') });
+
+    // --- Save, then the cart line carries the stand at the server price ---
+    await page.locator('.drawer-foot .tw-btn-secondary').click();
+    await page.waitForSelector('.note.ok', { timeout: 40000 });
+    const token = await page.evaluate(() => localStorage.getItem('petmory.access'));
+    const auth = { headers: { Authorization: `Bearer ${token}` } };
+    const designs = await (await page.request.get(`${API}/designs`, auth)).json();
+    const stand = designs[0]?.stand;
+    res.push(check('The server stores the stand choice',
+      stand?.baseCode === 'BASE-ROUND' && stand?.tone === 'WALNUT' && stand?.decorations?.length === 4,
+      JSON.stringify(stand)));
+
+    await page.locator('.drawer .tab').nth(2).click();
+    await page.locator('.tone').nth(0).click();
+    await page.locator('.drawer .tab').nth(3).click();
+    await page.waitForTimeout(400);
+    res.push(check('Changing the stand after saving asks for another save',
+      (await page.locator('.note.warn').count()) === 1
+        && (await page.locator('.drawer-foot .tw-btn-primary').isDisabled())));
+    await page.locator('.drawer-foot .tw-btn-secondary').click();
+    await page.waitForFunction(() => !document.querySelector('.note.warn'), null, { timeout: 40000 });
+    res.push(check('Saving a second time works, the six photos upload side by side',
+      (await page.locator('.note.danger').count()) === 0));
+    await page.locator('.drawer-foot .tw-btn-primary').click();
+    await page.waitForSelector('a[href="/cart"] [role="status"]', { timeout: 20000 });
+    const cart = await (await page.request.get(`${API}/cart`, auth)).json();
+    const line = (cart.items ?? cart.lines ?? [])[0];
+    const quote = (await page.locator('.quote-price').innerText()).replace(/[^0-9]/g, '');
+    const unit = String(line?.unitPrice?.$numberDecimal ?? line?.unitPrice ?? '').split('.')[0];
+    res.push(check('The cart line names the stand', line?.displayBaseCode === 'BASE-ROUND', line?.displayBaseName));
+    res.push(check('The server adds the stand price to the line',
+      BigInt(unit || '0') === BigInt(quote || '0') + 120000n, `${quote} + 120000 = ${unit}`));
 
     // --- Phone width ---
     await page.setViewportSize({ width: 390, height: 844 });

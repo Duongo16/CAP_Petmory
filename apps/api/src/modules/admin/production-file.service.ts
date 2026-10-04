@@ -16,6 +16,9 @@ export interface WoolRoll {
   swatch: string;
 }
 
+/** Ma de 'khong de' trong danh muc: co ma nhung khong co gi de xuong lam. */
+const BASE_NONE = 'BASE-NONE';
+
 /** One product to make, carrying everything the workshop needs to know. */
 export interface ProductionItem {
   displayName: string;
@@ -28,6 +31,8 @@ export interface ProductionItem {
   /** Ma mau theo tung vung co ten, de xuong pha len dung cho. */
   zoneColours: { zone: string; wool: WoolRoll }[];
   engraving: { name: string; memorialDate: Date | null; message: string } | null;
+  /** De trung bay: ten de theo don, mau go va do trang tri. Rong khi khong co de. */
+  stand: { baseName: string; tone: string; decorations: string[] } | null;
   anglesPreview: string[];
   productionDays: number;
 }
@@ -139,6 +144,7 @@ export class ProductionFileService {
     const engraving = taken?.engraving ?? older?.engraving ?? null;
     const preview = taken?.preview ?? older?.preview ?? [];
     const zones = taken?.zonePaint ?? older?.zonePaint ?? [];
+    const stand = taken?.stand ?? older?.stand ?? null;
 
     return {
       displayName: line.displayName,
@@ -172,6 +178,13 @@ export class ProductionFileService {
             name: engraving.name ?? '',
             memorialDate: engraving.memorialDate ?? null,
             message: engraving.message ?? '',
+          }
+        : null,
+      stand: line.displayBaseCode && line.displayBaseCode !== BASE_NONE
+        ? {
+            baseName: line.displayBaseName,
+            tone: stand?.tone ?? '',
+            decorations: [...(stand?.decorations ?? [])],
           }
         : null,
       anglesPreview: preview.map((a) => a.angle),

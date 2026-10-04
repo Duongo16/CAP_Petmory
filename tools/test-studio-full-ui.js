@@ -128,8 +128,12 @@ async function run() {
     const price = (await page.locator('.quote-price').innerText()).trim();
     res.push(check('The price comes from the server', price.includes('750.000'), price));
 
-                // --- Engraving, in its own tab ---
+                // --- Stand and engraving, in their own tab ---
     await page.locator('.drawer .tab').nth(2).click();
+    await page.locator('.base[data-base="BASE-ROUND"]').click();
+    await page.locator('.tone').nth(1).click();
+    await page.locator('.decor[data-decor="FLOWERS"]').click();
+    await page.locator('.decor[data-decor="BONE"]').click();
     await page.fill('input[formcontrolname="name"]', 'Ban thiet ke cua Mun');
     await page.fill('input[formcontrolname="engravedName"]', 'Mun');
     await page.fill('input[formcontrolname="memorialDate"]', '2019-05-20');
@@ -165,6 +169,9 @@ async function run() {
       (design?.colorCodesUsed ?? []).join(',')));
     res.push(check('The server stores the engraving', design?.engraving?.name === 'Mun'));
     res.push(check('The server stores the engraving font', design?.engraving?.message === 'Nho be nhieu lam'));
+    res.push(check('The server stores the stand', design?.stand?.baseCode === 'BASE-ROUND'
+      && design?.stand?.tone === 'WALNUT' && design?.stand?.decorations?.join(',') === 'FLOWERS,BONE',
+      JSON.stringify(design?.stand)));
 
                 // --- Add to cart ---
     await page.locator('button:has-text("Thêm vào giỏ hàng")').click();
@@ -220,9 +227,17 @@ async function run() {
     const orderCode = page.url().split('/').pop();
     res.push(check('The order is created from the saved design', Boolean(orderCode), orderCode));
 
+    // So tien chuyen khoan lay dung tong don tu may chu, vi gia de da cong vao.
+    const orderRes = await page.request.get(`${API}/orders/${orderCode}`, {
+      headers: { Authorization: `Bearer ${await page.evaluate(() => localStorage.getItem('petmory.access'))}` },
+    });
+    const orderBody = orderRes.ok() ? await orderRes.json() : {};
+    const orderTotal = String(orderBody.total?.$numberDecimal ?? orderBody.total ?? '0').split('.')[0];
+    res.push(check('The order total includes the stand price', orderTotal === '870000', orderTotal));
+
     await page.request.post(`${API}/payments/webhook`, {
       headers: { Authorization: `Apikey ${WEBHOOK_KEY}` },
-      data: { id: `sd-${Date.now()}`, transferAmount: 750000, content: `CT DEN ${orderCode}` },
+      data: { id: `sd-${Date.now()}`, transferAmount: Number(orderTotal), content: `CT DEN ${orderCode}` },
     });
 
     // Switch to an operations account to open the production file
@@ -255,6 +270,11 @@ async function run() {
     res.push(check('The production file shows the six angles the customer approved',
       (await page.locator('.photo-grid img').count()) === 6,
       `${await page.locator('.photo-grid img').count()} photo`));
+    const standText = (await page.locator('.stand-line').first().innerText()).trim();
+    res.push(check('The production file names the stand and its wood', standText.includes('Gỗ tròn')
+      && standText.includes('óc chó'), standText));
+    res.push(check('The production file lists the stand decorations',
+      (await page.locator('.stand-decor .tw-badge').count()) === 2));
     res.push(check('Nothing is reported missing',
       (await page.locator('.missing-warning').count()) === 0));
     await page.screenshot({ path: path.join(OUT, 'studio-full-4-production-file.png'), fullPage: true });

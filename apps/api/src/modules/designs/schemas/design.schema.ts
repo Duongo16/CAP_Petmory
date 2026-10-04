@@ -75,6 +75,49 @@ export class Engraving {
 
 export const EngravingSchema = SchemaFactory.createForClass(Engraving);
 
+/** Mau go cua de trung bay. */
+export enum StandTone {
+  OAK = 'OAK',
+  WALNUT = 'WALNUT',
+  CHERRY = 'CHERRY',
+  BIRCH = 'BIRCH',
+  PINK = 'PINK',
+  MINT = 'MINT',
+}
+
+/** Do trang tri bang len dat tren de, quanh chan be. */
+export enum StandDecoration {
+  FLOWERS = 'FLOWERS',
+  HEART = 'HEART',
+  BONE = 'BONE',
+  FISH = 'FISH',
+  YARN_BALL = 'YARN_BALL',
+  MUSHROOM = 'MUSHROOM',
+}
+
+/** Moi de co bon cho dat do trang tri. */
+export const STAND_DECORATION_MAX = 4;
+
+/**
+ * De trung bay khach chon cho ban thiet ke.
+ *
+ * Ma de tro toi danh muc de cua cua hang, noi co gia; mau go va do trang tri
+ * di kem khong tinh them tien. Chu khac tren de lay tu phan khac chu.
+ */
+@Schema({ _id: false })
+export class Stand {
+  @Prop({ trim: true, uppercase: true, default: '' })
+  baseCode!: string;
+
+  @Prop({ type: String, enum: StandTone, default: StandTone.OAK })
+  tone!: StandTone;
+
+  @Prop({ type: [String], enum: StandDecoration, default: [] })
+  decorations!: StandDecoration[];
+}
+
+export const StandSchema = SchemaFactory.createForClass(Stand);
+
 @Schema({ _id: false })
 export class Preview {
   @Prop({ type: String, enum: PreviewAngle, required: true })
@@ -127,6 +170,9 @@ export class Design {
 
   @Prop({ type: EngravingSchema, default: () => ({}) })
   engraving!: Engraving;
+
+  @Prop({ type: StandSchema, default: () => ({}) })
+  stand!: Stand;
 
   @Prop({ type: [PreviewImageSchema], default: [] })
   preview!: Preview[];

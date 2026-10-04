@@ -23,6 +23,7 @@
             [paintMode]="paintMode()"
             [brushSize]="brushSize()"
             [statusPaint]="facade.paintSaved()"
+            [stand]="standView()"
             (zoneDetected)="labelZoneDetected($event)"
             (capturedSixAngles)="onSixAnglesCaptured($event)"
             (painted)="recordPainted($event)"
@@ -171,8 +172,57 @@
               </ul>
             }
 
-            @case ('ENGRAVE') {
-              <h2 class="panel-title">{{ 'STUDIO.PANEL.ENGRAVE' | translate }}</h2>
+            @case ('STAND') {
+              <h2 class="panel-title">{{ 'STUDIO.PANEL.STAND' | translate }}</h2>
+
+              <h3 class="group-title first">{{ 'STUDIO.STAND.SHAPE' | translate }}</h3>
+              <ul class="bases">
+                @for (card of baseCards(); track card.raw.code) {
+                  <li>
+                    <button type="button" class="base" [class.on]="card.on" [attr.aria-pressed]="card.on"
+                      [attr.data-base]="card.raw.code" (click)="facade.selectBase(card.raw.code)">
+                      <span class="base-art" [attr.data-shape]="card.shape ?? 'NONE'" aria-hidden="true"></span>
+                      <span class="base-name">{{ card.raw.displayName }}</span>
+                      <span class="base-price">
+                        @if (card.free) {
+                          {{ 'STUDIO.STAND.FREE' | translate }}
+                        } @else {
+                          +{{ card.raw.priceDelta | amount: card.raw.currency }}
+                        }
+                      </span>
+                    </button>
+                  </li>
+                }
+              </ul>
+
+              @if (hasStand()) {
+                <h3 class="group-title">{{ 'STUDIO.STAND.TONE_LABEL' | translate }}</h3>
+                <ul class="tones">
+                  @for (tone of toneCards(); track tone.code) {
+                    <li>
+                      <button type="button" class="tone" [class.on]="tone.on" [attr.aria-pressed]="tone.on"
+                        [style.--wood]="tone.hex" [attr.aria-label]="tone.key | translate" [attr.title]="tone.key | translate"
+                        (click)="facade.selectTone(tone.code)"></button>
+                    </li>
+                  }
+                </ul>
+
+                <h3 class="group-title">
+                  {{ 'STUDIO.STAND.DECOR_LABEL' | translate }}
+                  <span class="count">{{ decorCount() }}/{{ decorationMax }}</span>
+                </h3>
+                <div class="chips">
+                  @for (one of decorCards(); track one.code) {
+                    <button type="button" class="chip decor" [class.on]="one.on" [attr.aria-pressed]="one.on"
+                      [disabled]="one.disabled" [attr.data-decor]="one.code" (click)="facade.toggleDecoration(one.code)">
+                      {{ one.key | translate }}
+                    </button>
+                  }
+                </div>
+              }
+
+              <h3 class="group-title">{{ (hasStand() ? 'STUDIO.STAND.ENGRAVE_ON_STAND' : 'STUDIO.STAND.ENGRAVE_ON_TAG') | translate }}</h3>
+              @if (!hasStand()) {
               <div class="tag-preview" aria-hidden="true">
                 <span class="tag-hole"></span>
                 <span class="tag-name">{{ engraving().engravedName || ('STUDIO.TAG_PLACEHOLDER' | translate) }}</span>
@@ -183,6 +233,7 @@
                   <span class="tag-message">{{ engraving().message }}</span>
                 }
               </div>
+              }
               <div class="form" [formGroup]="facade.form">
                 <label class="field">
                   <span>{{ 'STUDIO.ENGRAVED_NAME' | translate }}</span>
@@ -266,6 +317,22 @@
                   <span class="quote-price">{{ bg.unitPrice | amount: bg.currency }}</span>
                   <span class="quote-days"><pm-icon name="truck" [size]="14" />{{ 'STUDIO.DAYS' | translate: { count: bg.productionDays } }}</span>
                 </p>
+              }
+
+              @if (baseLine(); as base) {
+                <p class="base-line">
+                  <span>{{ 'STUDIO.STAND.BASE_LINE' | translate }} {{ base.name }}</span>
+                  <span>
+                    @if (base.free) {
+                      {{ 'STUDIO.STAND.FREE' | translate }}
+                    } @else {
+                      +{{ base.price | amount: base.currency }}
+                    }
+                  </span>
+                </p>
+              }
+              @if (facade.standDirty()) {
+                <p class="note warn" role="status">{{ 'STUDIO.STAND.DIRTY' | translate }}</p>
               }
 
               <p class="summary">

@@ -792,9 +792,18 @@ export interface Design {
   productTypeCode: string;
   sizeCode: string;
   engraving: Engraving;
+  /** De trung bay; vang mat o cac ban thiet ke cu. */
+  stand?: DesignStand;
   preview: DesignPreview[];
   pet: string | null;
   updatedAt: string;
+}
+
+/** De trung bay cua ban thiet ke: ma de trong danh muc, mau go va do trang tri. */
+export interface DesignStand {
+  baseCode: string;
+  tone: string;
+  decorations: string[];
 }
 
 /** Mau cua mot vung co ten tren mo hinh. */
@@ -813,6 +822,7 @@ export interface SaveDesign {
   productTypeCode?: string;
   sizeCode?: string;
   engraving?: { name?: string; memorialDate?: string; message?: string };
+  stand?: DesignStand;
   pet?: string;
 }
 
@@ -845,6 +855,8 @@ export interface ProductionItem {
   /** Ma mau theo tung vung co ten, de xuong pha len dung cho. */
   zoneColours: { zone: string; wool: WoolRoll }[];
   engraving: Engraving | null;
+  /** De trung bay cua mon nay, rong khi khong co de. */
+  stand: { baseName: string; tone: string; decorations: string[] } | null;
   anglesPreview: PreviewAngle[];
   productionDays: number;
 }

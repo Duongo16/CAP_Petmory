@@ -562,6 +562,134 @@ ul {
   }
 }
 
+// ---------- De trung bay ----------
+
+.group-title.first {
+  margin-block-start: 0;
+}
+
+.count {
+  margin-inline-start: 6px;
+  padding: 0 7px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-muted);
+  letter-spacing: 0;
+}
+
+.bases {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  inline-size: 100%;
+  padding: 10px 6px 8px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: var(--pm-paper-cream);
+  color: var(--pm-ink);
+  cursor: pointer;
+
+  &.on {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pm-accent-ring);
+  }
+}
+
+// Hinh thu nho cua de, ve bang khoi mau don gian.
+.base-art {
+  inline-size: 46px;
+  block-size: 18px;
+  margin-block: 6px 2px;
+  background: linear-gradient(var(--pm-paper-kraft) 0 45%, var(--pm-paper-mark) 45% 100%);
+  box-shadow: inset 0 -3px 0 var(--pm-paper-mark);
+
+  &[data-shape='ROUND'] {
+    border-radius: 50%;
+  }
+
+  &[data-shape='SQUARE'] {
+    border-radius: 6px;
+  }
+
+  &[data-shape='NONE'] {
+    border: 2px dashed var(--pm-paper-mark);
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+.base-name {
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.base-price {
+  font-size: 11px;
+  color: var(--pm-text-muted);
+}
+
+.tones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tone {
+  inline-size: 36px;
+  block-size: 36px;
+  border: 0;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle at 30% 70%, transparent 0 3px, color-mix(in srgb, var(--wood) 75%, var(--pm-ink)) 3px 4px),
+    var(--wood);
+  box-shadow: inset 0 0 0 2px var(--pm-paper-mark), var(--pm-shadow);
+  cursor: pointer;
+  transition: transform 0.18s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.on {
+    outline: 3px solid var(--pm-accent);
+    outline-offset: 3px;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pm-accent-ring);
+    outline-offset: 3px;
+  }
+}
+
+.chip.decor:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.base-line {
+  display: flex;
+  justify-content: space-between;
+  margin: var(--pm-space-2) 0 0;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--pm-paper-cream);
+  font-size: var(--pm-text-sm);
+  color: var(--pm-ink);
+}
+
 // The ten go xem truoc: ban khac that se trong giong vay.
 .tag-preview {
   position: relative;
@@ -763,6 +891,11 @@ ul {
     background: var(--pm-danger-soft);
     color: var(--pm-on-danger-soft);
   }
+
+  &.warn {
+    background: var(--pm-amber-soft);
+    color: var(--pm-on-amber);
+  }
 }
 
 .drawer-foot {
@@ -808,7 +941,8 @@ ul {
   .round-button,
   .model,
   .yarn-ball,
-  .tab-paw {
+  .tab-paw,
+  .tone {
     transition: none;
   }
 }

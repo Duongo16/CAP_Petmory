@@ -506,21 +506,47 @@
     "TAB": {
       "MODEL": "Pick",
       "COLOR": "Yarn",
-      "ENGRAVE": "Engrave",
-      "FINISH": "Wrap up"
+      "FINISH": "Wrap up",
+      "STAND": "Stand & name"
     },
     "PANEL": {
       "MODEL": "Who are we making today?",
       "COLOR": "Pick a yarn, then tap the plush",
-      "ENGRAVE": "Engrave a little memory",
-      "FINISH": "Time to wrap it up!"
+      "FINISH": "Time to wrap it up!",
+      "STAND": "Pick a stand, engrave a name"
     },
     "SUGGEST_LINK": "Not sure? Send a photo for a suggestion",
     "TAG_PLACEHOLDER": "Pet name",
     "CAPTURING": "Capturing 6 angles…",
     "RECAPTURE": "Capture again",
     "SUMMARY_LINE": "{{colors}} yarn colours · {{photos}}/6 photos",
-    "NEXT_TO": "Next: {{step}}"
+    "NEXT_TO": "Next: {{step}}",
+    "STAND": {
+      "SHAPE": "Stand",
+      "TONE_LABEL": "Wood colour",
+      "DECOR_LABEL": "Stand decorations",
+      "FREE": "Included",
+      "ENGRAVE_ON_STAND": "Engraved on the stand",
+      "ENGRAVE_ON_TAG": "Engraved on the name tag",
+      "BASE_LINE": "Stand:",
+      "DIRTY": "You changed the stand. Save the design again before adding it to the cart.",
+      "TONE": {
+        "OAK": "Oak",
+        "WALNUT": "Walnut",
+        "CHERRY": "Cherry",
+        "BIRCH": "Birch",
+        "PINK": "Pastel pink",
+        "MINT": "Mint"
+      },
+      "DECOR": {
+        "FLOWERS": "🌼 Little flowers",
+        "HEART": "💗 Heart",
+        "BONE": "🦴 Bone",
+        "FISH": "🐟 Fish",
+        "YARN_BALL": "🧶 Yarn ball",
+        "MUSHROOM": "🍄 Mushroom"
+      }
+    }
   },
   "HOME": {
     "BADGE": "HANDMADE • RECYCLED MATERIAL • 100% PERSONALISED",
@@ -1495,7 +1521,10 @@
       "WOOL_ROLL": "Wool colours needed",
       "PREVIEW": "Design the customer approved",
       "CUSTOMER_PHOTOS": "Photos the customer sent",
-      "NOT_SIZE_PHOTO": "The customer has not linked a pet profile to the design."
+      "NOT_SIZE_PHOTO": "The customer has not linked a pet profile to the design.",
+      "STAND": "Display stand",
+      "STAND_DECOR": "Stand decorations",
+      "STAND_DECOR_NONE": "None"
     },
     "CHAT": {
       "TITLE": "Chat desk",

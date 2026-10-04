@@ -1,5 +1,6 @@
 import {
   ArrayMaxSize,
+  ArrayUnique,
   IsArray,
   IsDateString,
   IsEnum,
@@ -13,7 +14,12 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PreviewAngle } from '../schemas/design.schema';
+import {
+  PreviewAngle,
+  STAND_DECORATION_MAX,
+  StandDecoration,
+  StandTone,
+} from '../schemas/design.schema';
 
 /** Caps how many faces one mesh may carry, so a record cannot balloon. */
 export const COUNT_FACE_MAX = 20000;
@@ -65,6 +71,24 @@ export class EngravingDto {
   message?: string;
 }
 
+/** De trung bay: ma de trong danh muc, mau go va do trang tri, deu theo danh sach co san. */
+export class StandDto {
+  @IsOptional()
+  @Matches(/^[A-Za-z0-9-]{0,40}$/)
+  baseCode?: string;
+
+  @IsOptional()
+  @IsEnum(StandTone)
+  tone?: StandTone;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(STAND_DECORATION_MAX)
+  @ArrayUnique()
+  @IsEnum(StandDecoration, { each: true })
+  decorations?: StandDecoration[];
+}
+
 export class SaveDesignDto {
   @IsString()
   @MinLength(1)
@@ -110,6 +134,11 @@ export class SaveDesignDto {
   @ValidateNested()
   @Type(() => EngravingDto)
   engraving?: EngravingDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => StandDto)
+  stand?: StandDto;
 
   @IsOptional()
   @IsMongoId()

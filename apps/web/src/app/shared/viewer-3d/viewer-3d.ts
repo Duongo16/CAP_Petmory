@@ -16,6 +16,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ANGLES_PREPARE, Engine3d, StandardAngle, MaterialZone } from './engine-3d';
 import { PaintMode, PaintState } from './painter';
+import { StandView } from './stand-options';
 
 type ScreenState = 'NOT_LOADED' | 'LOADING' | 'READY' | 'ERROR' | 'UNSUPPORTED';
 
@@ -89,6 +90,8 @@ export class Viewer3d {
    * has finished loading. An empty array means the model keeps its original colours.
    */
   readonly statusPaint = input<PaintState[]>([]);
+  /** De trung bay duoi chan be, rong la khong co de. */
+  readonly stand = input<StandView | null>(null);
 
   /** Reports the set of six still images once the user presses capture. */
   readonly capturedSixAngles = output<Record<StandardAngle, string>>();
@@ -128,6 +131,15 @@ export class Viewer3d {
         return;
       }
       engine.setBodyShape(shape);
+    });
+
+    effect(() => {
+      const view = this.stand();
+      const engine = this.engine;
+      if (!engine || this.status() !== READY) {
+        return;
+      }
+      engine.setStand(view);
     });
 
     effect(() => {
@@ -246,6 +258,7 @@ export class Viewer3d {
 
     this.status.set('LOADING');
     this.engine.setBodyShape(this.bodyShape());
+    this.engine.setStand(this.stand());
     this.engine
       .loadModel(path)
       .then((kq) => {

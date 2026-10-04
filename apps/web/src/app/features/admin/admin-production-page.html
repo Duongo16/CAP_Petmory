@@ -84,6 +84,23 @@
                 <dt>{{ 'STUDIO.MESSAGE' | translate }}</dt>
                 <dd>{{ item.engraving?.message }}</dd>
               }
+              @if (item.stand; as stand) {
+                <dt>{{ 'ADMIN.PROFILE.STAND' | translate }}</dt>
+                <dd class="stand-line">
+                  {{ stand.baseName }}
+                  @if (stand.tone) {
+                    · {{ (toneKey[stand.tone] ?? stand.tone) | translate }}
+                  }
+                </dd>
+                <dt>{{ 'ADMIN.PROFILE.STAND_DECOR' | translate }}</dt>
+                <dd class="stand-decor">
+                  @for (code of stand.decorations; track code) {
+                    <span class="tw-badge">{{ (decorKey[code] ?? code) | translate }}</span>
+                  } @empty {
+                    {{ 'ADMIN.PROFILE.STAND_DECOR_NONE' | translate }}
+                  }
+                </dd>
+              }
             </dl>
 
             <h3>{{ 'ADMIN.PROFILE.ZONE_COLOUR' | translate }}</h3>

@@ -3,6 +3,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Painter, PaintMode, PaintState } from './painter';
 import { BodyShape, bodyShapeOf } from './body-shape';
+import { applyFelt, softenNormals } from './felt-material';
+import { StandBuilder } from './stand-builder';
+import { StandView } from './stand-options';
 
 /** Six standard angles for viewing and for capturing stills for the workshop. */
 export type StandardAngle = 'FRONT' | 'LEFT' | 'RIGHT' | 'BACK' | 'TOP' | 'ISO';
@@ -64,6 +67,8 @@ export class Engine3d {
   private modelCenter = new THREE.Vector3();
   private frameHandle = 0;
   private disposed = false;
+  private readonly stand = new StandBuilder();
+  private standView: StandView | null = null;
 
   constructor(
     private readonly wrap: HTMLElement,
@@ -89,6 +94,7 @@ export class Engine3d {
     this.controls.maxDistance = 20;
 
     this.addLights();
+    this.scene.add(this.stand.group);
 
     wrap.appendChild(this.renderer.domElement);
     this.renderer.domElement.style.width = '100%';
@@ -116,10 +122,13 @@ export class Engine3d {
         // Bake the texture colours into vertex colours so the model can be painted directly.
     this.painter = new Painter(this.angle);
     this.groupMaterialByZone(this.angle);
+    // Sau buoc tach vat lieu, vi ban sao cua vat lieu khong mang theo doan ma to bong.
+    this.makeFelted(this.angle);
     this.collectBones(this.angle);
     this.applyBodyShape(this.shapeWanted);
     const countVertex = this.countVertex(this.angle);
     this.centerAndNormalise(this.angle);
+    this.refreshStand();
     this.setAngle('ISO');
 
     const zone: MaterialZone[] = [...this.materialByZone.entries()].map(([name, list]) => ({
@@ -280,6 +289,7 @@ export class Engine3d {
   destroy(): void {
     this.disposed = true;
     cancelAnimationFrame(this.frameHandle);
+    this.stand.dispose();
     this.resizeObserver.disconnect();
     this.controls.dispose();
     this.disposeOldModel();
@@ -336,7 +346,53 @@ export class Engine3d {
     }
     this.applyBodyShape(name);
     this.centerAndNormalise(this.angle);
+    this.refreshStand();
     this.setAngle('ISO');
+  }
+
+  /** Dat, doi hoac bo de trung bay duoi chan be. */
+  setStand(view: StandView | null): void {
+    this.standView = view;
+    if (!this.angle) {
+      return;
+    }
+    const before = this.radius;
+    this.refreshStand();
+    // Chi dua camera ra lai khi khung hinh doi han, de khong mat muc phong to cua nguoi dung.
+    if (Math.abs(this.radius - before) > 0.02) {
+      const direction = this.camera.position.clone().sub(this.controls.target).normalize();
+      this.camera.position.copy(this.modelCenter).addScaledVector(direction, this.radius * 2.6);
+      this.controls.target.copy(this.modelCenter);
+      this.controls.update();
+    }
+  }
+
+  /** Khoac chat len cho moi mang cua be va lam mem cac canh gay. */
+  private makeFelted(angle: THREE.Object3D): void {
+    angle.traverse((node) => {
+      if (!(node instanceof THREE.Mesh)) {
+        return;
+      }
+      softenNormals(node.geometry);
+      const list = Array.isArray(node.material) ? node.material : [node.material];
+      for (const material of list) {
+        if (material instanceof THREE.MeshStandardMaterial) {
+          applyFelt(material);
+        }
+      }
+    });
+  }
+
+  /** Dung lai de theo khung bao hien tai cua be, roi tinh lai tam va ban kinh khung hinh. */
+  private refreshStand(): void {
+    if (!this.angle) {
+      return;
+    }
+    const petBox = new THREE.Box3().setFromObject(this.angle);
+    const hasStand = this.stand.update(this.standView, petBox);
+    const box = hasStand ? petBox.clone().union(new THREE.Box3().setFromObject(this.stand.group)) : petBox;
+    box.getCenter(this.modelCenter);
+    this.radius = box.getSize(new THREE.Vector3()).length() / 2 || 1;
   }
 
   private applyBodyShape(name: string): void {

@@ -263,6 +263,11 @@ export class OrdersService {
           memorialDate: design.engraving?.memorialDate ?? null,
           message: design.engraving?.message ?? '',
         },
+        stand: {
+          baseCode: design.stand?.baseCode ?? '',
+          tone: design.stand?.tone,
+          decorations: [...(design.stand?.decorations ?? [])],
+        },
         preview: design.preview.map((one) => ({ angle: one.angle, fileName: one.fileName })),
         pet: design.pet,
         petPhoto: photos.filter((one) => !one.isHidden).map((one) => one._id),

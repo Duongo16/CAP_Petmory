@@ -16,6 +16,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AdminService } from '../../core/services/admin.service';
 import { ProductionFile } from '../../core/models/api.model';
 import { KEY_STATUS_ORDER } from '../../shared/order-status';
+import { STAND_DECORATIONS, STAND_TONES } from '../../shared/viewer-3d/stand-options';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
@@ -49,6 +50,10 @@ const ZONE_KEY: Record<string, string> = {
 
 const ZONE_KEY_OTHER = 'ADMIN.PROFILE.ZONE_OTHER';
 
+/** Ten mau go va do trang tri cua de, tra theo ma da luu. */
+const TONE_KEY: Partial<Record<string, string>> = Object.fromEntries(STAND_TONES.map((one) => [one.code, one.key]));
+const DECOR_KEY: Partial<Record<string, string>> = Object.fromEntries(STAND_DECORATIONS.map((one) => [one.code, one.key]));
+
 @Component({
   selector: 'pm-admin-production-page',
   standalone: true,
@@ -76,6 +81,8 @@ export class AdminProductionPage implements OnInit {
   private readonly data = signal<ProductionFile | null>(null);
 
   /** Temporary object URL for a preview, created from the bytes already fetched. */
+  readonly toneKey = TONE_KEY;
+  readonly decorKey = DECOR_KEY;
   readonly sourcePhoto = signal<Record<string, string>>({});
   readonly status = signal<ScreenState>('LOADING');
   readonly orderCode = signal('');

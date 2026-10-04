@@ -5,10 +5,12 @@ import {
   EngravingSchema,
   MeshPaintSchema,
   PreviewImageSchema,
+  StandSchema,
   ZonePaintSchema,
   type Engraving,
   type MeshPaint,
   type Preview,
+  type Stand,
   type ZonePaint,
 } from '../../designs/schemas/design.schema';
 
@@ -53,6 +55,10 @@ export class DesignSnapshot {
 
   @Prop({ type: EngravingSchema, default: () => ({}) })
   engraving!: Engraving;
+
+  /** Mau go va do trang tri cua de, de xuong lam dung. */
+  @Prop({ type: StandSchema, default: () => ({}) })
+  stand!: Stand;
 
   /** The six preview pictures, kept by file name in the picture store. */
   @Prop({ type: [PreviewImageSchema], default: [] })

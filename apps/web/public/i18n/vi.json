@@ -506,21 +506,47 @@
     "TAB": {
       "MODEL": "Chọn bé",
       "COLOR": "Tô len",
-      "ENGRAVE": "Khắc tên",
-      "FINISH": "Gói quà"
+      "FINISH": "Gói quà",
+      "STAND": "Đế & tên"
     },
     "PANEL": {
       "MODEL": "Hôm nay mình làm bé nào?",
       "COLOR": "Chọn len rồi chạm lên bé",
-      "ENGRAVE": "Khắc chút kỷ niệm",
-      "FINISH": "Gói bé lại thôi!"
+      "FINISH": "Gói bé lại thôi!",
+      "STAND": "Chọn đế, khắc tên cho bé"
     },
     "SUGGEST_LINK": "Chưa biết chọn? Gửi ảnh để mình gợi ý",
     "TAG_PLACEHOLDER": "Tên bé",
     "CAPTURING": "Đang chụp 6 góc…",
     "RECAPTURE": "Chụp lại",
     "SUMMARY_LINE": "{{colors}} màu len · {{photos}}/6 ảnh",
-    "NEXT_TO": "Tiếp: {{step}}"
+    "NEXT_TO": "Tiếp: {{step}}",
+    "STAND": {
+      "SHAPE": "Mẫu đế",
+      "TONE_LABEL": "Màu gỗ",
+      "DECOR_LABEL": "Trang trí trên đế",
+      "FREE": "Đã gồm",
+      "ENGRAVE_ON_STAND": "Chữ khắc trên đế",
+      "ENGRAVE_ON_TAG": "Chữ khắc trên thẻ tên",
+      "BASE_LINE": "Đế:",
+      "DIRTY": "Bạn vừa đổi đế. Lưu lại bản thiết kế trước khi thêm vào giỏ nhé.",
+      "TONE": {
+        "OAK": "Gỗ sồi",
+        "WALNUT": "Gỗ óc chó",
+        "CHERRY": "Gỗ anh đào",
+        "BIRCH": "Gỗ bạch dương",
+        "PINK": "Sơn hồng phấn",
+        "MINT": "Sơn xanh bạc hà"
+      },
+      "DECOR": {
+        "FLOWERS": "🌼 Hoa nhỏ",
+        "HEART": "💗 Trái tim",
+        "BONE": "🦴 Khúc xương",
+        "FISH": "🐟 Chú cá",
+        "YARN_BALL": "🧶 Cuộn len",
+        "MUSHROOM": "🍄 Nấm nhỏ"
+      }
+    }
   },
   "HOME": {
     "BADGE": "THỦ CÔNG • VẬT LIỆU TÁI CHẾ • 100% CÁ NHÂN HÓA",
@@ -1495,7 +1521,10 @@
       "WOOL_ROLL": "Cuộn len cần dùng",
       "PREVIEW": "Ảnh mẫu khách đã duyệt",
       "CUSTOMER_PHOTOS": "Ảnh thú cưng khách gửi",
-      "NOT_SIZE_PHOTO": "Khách chưa gắn hồ sơ thú cưng nào vào bản thiết kế."
+      "NOT_SIZE_PHOTO": "Khách chưa gắn hồ sơ thú cưng nào vào bản thiết kế.",
+      "STAND": "Đế trưng bày",
+      "STAND_DECOR": "Trang trí trên đế",
+      "STAND_DECOR_NONE": "Không có"
     },
     "CHAT": {
       "TITLE": "Trực hội thoại",

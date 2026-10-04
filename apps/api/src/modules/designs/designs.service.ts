@@ -8,6 +8,7 @@ import {
   Design,
   DesignDocument,
   PreviewAngle,
+  StandTone,
 } from './schemas/design.schema';
 import { SaveDesignDto, COUNT_DESIGN_MAX } from './dto/design.dto';
 import { CatalogService } from '../catalog/catalog.service';
@@ -128,10 +129,33 @@ export class DesignsService {
     const fileName = `tk-${randomUUID()}.png`;
     await this.storage.save(StorageFolder.DESIGN, fileName, file.buffer, 'image/png');
 
-        // Only one image is kept per angle.
-    tk.preview = tk.preview.filter((a) => a.angle !== angle);
-    tk.preview.push({ angle, fileName });
-    return tk.save();
+    /*
+     * Moi goc chi giu mot anh. Trinh duyet gui sau goc cung luc, nen phai thay
+     * anh trong mot lenh cap nhat duy nhat tren may chu co so du lieu. Doc ra,
+     * sua roi luu lai thi cac lan gui song song se giam len nhau va bao loi.
+     */
+    const updated = await this.model
+      .findOneAndUpdate(
+        { _id: tk._id, owner: tk.owner, isHidden: false },
+        [
+          {
+            $set: {
+              preview: {
+                $concatArrays: [
+                  { $filter: { input: '$preview', cond: { $ne: ['$$this.angle', angle] } } },
+                  [{ angle, fileName }],
+                ],
+              },
+            },
+          },
+        ],
+        { new: true, updatePipeline: true },
+      )
+      .exec();
+    if (!updated) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    return updated;
   }
 
   async readPreview(id: string, owner: string, angle: PreviewAngle): Promise<Buffer> {
@@ -174,6 +198,8 @@ export class DesignsService {
 
   /** If a product type and size are given, they must exist and be on sale. */
   private async checkProduct(dto: SaveDesignDto): Promise<void> {
+    // Ma de phai co trong danh muc va dang ban; ma rong nghia la chua chon de.
+    await this.catalog.findDisplayBase(dto.stand?.baseCode);
     if (!dto.productTypeCode || !dto.sizeCode) {
       return;
     }
@@ -192,6 +218,11 @@ export class DesignsService {
         name: dto.engraving?.name ?? '',
         memorialDate: dto.engraving?.memorialDate ? new Date(dto.engraving.memorialDate) : null,
         message: dto.engraving?.message ?? '',
+      },
+      stand: {
+        baseCode: dto.stand?.baseCode?.toUpperCase() ?? '',
+        tone: dto.stand?.tone ?? StandTone.OAK,
+        decorations: [...(dto.stand?.decorations ?? [])],
       },
       pet: dto.pet ? new Types.ObjectId(dto.pet) : null,
     };

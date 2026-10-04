@@ -25,19 +25,37 @@ import { PaintMode } from '../../shared/viewer-3d/painter';
 import { CatalogService } from '../../core/services/catalog.service';
 import { PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
 import { BaseModel, ModelLibrary, DeclaredZone, ZoneName } from './model-manifest';
+import {
+  STAND_DECORATIONS,
+  STAND_DECORATION_MAX,
+  STAND_TONES,
+  StandView,
+  shapeOfBase,
+} from '../../shared/viewer-3d/stand-options';
+
+/** Ngay dang nam-thang-ngay doi sang ngay.thang.nam de khac len de. */
+function dateForStand(value: string): string {
+  const [year, month, day] = value.split('-');
+  return year && month && day ? `${day}.${month}.${year}` : '';
+}
+
+/** Gia them bang khong thi hien chu da gom thay vi so khong dong. */
+function isZero(value: string): boolean {
+  return /^0+(\.0+)?$/.test(value.trim());
+}
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
 /** Bon ngan do nghe cua ban len, theo thu tu nguoi dung di qua. */
-export type Step = 'MODEL' | 'COLOR' | 'ENGRAVE' | 'FINISH';
+export type Step = 'MODEL' | 'COLOR' | 'STAND' | 'FINISH';
 
-export const STEPS: Step[] = ['MODEL', 'COLOR', 'ENGRAVE', 'FINISH'];
+export const STEPS: Step[] = ['MODEL', 'COLOR', 'STAND', 'FINISH'];
 
 /** Nhan va bieu tuong cua tung ngan, viet ra tung key de tim duoc. */
 const STEP_VIEW: Record<Step, { key: string; icon: string }> = {
   MODEL: { key: 'STUDIO.TAB.MODEL', icon: 'paw' },
   COLOR: { key: 'STUDIO.TAB.COLOR', icon: 'sparkle' },
-  ENGRAVE: { key: 'STUDIO.TAB.ENGRAVE', icon: 'pencil' },
+  STAND: { key: 'STUDIO.TAB.STAND', icon: 'pencil' },
   FINISH: { key: 'STUDIO.TAB.FINISH', icon: 'gift' },
 };
 
@@ -188,6 +206,63 @@ export class StudioPage implements OnInit {
   readonly photos = computed(() => this.preview().map((m) => ({ ...m, key: KEY_ANGLE[m.angle] })));
   readonly hasPhotos = computed(() => this.preview().length === 6);
   readonly countColorInUse = computed(() => this.colorCodesUsed().length);
+
+  // --- De trung bay ---
+
+  readonly decorationMax = STAND_DECORATION_MAX;
+  readonly hasStand = computed(() => shapeOfBase(this.facade.stand().baseCode) !== null);
+
+  readonly baseCards = computed(() => {
+    const chosen = this.facade.stand().baseCode;
+    return this.facade.bases().map((raw) => ({
+      raw,
+      on: raw.code === chosen,
+      free: isZero(raw.priceDelta.$numberDecimal),
+      shape: shapeOfBase(raw.code),
+    }));
+  });
+
+  readonly toneCards = computed(() => {
+    const chosen = this.facade.stand().tone;
+    return STAND_TONES.map((one) => ({ ...one, on: one.code === chosen }));
+  });
+
+  readonly decorCards = computed(() => {
+    const chosen = this.facade.stand().decorations;
+    const full = chosen.length >= STAND_DECORATION_MAX;
+    return STAND_DECORATIONS.map((one) => {
+      const on = chosen.includes(one.code);
+      return { ...one, on, disabled: !on && full };
+    });
+  });
+
+  readonly decorCount = computed(() => this.facade.stand().decorations.length);
+
+  /** Nhung gi khung ba chieu can de ve de, cap nhat ngay khi go chu khac. */
+  readonly standView = computed<StandView | null>(() => {
+    const choice = this.facade.stand();
+    const shape = shapeOfBase(choice.baseCode);
+    if (!shape) {
+      return null;
+    }
+    const value = this.engraving();
+    return {
+      shape,
+      tone: STAND_TONES.find((one) => one.code === choice.tone) ?? STAND_TONES[0],
+      decorations: choice.decorations,
+      name: (value.engravedName ?? '').trim(),
+      line: dateForStand(value.memorialDate ?? ''),
+    };
+  });
+
+  /** Gia them cua de dang chon, hien rieng o buoc goi qua. */
+  readonly baseLine = computed(() => {
+    const base = this.facade.baseChosen();
+    if (!base || !this.hasStand()) {
+      return null;
+    }
+    return { name: base.displayName, price: base.priceDelta, currency: base.currency, free: isZero(base.priceDelta.$numberDecimal) };
+  });
 
   readonly productCards = computed(() =>
     this.facade.types().map((kind) => ({

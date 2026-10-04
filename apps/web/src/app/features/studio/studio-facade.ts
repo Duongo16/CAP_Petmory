@@ -15,7 +15,21 @@ import {
   Design,
   MeshPaint,
   Pet,
+  DisplayBase,
 } from '../../core/models/api.model';
+import {
+  BASE_NONE,
+  StandDecoration,
+  StandTone,
+  STAND_DECORATION_MAX,
+} from '../../shared/viewer-3d/stand-options';
+
+/** Lua chon de cua ban thiet ke dang mo. */
+export interface StandChoice {
+  baseCode: string;
+  tone: StandTone;
+  decorations: StandDecoration[];
+}
 
 export type SaveState = 'UNSAVED' | 'SAVING' | 'SAVED' | 'ERROR';
 
@@ -68,6 +82,24 @@ export class StudioFacade {
   /** The customer's pet profiles, so a design can be tied to one of them. */
   readonly pets = signal<Pet[]>([]);
 
+  /** Danh muc de cua cua hang, kem gia, doc tu may chu. */
+  readonly bases = signal<DisplayBase[]>([]);
+
+  /** Mac dinh khong de, de khong tu cong tien vao don cua khach. */
+  readonly stand = signal<StandChoice>({ baseCode: BASE_NONE, tone: 'OAK', decorations: [] });
+
+  /**
+   * Da doi de sau lan luu gan nhat.
+   *
+   * Gia de di theo dong gio hang, con mau go va do trang tri di theo ban thiet
+   * ke da luu. Hai ben phai khop, nen doi de xong phai luu lai moi them vao gio.
+   */
+  readonly standDirty = signal(false);
+
+  readonly baseChosen = computed<DisplayBase | null>(
+    () => this.bases().find((one) => one.code === this.stand().baseCode) ?? null,
+  );
+
   readonly kindSelected = computed<ProductType | null>(
     () => this.types().find((l) => l.code === this.codeKindSelected()) ?? null,
   );
@@ -81,7 +113,7 @@ export class StudioFacade {
   );
 
   readonly canAddToCart = computed(
-    () => this.chosenProduct() && this.designId() !== null && !this.addedToCart(),
+    () => this.chosenProduct() && this.designId() !== null && !this.addedToCart() && !this.standDirty(),
   );
 
   /** Loads the pet profiles the design can be tied to. */
@@ -93,12 +125,42 @@ export class StudioFacade {
   }
 
   loadCatalog(): void {
+    this.catalog.displayBase$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (ds) => this.bases.set(ds),
+      error: () => this.bases.set([]),
+    });
     this.catalog.product$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (ds) => this.types.set(ds.filter((l) => l.enabled)),
         error: () => this.types.set([]),
       });
+  }
+
+  selectBase(code: string): void {
+    this.changeStand({ baseCode: code });
+  }
+
+  selectTone(tone: StandTone): void {
+    this.changeStand({ tone });
+  }
+
+  /** Bat tat mot mon trang tri, toi da so cho tren de. */
+  toggleDecoration(code: StandDecoration): void {
+    const now = this.stand().decorations;
+    if (now.includes(code)) {
+      this.changeStand({ decorations: now.filter((one) => one !== code) });
+    } else if (now.length < STAND_DECORATION_MAX) {
+      this.changeStand({ decorations: [...now, code] });
+    }
+  }
+
+  private changeStand(patch: Partial<StandChoice>): void {
+    this.stand.update((now) => ({ ...now, ...patch }));
+    this.addedToCart.set(false);
+    if (this.designId()) {
+      this.standDirty.set(true);
+    }
   }
 
   selectKind(code: string): void {
@@ -165,6 +227,7 @@ export class StudioFacade {
         memorialDate: v.memorialDate || undefined,
         message: v.message.trim(),
       },
+      stand: { ...this.stand(), decorations: [...this.stand().decorations] },
     };
 
     const existing = this.designId();
@@ -179,6 +242,7 @@ export class StudioFacade {
         next: (tk) => {
           this.designId.set(tk._id);
           this.nameDraft.set(tk.name);
+          this.standDirty.set(false);
           this.statusSave.set('SAVED');
         },
         error: () => {
@@ -210,6 +274,7 @@ export class StudioFacade {
         quantity: 1,
         designId: code,
         petName: petName || undefined,
+        displayBaseCode: this.stand().baseCode || undefined,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -230,6 +295,12 @@ export class StudioFacade {
           this.paintSaved.set(tk.paint);
           this.codeKindSelected.set(tk.productTypeCode);
           this.sizeCodeSelected.set(tk.sizeCode);
+          this.stand.set({
+            baseCode: tk.stand?.baseCode || BASE_NONE,
+            tone: (tk.stand?.tone as StandTone) || 'OAK',
+            decorations: [...((tk.stand?.decorations ?? []) as StandDecoration[])],
+          });
+          this.standDirty.set(false);
           this.form.patchValue({
             name: tk.name,
             engravedName: tk.engraving?.name ?? '',
