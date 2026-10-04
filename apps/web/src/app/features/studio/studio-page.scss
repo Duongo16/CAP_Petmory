@@ -434,10 +434,23 @@ ul {
   }
 }
 
-.model-art {
-  display: grid;
-  place-items: center;
-  block-size: 64px;
+.model-thumb {
+  inline-size: 100%;
+  max-inline-size: 112px;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 14px;
+  background: var(--pm-bg-3d);
+}
+
+.credit {
+  margin: var(--pm-space-3) 0 0;
+  font-size: var(--pm-text-xs);
+  color: var(--pm-text-muted);
+
+  a {
+    color: var(--pm-accent-dark);
+  }
 }
 
 .model-name {
@@ -454,7 +467,7 @@ ul {
   font-size: 11px;
   color: var(--pm-text-muted);
 
-  &.felted {
+  &.sitting {
     background: var(--pm-amber-soft);
     color: var(--pm-on-amber);
   }

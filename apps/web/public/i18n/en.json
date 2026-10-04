@@ -493,8 +493,6 @@
     "PET_NONE": "No pet attached",
     "PET_HINT": "Attaching a pet sends the photos you uploaded along to the workshop.",
     "EYEBROW": "The little yarn table",
-    "FELTED": "Felted shape",
-    "FELTED_NOTE": "The same realistic model with a bigger head, a rounder body and shorter legs, closer to a needle-felted toy.",
     "LOAD_ERROR": "The workbench could not load. Please refresh the page.",
     "STAGE": "3D plush viewer",
     "STAGE_TOOLS": "Viewer tools",
@@ -546,7 +544,9 @@
         "YARN_BALL": "🧶 Yarn ball",
         "MUSHROOM": "🍄 Mushroom"
       }
-    }
+    },
+    "CREDIT": "3D model: {{author}} · {{licence}}",
+    "CREDIT_SOURCE": "View source"
   },
   "HOME": {
     "BADGE": "HANDMADE • RECYCLED MATERIAL • 100% PERSONALISED",
@@ -1583,22 +1583,20 @@
     "MODELS": {
       "EYEBROW": "CHOOSE THE PRODUCT SHAPE",
       "TITLE": "Compare 3D models",
-      "SUB": "Pick a species and see its three shapes side by side. Each frame is the real model, rotatable, reading the same file the shop will use.",
+      "SUB": "Pick a species and compare its two styles side by side. Each frame is the real model file used in the shop.",
       "ERROR": "The model catalogue could not be read.",
       "PICK_KIND": "Species",
       "MODEL_NAME": "Model name",
       "KIND": "Species",
       "GROUP": "Shape group",
-      "SHAPE": "Body shape",
       "FILE": "File",
       "ZONES": "Colour zones",
       "ZONES_READING": "Reading from the file…",
       "NONE_IN_GROUP": "This group has no model for the chosen species yet.",
       "ALL_TITLE": "Every model on hand",
-      "SHARED_FILE_NOTE": "The felted models share their file with the realistic ones and differ only in the reshaped body, so they add no weight to the site.",
-      "NOTE_FELTED": "The realistic model reshaped: bigger head, rounder body, shorter legs. Cuter, while the build is still a real animal.",
-      "NOTE_REALISTIC": "Proportions as in life, long body and tall legs. Already split into four to eight colour zones.",
-      "NOTE_BLOCKY": "Cube shaped and very cute, but not lifelike. The whole animal has a single colour zone."
+      "NOTE_REALISTIC": "True-to-life shapes, sitting and standing. Models split into material zones can be filled patch by patch.",
+      "NOTE_BLOCKY": "Cube shaped and very cute, but not lifelike. The whole animal has a single colour zone.",
+      "CREDIT": "Source"
     },
     "GROUP_OPERATE": "Operations",
     "GROUP_CATALOG": "Catalogue & workshop",

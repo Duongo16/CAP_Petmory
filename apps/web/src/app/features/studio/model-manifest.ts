@@ -8,6 +8,13 @@ export interface DeclaredZone {
   required: boolean;
 }
 
+/** Nguon cua mot tep mo hinh, de ghi ten tac gia dung giay phep. */
+export interface ModelCredit {
+  author: string;
+  licence: string;
+  source: string;
+}
+
 export interface BaseModel {
   code: string;
   name: string;
@@ -15,17 +22,11 @@ export interface BaseModel {
   pose: string;
   file: string;
   ready: boolean;
-  temporary?: boolean;
-  /**
-   * Nhom dang cua mo hinh.
-   *
-   * Dang len dung lai chinh tep mo hinh that, chi khac o cho ti le than duoc
-   * nan lai, nen no khong them tep nao vao thu muc mo hinh.
-   */
-  styleGroup?: 'REALISTIC' | 'BLOCKY' | 'FELTED';
-
-  /** Ten dang than muon nan, chi co nghia voi nhom dang len. */
-  bodyShape?: string;
+  /** Dang that hay dang khoi vuong. */
+  styleGroup?: 'REALISTIC' | 'BLOCKY';
+  /** Goc xoay quanh truc dung, do theo do, de con vat quay mat ve phia truoc. */
+  rotateY?: number;
+  credit?: ModelCredit;
 }
 
 /**
@@ -46,4 +47,16 @@ export interface ModelLibrary {
   zoneName?: ZoneName[];
   /** Ban do ten mang vat lieu sang vung co ten, tra theo ten tep mo hinh. */
   zoneByFile?: Record<string, Record<string, ZoneName>>;
+  /**
+   * Ma mau da bo, tro sang mau thay the.
+   *
+   * Ban thiet ke cu van giu ma cu, nen khi mo lai phai doi sang mau dang con
+   * thay vi roi ve mau dau tien trong danh sach.
+   */
+  retired?: Record<string, string>;
+}
+
+/** Ma mau dang con dung cho mot ma co the da bo. */
+export function currentModelCode(code: string, library: Pick<ModelLibrary, 'retired'>): string {
+  return library.retired?.[code] ?? code;
 }

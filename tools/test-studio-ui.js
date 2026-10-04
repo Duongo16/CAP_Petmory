@@ -84,6 +84,18 @@ async function run() {
 
     const countModel = await page.locator('.model').count();
     res.push(check('The model tab lists the base models', countModel > 0, `${countModel} models`));
+    const codes = await page.locator('.model[data-model]').evaluateAll((all) => all.map((b) => b.dataset.model));
+    res.push(check('The retired felted variants are gone from the list',
+      codes.length > 0 && !codes.some((c) => c.startsWith('F-'))));
+    await page.locator('.model').last().scrollIntoViewIfNeeded();
+    await page.waitForTimeout(800);
+    const brokenThumbs = await page.locator('.model-thumb').evaluateAll((all) =>
+      all.filter((img) => img.complete && img.naturalWidth === 0).map((img) => img.getAttribute('src')));
+    res.push(check('Every model card shows its picture', brokenThumbs.length === 0, brokenThumbs.join(', ')));
+    const creditText = (await page.locator('.credit').innerText()).trim();
+    res.push(check('The chosen model credits its author and licence',
+      /CC0|CC-BY/.test(creditText) && (await page.locator('.credit a').getAttribute('href'))?.startsWith('https://'),
+      creditText));
     const canvas = await page.evaluate(() => {
       const c = document.querySelector('pm-viewer-3d canvas');
       return c ? { width: c.width, webgl: Boolean(c.getContext('webgl2') || c.getContext('webgl')) } : null;
@@ -224,6 +236,20 @@ async function run() {
     res.push(check('The cart line names the stand', line?.displayBaseCode === 'BASE-ROUND', line?.displayBaseName));
     res.push(check('The server adds the stand price to the line',
       BigInt(unit || '0') === BigInt(quote || '0') + 120000n, `${quote} + 120000 = ${unit}`));
+
+    // --- A draft saved on a retired model opens on its replacement ---
+    const retired = await page.request.post(`${API}/designs`, {
+      ...auth,
+      data: { name: 'Ban cu dang len', modelCode: 'F-SHIBA-SOFT' },
+    });
+    const retiredId = (await retired.json())._id;
+    await page.goto(`${WEB}/studio?draft=${retiredId}`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('.name-chip', { timeout: 40000 });
+    await page.waitForTimeout(1500);
+    const chipText = (await page.locator('.name-chip').innerText()).trim();
+    res.push(check('A design on a retired felted model reopens on the matching real model',
+      chipText === 'Shiba Inu', chipText));
+    await page.request.delete(`${API}/designs/${retiredId}`, auth);
 
     // --- Phone width ---
     await page.setViewportSize({ width: 390, height: 844 });

@@ -41,11 +41,14 @@ export class ModelLibraryService {
   private readonly logger = new Logger(ModelLibraryService.name);
   private readonly model: BaseModel[];
   private readonly zone: string[];
+  /** Ma mau da bo, tro sang mau thay the. */
+  private readonly retired: Record<string, string>;
 
   constructor() {
     const read = this.load();
     this.model = read.model;
     this.zone = read.zone;
+    this.retired = read.retired;
     this.logger.log(`Thu vien mo hinh: ${this.model.length} mau nen, ${this.zone.length} vung`);
   }
 
@@ -61,7 +64,9 @@ export class ModelLibraryService {
 
   /** Mot mau nen theo ma, hoac rong neu ma khong co trong thu vien. */
   byCode(code: string): BaseModel | null {
-    const want = code.trim().toUpperCase();
+    const asked = code.trim().toUpperCase();
+    // Ma da bo thi doi sang mau thay the, de phuong an cu van mo ra dung loai.
+    const want = (this.retired[asked] ?? asked).toUpperCase();
     return this.ready().find((one) => one.code.toUpperCase() === want) ?? null;
   }
 
@@ -81,7 +86,7 @@ export class ModelLibraryService {
   }
 
   /** Doc ban khai tu dia, hoac tra ve danh sach rong neu khong tim thay. */
-  private load(): { model: BaseModel[]; zone: string[] } {
+  private load(): { model: BaseModel[]; zone: string[]; retired: Record<string, string> } {
     for (const where of MAYBE) {
       const path = resolve(join(process.cwd(), where));
       if (!existsSync(path)) {
@@ -91,14 +96,15 @@ export class ModelLibraryService {
         const raw = JSON.parse(readFileSync(path, 'utf8')) as {
           baseModel?: BaseModel[];
           zoneName?: string[];
+          retired?: Record<string, string>;
         };
-        return { model: raw.baseModel ?? [], zone: raw.zoneName ?? [] };
+        return { model: raw.baseModel ?? [], zone: raw.zoneName ?? [], retired: raw.retired ?? {} };
       } catch (trouble) {
         const why = trouble instanceof Error ? trouble.message : String(trouble);
         this.logger.warn(`Ban khai mo hinh doc khong ra: ${why}`);
       }
     }
     this.logger.warn('Khong tim thay ban khai mo hinh. Phan goi y thiet ke se khong chay duoc.');
-    return { model: [], zone: [] };
+    return { model: [], zone: [], retired: {} };
   }
 }

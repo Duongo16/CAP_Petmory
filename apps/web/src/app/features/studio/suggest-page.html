@@ -102,7 +102,7 @@
           <article class="option-detail tw-card grid grid-cols-1 nav:grid-cols-[1fr_300px] gap-6 p-5">
             <div class="stage min-h-[380px] rounded-lg bg-muted overflow-hidden">
               @if (one.modelPath) {
-                <pm-viewer-3d [pathModel]="one.modelPath" [colorByZone]="one.colorByZone" />
+                <pm-viewer-3d [pathModel]="one.modelPath" [rotateY]="one.rotateY" [colorByZone]="one.colorByZone" />
               }
             </div>
 

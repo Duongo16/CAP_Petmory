@@ -43,7 +43,7 @@
             <div class="shape-view">
               <pm-viewer-3d
                 [pathModel]="one.path"
-                [bodyShape]="one.shape"
+                [rotateY]="one.rotate"
                 [compact]="true"
                 (zoneDetected)="noteZones(picked.code, $event)"
               />
@@ -95,7 +95,7 @@
               <th>{{ 'ADMIN.MODELS.MODEL_NAME' | translate }}</th>
               <th>{{ 'ADMIN.MODELS.KIND' | translate }}</th>
               <th>{{ 'ADMIN.MODELS.GROUP' | translate }}</th>
-              <th>{{ 'ADMIN.MODELS.SHAPE' | translate }}</th>
+              <th>{{ 'ADMIN.MODELS.CREDIT' | translate }}</th>
               <th>{{ 'ADMIN.MODELS.FILE' | translate }}</th>
             </tr>
           </thead>
@@ -106,14 +106,13 @@
                 <td>{{ row.raw.name }}</td>
                 <td class="thin">{{ row.kindKey | translate }}</td>
                 <td class="thin">{{ row.group }}</td>
-                <td class="thin">{{ row.shape || '—' }}</td>
+                <td class="thin">{{ row.creditText || '—' }}</td>
                 <td class="thin">{{ row.raw.file }}</td>
               </tr>
             }
           </tbody>
         </table>
       </div>
-      <p class="pm-empty table-note">{{ 'ADMIN.MODELS.SHARED_FILE_NOTE' | translate }}</p>
     </section>
   }
 }

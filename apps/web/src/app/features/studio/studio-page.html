@@ -17,7 +17,7 @@
             class="stage-viewer"
             [bare]="true"
             [pathModel]="path"
-            [bodyShape]="bodyShapeSelected()"
+            [rotateY]="rotateSelected()"
             [colorByZone]="colorByZone()"
             [colorPendingPaint]="colorCodePendingPaint()"
             [paintMode]="paintMode()"
@@ -119,15 +119,21 @@
               <ul class="models">
                 @for (card of modelCards(); track card.raw.code) {
                   <li>
-                    <button type="button" class="model" [class.on]="card.on" [attr.aria-pressed]="card.on"
+                    <button type="button" class="model" [class.on]="card.on" [attr.aria-pressed]="card.on" [attr.data-model]="card.raw.code"
                       (click)="selectBaseModel(card.raw)">
-                      <span class="model-art"><pm-pet-art [kind]="card.art" [width]="64" /></span>
+                      <img class="model-thumb" [src]="card.thumb" alt="" loading="lazy" width="96" height="96" />
                       <span class="model-name">{{ card.raw.name }}</span>
-                      <span class="model-tag" [class.felted]="card.felted">{{ card.styleKey | translate }}</span>
+                      <span class="model-tag" [class.sitting]="card.sitting">{{ card.tagKey | translate }}</span>
                     </button>
                   </li>
                 }
               </ul>
+              @if (credit(); as one) {
+                <p class="credit">
+                  {{ 'STUDIO.CREDIT' | translate: { author: one.author, licence: one.licence } }}
+                  <a [href]="one.source" target="_blank" rel="noopener noreferrer">{{ 'STUDIO.CREDIT_SOURCE' | translate }}</a>
+                </p>
+              }
               <a class="suggest-link" routerLink="/suggest">
                 <pm-icon name="bulb" [size]="15" />{{ 'STUDIO.SUGGEST_LINK' | translate }}
               </a>

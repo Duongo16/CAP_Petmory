@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "description": "Declares the base models and their material zones. The viewer reads the zones straight from the model file; this file only attaches a display label and the colour group each zone may use.",
   "zoneMaterial": [
     {
@@ -127,9 +127,249 @@
       "labelDisplay": "PET.ZONE.NOSE",
       "colorGroupAllowed": "EYES_NOSE",
       "required": false
+    },
+    {
+      "name": "body",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "white",
+      "labelDisplay": "PET.ZONE.BELLY_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "ear",
+      "labelDisplay": "PET.ZONE.EARS",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "mat16",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "mat21",
+      "labelDisplay": "PET.ZONE.BELLY_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "mat23",
+      "labelDisplay": "PET.ZONE.EYES",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "DD9944",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "FFCC88",
+      "labelDisplay": "PET.ZONE.BELLY_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "BA68C8",
+      "labelDisplay": "PET.ZONE.NOSE",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "1A1A1A",
+      "labelDisplay": "PET.ZONE.EYES",
+      "colorGroupAllowed": "EYES_NOSE",
+      "required": false
+    },
+    {
+      "name": "lambert2SG",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "795548",
+      "labelDisplay": "PET.ZONE.EARS",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "Material.131",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "Beige",
+      "labelDisplay": "PET.ZONE.MAIN_FUR",
+      "colorGroupAllowed": "FUR",
+      "required": false
+    },
+    {
+      "name": "Brown",
+      "labelDisplay": "PET.ZONE.EARS",
+      "colorGroupAllowed": "FUR",
+      "required": false
     }
   ],
   "baseModel": [
+    {
+      "code": "CAT-SIT-GINGER",
+      "name": "Mèo mướp ngồi",
+      "kind": "CAT",
+      "pose": "SITTING",
+      "file": "cat-sitting-ginger.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": -90,
+      "credit": {
+        "author": "elkiotbear",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/ovFy5UldDq"
+      }
+    },
+    {
+      "code": "CAT-SIT-GREY",
+      "name": "Mèo xám ngồi",
+      "kind": "CAT",
+      "pose": "SITTING",
+      "file": "cat-sitting-grey.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": -90,
+      "credit": {
+        "author": "Corentin Fatus",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/axMUjC7xwSa"
+      }
+    },
+    {
+      "code": "CAT-KITTEN",
+      "name": "Mèo con tròn",
+      "kind": "CAT",
+      "pose": "SITTING",
+      "file": "cat-kitten-round.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": -90,
+      "credit": {
+        "author": "jeremy",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/dXyLRVNOalM"
+      }
+    },
+    {
+      "code": "CAT-SIAMESE",
+      "name": "Mèo Xiêm",
+      "kind": "CAT",
+      "pose": "STANDING",
+      "file": "cat-siamese.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Poly by Google",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/dBJgGEu5bHW"
+      }
+    },
+    {
+      "code": "DOG-PUPPY-SIT",
+      "name": "Cún con ngồi",
+      "kind": "DOG",
+      "pose": "SITTING",
+      "file": "dog-puppy-sitting.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": -90,
+      "credit": {
+        "author": "Poly by Google",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/07qH3gO5K8L"
+      }
+    },
+    {
+      "code": "DOG-GOLDEN",
+      "name": "Cún lông vàng",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-golden-puppy.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Poly by Google",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/3nFLBC3aXen"
+      }
+    },
+    {
+      "code": "DOG-POODLE",
+      "name": "Poodle",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-poodle.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Poly by Google",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/eQmBaLcGbbE"
+      }
+    },
+    {
+      "code": "DOG-BEAGLE",
+      "name": "Beagle",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-beagle.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Poly by Google",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/0BnDT3T1wTE"
+      }
+    },
+    {
+      "code": "DOG-CORGI",
+      "name": "Corgi",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-corgi.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "madtrollstudio",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/2neHxHTY3t"
+      }
+    },
+    {
+      "code": "Q-PUG",
+      "name": "Pug",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-Pug.glb",
+      "ready": true,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Quaternius",
+        "licence": "CC0 1.0",
+        "source": "https://poly.pizza/m/1gXKv15ik8"
+      }
+    },
     {
       "code": "Q-SHIBA",
       "name": "Shiba Inu",
@@ -137,8 +377,13 @@
       "pose": "STANDING",
       "file": "q-ShibaInu.glb",
       "ready": true,
-      "temporary": true,
-      "styleGroup": "REALISTIC"
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Quaternius",
+        "licence": "CC0 1.0",
+        "source": "https://poly.pizza/m/y4wdQpg767"
+      }
     },
     {
       "code": "Q-HUSKY",
@@ -147,8 +392,13 @@
       "pose": "STANDING",
       "file": "q-Husky.glb",
       "ready": true,
-      "temporary": true,
-      "styleGroup": "REALISTIC"
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Quaternius",
+        "licence": "CC0 1.0",
+        "source": "https://poly.pizza/m/wcWiuEqwzq"
+      }
     },
     {
       "code": "Q-FOX",
@@ -157,28 +407,13 @@
       "pose": "STANDING",
       "file": "q-Fox.glb",
       "ready": true,
-      "temporary": true,
-      "styleGroup": "REALISTIC"
-    },
-    {
-      "code": "TEMP-CAT",
-      "name": "Mèo",
-      "kind": "CAT",
-      "pose": "STANDING",
-      "file": "animal-cat.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "BLOCKY"
-    },
-    {
-      "code": "TEMP-DOG",
-      "name": "Chó",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "animal-dog.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "BLOCKY"
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Quaternius",
+        "licence": "CC0 1.0",
+        "source": "https://quaternius.com/packs/ultimateanimatedanimals.html"
+      }
     },
     {
       "code": "TEMP-BUNNY",
@@ -187,18 +422,13 @@
       "pose": "STANDING",
       "file": "animal-bunny.glb",
       "ready": true,
-      "temporary": true,
-      "styleGroup": "BLOCKY"
-    },
-    {
-      "code": "TEMP-FOX",
-      "name": "Cáo",
-      "kind": "OTHER",
-      "pose": "STANDING",
-      "file": "animal-fox.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "BLOCKY"
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "credit": {
+        "author": "Kenney",
+        "licence": "CC0 1.0",
+        "source": "https://kenney.nl/assets/cube-pets"
+      }
     },
     {
       "code": "TEMP-PANDA",
@@ -207,38 +437,13 @@
       "pose": "STANDING",
       "file": "animal-panda.glb",
       "ready": true,
-      "temporary": true,
-      "styleGroup": "BLOCKY"
-    },
-    {
-      "code": "TEMP-TIGER",
-      "name": "Hổ",
-      "kind": "OTHER",
-      "pose": "STANDING",
-      "file": "animal-tiger.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "BLOCKY"
-    },
-    {
-      "code": "Q-WOLF",
-      "name": "Chó sói",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-Wolf.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "REALISTIC"
-    },
-    {
-      "code": "Q-DEER",
-      "name": "Hươu",
-      "kind": "OTHER",
-      "pose": "STANDING",
-      "file": "q-Deer.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "REALISTIC"
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "credit": {
+        "author": "Kenney",
+        "licence": "CC0 1.0",
+        "source": "https://kenney.nl/assets/cube-pets"
+      }
     },
     {
       "code": "TEMP-PARROT",
@@ -247,8 +452,13 @@
       "pose": "STANDING",
       "file": "animal-parrot.glb",
       "ready": true,
-      "temporary": true,
-      "styleGroup": "BLOCKY"
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "credit": {
+        "author": "Kenney",
+        "licence": "CC0 1.0",
+        "source": "https://kenney.nl/assets/cube-pets"
+      }
     },
     {
       "code": "TEMP-FISH",
@@ -257,114 +467,17 @@
       "pose": "STANDING",
       "file": "animal-fish.glb",
       "ready": true,
-      "temporary": true,
-      "styleGroup": "BLOCKY"
-    },
-    {
-      "code": "F-SHIBA-SOFT",
-      "name": "Shiba dáng len",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-ShibaInu.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "FELTED",
-      "bodyShape": "FELTED_SOFT"
-    },
-    {
-      "code": "F-SHIBA-ROUND",
-      "name": "Shiba dáng len tròn",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-ShibaInu.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "FELTED",
-      "bodyShape": "FELTED_ROUND"
-    },
-    {
-      "code": "F-HUSKY-SOFT",
-      "name": "Husky dáng len",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-Husky.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "FELTED",
-      "bodyShape": "FELTED_SOFT"
-    },
-    {
-      "code": "F-HUSKY-ROUND",
-      "name": "Husky dáng len tròn",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-Husky.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "FELTED",
-      "bodyShape": "FELTED_ROUND"
-    },
-    {
-      "code": "F-WOLF-ROUND",
-      "name": "Chó sói dáng len tròn",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-Wolf.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "FELTED",
-      "bodyShape": "FELTED_ROUND"
-    },
-    {
-      "code": "F-FOX-ROUND",
-      "name": "Cáo dáng len tròn",
-      "kind": "OTHER",
-      "pose": "STANDING",
-      "file": "q-Fox.glb",
-      "ready": true,
-      "temporary": true,
-      "styleGroup": "FELTED",
-      "bodyShape": "FELTED_ROUND"
-    },
-    {
-      "code": "DOG-SITTING",
-      "name": "Chó ngồi",
-      "kind": "DOG",
-      "pose": "SITTING",
-      "file": "dog-sitting.glb",
-      "ready": false
-    },
-    {
-      "code": "DOG-STANDING",
-      "name": "Chó đứng",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "dog-standing.glb",
-      "ready": false
-    },
-    {
-      "code": "CAT-SITTING",
-      "name": "Mèo ngồi",
-      "kind": "CAT",
-      "pose": "SITTING",
-      "file": "cat-sitting.glb",
-      "ready": false
-    },
-    {
-      "code": "CAT-LYING",
-      "name": "Mèo nằm",
-      "kind": "CAT",
-      "pose": "LYING",
-      "file": "cat-lying.glb",
-      "ready": false
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "credit": {
+        "author": "Kenney",
+        "licence": "CC0 1.0",
+        "source": "https://kenney.nl/assets/cube-pets"
+      }
     }
   ],
   "source": {
-    "author": "Kenney",
-    "site": "https://kenney.nl",
-    "licence": "CC0 1.0 Universal",
-    "origin": "Cube Pets 2.0",
-    "note": "Ba nhom dang cung ton tai de so sanh: Kenney Cube Pets dang khoi vuong, Quaternius dang that, va dang len la chinh mo hinh that duoc nan lai ti le xuong cho dau to than tron chan ngan. Dang len khong them tep mo hinh nao."
+    "note": "Moi mau ghi nguon rieng o truong credit. Giay phep va danh sach ghi cong nam trong LICENCE.md."
   },
   "zoneName": [
     "MAIN_FUR",
@@ -398,43 +511,72 @@
       "Black": "NOSE",
       "Eyes": "EYE"
     },
-    "animal-cat.glb": {
-      "colormap": "MAIN_FUR"
-    },
-    "animal-dog.glb": {
-      "colormap": "MAIN_FUR"
-    },
     "animal-bunny.glb": {
-      "colormap": "MAIN_FUR"
-    },
-    "animal-fox.glb": {
       "colormap": "MAIN_FUR"
     },
     "animal-panda.glb": {
       "colormap": "MAIN_FUR"
-    },
-    "animal-tiger.glb": {
-      "colormap": "MAIN_FUR"
-    },
-    "q-Wolf.glb": {
-      "Main": "MAIN_FUR",
-      "Main_Light": "BELLY_FUR",
-      "Nose": "NOSE",
-      "Eyes_Black": "EYE"
-    },
-    "q-Deer.glb": {
-      "Main": "MAIN_FUR",
-      "Main_Light": "BELLY_FUR",
-      "Main_Dark": "MAIN_FUR",
-      "Eye_Black": "EYE",
-      "Eye_White": "EYE",
-      "Eye_Lighter": "EYE"
     },
     "animal-parrot.glb": {
       "colormap": "MAIN_FUR"
     },
     "animal-fish.glb": {
       "colormap": "MAIN_FUR"
+    },
+    "cat-sitting-ginger.glb": {
+      "body": "MAIN_FUR",
+      "white": "BELLY_FUR",
+      "ear": "EAR"
+    },
+    "cat-sitting-grey.glb": {
+      "mat16": "MAIN_FUR",
+      "mat21": "BELLY_FUR",
+      "mat23": "EYE"
+    },
+    "cat-kitten-round.glb": {
+      "DD9944": "MAIN_FUR",
+      "FFCC88": "BELLY_FUR",
+      "BA68C8": "NOSE",
+      "1A1A1A": "EYE"
+    },
+    "cat-siamese.glb": {
+      "lambert2SG": "MAIN_FUR"
+    },
+    "dog-puppy-sitting.glb": {
+      "795548": "EAR",
+      "DD9944": "MAIN_FUR",
+      "FFCC88": "BELLY_FUR",
+      "1A1A1A": "EYE"
+    },
+    "dog-golden-puppy.glb": {
+      "lambert2SG": "MAIN_FUR"
+    },
+    "dog-poodle.glb": {
+      "lambert2SG": "MAIN_FUR"
+    },
+    "dog-beagle.glb": {
+      "lambert2SG": "MAIN_FUR"
+    },
+    "dog-corgi.glb": {
+      "Material.131": "MAIN_FUR"
+    },
+    "q-Pug.glb": {
+      "Beige": "MAIN_FUR",
+      "Brown": "EAR"
     }
+  },
+  "retired": {
+    "F-SHIBA-SOFT": "Q-SHIBA",
+    "F-SHIBA-ROUND": "Q-SHIBA",
+    "F-HUSKY-SOFT": "Q-HUSKY",
+    "F-HUSKY-ROUND": "Q-HUSKY",
+    "F-WOLF-ROUND": "Q-HUSKY",
+    "F-FOX-ROUND": "Q-FOX",
+    "Q-WOLF": "Q-HUSKY",
+    "Q-DEER": "Q-FOX",
+    "TEMP-CAT": "CAT-SIT-GINGER",
+    "TEMP-DOG": "DOG-PUPPY-SIT",
+    "TEMP-FOX": "Q-FOX",
+    "TEMP-TIGER": "CAT-SIT-GINGER"
   }
 }

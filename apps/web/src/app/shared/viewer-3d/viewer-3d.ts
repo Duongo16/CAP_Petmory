@@ -62,13 +62,8 @@ export class Viewer3d {
    */
   readonly bare = input(false);
 
-  /**
-   * Ten dang than muon ap cho mo hinh.
-   *
-   * Rong nghia la giu nguyen dang goc cua tep. Doi ten thi nan lai ngay, khong
-   * phai tai lai tep mo hinh.
-   */
-  readonly bodyShape = input('');
+  /** Goc xoay quanh truc dung khi nap mo hinh, de con vat quay mat ve phia truoc. */
+  readonly rotateY = input(0);
 
   /** Colour map by zone name. Changing it applies immediately without reloading the model. */
   readonly colorByZone = input<Record<string, string>>({});
@@ -117,20 +112,11 @@ export class Viewer3d {
 
   constructor() {
     // Chi nap lai khi doi tep mo hinh. Cac tin hieu doc ben trong luc nap, nhu
-    // tu xoay hay dang than, khong duoc lam nap lai, neu khong se mat mau dang to.
+    // tu xoay hay de trung bay, khong duoc lam nap lai, neu khong se mat mau dang to.
     effect(() => {
       const path = this.pathModel();
       const box = this.wrap().nativeElement;
       untracked(() => this.initAndLoad(box, path));
-    });
-
-    effect(() => {
-      const shape = this.bodyShape();
-      const engine = this.engine;
-      if (!engine || this.status() !== READY) {
-        return;
-      }
-      engine.setBodyShape(shape);
     });
 
     effect(() => {
@@ -257,10 +243,9 @@ export class Viewer3d {
     }
 
     this.status.set('LOADING');
-    this.engine.setBodyShape(this.bodyShape());
     this.engine.setStand(this.stand());
     this.engine
-      .loadModel(path)
+      .loadModel(path, this.rotateY())
       .then((kq) => {
         this.countVertex.set(kq.countVertex);
         this.status.set(READY);

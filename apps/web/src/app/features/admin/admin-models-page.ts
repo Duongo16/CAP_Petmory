@@ -26,12 +26,11 @@ const MANIFEST = '/models/manifest.json';
 const GROUP_FALLBACK = 'BLOCKY';
 
 /**
- * Ba nhom dang, kem key ban dich.
+ * Hai nhom dang, kem key ban dich.
  *
  * Viet ra tung key mot de tim duoc bang tim kiem chu, khong ghep key tu chuoi.
  */
 const GROUPS: { group: string; key: string; noteKey: string }[] = [
-  { group: 'FELTED', key: 'STUDIO.FELTED', noteKey: 'ADMIN.MODELS.NOTE_FELTED' },
   { group: 'REALISTIC', key: 'STUDIO.REALISTIC', noteKey: 'ADMIN.MODELS.NOTE_REALISTIC' },
   { group: GROUP_FALLBACK, key: 'STUDIO.BLOCKY', noteKey: 'ADMIN.MODELS.NOTE_BLOCKY' },
 ];
@@ -56,7 +55,7 @@ interface ShapeColumn {
   choices: BaseModel[];
   picked: BaseModel | null;
   path: string;
-  shape: string;
+  rotate: number;
   zoneCount: number;
   zoneText: string;
 }
@@ -65,10 +64,10 @@ interface ShapeColumn {
  * So sanh cac mau 3D dang co.
  *
  * Man hinh nay de chon dang nao hop voi san pham len choc nhat. Chon mot loai
- * thu roi nhin ba dang cua no canh nhau: dang len, dang that va dang khoi.
+ * thu roi nhin hai dang cua no canh nhau: dang that va dang khoi vuong.
  *
  * Moi cot la mot khung nhin thuc su, xoay duoc, doc dung tep mo hinh se dung
- * khi ban hang chu khong phai anh chup san. Chi mo ba khung mot luc, vi trinh
+ * khi ban hang chu khong phai anh chup san. Chi mo hai khung mot luc, vi trinh
  * duyet chi cho mo mot so luong khung do hoa nhat dinh.
  *
  * Nhom nao khong co mau cho loai thu dang chon thi cot do noi thang la chua co,
@@ -119,7 +118,7 @@ export class AdminModelsPage implements OnInit {
         choices,
         picked,
         path: picked ? `/models/${picked.file}` : '',
-        shape: picked?.bodyShape ?? '',
+        rotate: picked?.rotateY ?? 0,
         zoneCount: found.length,
         zoneText: found.join(' · '),
       };
@@ -132,7 +131,7 @@ export class AdminModelsPage implements OnInit {
       raw: one,
       group: one.styleGroup ?? GROUP_FALLBACK,
       kindKey: KEY_KIND[one.kind] ?? KEY_KIND['OTHER'],
-      shape: one.bodyShape ?? '',
+      creditText: one.credit ? `${one.credit.author} · ${one.credit.licence}` : '',
     })),
   );
 

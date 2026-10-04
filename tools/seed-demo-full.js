@@ -130,7 +130,7 @@ const PETS = [
 
 /** Ba ban thiet ke len, dung mau nen va bang mau that cua xuong. */
 const DESIGNS = [
-  { key: 'mochi', pet: 'mochi', name: 'Mochi cười híp mắt', modelCode: 'F-SHIBA-ROUND', productTypeCode: 'PT-01', sizeCode: 'FIG-M',
+  { key: 'mochi', pet: 'mochi', name: 'Mochi cười híp mắt', modelCode: 'Q-SHIBA', productTypeCode: 'PT-01', sizeCode: 'FIG-M',
     zonePaint: { MAIN_FUR: 'WOOL-Y02', BELLY_FUR: 'WOOL-W01', EAR: 'WOOL-Y02', TAIL: 'WOOL-W02', EYE: 'WOOL-K01', NOSE: 'WOOL-NS01' },
     engraving: { name: 'MOCHI', message: 'Cậu Shiba của phố Hàng Bút' } },
   { key: 'bong', pet: 'bong', name: 'Móc khóa Bông lông trắng', modelCode: 'TEMP-CAT', productTypeCode: 'PT-02', sizeCode: 'KEY-S',

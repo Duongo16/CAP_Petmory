@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Painter, PaintMode, PaintState } from './painter';
-import { BodyShape, bodyShapeOf } from './body-shape';
 import { applyFelt, softenNormals } from './felt-material';
 import { StandBuilder } from './stand-builder';
 import { StandView } from './stand-options';
@@ -21,6 +20,11 @@ const ANGLE_DIRECTION: Record<StandardAngle, THREE.Vector3> = {
   TOP: new THREE.Vector3(0, 1, 0.001),
   ISO: new THREE.Vector3(0.9, 0.6, 0.9),
 };
+
+/** Khoang cach camera, tinh theo ban kinh mo hinh. */
+const FRAME_DISTANCE = 2.85;
+/** Do ha diem nhin, tinh theo ban kinh, de con vat nam cao hon trong khung. */
+const FRAME_LIFT = 0.14;
 
 export interface MaterialZone {
   /** Zone name read from the model file itself. */
@@ -58,11 +62,8 @@ export class Engine3d {
   private angle: THREE.Group | null = null;
   private painter: Painter | null = null;
   private readonly raycaster = new THREE.Raycaster();
-  private bonesByName = new Map<string, THREE.Object3D>();
-  private originalBoneScale = new Map<string, THREE.Vector3>();
   private materialByZone = new Map<string, THREE.MeshStandardMaterial[]>();
   private attachedAccessories = new Map<string, THREE.Object3D>();
-  private shapeWanted = '';
   private radius = 1;
   private modelCenter = new THREE.Vector3();
   private frameHandle = 0;
@@ -109,7 +110,13 @@ export class Engine3d {
   }
 
   /** Loads a new model, replacing the one on screen if there is one. */
-  async loadModel(path: string): Promise<ResultLoadModel> {
+  /**
+   * Nap mot mo hinh moi, thay cho mo hinh dang hien neu co.
+   *
+   * Moi tac gia ve con vat quay mot huong, nen ban khai ghi them goc xoay de
+   * con nao cung quay mat ve phia truoc.
+   */
+  async loadModel(path: string, rotateYDegrees = 0): Promise<ResultLoadModel> {
     const gltf = await this.loader.loadAsync(path);
     if (this.disposed) {
       return { zone: [], countVertex: 0 };
@@ -124,8 +131,8 @@ export class Engine3d {
     this.groupMaterialByZone(this.angle);
     // Sau buoc tach vat lieu, vi ban sao cua vat lieu khong mang theo doan ma to bong.
     this.makeFelted(this.angle);
-    this.collectBones(this.angle);
-    this.applyBodyShape(this.shapeWanted);
+    this.angle.rotation.y = THREE.MathUtils.degToRad(rotateYDegrees);
+    this.angle.updateMatrixWorld(true);
     const countVertex = this.countVertex(this.angle);
     this.centerAndNormalise(this.angle);
     this.refreshStand();
@@ -184,9 +191,20 @@ export class Engine3d {
   /** Moves the camera to a standard angle. */
   setAngle(angle: StandardAngle): void {
     const direction = ANGLE_DIRECTION[angle].clone().normalize();
-    const distance = this.radius * 2.6;
-    this.camera.position.copy(this.modelCenter).addScaledVector(direction, distance);
-    this.controls.target.copy(this.modelCenter);
+    this.aimCamera(direction);
+  }
+
+  /**
+   * Dat camera theo mot huong, nhin vao diem hoi thap hon tam mo hinh.
+   *
+   * Mep duoi khung xem co cac nut noi, nen day con vat len cao mot chut va lui
+   * camera ra them, de dang cao nhu meo ngoi khong bi che mat phan chan.
+   */
+  private aimCamera(direction: THREE.Vector3): void {
+    const target = this.modelCenter.clone();
+    target.y -= this.radius * FRAME_LIFT;
+    this.camera.position.copy(target).addScaledVector(direction, this.radius * FRAME_DISTANCE);
+    this.controls.target.copy(target);
     this.controls.update();
   }
 
@@ -330,26 +348,6 @@ export class Engine3d {
     });
   }
 
-  /**
-   * Nan lai ti le cac phan than cua mo hinh.
-   *
-   * Moi lan deu tinh tu ti le goc da nho luc doc tep, nen goi bao nhieu lan
-   * cung ra cung mot ket qua, va ten dang rong thi tra ve nguyen dang goc.
-   *
-   * Chi nhung ten xuong co that trong tep moi duoc dung. Ten khong co thi bo
-   * qua, vi moi bo mo hinh dat ten mot kieu.
-   */
-  setBodyShape(name: string): void {
-    this.shapeWanted = name;
-    if (!this.angle) {
-      return;
-    }
-    this.applyBodyShape(name);
-    this.centerAndNormalise(this.angle);
-    this.refreshStand();
-    this.setAngle('ISO');
-  }
-
   /** Dat, doi hoac bo de trung bay duoi chan be. */
   setStand(view: StandView | null): void {
     this.standView = view;
@@ -360,10 +358,7 @@ export class Engine3d {
     this.refreshStand();
     // Chi dua camera ra lai khi khung hinh doi han, de khong mat muc phong to cua nguoi dung.
     if (Math.abs(this.radius - before) > 0.02) {
-      const direction = this.camera.position.clone().sub(this.controls.target).normalize();
-      this.camera.position.copy(this.modelCenter).addScaledVector(direction, this.radius * 2.6);
-      this.controls.target.copy(this.modelCenter);
-      this.controls.update();
+      this.aimCamera(this.camera.position.clone().sub(this.controls.target).normalize());
     }
   }
 
@@ -374,6 +369,9 @@ export class Engine3d {
         return;
       }
       softenNormals(node.geometry);
+      // Khung bao ghi san trong tep co khi sai, ma khung nay dung de can co mo hinh.
+      node.geometry.computeBoundingBox();
+      node.geometry.computeBoundingSphere();
       const list = Array.isArray(node.material) ? node.material : [node.material];
       for (const material of list) {
         if (material instanceof THREE.MeshStandardMaterial) {
@@ -393,32 +391,6 @@ export class Engine3d {
     const box = hasStand ? petBox.clone().union(new THREE.Box3().setFromObject(this.stand.group)) : petBox;
     box.getCenter(this.modelCenter);
     this.radius = box.getSize(new THREE.Vector3()).length() / 2 || 1;
-  }
-
-  private applyBodyShape(name: string): void {
-    const shape: BodyShape = bodyShapeOf(name);
-    for (const [bone, original] of this.originalBoneScale.entries()) {
-      const node = this.bonesByName.get(bone);
-      if (!node) {
-        continue;
-      }
-      const factor = shape[bone] ?? 1;
-      node.scale.copy(original).multiplyScalar(factor);
-    }
-    this.angle?.updateMatrixWorld(true);
-  }
-
-  /** Remembers each named node and its original scale so it can be restored. */
-  private collectBones(angle: THREE.Object3D): void {
-    this.bonesByName = new Map();
-    this.originalBoneScale = new Map();
-    angle.traverse((node) => {
-      if (!node.name) {
-        return;
-      }
-      this.bonesByName.set(node.name, node);
-      this.originalBoneScale.set(node.name, node.scale.clone());
-    });
   }
 
   private countVertex(angle: THREE.Object3D): number {
@@ -462,8 +434,6 @@ export class Engine3d {
     this.angle = null;
     this.painter = null;
     this.materialByZone.clear();
-    this.bonesByName.clear();
-    this.originalBoneScale.clear();
   }
 
   private disposeTree(angle: THREE.Object3D): void {

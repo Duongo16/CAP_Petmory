@@ -493,8 +493,6 @@
     "PET_NONE": "Chưa gắn thú cưng nào",
     "PET_HINT": "Gắn thú cưng để ảnh bạn đã tải lên đi kèm vào hồ sơ gửi xưởng.",
     "EYEBROW": "Bàn len của bé",
-    "FELTED": "Dáng len",
-    "FELTED_NOTE": "Cùng mô hình thật nhưng đầu to hơn, thân tròn hơn và chân ngắn lại, cho gần dáng thú len chọc.",
     "LOAD_ERROR": "Chưa tải được bàn làm việc. Bạn thử tải lại trang nhé.",
     "STAGE": "Khung xem bé len 3D",
     "STAGE_TOOLS": "Công cụ khung xem",
@@ -546,7 +544,9 @@
         "YARN_BALL": "🧶 Cuộn len",
         "MUSHROOM": "🍄 Nấm nhỏ"
       }
-    }
+    },
+    "CREDIT": "Mô hình 3D: {{author}} · {{licence}}",
+    "CREDIT_SOURCE": "Xem nguồn"
   },
   "HOME": {
     "BADGE": "THỦ CÔNG • VẬT LIỆU TÁI CHẾ • 100% CÁ NHÂN HÓA",
@@ -1583,22 +1583,20 @@
     "MODELS": {
       "EYEBROW": "CHỌN DÁNG SẢN PHẨM",
       "TITLE": "So sánh mẫu 3D",
-      "SUB": "Chọn một loài rồi xem ba dáng của nó cạnh nhau. Mỗi khung là mô hình thật, xoay được, đọc đúng tệp sẽ dùng khi bán hàng.",
+      "SUB": "Chọn một loài rồi xem hai dáng của nó cạnh nhau. Mỗi khung là mô hình thật, xoay được, đọc đúng tệp sẽ dùng khi bán hàng.",
       "ERROR": "Không đọc được danh mục mẫu.",
       "PICK_KIND": "Loài thú",
       "MODEL_NAME": "Tên mẫu",
       "KIND": "Loài",
       "GROUP": "Nhóm dáng",
-      "SHAPE": "Dáng thân",
       "FILE": "Tệp",
       "ZONES": "Vùng màu",
       "ZONES_READING": "Đang đọc từ tệp…",
       "NONE_IN_GROUP": "Nhóm này chưa có mẫu cho loài đang chọn.",
       "ALL_TITLE": "Toàn bộ mẫu đang có",
-      "SHARED_FILE_NOTE": "Các mẫu dáng len dùng chung tệp mô hình với mẫu dáng thật, chỉ khác ở tỉ lệ thân được nắn lại, nên chúng không làm nặng thêm trang web.",
-      "NOTE_FELTED": "Mô hình thật được nắn lại: đầu to hơn, thân tròn hơn, chân ngắn lại. Đáng yêu hơn mà cấu trúc vẫn là con vật thật.",
-      "NOTE_REALISTIC": "Tỉ lệ đúng như con vật ngoài đời, thân dài chân cao. Tách sẵn 4 đến 8 vùng màu.",
-      "NOTE_BLOCKY": "Dáng khối vuông, rất đáng yêu nhưng không giống thật. Cả con chỉ có một vùng màu."
+      "NOTE_REALISTIC": "Dáng thật, có cả dáng ngồi lẫn dáng đứng. Mẫu chia vật liệu theo vùng thì đổ màu được cả mảng.",
+      "NOTE_BLOCKY": "Dáng khối vuông, rất đáng yêu nhưng không giống thật. Cả con chỉ có một vùng màu.",
+      "CREDIT": "Nguồn"
     },
     "GROUP_OPERATE": "Vận hành",
     "GROUP_CATALOG": "Danh mục & xưởng",

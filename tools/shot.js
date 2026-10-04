@@ -72,7 +72,7 @@ async function run() {
   await settle(page);
   await page.fill('#login-email', who.email);
   await page.fill('#login-password', who.password);
-  await page.click('.submit');
+  await page.click('button[type="submit"]');
   await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 30000 });
 
   console.log('SCREENSHOTS');

@@ -16,7 +16,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Icon } from '../../shared/icon/icon';
-import { PetArt } from '../../shared/pet-art/pet-art';
 import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { StudioFacade } from './studio-facade';
@@ -24,7 +23,7 @@ import { StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
 import { PaintMode } from '../../shared/viewer-3d/painter';
 import { CatalogService } from '../../core/services/catalog.service';
 import { PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
-import { BaseModel, ModelLibrary, DeclaredZone, ZoneName } from './model-manifest';
+import { BaseModel, ModelLibrary, DeclaredZone, ZoneName, currentModelCode } from './model-manifest';
 import {
   STAND_DECORATIONS,
   STAND_DECORATION_MAX,
@@ -66,11 +65,11 @@ const KEY_KIND: Record<string, string> = {
   OTHER: 'STUDIO.KIND.OTHER',
 };
 
-/** Nhom dang cua mau nen, kem key ban dich. */
-const KEY_STYLE: Record<string, string> = {
-  FELTED: 'STUDIO.FELTED',
-  REALISTIC: 'STUDIO.REALISTIC',
-  BLOCKY: 'STUDIO.BLOCKY',
+/** Nhan tren the mau: dang that thi ghi tu the, dang khoi thi ghi khoi vuong. */
+const KEY_POSE: Record<string, string> = {
+  SITTING: 'STUDIO.POSE.SITTING',
+  STANDING: 'STUDIO.POSE.STANDING',
+  LYING: 'STUDIO.POSE.LYING',
 };
 
 const KEY_ANGLE: Record<StandardAngle, string> = {
@@ -94,7 +93,7 @@ export interface ZoneView {
 @Component({
   selector: 'pm-studio-page',
   standalone: true,
-  imports: [Icon, PetArt, Viewer3d, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe],
+  imports: [Icon, Viewer3d, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe],
   providers: [StudioFacade],
   templateUrl: './studio-page.html',
   styleUrl: './studio-page.scss',
@@ -178,7 +177,10 @@ export class StudioPage implements OnInit {
   readonly furColors = computed(() => this.palette().filter((m) => m.group === 'FUR'));
   readonly eyesNoseColors = computed(() => this.palette().filter((m) => m.group === 'EYES_NOSE'));
   readonly colorCodePendingPaint = computed(() => this.colorPendingPaint()?.swatch ?? null);
-  readonly bodyShapeSelected = computed(() => this.baseModelSelected()?.bodyShape ?? '');
+  readonly rotateSelected = computed(() => this.baseModelSelected()?.rotateY ?? 0);
+
+  /** Ten tac gia va giay phep cua mau dang chon, giay phep ghi ten bat buoc phai hien. */
+  readonly credit = computed(() => this.baseModelSelected()?.credit ?? null);
 
   readonly kindTabs = computed(() => {
     const kinds = [...new Set(this.baseModel().map((m) => m.kind))];
@@ -193,9 +195,9 @@ export class StudioPage implements OnInit {
       .filter((m) => !kind || m.kind === kind)
       .map((m) => ({
         raw: m,
-        art: (m.kind === 'CAT' ? 'cat' : 'dog') as 'cat' | 'dog',
-        styleKey: KEY_STYLE[m.styleGroup ?? 'BLOCKY'] ?? 'STUDIO.BLOCKY',
-        felted: m.styleGroup === 'FELTED',
+        thumb: `/models/thumbs/${m.code}.webp`,
+        tagKey: m.styleGroup === 'BLOCKY' ? 'STUDIO.BLOCKY' : (KEY_POSE[m.pose] ?? 'STUDIO.REALISTIC'),
+        sitting: m.pose === 'SITTING',
         on: m.code === chosen,
       }));
   });
@@ -295,13 +297,14 @@ export class StudioPage implements OnInit {
           this.status.set(ready.length > 0 ? 'READY' : 'ERROR');
           if (codeDraft) {
             this.facade.openDraft(codeDraft, (tk) => {
-              this.baseModelSelected.set(ready.find((m) => m.code === tk.modelCode) ?? ready[0] ?? null);
+              const code = currentModelCode(tk.modelCode, library);
+              this.baseModelSelected.set(ready.find((m) => m.code === code) ?? ready[0] ?? null);
               this.colorCodesUsed.set([...tk.colorCodesUsed]);
               this.zonePaintOpened.set(tk.paint.length === 0 ? (tk.zonePaint ?? []) : []);
             });
             return;
           }
-          const first = ready.find((m) => m.styleGroup === 'FELTED') ?? ready[0] ?? null;
+          const first = ready.find((m) => m.pose === 'SITTING') ?? ready[0] ?? null;
           this.baseModelSelected.set(first);
           this.nameDraftFor(first);
         },

@@ -23,7 +23,7 @@ import {
   SuggestOption,
   SuggestStyleChoice,
 } from '../../core/models/api.model';
-import { ModelLibrary, ZoneName } from './model-manifest';
+import { BaseModel, ModelLibrary, ZoneName, currentModelCode } from './model-manifest';
 import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
 import { Icon } from '../../shared/icon/icon';
 
@@ -58,6 +58,7 @@ interface OptionView {
   title: string;
   rationale: string;
   modelPath: string;
+  rotateY: number;
   /** Mau gan cho tung mang vat lieu cua tep mo hinh. */
   colorByZone: Record<string, string>;
   /** Cac vung va mau, viet ra cho nguoi doc. */
@@ -116,7 +117,8 @@ export class SuggestPage implements OnInit {
   readonly shownKey = signal('');
 
   private zoneByFile: Record<string, Record<string, ZoneName>> = {};
-  private fileOf: Record<string, string> = {};
+  private modelOf: Record<string, BaseModel> = {};
+  private retired: Record<string, string> = {};
 
   /** Cac phong cach kem key ban dich, tinh san de khung nhin khong goi ham. */
   readonly styles = computed(() =>
@@ -153,9 +155,10 @@ export class SuggestPage implements OnInit {
       .subscribe({
         next: (library) => {
           this.zoneByFile = library.zoneByFile ?? {};
-          this.fileOf = Object.fromEntries(
-            library.baseModel.filter((one) => one.ready).map((one) => [one.code, one.file]),
+          this.modelOf = Object.fromEntries(
+            library.baseModel.filter((one) => one.ready).map((one) => [one.code, one]),
           );
+          this.retired = library.retired ?? {};
           this.status.set('READY');
         },
         error: () => this.status.set('ERROR'),
@@ -264,7 +267,8 @@ export class SuggestPage implements OnInit {
     swatchOf: Map<string, string>,
     nameOf: Map<string, string>,
   ): OptionView {
-    const file = this.fileOf[one.modelCode] ?? '';
+    const model = this.modelOf[currentModelCode(one.modelCode, { retired: this.retired })];
+    const file = model?.file ?? '';
     const zoneOf = this.zoneByFile[file] ?? {};
     const colorByZone: Record<string, string> = {};
     for (const [material, zone] of Object.entries(zoneOf)) {
@@ -294,6 +298,7 @@ export class SuggestPage implements OnInit {
       title: one.title,
       rationale: one.rationale,
       modelPath: file ? `/models/${file}` : '',
+      rotateY: model?.rotateY ?? 0,
       colorByZone,
       zoneLine,
       someUnrendered: zoneLine.some((each) => !each.rendered),
