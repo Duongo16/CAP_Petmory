@@ -7,6 +7,14 @@ export interface AppConfig {
   mongodbUri: string;
   webOrigin: string;
   sepayWebhookKey: string;
+  sepay: {
+    /** Token goi API giao dich cua SePay, dung cho doi soat. Rong thi tat doi soat. */
+    apiToken: string;
+    apiBase: string;
+    /** IP duoc phep goi webhook, cach nhau dau phay. Rong thi khong kiem IP. */
+    allowedIps: string[];
+    timeoutMs: number;
+  };
   jwt: {
     accessSecret: string;
     refreshSecret: string;
@@ -50,7 +58,17 @@ export default (): AppConfig => ({
   port: Number(process.env.API_PORT ?? 3000),
   mongodbUri: required('MONGODB_URI'),
   webOrigin: process.env.WEB_ORIGIN ?? 'http://localhost:4200',
-  sepayWebhookKey: process.env.SEPAY_WEBHOOK_KEY ?? 'change-this-key-before-running',
+  // Khong co gia tri mac dinh: thieu khoa thi webhook tu choi moi yeu cau.
+  sepayWebhookKey: (process.env.SEPAY_WEBHOOK_KEY ?? '').trim(),
+  sepay: {
+    apiToken: (process.env.SEPAY_API_TOKEN ?? '').trim(),
+    apiBase: (process.env.SEPAY_API_BASE ?? 'https://my.sepay.vn/userapi').replace(/\/+$/, ''),
+    allowedIps: (process.env.SEPAY_ALLOWED_IPS ?? '')
+      .split(',')
+      .map((one) => one.trim())
+      .filter(Boolean),
+    timeoutMs: Number(process.env.SEPAY_TIMEOUT_MS ?? 10000),
+  },
   jwt: {
     accessSecret: required('JWT_ACCESS_SECRET'),
     refreshSecret: required('JWT_REFRESH_SECRET'),

@@ -60,6 +60,19 @@
 
             <p class="done-note tw-hint">{{ 'PAYMENT.DONE_NOTE' | translate }}</p>
           </section>
+        } @else if (cancelled()) {
+          <!-- ---------- Don da huy ---------- -->
+          <section class="cancelled tw-card flex flex-col items-center gap-4 w-full max-w-[640px] mx-auto px-8 py-12 max-[600px]:px-5 max-[600px]:py-8 text-center">
+            <span class="grid place-items-center w-[72px] h-[72px] rounded-full bg-danger-soft text-on-danger-soft" aria-hidden="true"><pm-icon name="close" [size]="34" /></span>
+            <h1 class="pm-page-title tw-page-title">{{ 'PAYMENT.CANCELLED_TITLE' | translate }}</h1>
+            <p class="m-0 text-base leading-[1.65] text-body">
+              {{ 'PAYMENT.CANCELLED_TEXT' | translate: { orderCode: qr.orderCode } }}
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+              <a class="tw-btn-primary" routerLink="/orders">{{ 'PAYMENT.SEE_MY_ORDERS' | translate }}</a>
+              <a class="tw-btn-secondary" routerLink="/shop">{{ 'PAYMENT.BACK_TO_SHOP' | translate }}</a>
+            </div>
+          </section>
         } @else {
           <!-- ---------- Dang cho tien ve ---------- -->
           <header class="head flex flex-col gap-1">
@@ -89,9 +102,16 @@
                 <strong>{{ expired() ? ('PAYMENT.EXPIRED' | translate) : countdown() }}</strong>
               </p>
 
-              <div class="qr-frame grid place-items-center mt-4 p-4 rounded-lg bg-card border border-edge">
-                <img [src]="qr.qrImage" [alt]="'PAYMENT.QR_CODE' | translate" />
-              </div>
+              @if (expired()) {
+                <div class="expired-box mt-4 p-5 rounded-lg bg-danger-soft text-on-danger-soft text-center" role="alert">
+                  <strong class="block mb-1">{{ 'PAYMENT.EXPIRED_TITLE' | translate }}</strong>
+                  <p class="m-0 text-sm leading-[1.6]">{{ 'PAYMENT.EXPIRED_TEXT' | translate }}</p>
+                </div>
+              } @else {
+                <div class="qr-frame grid place-items-center mt-4 p-4 rounded-lg bg-card border border-edge">
+                  <img [src]="qr.qrImage" [alt]="'PAYMENT.QR_CODE' | translate" />
+                </div>
+              }
               <p class="qr-bank mt-2 mb-0 text-xs font-medium text-ink-muted">{{ qr.bankName }}</p>
 
               <p class="waiting flex items-center gap-3 w-full mt-5 mb-0 px-4 py-3 rounded-md bg-accent-soft text-sm font-medium text-body" role="status">
@@ -119,6 +139,7 @@
                   </div>
                 </dl>
 
+                @if (!expired()) {
                 <div class="copy-box">
                   <span class="copy-name">{{ 'PAYMENT.ACCOUNT_NUMBER' | translate }}</span>
                   <span class="copy-row flex items-center justify-between gap-3">
@@ -152,6 +173,7 @@
                   </span>
                 </div>
 
+                }
                 <aside class="warn p-4 rounded-lg bg-amber-soft">
                   <strong class="block mb-1 text-xs font-bold text-on-amber">{{ 'PAYMENT.WARNING_TITLE' | translate }}</strong>
                   <p class="m-0 text-xs leading-[1.6] text-on-amber">{{ 'PAYMENT.WARNING_CONTENT' | translate: { message: qr.transferMessage } }}</p>

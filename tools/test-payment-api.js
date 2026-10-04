@@ -154,6 +154,76 @@ async function run() {
   const customerLog = await call('/payments/log', { headers: auth });
   check('A customer cannot read the payment log', customerLog.status === 403);
 
+  // --- SePay contract ---
+  check('The webhook answers the way SePay requires', raw.status === 200 && raw.body.success === true);
+
+  const manager = await call('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'quanly@petmory.local', password: 'Petmory@2026' }),
+  });
+  const mgr = { Authorization: `Bearer ${manager.body.accessToken}`, 'Content-Type': 'application/json' };
+  const settings = await call('/settings', { headers: mgr });
+  const shopAccount = settings.body.accountNumber;
+
+  /** Dat mot don moi mot mon, tra ve ma tham chieu. */
+  async function newOrder() {
+    await call('/cart/items', { method: 'POST', headers: auth, body: JSON.stringify({ productTypeCode: 'PT-01', sizeCode: 'FIG-M', quantity: 1 }) });
+    const made = await call('/orders', {
+      method: 'POST',
+      headers: auth,
+      body: JSON.stringify({ fullName: 'Nguyen Van A', phone: '0901234567', address: '12 Duong ABC, Phuong 1', province: 'Ha Noi' }),
+    });
+    return made.body;
+  }
+  const send = (body) => call('/payments/webhook', { method: 'POST', headers: hdr, body: JSON.stringify(body) });
+  const status = async (code) => (await call(`/orders/${code}`, { headers: auth })).body.status;
+
+  const second = await newOrder();
+  const fullPayload = await send({
+    id: Date.now(), gateway: 'VietinBank', transactionDate: '2026-10-04 10:00:00', accountNumber: shopAccount,
+    subAccount: null, code: second.reference, content: `${second.reference} chuyen tien`, transferType: 'in',
+    description: 'NGUYEN VAN A chuyen tien', transferAmount: 750000, accumulated: 9750000,
+    referenceCode: 'FT26100400001', someNewSePayField: 'kept',
+  });
+  check('A full SePay payload with an unknown extra field is accepted and matched',
+    fullPayload.status === 200 && fullPayload.body.result === 'MATCHED', JSON.stringify(fullPayload.body));
+  check('That order is paid', (await status(second.orderCode)) === 'PAID');
+
+  const third = await newOrder();
+  const outgoing = await send({ id: `out-${Date.now()}`, transferType: 'out', transferAmount: 750000, content: third.reference, accountNumber: shopAccount });
+  check('Money going out is ignored even with an order code inside', outgoing.body.result === 'IGNORED');
+  const otherAccount = await send({ id: `acc-${Date.now()}`, transferType: 'in', transferAmount: 750000, content: third.reference, accountNumber: '999999999999' });
+  check('Money into another linked account is ignored', otherAccount.body.result === 'IGNORED');
+  check('Neither moved the order', (await status(third.orderCode)) === 'AWAITING_PAYMENT');
+
+  const over = await send({ id: `over-${Date.now()}`, transferType: 'in', transferAmount: 800000, content: `CK ${third.reference}`, accountNumber: shopAccount });
+  check('Paying too much is recorded as overpaid', over.body.result === 'OVERPAID');
+  check('An overpaid order is still paid', (await status(third.orderCode)) === 'PAID');
+  const flagged = await call(`/admin/orders/${third.orderCode}`, { headers: mgr });
+  const flaggedOrder = flagged.body.order ?? flagged.body;
+  check('An overpaid order is flagged for a refund of the difference',
+    flaggedOrder.needsAttention === true && String(flaggedOrder.attentionNote).includes('50000'), flaggedOrder.attentionNote);
+
+  const late = await send({ id: `late-${Date.now()}`, transferType: 'in', transferAmount: 1500000, content: reference });
+  check('A second payment for a paid order is recorded as late', late.body.result === 'LATE');
+
+  const noId = await send({ transferAmount: 750000, content: third.reference });
+  check('A notification without a transaction id is rejected', noId.status === 400);
+  const fraction = await send({ id: `fr-${Date.now()}`, transferAmount: 1000.5, content: third.reference });
+  check('A fractional amount is rejected instead of crashing', fraction.status === 400);
+
+  // --- Reconciliation ---
+  const customerReconcile = await call('/payments/reconcile', { method: 'POST', headers: auth, body: '{}' });
+  check('A customer cannot reconcile', customerReconcile.status === 403);
+  const reconcile = await call('/payments/reconcile', { method: 'POST', headers: mgr, body: JSON.stringify({ days: 1 }) });
+  check('Reconciling answers clearly whether SePay is configured',
+    reconcile.status === 200 || reconcile.status === 424, `${reconcile.status} ${JSON.stringify(reconcile.body?.message ?? '')}`);
+
+  const log = await call('/payments/log?limit=20', { headers: mgr });
+  const row = (log.body ?? []).find((one) => one.referenceCode === 'FT26100400001');
+  check('The log keeps the bank reference and the raw payload', Boolean(row) && row.rawData?.someNewSePayField === 'kept');
+
   console.log('='.repeat(64));
   console.log(failed === 0 ? `ALL ${passed} CHECKS PASSED` : `${failed}/${passed + failed} CHECKS FAILED`);
   process.exit(failed === 0 ? 0 : 1);

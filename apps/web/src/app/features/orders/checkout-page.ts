@@ -10,7 +10,7 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, of, finalize } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CartService } from '../../core/services/cart.service';
 import { OrdersService } from '../../core/services/orders.service';
@@ -147,9 +147,18 @@ export class CheckoutPage implements OnInit {
       .subscribe({
         next: (order) => {
           this.pendingSend.set(false);
-          // Reload cart so remaining items stay in cart
-          this.cartService.reload().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => undefined });
-          void this.router.navigate(['/payments', order.orderCode]);
+          /*
+           * Doc lai gio truoc roi moi chuyen trang. Chuyen trang ngay thi man
+           * hinh nay bi huy, keo theo huy luon yeu cau doc gio, va thanh dieu
+           * huong van hien so mon cu du gio da trong.
+           */
+          this.cartService
+            .reload()
+            .pipe(
+              finalize(() => void this.router.navigate(['/payments', order.orderCode])),
+              takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe({ error: () => undefined });
         },
         error: (trouble: { status?: number }) => {
           this.pendingSend.set(false);

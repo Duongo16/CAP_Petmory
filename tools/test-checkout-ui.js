@@ -58,12 +58,12 @@ async function run() {
     await page.waitForSelector('.picker .name', { timeout: 15000 });
     await page.locator('button:has-text("Thêm vào giỏ hàng")').click();
     await page.waitForTimeout(1200);
-    res.push(check('A product can be added to the cart', (await page.locator('.badge').innerText()) === '1'));
+    res.push(check('A product can be added to the cart', (await page.locator('a[href="/cart"] [role="status"]').innerText()) === '1'));
 
                 // Move on to the details form
     await page.goto(`${WEB}/cart`, { waitUntil: 'networkidle' });
     await page.locator('a:has-text("Tiến hành đặt hàng")').click();
-    await page.waitForURL('**/checkout', { timeout: 15000 });
+    await page.waitForURL('**/checkout**', { timeout: 15000 });
     await page.waitForSelector('.form', { timeout: 15000 });
     res.push(check('The details form opens', true));
 
@@ -109,7 +109,7 @@ async function run() {
 
     // The cart must be empty once the order has been placed
     res.push(check('The cart badge is gone once the order is placed',
-      (await page.locator('.badge').count()) === 0));
+      (await page.locator('a[href="/cart"] [role="status"]').count()) === 0));
 
     // Send a transfer notification exactly as the real service would
     const bao1 = await page.request.post(`${API}/payments/webhook`, {
@@ -151,6 +151,25 @@ async function run() {
     res.push(check('Clearing the filter brings the order back',
       (await page.locator('.order').count()) === 1));
     await page.screenshot({ path: path.join(OUT, 'checkout-4-order-list.png') });
+
+    // --- A cancelled order must not look paid ---
+    const access = await page.evaluate(() => localStorage.getItem('petmory.access'));
+    const bearer = { Authorization: `Bearer ${access}` };
+    const products = await (await page.request.get(`${API}/catalog/products`, { headers: bearer })).json();
+    const product = products.find((p) => p.enabled && p.sizes.some((one) => one.enabled));
+    await page.request.post(`${API}/cart/items`, {
+      headers: bearer,
+      data: { productTypeCode: product.code, sizeCode: product.sizes.find((one) => one.enabled).code, quantity: 1 },
+    });
+    const placed = await (await page.request.post(`${API}/orders`, {
+      headers: bearer,
+      data: { fullName: 'Nguyen Van B', phone: '0901234567', address: '12 Duong ABC, Phuong 1', province: 'Ha Noi' },
+    })).json();
+    await page.request.post(`${API}/orders/${placed.orderCode}/cancel`, { headers: bearer });
+    await page.goto(`${WEB}/payments/${placed.orderCode}`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('.cancelled, .done', { timeout: 20000 });
+    res.push(check('A cancelled order shows as cancelled, not as paid',
+      (await page.locator('.cancelled').count()) === 1 && (await page.locator('.done').count()) === 0));
 
     const realErrors = error.filter((l) => !/favicon/i.test(l));
     res.push(check('No javascript error', realErrors.length === 0, realErrors.slice(0, 2).join(' | ')));

@@ -6,6 +6,7 @@ import {
 } from './schemas/payment-notification.schema';
 import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
+import { SePayClient } from './sepay-client';
 import { OrdersModule } from '../orders/orders.module';
 import { BusinessConfigModule } from '../business-config/business-config.module';
 
@@ -18,6 +19,6 @@ import { BusinessConfigModule } from '../business-config/business-config.module'
     BusinessConfigModule,
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService],
+  providers: [PaymentsService, SePayClient],
 })
 export class PaymentsModule {}

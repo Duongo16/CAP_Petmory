@@ -796,7 +796,7 @@
     "WARNING_CONTENT": "Vui lòng điền chính xác tuyệt đối nội dung chuyển khoản {{message}}. Nếu sai nội dung, hệ thống sẽ không thể tự động kích hoạt đơn hàng cho thú cưng của bạn.",
     "SEE_MY_ORDERS": "Xem đơn hàng của tôi",
     "I_HAVE_PAID": "Tôi đã chuyển tiền xong",
-    "EXPIRY_NOTE": "Mã QR có thời hạn. Hết hạn thì bạn tạo lại mã mới cho cùng đơn.",
+    "EXPIRY_NOTE": "The payment code has a time limit. If it runs out before you pay, cancel the order and place it again.",
     "PAYMENT_RECEIVED": "Đã nhận được tiền thành công!",
     "PAYMENT_RECEIVED_TEXT": "Đơn hàng {{orderCode}} đã được chuyển sang xưởng sản xuất len thủ công. Nghệ nhân của Petmory sẽ tỉ mẩn từng chi tiết để tái hiện trọn vẹn kỷ vật của bé cưng gửi tới bạn.",
     "RECAP": "THÔNG TIN ĐƠN HÀNG",
@@ -807,7 +807,12 @@
     "RECAP_DELIVERY": "Dự kiến giao hàng",
     "VIEW_ORDER": "Xem đơn hàng",
     "GO_HOME": "Về trang chủ",
-    "DONE_NOTE": "Bạn sẽ nhận được thông báo mỗi khi xưởng cập nhật tiến độ nặn phôi len và đóng gói."
+    "DONE_NOTE": "Bạn sẽ nhận được thông báo mỗi khi xưởng cập nhật tiến độ nặn phôi len và đóng gói.",
+    "CANCELLED_TITLE": "Order cancelled",
+    "CANCELLED_TEXT": "Order {{orderCode}} was cancelled, so no transfer is needed. If you already sent money, the shop will contact you to refund it.",
+    "EXPIRED_TITLE": "This payment code has expired",
+    "EXPIRED_TEXT": "Please do not transfer with this code any more. A transfer made earlier is still recorded when it arrives. Otherwise, cancel the order in My orders and place it again.",
+    "BACK_TO_SHOP": "Back to the shop"
   },
   "ORDER": {
     "TITLE": "Đơn hàng của tôi",
@@ -1409,8 +1414,8 @@
       "TAKEN_TODAY": "Taken today",
       "MATCHED_FULLY": "Matched in full",
       "AUTO_SHARE": "{{share}}% matched without help",
-      "SHORT": "Short of the amount",
-      "SHORT_NOTE": "Customer sent less than the order",
+      "SHORT": "Needs checking",
+      "SHORT_NOTE": "Underpaid, overpaid or late payments",
       "LOOSE": "No order code",
       "LOOSE_NOTE": "Needs handling by hand",
       "GROUP_ALL": "All",
@@ -1424,7 +1429,12 @@
       "AMOUNT": "Amount",
       "CONTENT": "Transfer message",
       "ORDER_CODE": "Matched order",
-      "RESULT": "Result"
+      "RESULT": "Result",
+      "GROUP_NEEDS_CHECK": "Needs checking",
+      "RECONCILE": "Reconcile with SePay",
+      "RECONCILING": "Reconciling…",
+      "RECONCILE_DONE": "Reconciled from {{since}}: SePay listed {{fetched}} transactions, {{added}} added, {{known}} already recorded.",
+      "RECONCILE_FAILED": "Reconciliation failed."
     },
     "ACTION": {
       "ORDER_CREATED": "Order created",
@@ -1438,7 +1448,10 @@
       "NO_REFERENCE": "No order code found",
       "UNDERPAID": "Amount too low",
       "ALREADY_PROCESSED": "Already processed",
-      "OTHER": "Other"
+      "OTHER": "Other",
+      "OVERPAID": "Overpaid",
+      "LATE": "Arrived after the order closed",
+      "IGNORED": "Ignored"
     },
     "CONFIG": {
       "TAB_SYSTEM": "System & Orders",

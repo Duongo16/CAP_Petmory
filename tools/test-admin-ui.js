@@ -322,8 +322,8 @@ async function run() {
     // The log is long, so it must arrive a page at a time rather than all at once.
     const logRows = await page.locator(ROW_TABLE).count();
     res.push(check('The log shows one page at a time', logRows <= 25, `${logRows} rows`));
-    res.push(check('The log reports four outcome groups',
-      (await page.locator(FILTER_LOG).count()) === 4));
+    res.push(check('The log reports five outcome groups',
+      (await page.locator(FILTER_LOG).count()) === 5));
     res.push(check('The log carries a money summary',
       (await page.locator('.money-tile').count()) === 4));
 
@@ -339,7 +339,7 @@ async function run() {
     const pill = await page.locator(FILTER_LOG).allInnerTexts();
     const figures = pill.map((t) => Number(/\((\d+)\)/.exec(t)[1]));
     res.push(check('The group counts add up to the whole log',
-      figures[0] === figures[1] + figures[2] + figures[3], figures.join(' vs ')));
+      figures[0] === figures[1] + figures[2] + figures[3] + figures[4], figures.join(' vs ')));
 
     await page.locator(FILTER_LOG).first().click();
     await page.waitForTimeout(600);

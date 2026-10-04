@@ -796,7 +796,7 @@
     "WARNING_CONTENT": "Vui lòng điền chính xác tuyệt đối nội dung chuyển khoản {{message}}. Nếu sai nội dung, hệ thống sẽ không thể tự động kích hoạt đơn hàng cho thú cưng của bạn.",
     "SEE_MY_ORDERS": "Xem đơn hàng của tôi",
     "I_HAVE_PAID": "Tôi đã chuyển tiền xong",
-    "EXPIRY_NOTE": "Mã QR có thời hạn. Hết hạn thì bạn tạo lại mã mới cho cùng đơn.",
+    "EXPIRY_NOTE": "Mã thanh toán có thời hạn. Quá hạn mà chưa chuyển khoản thì hãy huỷ đơn và đặt lại.",
     "PAYMENT_RECEIVED": "Đã nhận được tiền thành công!",
     "PAYMENT_RECEIVED_TEXT": "Đơn hàng {{orderCode}} đã được chuyển sang xưởng sản xuất len thủ công. Nghệ nhân của Petmory sẽ tỉ mẩn từng chi tiết để tái hiện trọn vẹn kỷ vật của bé cưng gửi tới bạn.",
     "RECAP": "THÔNG TIN ĐƠN HÀNG",
@@ -807,7 +807,12 @@
     "RECAP_DELIVERY": "Dự kiến giao hàng",
     "VIEW_ORDER": "Xem đơn hàng",
     "GO_HOME": "Về trang chủ",
-    "DONE_NOTE": "Bạn sẽ nhận được thông báo mỗi khi xưởng cập nhật tiến độ nặn phôi len và đóng gói."
+    "DONE_NOTE": "Bạn sẽ nhận được thông báo mỗi khi xưởng cập nhật tiến độ nặn phôi len và đóng gói.",
+    "CANCELLED_TITLE": "Đơn hàng đã huỷ",
+    "CANCELLED_TEXT": "Đơn {{orderCode}} đã được huỷ nên không cần chuyển khoản nữa. Nếu bạn đã lỡ chuyển tiền, cửa hàng sẽ liên hệ để hoàn lại.",
+    "EXPIRED_TITLE": "Mã thanh toán đã hết hạn",
+    "EXPIRED_TEXT": "Đừng chuyển khoản theo mã này nữa. Nếu bạn đã chuyển trước đó, tiền vẫn được ghi nhận khi về tới. Nếu chưa, hãy vào Đơn hàng để huỷ và đặt lại.",
+    "BACK_TO_SHOP": "Về cửa hàng"
   },
   "ORDER": {
     "TITLE": "Đơn hàng của tôi",
@@ -1410,8 +1415,8 @@
       "TAKEN_TODAY": "Tổng tiền nhận hôm nay",
       "MATCHED_FULLY": "Đã khớp hoàn toàn",
       "AUTO_SHARE": "Tỷ lệ tự động {{share}}%",
-      "SHORT": "Cần bù tiền",
-      "SHORT_NOTE": "Khách chuyển thiếu so với đơn",
+      "SHORT": "Cần kiểm tra",
+      "SHORT_NOTE": "Chuyển thiếu, chuyển dư hoặc tiền về trễ",
       "LOOSE": "Chưa rõ mã đơn",
       "LOOSE_NOTE": "Cần xử lý thủ công",
       "GROUP_ALL": "Tất cả",
@@ -1424,7 +1429,12 @@
       "AMOUNT": "Số tiền",
       "CONTENT": "Nội dung chuyển khoản",
       "ORDER_CODE": "Đơn khớp",
-      "RESULT": "Kết quả"
+      "RESULT": "Kết quả",
+      "GROUP_NEEDS_CHECK": "Cần kiểm tra",
+      "RECONCILE": "Đối soát SePay",
+      "RECONCILING": "Đang đối soát…",
+      "RECONCILE_DONE": "Đã đối soát từ ngày {{since}}: SePay có {{fetched}} giao dịch, bổ sung {{added}}, đã có sẵn {{known}}.",
+      "RECONCILE_FAILED": "Đối soát không thành công."
     },
     "ACTION": {
       "ORDER_CREATED": "Tạo đơn",
@@ -1438,7 +1448,10 @@
       "NO_REFERENCE": "Không tìm thấy mã đơn",
       "UNDERPAID": "Thiếu tiền",
       "ALREADY_PROCESSED": "Đã xử lý trước đó",
-      "OTHER": "Khác"
+      "OTHER": "Khác",
+      "OVERPAID": "Chuyển dư",
+      "LATE": "Tiền về khi đơn không còn chờ",
+      "IGNORED": "Bỏ qua"
     },
     "CONFIG": {
       "TAB_SYSTEM": "Hệ thống & Đơn hàng",

@@ -55,3 +55,26 @@
   flex-wrap: wrap;
   margin-bottom: var(--pm-gap);
 }
+
+.head-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reconcile-note {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+
+  &.ok {
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+
+  &.bad {
+    background: var(--pm-danger-soft);
+    color: var(--pm-on-danger-soft);
+  }
+}

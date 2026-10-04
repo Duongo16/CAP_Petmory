@@ -29,6 +29,7 @@ export class PaymentPage implements OnInit, OnDestroy {
   readonly payment = this.facade.payment;
   readonly paidOrder = this.facade.paidOrder;
   readonly paid = this.facade.paid;
+  readonly cancelled = this.facade.cancelled;
   readonly copied = this.facade.copied;
   readonly countdown = this.facade.countdown;
   readonly expired = this.facade.expired;

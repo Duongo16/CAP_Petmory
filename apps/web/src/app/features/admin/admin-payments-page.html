@@ -3,10 +3,28 @@
     <p class="board-eyebrow">{{ 'ADMIN.LOG.EYEBROW' | translate }}</p>
     <h1 class="title pm-page-title">{{ 'ADMIN.LOG.TITLE' | translate }}</h1>
     <p class="description">{{ 'ADMIN.LOG.DESCRIPTION' | translate }}</p>
-    <button class="pm-button-secondary" type="button" (click)="facade.reload()">
-      {{ 'ADMIN.REFRESH' | translate }}
-    </button>
+    <div class="head-buttons">
+      <button class="pm-button-secondary" type="button" (click)="facade.reload()">
+        {{ 'ADMIN.REFRESH' | translate }}
+      </button>
+      @if (isManager()) {
+        <button class="pm-button-primary" type="button" id="reconcile-sepay" [disabled]="facade.reconciling()" (click)="facade.reconcile()">
+          {{ (facade.reconciling() ? 'ADMIN.LOG.RECONCILING' : 'ADMIN.LOG.RECONCILE') | translate }}
+        </button>
+      }
+    </div>
   </header>
+
+  @if (facade.lastReconcile(); as done) {
+    <p class="reconcile-note ok" role="status">
+      {{ 'ADMIN.LOG.RECONCILE_DONE' | translate: { since: done.sinceDate, fetched: done.fetched, added: done.added, known: done.alreadyKnown } }}
+    </p>
+  }
+  @if (facade.reconcileError() !== null) {
+    <p class="reconcile-note bad" role="alert">
+      {{ 'ADMIN.LOG.RECONCILE_FAILED' | translate }} {{ facade.reconcileError() }}
+    </p>
+  }
 
   @switch (facade.status()) {
     @case ('LOADING') {

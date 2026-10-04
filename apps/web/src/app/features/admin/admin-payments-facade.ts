@@ -1,7 +1,8 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AdminService } from '../../core/services/admin.service';
-import { ReconcileResult, TransferNotification } from '../../core/models/api.model';
+import { ReconcileResult, ReconcileSummary, TransferNotification } from '../../core/models/api.model';
 import { KEY_RESULT_RECONCILE } from '../../shared/order-status';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
@@ -9,22 +10,28 @@ type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 const KEY_RESULT_OTHER = 'ADMIN.RECONCILE.OTHER';
 
 /** The groups the filter pills offer, in the order the design shows them. */
-export type LogGroup = 'ALL' | 'MATCHED' | 'UNDERPAID' | 'NO_REFERENCE';
+export type LogGroup = 'ALL' | 'MATCHED' | 'NEEDS_CHECK' | 'NO_REFERENCE' | 'IGNORED';
 
-const GROUP_HOLDS: Record<Exclude<LogGroup, 'ALL'>, ReconcileResult> = {
-  MATCHED: 'MATCHED',
-  UNDERPAID: 'UNDERPAID',
-  NO_REFERENCE: 'NO_REFERENCE',
+/** Nhung ket qua moi nhom gom. Nhom can kiem gom moi truong hop lech can nguoi xu ly. */
+const GROUP_HOLDS: Record<Exclude<LogGroup, 'ALL'>, ReconcileResult[]> = {
+  MATCHED: ['MATCHED'],
+  NEEDS_CHECK: ['UNDERPAID', 'OVERPAID', 'LATE'],
+  NO_REFERENCE: ['NO_REFERENCE'],
+  IGNORED: ['IGNORED'],
 };
 
 const GROUP_KEY: Record<LogGroup, string> = {
   ALL: 'ADMIN.LOG.GROUP_ALL',
   MATCHED: 'ADMIN.RECONCILE.MATCHED',
-  UNDERPAID: 'ADMIN.RECONCILE.UNDERPAID',
+  NEEDS_CHECK: 'ADMIN.LOG.GROUP_NEEDS_CHECK',
   NO_REFERENCE: 'ADMIN.RECONCILE.NO_REFERENCE',
+  IGNORED: 'ADMIN.RECONCILE.IGNORED',
 };
 
-export const LOG_GROUP_ORDER: LogGroup[] = ['ALL', 'MATCHED', 'UNDERPAID', 'NO_REFERENCE'];
+export const LOG_GROUP_ORDER: LogGroup[] = ['ALL', 'MATCHED', 'NEEDS_CHECK', 'NO_REFERENCE', 'IGNORED'];
+
+/** Tien da ve cho mot don: du hoac du ra. */
+const MONEY_IN: ReconcileResult[] = ['MATCHED', 'OVERPAID'];
 
 /** How many notices one page of the log holds. */
 const PAGE_SIZE = 25;
@@ -46,6 +53,9 @@ export interface LogRow {
 /** The colour group each outcome reads in. */
 const TONE_OF_RESULT: Record<string, string> = {
   MATCHED: 'good',
+  OVERPAID: 'awaiting',
+  LATE: 'bad',
+  IGNORED: 'in-progress',
   UNDERPAID: 'bad',
   NO_REFERENCE: 'awaiting',
   ALREADY_PROCESSED: 'in-progress',
@@ -90,7 +100,7 @@ export class AdminPaymentsFacade {
     const group = this.group();
     const text = this.search().trim().toLowerCase();
     return this.log().filter((one) => {
-      if (group !== 'ALL' && one.result !== GROUP_HOLDS[group]) {
+      if (group !== 'ALL' && !GROUP_HOLDS[group].includes(one.result)) {
         return false;
       }
       if (!text) {
@@ -126,19 +136,21 @@ export class AdminPaymentsFacade {
       count:
         group === 'ALL'
           ? this.log().length
-          : this.log().filter((one) => one.result === GROUP_HOLDS[group]).length,
+          : this.log().filter((one) => GROUP_HOLDS[group].includes(one.result)).length,
     })),
   );
 
   /** Money that landed today, as an integer string in dong. */
   readonly takenToday = computed(() =>
-    sumOf(this.log().filter((one) => one.result === 'MATCHED' && isToday(one.createdAt))).toString(),
+    sumOf(this.log().filter((one) => MONEY_IN.includes(one.result) && isToday(one.createdAt))).toString(),
   );
 
   readonly matchedCount = computed(
     () => this.log().filter((one) => one.result === 'MATCHED').length,
   );
-  readonly shortCount = computed(() => this.log().filter((one) => one.result === 'UNDERPAID').length);
+  readonly shortCount = computed(
+    () => this.log().filter((one) => GROUP_HOLDS.NEEDS_CHECK.includes(one.result)).length,
+  );
   readonly looseCount = computed(
     () => this.log().filter((one) => one.result === 'NO_REFERENCE').length,
   );
@@ -151,6 +163,32 @@ export class AdminPaymentsFacade {
 
   readonly remainingPrevPage = computed(() => this.page() > 1);
   readonly remainingNextPage = computed(() => this.page() < this.pageCount());
+
+  /** Ket qua lan doi soat gan nhat, va loi neu co. */
+  readonly reconciling = signal(false);
+  readonly lastReconcile = signal<ReconcileSummary | null>(null);
+  readonly reconcileError = signal<string | null>(null);
+
+  /** Doi soat voi SePay roi doc lai nhat ky de thay giao dich vua bo sung. */
+  reconcile(): void {
+    this.reconciling.set(true);
+    this.reconcileError.set(null);
+    this.service
+      .reconcileSepay()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (summary) => {
+          this.reconciling.set(false);
+          this.lastReconcile.set(summary);
+          this.reload();
+        },
+        error: (trouble: HttpErrorResponse) => {
+          this.reconciling.set(false);
+          const why = (trouble.error as { message?: string } | null)?.message;
+          this.reconcileError.set(typeof why === 'string' ? why : '');
+        },
+      });
+  }
 
   reload(): void {
     this.status.set('LOADING');

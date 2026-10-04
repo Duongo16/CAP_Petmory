@@ -1,6 +1,6 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { interval, switchMap } from 'rxjs';
+import { interval, switchMap, takeWhile } from 'rxjs';
 import { OrdersService } from '../../core/services/orders.service';
 import { Order, PaymentQr } from '../../core/models/api.model';
 
@@ -59,10 +59,19 @@ export class PaymentFacade {
   readonly copied = this.copiedLabel.asReadonly();
   readonly checkingNow = this.checking.asReadonly();
 
+  /** Don con dang cho tien, hoac chua doc duoc lan nao. */
+  private readonly waiting = computed(() => {
+    const where = this.qr()?.status;
+    return where === undefined || where === 'AWAITING_PAYMENT';
+  });
+
+  /** Tien da ve: don da sang mot buoc sau thanh toan. Don da huy khong tinh. */
   readonly paid = computed(() => {
     const where = this.qr()?.status;
-    return where !== undefined && where !== 'AWAITING_PAYMENT';
+    return where !== undefined && where !== 'AWAITING_PAYMENT' && where !== 'CANCELLED';
   });
+
+  readonly cancelled = computed(() => this.qr()?.status === 'CANCELLED');
 
   /** Milliseconds left before the transfer code stops being accepted. */
   private readonly leftMs = computed(() => {
@@ -74,7 +83,10 @@ export class PaymentFacade {
   });
 
   readonly countdown = computed(() => asClock(this.leftMs()));
-  readonly expired = computed(() => this.qr() !== null && !this.paid() && this.leftMs() === 0);
+  readonly expired = computed(() => {
+    const qr = this.qr();
+    return qr !== null && this.waiting() && (qr.expired || this.leftMs() === 0);
+  });
 
   start(orderCode: string): void {
     this.code = orderCode;
@@ -118,8 +130,10 @@ export class PaymentFacade {
   }
 
   private watchMoney(): void {
+    // Thoi hoi khi don da thanh toan hoac da huy: khong con gi de cho.
     interval(POLL_INTERVAL_MS)
       .pipe(
+        takeWhile(() => this.waiting()),
         switchMap(() => this.orders.maQr(this.code)),
         takeUntilDestroyed(this.destroyRef),
       )
