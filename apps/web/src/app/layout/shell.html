@@ -183,6 +183,7 @@
 
 <!-- ───── Footer (Chi hien cho khach hang) ───── -->
 @if (!isInternal()) {
+  @if (!immersive()) {
   <footer class="mt-16 bg-night text-on-night">
     <div class="grid gap-10 max-w-[1180px] mx-auto px-6 pt-12 pb-8 box-border [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
 
@@ -220,6 +221,7 @@
       <p class="m-0 pt-5 border-t border-on-night/15 text-xs text-on-night/60">{{ 'FOOTER.RIGHTS' | translate }}</p>
     </div>
   </footer>
+  }
 
   <pm-chat-widget />
   <pm-bottom-nav />

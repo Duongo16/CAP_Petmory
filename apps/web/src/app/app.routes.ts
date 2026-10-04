@@ -138,6 +138,7 @@ export const routes: Routes = [
       {
         path: 'studio',
         canActivate: [customerOnlyGuard],
+        data: { immersive: true },
         loadComponent: () => import('./features/studio/studio-page').then((m) => m.StudioPage),
       },
       {

@@ -1,5 +1,6 @@
 /**
- * Browser test of the whole three-step customiser flow.
+ * Browser test of the "yarn table" customiser: one screen, a stage on the left
+ * and a tabbed drawer on the right.
  * Run: node tools/test-studio-ui.js
  */
 const { chromium } = require('playwright');
@@ -35,130 +36,142 @@ async function fingerprint(page) {
   });
 }
 
+/** The tab that is open now, counted from one. */
+function tabOpen(page) {
+  return page.evaluate(() => Array.from(document.querySelectorAll('.tab')).findIndex((b) => b.classList.contains('on')) + 1);
+}
+
+async function signIn(page) {
+  await page.request.post(`${API}/auth/register`, {
+    data: { email: EMAIL, password: PASSWORD, fullName: 'Studio test' },
+  });
+  await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[formcontrolname="email"]', EMAIL);
+  await page.fill('input[formcontrolname="password"]', PASSWORD);
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/home', { timeout: 20000 });
+}
+
+async function openStudio(page) {
+  await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('.drawer .tab', { timeout: 40000 });
+  await page.waitForFunction(() => Boolean(document.querySelector('pm-viewer-3d canvas')), null, { timeout: 40000 });
+  await page.waitForTimeout(1500);
+}
+
 async function run() {
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1400, height: 940 } });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
   const error = [];
   page.on('pageerror', (e) => error.push(String(e)));
   page.on('console', (m) => m.type() === 'error' && error.push(m.text()));
 
   const res = [];
   try {
-    console.log('THREE-STEP CUSTOMISER FLOW TEST');
+    console.log('YARN TABLE CUSTOMISER TEST');
     console.log('='.repeat(64));
 
-    await page.request.post(`${API}/auth/register`, {
-      data: { email: EMAIL, password: PASSWORD, fullName: 'Studio test' },
-    });
-    await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
-    await page.fill('input[formcontrolname="email"]', EMAIL);
-    await page.fill('input[formcontrolname="password"]', PASSWORD);
-    await page.click('button[type="submit"]');
-    await page.waitForURL('**/home', { timeout: 20000 });
+    await signIn(page);
     res.push(check('Sign in through the interface', true));
+    await openStudio(page);
 
-    await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('mat-button-toggle-group', { timeout: 40000 });
-    await page.locator('button:has-text("Dừng xoay")').click();
-    await page.waitForTimeout(700);
+    const overflow = await page.evaluate(() => document.scrollingElement.scrollHeight - window.innerHeight);
+    res.push(check('The workbench fits on one screen without page scroll', overflow <= 2, `${overflow}px extra`));
+    res.push(check('All four tabs are shown', (await page.locator('.tab').count()) === 4));
+    res.push(check('The first tab is open', (await tabOpen(page)) === 1));
 
-                // --- Step 1 ---
-    res.push(check('All four steps are shown', (await page.locator('.step-button').count()) === 4));
-    const countColor = await page.locator('.model-button').count();
-    res.push(check('Step 1 lists the base models', countColor > 0, `${countColor} models`));
-
+    const countModel = await page.locator('.model').count();
+    res.push(check('The model tab lists the base models', countModel > 0, `${countModel} models`));
     const canvas = await page.evaluate(() => {
       const c = document.querySelector('pm-viewer-3d canvas');
-      return c ? { width: c.width, coWebgl: Boolean(c.getContext('webgl2') || c.getContext('webgl')) } : null;
+      return c ? { width: c.width, webgl: Boolean(c.getContext('webgl2') || c.getContext('webgl')) } : null;
     });
-    res.push(check('There is a WebGL drawing area', Boolean(canvas?.coWebgl && canvas.width > 0)));
+    res.push(check('There is a WebGL drawing area', Boolean(canvas?.webgl && canvas.width > 0)));
+    res.push(check('The viewer draws no toolbar of its own', (await page.locator('pm-viewer-3d .toolbar').count()) === 0));
 
-    await page.locator('.model-button:has-text("Shiba Inu")').click();
-    await page.waitForTimeout(2600);
-    res.push(check('Switching to the realistic style works', true));
-    await page.screenshot({ path: path.join(OUT, 'studio-1-base-model.png') });
+    await page.locator('.round-button[aria-pressed="true"]').first().click();
+    await page.waitForTimeout(500);
+    res.push(check('Auto-rotate can be switched off from the stage',
+      (await page.locator('.stage-tools .round-button[aria-pressed="true"]').count()) === 0));
 
-                // --- Step 2 ---
-    await page.locator('button:has-text("Tiếp tục")').click();
-    await page.waitForTimeout(600);
-    // Kiem theo vi tri buoc chu khong theo chu, vi chu co the doi theo thiet ke.
-    const atStep = await page.evaluate(() => {
-      const all = Array.from(document.querySelectorAll('.step-button'));
-      return all.findIndex((b) => b.classList.contains('current')) + 1;
-    });
-    res.push(check('Step two can be reached', atStep === 2, `dang o buoc ${atStep}`));
+    const beforeAngle = await fingerprint(page);
+    await page.locator('.angle').nth(1).click();
+    await page.waitForTimeout(900);
+    res.push(check('An angle pill moves the camera', (await fingerprint(page)) !== beforeAngle));
+    await page.screenshot({ path: path.join(OUT, 'studio-1-model.png') });
 
-    const countCell = await page.locator('.swatch').count();
-    res.push(check('Step 2 shows the colour palette', countCell > 0, `${countCell} colour codes`));
+    // --- Tab 2: yarn colours ---
+    await page.locator('.drawer-foot .tw-btn-primary').click();
+    await page.waitForTimeout(500);
+    res.push(check('The next button opens the yarn tab', (await tabOpen(page)) === 2));
+    const countBall = await page.locator('.yarn-ball').count();
+    res.push(check('The yarn tab shows the palette as yarn balls', countBall > 0, `${countBall} balls`));
 
-    await page.locator('mat-button-toggle:has-text("Chéo")').click();
-    await page.waitForTimeout(700);
+    await page.locator('.angle').first().click();
+    await page.waitForTimeout(800);
     const before = await fingerprint(page);
-
-                // Flood a whole patch
-    await page.locator('.swatch').first().click();
+    await page.locator('.yarn-ball').first().click();
     await page.waitForTimeout(250);
-    res.push(check('A colour can be picked up', (await page.locator('.holding').count()) > 0));
+    res.push(check('Picking a yarn shows the held chip', (await page.locator('.held').count()) === 1));
 
-    const box = await page.locator('.canvas-3d').boundingBox();
+    const box = await page.locator('.stage').boundingBox();
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     await page.waitForTimeout(800);
-    const afterMeasure = await fingerprint(page);
-    res.push(check('Flooding a patch changes the model colour', before !== afterMeasure));
-    await page.screenshot({ path: path.join(OUT, 'studio-2-flood-fill.png') });
+    const afterFill = await fingerprint(page);
+    res.push(check('Tapping the plush paints it', before !== afterFill));
+    res.push(check('The used yarn gets a mark', (await page.locator('.yarn-ball.used').count()) > 0));
+    await page.screenshot({ path: path.join(OUT, 'studio-2-yarn.png') });
 
-                // Brush stroke
-    await page.locator('mat-button-toggle:has-text("Quét bằng cọ")').click();
+    await page.locator('.segmented button').nth(1).click();
     await page.waitForTimeout(250);
-    res.push(check('The brush toolbar is shown', (await page.locator('#brush-size').count()) > 0));
+    res.push(check('Brush mode shows the brush slider', (await page.locator('.brush input[type="range"]').count()) === 1));
 
-    await page.locator('.swatch').nth(14).click();
+    await page.locator('.stage-tools .round-button').nth(1).click();
+    await page.waitForTimeout(600);
+    res.push(check('Undo from the stage puts the colour back', (await fingerprint(page)) !== afterFill));
+
+    await page.locator('.held-drop').click();
+    await page.waitForTimeout(250);
+    res.push(check('The held yarn can be put down', (await page.locator('.held').count()) === 0));
+
+    // --- Tab 3: engraving with a live tag ---
+    await page.locator('.tab').nth(2).click();
+    await page.waitForTimeout(400);
+    await page.fill('input[formcontrolname="engravedName"]', 'Mun');
     await page.waitForTimeout(200);
-    await page.mouse.move(box.x + box.width * 0.44, box.y + box.height * 0.42);
-    await page.mouse.down();
-    for (let i = 0; i <= 10; i += 1) {
-      await page.mouse.move(box.x + box.width * (0.44 + i * 0.011), box.y + box.height * (0.42 + i * 0.007));
-      await page.waitForTimeout(40);
+    res.push(check('The wooden tag shows the engraved name live',
+      (await page.locator('.tag-name').innerText()).trim() === 'Mun'));
+    res.push(check('The design name is filled from the model',
+      (await page.locator('input[formcontrolname="name"]').inputValue()).length > 0));
+    await page.screenshot({ path: path.join(OUT, 'studio-3-engrave.png') });
+
+    // --- Tab 4: wrap up, photos are taken by themselves ---
+    await page.locator('.tab').nth(3).click();
+    await page.waitForSelector('.photo', { timeout: 15000 });
+    await page.waitForTimeout(600);
+    const countPhoto = await page.locator('.photo').count();
+    res.push(check('Opening the last tab captures six photos by itself', countPhoto === 6, `${countPhoto} photos`));
+    res.push(check('Product cards are listed', (await page.locator('.product').count()) > 0));
+    await page.locator('.product').first().click();
+    await page.waitForTimeout(300);
+    if ((await page.locator('.chips .chip').count()) > 0) {
+      await page.locator('.chips .chip').first().click();
+      await page.waitForSelector('.quote', { timeout: 10000 });
     }
-    await page.mouse.up();
-    await page.waitForTimeout(600);
-    const afterSize = await fingerprint(page);
-    res.push(check('A brush stroke changes the model colour', afterSize !== afterMeasure));
+    res.push(check('Choosing a product and size shows the price', (await page.locator('.quote').count()) === 1));
+    const extra = await page.evaluate(() => document.scrollingElement.scrollHeight - window.innerHeight);
+    res.push(check('The last tab still fits on one screen', extra <= 2, `${extra}px extra`));
+    await page.screenshot({ path: path.join(OUT, 'studio-4-finish.png') });
 
-    await page.locator('button:has-text("Hoàn tác")').click();
-    await page.waitForTimeout(600);
-    res.push(check('Undo puts the drawing back', (await fingerprint(page)) !== afterSize));
-
-    await page.locator('button:has-text("Bỏ cầm màu")').click();
-    await page.waitForTimeout(250);
-    const beforeRotate = await fingerprint(page);
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 2 + 170, box.y + box.height / 2);
-    await page.mouse.up();
-    await page.waitForTimeout(600);
-    res.push(check('Dropping the colour makes dragging rotate again', (await fingerprint(page)) !== beforeRotate));
-
-                // Capture the six angles
-    await page.locator('button:has-text("Chụp 6 góc")').click();
-    await page.waitForTimeout(2200);
-    const countPhoto = await page.locator('.photo-card').count();
-    res.push(check('All six preview images are produced', countPhoto === 6, `${countPhoto} images`));
-    await page.screenshot({ path: path.join(OUT, 'studio-3-preview.png') });
-
-                // --- Step 3, then step 4 ---
-    await page.locator('button:has-text("Tiếp tục")').click();
-    await page.waitForTimeout(600);
-    res.push(check('Step three can be reached', (await page.locator('.angle-list').count()) > 0));
-    await page.locator('button:has-text("Tiếp tục")').click();
-    await page.waitForTimeout(600);
-    res.push(check('Step four can be reached', (await page.locator('.summary').count()) > 0));
-    await page.screenshot({ path: path.join(OUT, 'studio-4-final.png') });
-
-    await page.locator('button:has-text("Quay lại")').click();
-    await page.waitForTimeout(500);
-    res.push(check('The previous step can be reached again', (await page.locator('.angle-list').count()) > 0));
+    // --- Phone width ---
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.locator('.tab').first().click();
+    await page.waitForTimeout(800);
+    const wide = await page.evaluate(() => document.scrollingElement.scrollWidth - window.innerWidth);
+    res.push(check('No sideways scroll on a phone', wide <= 1, `${wide}px`));
+    await page.screenshot({ path: path.join(OUT, 'studio-5-mobile.png'), fullPage: true });
 
     const realErrors = error.filter((l) => !/favicon/i.test(l));
     res.push(check('No javascript error', realErrors.length === 0, realErrors.slice(0, 2).join(' | ')));
@@ -174,6 +187,6 @@ async function run() {
 }
 
 run().catch((e) => {
-  console.error('Test error:', e.message.slice(0, 140));
+  console.error('Test error:', e.message.slice(0, 200));
   process.exit(1);
 });

@@ -32,7 +32,7 @@ function check(name, passed, note = '') {
 async function captureFrame3d(page, file) {
         // Choosing an angle other than the current one raises a change event, and that event
         // both moves the camera and stops auto-rotate. Choosing the current angle again does not.
-  await page.locator('mat-button-toggle:has-text("Trước")').click();
+  await page.locator('.angle:has-text("Trước")').click();
   await page.waitForTimeout(900);
   await page.locator('canvas').first().screenshot({ path: file });
 }
@@ -88,53 +88,54 @@ async function run() {
     await page.waitForURL('**/home', { timeout: 20000 });
 
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('.step-button', { timeout: 40000 });
-    res.push(check('The customiser screen opens', (await page.locator('.step-button').count()) === 4));
+    await page.waitForSelector('.drawer .tab', { timeout: 40000 });
+    res.push(check('The customiser screen opens', (await page.locator('.drawer .tab').count()) === 4));
 
                 // --- Painting, in step two ---
-    await page.locator('.step-button').nth(1).click();
-    await page.waitForSelector('.swatch', { timeout: 20000 });
-    await page.locator('.swatch').first().click();
+    await page.locator('.drawer .tab').nth(1).click();
+    await page.waitForSelector('.yarn-ball', { timeout: 20000 });
+    await page.locator('.yarn-ball').first().click();
     await paintWoolModel(page);
     await paintWoolModel(page, 30);
 
                 // --- Capture the six angles ---
-    await page.locator('button:has-text("Chụp 6 góc")').click();
-    await page.waitForSelector('.photo-card', { timeout: 30000 });
+    await page.locator('.round-button.camera').click();
+    await page.locator('.drawer .tab').nth(3).click();
+    await page.waitForSelector('.photo', { timeout: 30000 });
     res.push(check('All six preview angles are captured',
-      (await page.locator('.photo-card').count()) === 6,
-      `${await page.locator('.photo-card').count()} photo`));
+      (await page.locator('.photo').count()) === 6,
+      `${await page.locator('.photo').count()} photo`));
 
                 // --- Step four: choose a product and a size ---
-    await page.locator('.step-button').nth(3).click();
-    await page.waitForSelector('.choice-card', { timeout: 20000 });
-    const countKind = await page.locator('.choice-card').count();
+    await page.waitForSelector('.product', { timeout: 20000 });
+    const countKind = await page.locator('.product').count();
     res.push(check('Step three lists the product types', countKind >= 5, `${countKind} kind`));
 
-    res.push(check('The summary counts the colours used',
-      (await page.locator('.summary dd').nth(1).innerText()).trim() === '1',
-      (await page.locator('.summary dd').nth(1).innerText()).trim()));
-    res.push(check('The summary reports all six angles',
-      (await page.locator('.summary dd').nth(2).innerText()).trim() === '6 / 6'));
+    const summary = (await page.locator('.summary').innerText()).trim();
+    res.push(check('The summary counts the colours used', summary.startsWith('1 '), summary));
+    res.push(check('The summary reports all six angles', summary.includes('6/6'), summary));
 
-    await page.locator('.choice-card:has-text("Tượng len chọc")').click();
+    await page.locator('.product:has-text("Tượng len chọc")').click();
     await page.waitForTimeout(500);
     res.push(check('Choosing a type shows its sizes',
-      (await page.locator('.choice-card:has-text("Vừa")').count()) === 1));
+      (await page.locator('.chip:has-text("Vừa")').count()) === 1));
 
     res.push(check('With no size chosen there is no price',
-      (await page.locator('.price').count()) === 0));
+      (await page.locator('.quote-price').count()) === 0));
 
-    await page.locator('.choice-card:has-text("Vừa")').click();
-    await page.waitForSelector('.price', { timeout: 20000 });
-    const price = (await page.locator('.price').innerText()).trim();
+    await page.locator('.chip:has-text("Vừa")').click();
+    await page.waitForSelector('.quote-price', { timeout: 20000 });
+    const price = (await page.locator('.quote-price').innerText()).trim();
     res.push(check('The price comes from the server', price.includes('750.000'), price));
 
-                // --- Engraving ---
+                // --- Engraving, in its own tab ---
+    await page.locator('.drawer .tab').nth(2).click();
     await page.fill('input[formcontrolname="name"]', 'Ban thiet ke cua Mun');
     await page.fill('input[formcontrolname="engravedName"]', 'Mun');
     await page.fill('input[formcontrolname="memorialDate"]', '2019-05-20');
     await page.fill('textarea[formcontrolname="message"]', 'Nho be nhieu lam');
+    await page.locator('.drawer .tab').nth(3).click();
+    await page.waitForSelector('.quote-price', { timeout: 20000 });
     await page.screenshot({ path: path.join(OUT, 'studio-full-1-final-step.png') });
 
                 // Capture this same angle again, to compare against the reopened draft later
@@ -147,7 +148,7 @@ async function run() {
 
                 // --- Save a draft ---
     await page.locator('button:has-text("Lưu bản thiết kế")').click();
-    await page.waitForSelector('.saved', { timeout: 40000 });
+    await page.waitForSelector('.note.ok', { timeout: 40000 });
     res.push(check('The design can be saved', true));
 
     const designsRes = await page.request.get(`${API}/designs`, {
@@ -170,22 +171,28 @@ async function run() {
     await page.waitForSelector('a:has-text("Xem giỏ hàng")', { timeout: 20000 });
     res.push(check('The design can be added to the cart', true));
     res.push(check('The cart badge goes up',
-      (await page.locator('.badge').innerText()) === '1'));
+      (await page.locator('a[href="/cart"] [role="status"]').first().innerText()) === '1'));
     await page.screenshot({ path: path.join(OUT, 'studio-full-2-saved.png') });
 
                 // --- Reopen the draft ---
     await page.goto(`${WEB}/studio?draft=${design._id}`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('.step-button', { timeout: 40000 });
-    await page.locator('.step-button').nth(3).click();
-    await page.waitForSelector('.price', { timeout: 30000 });
+    await page.waitForSelector('.drawer .tab', { timeout: 40000 });
+    await page.waitForTimeout(1500);
+    await page.locator('.drawer .tab').nth(2).click();
+    await page.waitForSelector('input[formcontrolname="name"]', { timeout: 30000 });
     res.push(check('Reopening the draft keeps the name',
       (await page.locator('input[formcontrolname="name"]').inputValue()) === 'Ban thiet ke cua Mun'));
     res.push(check('Reopening the draft keeps the engraving',
       (await page.locator('input[formcontrolname="engravedName"]').inputValue()) === 'Mun'));
     res.push(check('Reopening the draft keeps the memorial date',
       (await page.locator('input[formcontrolname="memorialDate"]').inputValue()) === '2019-05-20'));
+    await page.locator('.drawer .tab').nth(3).click();
+    await page.waitForSelector('.quote-price', { timeout: 30000 });
+    // Mo ngan cuoi thi tu chup sau goc, cho chup xong de camera dung yen.
+    await page.waitForSelector('.photo', { timeout: 30000 });
+    await page.waitForTimeout(800);
     res.push(check('Reopening the draft keeps the size and the price',
-      (await page.locator('.price').innerText()).includes('750.000')));
+      (await page.locator('.quote-price').innerText()).includes('750.000')));
     await page.screenshot({ path: path.join(OUT, 'studio-full-3-reopened.png') });
 
                 // The most important check: reopening must give back exactly the colours that were painted
@@ -203,7 +210,7 @@ async function run() {
 
                 // --- Place the order, then view the production file from the internal side ---
     await page.locator('a:has-text("Tiến hành đặt hàng")').click();
-    await page.waitForURL('**/checkout', { timeout: 20000 });
+    await page.waitForURL('**/checkout**', { timeout: 20000 });
     await page.fill('input[formcontrolname="fullName"]', 'Studio test');
     await page.fill('input[formcontrolname="phone"]', '0909090909');
     await page.fill('input[formcontrolname="address"]', '7 Duong Studio');
@@ -219,14 +226,13 @@ async function run() {
     });
 
     // Switch to an operations account to open the production file
-    await page.goto(WEB, { waitUntil: 'networkidle' });
-    await page.locator('.account-button').click();
-    await page.locator('.logout-item').click();
-    await page.waitForURL('**/login', { timeout: 20000 });
+    // Xoa phien dang nhap roi mo trang dang nhap, khong phu thuoc vao vi tri nut dang xuat.
+    await page.evaluate(() => localStorage.clear());
+    await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
     await page.fill('input[formcontrolname="email"]', 'quanly@petmory.local');
     await page.fill('input[formcontrolname="password"]', 'Petmory@2026');
     await page.click('button[type="submit"]');
-    await page.waitForURL('**/home', { timeout: 20000 });
+    await page.waitForURL('**/admin/**', { timeout: 20000 });
 
     await page.goto(`${WEB}/admin/orders/${orderCode}/production-file`, {
       waitUntil: 'networkidle',

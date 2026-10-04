@@ -84,3 +84,20 @@
 .canvas-3d.painting {
   cursor: crosshair;
 }
+
+/* Che do tran: khung 3D lap day cho chua, khong vien, khong nen rieng. */
+:host(.bare) {
+  block-size: 100%;
+}
+
+.frame.bare {
+  block-size: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.frame.bare .overlay {
+  background: transparent;
+}

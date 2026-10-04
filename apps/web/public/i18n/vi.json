@@ -421,7 +421,7 @@
     "PAINT_HINT": "Bấm vào mẫu để tô. Bấm lại màu đang cầm để quay về chế độ xoay."
   },
   "STUDIO": {
-    "TITLE": "Tùy biến sản phẩm",
+    "TITLE": "Tự tay làm bé len",
     "SELECT_ZONE": "Chọn vùng cần đổi màu",
     "SELECT_COLOR_CODE": "Chọn mã màu len",
     "PALETTE": "(bản tạm)",
@@ -446,7 +446,7 @@
     "BACK": "Quay lại",
     "CONTINUE": "Tiếp tục",
     "PREVIEW": "Xem trước",
-    "NOT_CAPTURED": "Bấm \"Chụp 6 góc\" dưới khung 3D để tạo ảnh xem trước.",
+    "NOT_CAPTURED": "Chưa có ảnh. Bấm nút máy ảnh trên khung để chụp 6 góc.",
     "SUMMARY": "Tóm tắt",
     "COLOR_CHOSEN": "Mẫu đã chọn",
     "COUNT_ZONE": "Số vùng màu",
@@ -492,9 +492,35 @@
     "PET_LABEL": "Thú cưng trong thiết kế",
     "PET_NONE": "Chưa gắn thú cưng nào",
     "PET_HINT": "Gắn thú cưng để ảnh bạn đã tải lên đi kèm vào hồ sơ gửi xưởng.",
-    "EYEBROW": "PHÒNG CHẾ TÁC TRỰC TUYẾN",
+    "EYEBROW": "Bàn len của bé",
     "FELTED": "Dáng len",
-    "FELTED_NOTE": "Cùng mô hình thật nhưng đầu to hơn, thân tròn hơn và chân ngắn lại, cho gần dáng thú len chọc."
+    "FELTED_NOTE": "Cùng mô hình thật nhưng đầu to hơn, thân tròn hơn và chân ngắn lại, cho gần dáng thú len chọc.",
+    "LOAD_ERROR": "Chưa tải được bàn làm việc. Bạn thử tải lại trang nhé.",
+    "STAGE": "Khung xem bé len 3D",
+    "STAGE_TOOLS": "Công cụ khung xem",
+    "STEPS": "Các bước làm bé len",
+    "ANGLES": "Góc nhìn",
+    "HOLDING": "Đang cầm cuộn len",
+    "BUBBLE_DRAG": "Kéo để xoay bé, cuộn để phóng to nha",
+    "BUBBLE_PICK": "Chọn một cuộn len rồi chạm lên bé để tô",
+    "TAB": {
+      "MODEL": "Chọn bé",
+      "COLOR": "Tô len",
+      "ENGRAVE": "Khắc tên",
+      "FINISH": "Gói quà"
+    },
+    "PANEL": {
+      "MODEL": "Hôm nay mình làm bé nào?",
+      "COLOR": "Chọn len rồi chạm lên bé",
+      "ENGRAVE": "Khắc chút kỷ niệm",
+      "FINISH": "Gói bé lại thôi!"
+    },
+    "SUGGEST_LINK": "Chưa biết chọn? Gửi ảnh để mình gợi ý",
+    "TAG_PLACEHOLDER": "Tên bé",
+    "CAPTURING": "Đang chụp 6 góc…",
+    "RECAPTURE": "Chụp lại",
+    "SUMMARY_LINE": "{{colors}} màu len · {{photos}}/6 ảnh",
+    "NEXT_TO": "Tiếp: {{step}}"
   },
   "HOME": {
     "BADGE": "THỦ CÔNG • VẬT LIỆU TÁI CHẾ • 100% CÁ NHÂN HÓA",

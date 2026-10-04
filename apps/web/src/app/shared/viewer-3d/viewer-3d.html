@@ -1,4 +1,4 @@
-<div class="frame">
+<div class="frame" [class.bare]="bare()">
   <div
     #wrap
     class="canvas-3d"
@@ -30,7 +30,7 @@
   }
 </div>
 
-@if (status() === 'READY') {
+@if (status() === 'READY' && !bare()) {
   <div class="toolbar">
     <mat-button-toggle-group
       [value]="angleSelected()"

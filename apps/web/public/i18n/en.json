@@ -421,7 +421,7 @@
     "PAINT_HINT": "Bấm vào mẫu để tô. Bấm lại màu đang cầm để quay về chế độ xoay."
   },
   "STUDIO": {
-    "TITLE": "Tùy biến sản phẩm",
+    "TITLE": "Make your plush buddy",
     "SELECT_ZONE": "Chọn vùng cần đổi màu",
     "SELECT_COLOR_CODE": "Chọn mã màu len",
     "PALETTE": "(bản tạm)",
@@ -446,7 +446,7 @@
     "BACK": "Quay lại",
     "CONTINUE": "Tiếp tục",
     "PREVIEW": "Xem trước",
-    "NOT_CAPTURED": "Bấm \"Chụp 6 góc\" dưới khung 3D để tạo ảnh xem trước.",
+    "NOT_CAPTURED": "No photos yet. Press the camera button on the viewer to capture 6 angles.",
     "SUMMARY": "Tóm tắt",
     "COLOR_CHOSEN": "Mẫu đã chọn",
     "COUNT_ZONE": "Số vùng màu",
@@ -492,9 +492,35 @@
     "PET_LABEL": "Pet in this design",
     "PET_NONE": "No pet attached",
     "PET_HINT": "Attaching a pet sends the photos you uploaded along to the workshop.",
-    "EYEBROW": "THE ONLINE WORKSHOP",
+    "EYEBROW": "The little yarn table",
     "FELTED": "Felted shape",
-    "FELTED_NOTE": "The same realistic model with a bigger head, a rounder body and shorter legs, closer to a needle-felted toy."
+    "FELTED_NOTE": "The same realistic model with a bigger head, a rounder body and shorter legs, closer to a needle-felted toy.",
+    "LOAD_ERROR": "The workbench could not load. Please refresh the page.",
+    "STAGE": "3D plush viewer",
+    "STAGE_TOOLS": "Viewer tools",
+    "STEPS": "Plush making steps",
+    "ANGLES": "Viewing angle",
+    "HOLDING": "Holding yarn",
+    "BUBBLE_DRAG": "Drag to spin, scroll to zoom",
+    "BUBBLE_PICK": "Pick a yarn ball, then tap the plush to paint",
+    "TAB": {
+      "MODEL": "Pick",
+      "COLOR": "Yarn",
+      "ENGRAVE": "Engrave",
+      "FINISH": "Wrap up"
+    },
+    "PANEL": {
+      "MODEL": "Who are we making today?",
+      "COLOR": "Pick a yarn, then tap the plush",
+      "ENGRAVE": "Engrave a little memory",
+      "FINISH": "Time to wrap it up!"
+    },
+    "SUGGEST_LINK": "Not sure? Send a photo for a suggestion",
+    "TAG_PLACEHOLDER": "Pet name",
+    "CAPTURING": "Capturing 6 angles…",
+    "RECAPTURE": "Capture again",
+    "SUMMARY_LINE": "{{colors}} yarn colours · {{photos}}/6 photos",
+    "NEXT_TO": "Next: {{step}}"
   },
   "HOME": {
     "BADGE": "HANDMADE • RECYCLED MATERIAL • 100% PERSONALISED",

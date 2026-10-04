@@ -8,6 +8,7 @@ import {
   input,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -32,6 +33,7 @@ function supportsWebgl(): boolean {
 }
 
 @Component({
+  host: { '[class.bare]': 'bare()' },
   selector: 'pm-viewer-3d',
   standalone: true,
   imports: [MatButtonToggleModule, MatProgressSpinnerModule, TranslatePipe],
@@ -51,6 +53,13 @@ export class Viewer3d {
    * khong so sanh duoc.
    */
   readonly compact = input(false);
+
+  /**
+   * Che do tran: chi con khung 3D, lap day cho chua no. Trang dung che do nay
+   * tu ve nut goc nhin, tu xoay, hoan tac va chup anh, roi goi cac ham cong
+   * khai cua khung nay.
+   */
+  readonly bare = input(false);
 
   /**
    * Ten dang than muon ap cho mo hinh.
@@ -104,10 +113,12 @@ export class Viewer3d {
   private draggingBrush = false;
 
   constructor() {
+    // Chi nap lai khi doi tep mo hinh. Cac tin hieu doc ben trong luc nap, nhu
+    // tu xoay hay dang than, khong duoc lam nap lai, neu khong se mat mau dang to.
     effect(() => {
       const path = this.pathModel();
       const box = this.wrap().nativeElement;
-      this.initAndLoad(box, path);
+      untracked(() => this.initAndLoad(box, path));
     });
 
     effect(() => {

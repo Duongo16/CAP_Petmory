@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../core/services/auth.service';
 import { CartService } from '../core/services/cart.service';
@@ -16,6 +17,15 @@ interface MenuItem {
 }
 import { Brand } from '../shared/brand/brand';
 import { UserFace } from '../shared/user-face/user-face';
+
+/** Doc co danh dau man hinh tran khung o tuyen sau nhat dang mo. */
+function isImmersive(root: ActivatedRouteSnapshot): boolean {
+  let route = root;
+  while (route.firstChild) {
+    route = route.firstChild;
+  }
+  return route.data['immersive'] === true;
+}
 
 @Component({
   selector: 'pm-shell',
@@ -40,6 +50,16 @@ export class Shell implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly cart = inject(CartService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+
+  /** Man hinh tran khung, nhu ban len 3D, thi khong hien chan trang. */
+  readonly immersive = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map(() => isImmersive(this.router.routerState.snapshot.root)),
+    ),
+    { initialValue: isImmersive(this.router.routerState.snapshot.root) },
+  );
 
   readonly user = this.auth.user;
   readonly cartItemCount = this.cart.countItem;
