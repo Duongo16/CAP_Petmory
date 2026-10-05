@@ -62,20 +62,24 @@ async function ensurePhotos(token, petId, need) {
  * Tao be, tai anh, tao ban thiet ke. Tra ve ma be va ma ban thiet ke.
  * extra: cac o them cho ban thiet ke (vi du accessories, stand).
  */
+/** Moi khach dung lai mot be, vi tai khoan co gioi han so ho so be. */
+const petOfToken = new Map();
+
 async function readyDesign(token, { productTypeCode = 'PT-01', sizeCode = 'FIG-M', petName = 'Be thu', extra = {} } = {}) {
   const auth = { Authorization: `Bearer ${token}` };
-  const pet = await asJson(await fetch(`${API}/pets`, {
-    method: 'POST', headers: { ...auth, 'content-type': 'application/json' }, body: JSON.stringify({ name: petName }),
-  }));
-  const need = await minPhotosOf(productTypeCode, sizeCode);
-  for (let at = 0; at < need; at += 1) {
-    const form = new FormData();
-    form.append('file', new Blob([await samplePhoto(at)], { type: 'image/jpeg' }), `anh-${at}.jpg`);
-    const sent = await fetch(`${API}/pet-photos/${pet._id}`, { method: 'POST', headers: auth, body: form });
-    if (!sent.ok) {
-      throw new Error(`tai anh that bai: ${sent.status}`);
+  let petId = petOfToken.get(token);
+  if (!petId) {
+    const pet = await asJson(await fetch(`${API}/pets`, {
+      method: 'POST', headers: { ...auth, 'content-type': 'application/json' }, body: JSON.stringify({ name: petName }),
+    }));
+    if (!pet._id) {
+      throw new Error(`tao be that bai: ${JSON.stringify(pet).slice(0, 160)}`);
     }
+    petId = pet._id;
+    petOfToken.set(token, petId);
   }
+  await ensurePhotos(token, petId, await minPhotosOf(productTypeCode, sizeCode));
+  const pet = { _id: petId };
   const design = await asJson(await fetch(`${API}/designs`, {
     method: 'POST',
     headers: { ...auth, 'content-type': 'application/json' },

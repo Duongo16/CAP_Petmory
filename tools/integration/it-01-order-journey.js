@@ -1,3 +1,4 @@
+const madeToOrder = require('../lib/made-to-order');
 /**
  * IT-01 — One order, end to end, across every module it touches.
  *
@@ -71,7 +72,7 @@ async function scenario(report) {
     headers: customer.auth,
     body: JSON.stringify({
       name: 'Ban thiet ke cua Mun',
-      modelCode: 'TEMP-CAT',
+      modelCode: 'BASE-CAT-SIT',
       productTypeCode: 'PT-01',
       sizeCode: size.code,
       pet: petId,
@@ -84,6 +85,8 @@ async function scenario(report) {
   const designId = design.body._id;
 
   // --- Cart ---
+  // Hang tuy bien can be du so anh toi thieu cua kich co (muc 7).
+  await madeToOrder.ensurePhotos(customer.token, petId, size.minPhotos ?? 4);
   report.step('The design goes into the cart with a stand');
   const cart = await h.call('/cart/items', {
     method: 'POST',
@@ -157,7 +160,7 @@ async function scenario(report) {
   const file = await h.call(`/admin/orders/${orderCode}/production-file`, { headers: manager.auth });
   report.require('The production file opens', file.status === 200, String(file.status));
   const item = file.body.items[0];
-  report.check('The file names the base model', item.modelCode === 'TEMP-CAT', item.modelCode);
+  report.check('The file names the base model', item.modelCode === 'BASE-CAT-SIT', item.modelCode);
   report.check('The file turns the colour code into a readable name',
     item.woolRolls?.[0]?.displayName?.length > 0, item.woolRolls?.[0]?.displayName);
   report.check('The file carries the engraving', item.engraving?.message === 'Mun');
@@ -179,7 +182,7 @@ async function scenario(report) {
     headers: customer.auth,
     body: JSON.stringify({
       name: 'Ban da sua sau khi dat',
-      modelCode: 'TEMP-DOG',
+      modelCode: 'BASE-DOG-STAND',
       productTypeCode: 'PT-01',
       sizeCode: size.code,
       paint: [{ mesh: 'Body', color: 'ff0000' }],
@@ -195,7 +198,7 @@ async function scenario(report) {
   });
   const keptItem = afterEdit.body.items[0];
   report.check('The production file keeps the model that was ordered',
-    keptItem.modelCode === 'TEMP-CAT', keptItem.modelCode);
+    keptItem.modelCode === 'BASE-CAT-SIT', keptItem.modelCode);
   report.check('The production file keeps the engraving that was ordered',
     keptItem.engraving?.message === 'Mun', keptItem.engraving?.message);
 
@@ -211,7 +214,7 @@ async function scenario(report) {
   report.check('Removing the design leaves the production file readable',
     afterDrop.status === 200, String(afterDrop.status));
   report.check('And the file still names what was ordered',
-    afterDrop.body.items[0].modelCode === 'TEMP-CAT', afterDrop.body.items[0].modelCode);
+    afterDrop.body.items[0].modelCode === 'BASE-CAT-SIT', afterDrop.body.items[0].modelCode);
 
   // --- Through the workshop to the customer ---
   report.step('The order is walked through to delivered');

@@ -53,7 +53,7 @@ async function fillDelivery(page) {
 }
 
 async function quantityShown(page) {
-  return (await page.locator('.line .tabular-nums').first().innerText()).trim();
+  return (await page.locator('.line .line-stepper-val').first().innerText()).trim();
 }
 
 (async () => {
@@ -96,14 +96,19 @@ async function quantityShown(page) {
 
   // --- Them vao gio tu popup chi tiet trong cua hang ---
   await page.goto(`${WEB}/shop?tab=ready&goods=${CODE}`, { waitUntil: 'networkidle' });
-  await page.locator('pm-goods-detail-page button', { hasText: /Thêm vào giỏ/ }).first().click();
-  await page.waitForTimeout(1200);
+  await page.locator('.pm-dialog pm-goods-detail-page button', { hasText: /Thêm vào giỏ/ }).first().click();
+  await page.locator('header a[href="/cart"] [role=status]').waitFor({ timeout: 15000 }).catch(() => undefined);
+  ok('Them tu cua so chi tiet thi bo dem gio hang len mot',
+    (await page.locator('header a[href="/cart"] [role=status]').innerText().catch(() => '')).trim() === '1');
   await page.keyboard.press('Escape');
+  await page.waitForSelector('.pm-dialog', { state: 'detached', timeout: 15000 });
+  ok('Bam Esc thi cua so chi tiet dong va dia chi bo ma mon',
+    !new URL(page.url()).searchParams.has('goods'), page.url());
 
   // --- Tang so luong trong gio vuot kho ---
   await page.goto(`${WEB}/cart`, { waitUntil: 'networkidle' });
   await page.waitForSelector('.line');
-  const more = page.locator('.line button:has-text("+")');
+  const more = page.locator('.line .line-stepper button:has-text("+")');
   await more.click();
   await page.waitForTimeout(800);
   await more.click();
@@ -134,7 +139,7 @@ async function quantityShown(page) {
   await page.goto(`${WEB}/cart`, { waitUntil: 'networkidle' });
   await page.waitForSelector('.line');
   ok('Gio hang van con sau lan dat khong thanh', (await page.locator('.line').count()) === 1);
-  await page.locator('.line button:has-text("−")').click();
+  await page.locator('.line .line-stepper button:has-text("−")').click();
   await page.waitForTimeout(800);
 
   await page.goto(`${WEB}/checkout`, { waitUntil: 'networkidle' });

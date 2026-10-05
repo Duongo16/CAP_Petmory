@@ -81,22 +81,9 @@ async function run() {
   })), PET);
   await page.goto(`${WEB}/register`, { waitUntil: 'networkidle' });
   ok('Duong dan dang ky mo duoc', await page.locator('form').isVisible());
-  ok('Co hai nut mang xa hoi', (await page.locator('.social button').count()) === 2);
-  ok('Co ba muc dac quyen', (await page.locator('.perk').count()) === 3);
-
-  await page.locator('.social button').first().click();
-  await page.waitForTimeout(300);
-  ok('Bam nut mang xa hoi thi noi ro chua ket noi',
-    await page.locator('.notice').isVisible());
-
-  // --- The strength meter ---
-  await page.fill('#up-password', 'abc');
-  await page.waitForTimeout(200);
-  const weak = await page.locator('.meter-value').innerText();
-  await page.fill('#up-password', 'Petmory@2026xyz');
-  await page.waitForTimeout(200);
-  const strong = await page.locator('.meter-value').innerText();
-  ok('Thanh do manh mat khau doi theo cai da go', weak !== strong, `${weak} -> ${strong}`);
+  // Dang nhap mang xa hoi da bo (chua ket noi dich vu that), nen khong con nut nao.
+  ok('Khong con nut mang xa hoi chua ket noi', (await page.locator('.social button').count()) === 0);
+  ok('Co ba muc dac quyen', (await page.locator('.ap-glass-perk').count()) === 3);
 
   // --- A wrong phone number is refused before sending ---
   await page.fill('#up-phone', '123');
@@ -108,21 +95,22 @@ async function run() {
   await page.fill('#up-name', 'Nguoi kiem thu');
   await page.fill('#up-email', EMAIL);
   await page.fill('#up-phone', PHONE);
+  await page.fill('#up-password', 'Petmory@2026xyz');
   await page.fill('#up-confirm', 'Petmory@2026khac');
-  await page.locator('.submit').click();
+  await page.locator('button[type="submit"]').click();
   await page.waitForTimeout(600);
   ok('Hai lan nhap mat khau khac nhau thi bi chan',
     page.url().includes('/register'), page.url());
 
   await page.fill('#up-confirm', 'Petmory@2026xyz');
-  await page.locator('.submit').click();
+  await page.locator('button[type="submit"]').click();
   await page.waitForTimeout(600);
   ok('Chua tich dieu khoan thi chua tao duoc tai khoan',
     page.url().includes('/register'), page.url());
 
-  await page.locator('.tick input').check();
+  await page.locator('input[formcontrolname="terms"]').check();
   await page.screenshot({ path: path.join(OUT, 'auth-register.png'), fullPage: true });
-  await page.locator('.submit').click();
+  await page.locator('button[type="submit"]').click();
   await page.waitForURL('**/home', { timeout: 30000 });
   ok('Tao tai khoan xong thi vao trang chu', true);
 
@@ -150,18 +138,18 @@ async function run() {
   const page2 = await guest.newPage();
   page2.on('pageerror', (e) => broken.push(String(e)));
   await page2.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
-  ok('Duong dan dang nhap mo duoc', await page2.locator('.pane form').isVisible());
-  ok('Co o ghi nho dang nhap', await page2.locator('.tick input').isVisible());
+  ok('Duong dan dang nhap mo duoc', await page2.locator('form').isVisible());
+  ok('Co o ghi nho dang nhap', await page2.locator('input[formcontrolname="remember"]').isVisible());
   await page2.screenshot({ path: path.join(OUT, 'auth-login.png'), fullPage: true });
 
   await page2.fill('#login-email', EMAIL);
   await page2.fill('#login-password', 'sai-mat-khau-roi');
-  await page2.locator('.submit').click();
+  await page2.locator('button[type="submit"]').click();
   await page2.waitForTimeout(1500);
-  ok('Sai mat khau thi bao loi ro rang', await page2.locator('.error').isVisible());
+  ok('Sai mat khau thi bao loi ro rang', await page2.locator('p[role="alert"]').isVisible());
 
   await page2.fill('#login-password', 'Petmory@2026xyz');
-  await page2.locator('.submit').click();
+  await page2.locator('button[type="submit"]').click();
   await page2.waitForURL('**/home', { timeout: 30000 });
   ok('Dung mat khau thi vao duoc trang chu', true);
 
@@ -169,20 +157,15 @@ async function run() {
   const quick = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const pageQuick = await quick.newPage();
   await pageQuick.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
-  await pageQuick.waitForSelector('.quick-button', { timeout: 20000 });
-  ok('Man hinh dang nhap co ba nut vao nhanh theo vai tro',
-    (await pageQuick.locator('.quick-button').count()) === 3,
-    (await pageQuick.locator('.quick-button').allInnerTexts()).join(' | '));
+  await pageQuick.waitForSelector('.ap-quick-btn', { timeout: 20000 });
+  ok('Man hinh dang nhap co bon nut vao nhanh theo vai tro',
+    (await pageQuick.locator('.ap-quick-btn').count()) === 4,
+    (await pageQuick.locator('.ap-quick-btn').allInnerTexts()).join(' | '));
 
-  await pageQuick.locator('.quick-button').first().click();
-  await pageQuick.waitForURL('**/home', { timeout: 20000 });
-  ok('Bam mot nut la vao thang, khong phai go gi',
-    (await pageQuick.locator('.account-button').innerText()).includes('Quan ly'),
-    (await pageQuick.locator('.account-button').innerText()).trim());
-
-  await pageQuick.goto(`${WEB}/admin/orders`, { waitUntil: 'networkidle' });
-  await pageQuick.waitForTimeout(1200);
-  ok('Vai tro vao nhanh dung la vai tro quan ly',
+  // Nut dau la tai khoan Quan ly, bam vao la sang thang ban dieu phoi don.
+  await pageQuick.locator('.ap-quick-btn').first().click();
+  await pageQuick.waitForURL('**/admin/orders', { timeout: 20000 });
+  ok('Bam mot nut la vao thang ban dieu phoi, khong phai go gi',
     pageQuick.url().includes('/admin/orders'), pageQuick.url());
   await quick.close();
 

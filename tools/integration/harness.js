@@ -1,3 +1,4 @@
+const madeToOrder = require('../lib/made-to-order');
 /**
  * Shared harness for the integration tests.
  *
@@ -87,6 +88,15 @@ async function newCustomer(label) {
     token: res.body.accessToken,
     auth: authHeaders(res.body.accessToken),
   };
+}
+
+/**
+ * Mot ban thiet ke hop le cho dong hang tuy bien (muc 7): be du anh toi thieu
+ * cua kich co, ban thiet ke gan be va kich co. Tra ve ma ban thiet ke.
+ */
+async function readyDesign(customer, productTypeCode = 'PT-01', sizeCode = 'FIG-M') {
+  const made = await madeToOrder.readyDesign(customer.token, { productTypeCode, sizeCode });
+  return made.designId;
 }
 
 /** One of the three seeded internal accounts. */
@@ -203,6 +213,7 @@ module.exports = {
   call,
   authHeaders,
   newCustomer,
+  readyDesign,
   signInInternal,
   makePhoto,
   uploadPhoto,

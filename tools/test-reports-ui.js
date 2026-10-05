@@ -46,21 +46,16 @@ async function signIn(page, email) {
    * tai xong thi ung dung chua kip dung khung, nut chua co, va buoc thoat
    * tai khoan bi bo qua mot cach im lang.
    */
-  const account = page.locator('.account-button');
-  await account.waitFor({ timeout: 15000 }).catch(() => undefined);
-  if ((await account.count()) > 0) {
-    await account.click();
-    await page.locator('.logout-item').click();
-    await page.waitForURL('**/login', { timeout: 20000 });
-  }
+  // Xoa phien dang mo ngay trong trinh duyet, khong phu thuoc nut dang xuat.
+  await page.evaluate(() => localStorage.clear());
   await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await settle(page);
   await page.fill('#login-email', email);
   await page.fill('#login-password', PASSWORD);
-  await page.click('.submit');
-  await page.waitForURL('**/home', { timeout: 30000 }).catch(async () => {
-    await page.click('.submit');
-    await page.waitForURL('**/home', { timeout: 40000 });
+  await page.click('button[type="submit"]');
+  await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 30000 }).catch(async () => {
+    await page.click('button[type="submit"]');
+    await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 40000 });
   });
 }
 
@@ -77,6 +72,8 @@ async function signIn(page, email) {
   await signIn(page, 'quanly@petmory.local');
   await page.goto(`${WEB}/admin/reports`, { waitUntil: 'networkidle' });
   await settle(page);
+  // Trang mo san o che do bieu do, cac bang so lieu nam o nut thu hai.
+  await page.locator('.toggle-btn').nth(1).click();
   await page.waitForSelector('#report-revenue', { timeout: 30000 });
   ok('Nhom Quan ly thay ca ba bao cao', (await page.locator('.card').count()) === 3,
     String(await page.locator('.card').count()));

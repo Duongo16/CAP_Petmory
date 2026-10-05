@@ -26,10 +26,11 @@ const ALL_STATES = Object.keys(ALLOWED);
 async function placeOrder(customer, label) {
   const product = await h.call('/catalog/products/PT-02');
   const size = product.body.sizes.find((s) => s.enabled);
+  const designId = await h.readyDesign(customer, 'PT-02', size.code);
   await h.call('/cart/items', {
     method: 'POST',
     headers: customer.auth,
-    body: JSON.stringify({ productTypeCode: 'PT-02', sizeCode: size.code, quantity: 1 }),
+    body: JSON.stringify({ productTypeCode: 'PT-02', sizeCode: size.code, quantity: 1, designId }),
   });
   const order = await h.call('/orders', {
     method: 'POST',

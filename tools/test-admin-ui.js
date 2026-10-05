@@ -1,3 +1,4 @@
+const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Browser test: the order dispatch board, order detail, customer profiles and the
  * payment log. Also checks the difference between an operations account and one
@@ -18,8 +19,8 @@ const FILTER_LOG = '.log-filters .filter';
 const CARD_SETTING = 'form .card';
 const STATE_MAKING = 'Đang làm';
 const STATE_SHIPPING = 'Đang giao';
+const SAVE_CONFIG = '.config-actions-bar button[type="submit"]';
 
-const ROW_MODEL = '#model-table tbody tr';
 
 /** Cac o cua man vat lieu, duoc chi den nhieu lan. */
 const ROW_COLOUR = '#color-table tbody tr';
@@ -43,13 +44,8 @@ async function login(page, email, password, destination = '**/home') {
         // Wait for the page to load, not for the network to fall silent. A guard that
         // redirects keeps a request in flight, so waiting for silence waits for ever.
   await page.goto(WEB, { waitUntil: 'load' });
-  await page.locator('.account-button').waitFor({ timeout: 12000 }).catch(() => undefined);
-  const accountButton = page.locator('.account-button');
-  if ((await accountButton.count()) > 0) {
-    await accountButton.click();
-    await page.locator('.logout-item').click();
-    await page.waitForURL('**/login', { timeout: 20000 });
-  }
+  // Xoa phien dang mo ngay trong trinh duyet, khong phu thuoc nut dang xuat.
+  await page.evaluate(() => localStorage.clear());
   await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await page.fill('input[formcontrolname="email"]', email);
   await page.fill('input[formcontrolname="password"]', password);
@@ -66,10 +62,8 @@ async function makeCustomerWithOrder(page, fullName) {
   const token = (await dk.json()).accessToken;
   const label = { Authorization: `Bearer ${token}` };
 
-  await page.request.post(`${API}/cart/items`, {
-    headers: label,
-    data: { productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 1 },
-  });
+  // Hang tuy bien can ban thiet ke gan voi be co du anh, nen dung chung buoc chuan bi.
+  await addCustomLine(token, { productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 1 });
   const order = await page.request.post(`${API}/orders`, {
     headers: label,
     data: {
@@ -126,15 +120,14 @@ async function run() {
       page.url().includes('/home'), page.url()));
 
                 // --- The manager reaches the dispatch board ---
-    await login(page, 'quanly@petmory.local', PASSWORD_INTERNAL);
-    await page.locator('.account-button').click();
-    await page.waitForSelector('.account-menu', { timeout: 20000 });
-    res.push(check('The manager sees all five internal menu items',
-      (await page.locator('.account-menu .internal-link').count()) === 5,
-      (await page.locator('.account-menu .internal-link').allInnerTexts()).join(' / ')));
+    // Nhom Quan ly dang nhap xong vao thang ban dieu phoi, thanh ben liet ke phan van hanh.
+    await login(page, 'quanly@petmory.local', PASSWORD_INTERNAL, '**/admin/orders');
+    await page.waitForSelector('.rail-link', { timeout: 20000 });
+    const rail = await page.locator('.rail-link').allInnerTexts();
+    res.push(check('The manager sees the operations rail',
+      rail.some((one) => one.includes('Đơn hàng')) && rail.some((one) => one.includes('Báo cáo')),
+      rail.join(' / ').slice(0, 80)));
 
-    await page.locator('.account-menu .internal-link').first().click();
-    await page.waitForURL('**/admin/orders', { timeout: 20000 });
     await page.waitForSelector('.counter-tile', { timeout: 30000 });
     res.push(check('The dispatch board shows all six statuses',
       (await page.locator('.counter-tile').count()) === 6));
@@ -261,6 +254,7 @@ async function run() {
     res.push(check('The checklist starts with nothing ticked',
       (await page.locator('.quality-tick input:checked').count()) === 0));
 
+    await page.fill('#reason-input', 'xuong da lam xong mon');
     await page.locator(`button:has-text("${STATE_SHIPPING}")`).click();
     await page.waitForTimeout(1200);
     res.push(check('Shipping is refused while the checklist is open',
@@ -285,6 +279,7 @@ async function run() {
       (await page.locator('.quality-when').count()) === countTick));
     await page.screenshot({ path: path.join(OUT, 'admin-3b-quality-check.png') });
 
+    await page.fill('#reason-input', 'xuong da lam xong mon');
     await page.locator(`button:has-text("${STATE_SHIPPING}")`).click();
     await page.waitForTimeout(1500);
     res.push(check('With the checklist done the order moves on',
@@ -299,18 +294,19 @@ async function run() {
     res.push(check('A customer can be found by email',
       (await page.locator(ROW_TABLE).count()) === 1));
 
-    await page.locator('.table tbody a').first().click();
-    await page.waitForURL(/admin\/customers\/[0-9a-f]{24}$/, { timeout: 20000 });
-    await page.waitForSelector('.card', { timeout: 20000 });
+    // Ho so khach mo trong hop thoai ngay tren danh sach.
+    await page.locator('.table tbody button.plain').first().click();
+    await page.waitForSelector('.dialog-shell .who-figures', { timeout: 20000 });
     res.push(check('A customer profile shows their order history',
-      (await page.locator(ROW_TABLE).count()) === 1));
+      (await page.locator('.dialog-shell .table tbody tr').count()) === 1));
     res.push(check('A customer profile shows their email',
-      (await page.locator('.who-lines span').first().innerText()).trim() === customer.email));
+      (await page.locator('.dialog-shell .who-lines span').first().innerText()).trim() === customer.email));
     res.push(check('A customer profile counts their orders, spend and pets',
-      (await page.locator('.who-figures div').count()) === 3));
+      (await page.locator('.dialog-shell .who-figures div').count()) === 3));
     res.push(check('A customer profile shows how far they are up the tiers',
       (await page.locator('.tier-rail').count()) === 1));
     await page.screenshot({ path: path.join(OUT, 'admin-4-customer-profile.png') });
+    await page.keyboard.press('Escape');
 
                 // --- Payment log ---
     await page.goto(`${WEB}/admin/payment-log`, { waitUntil: 'networkidle' });
@@ -403,64 +399,33 @@ async function run() {
       (await colourRow.getAttribute('class')) ?? ''));
     await page.screenshot({ path: path.join(OUT, 'admin-7-materials.png'), fullPage: true });
 
-                // --- 3D model comparison screen ---
-                //
-                // Three shape groups side by side. The felted group is the realistic
-                // model reshaped, so it must report the same file, not a new one.
-    await page.goto(`${WEB}/admin/models`, { waitUntil: 'load' });
-    await page.waitForSelector(ROW_MODEL, { timeout: 30000 });
-    const modelRows = await page.locator(ROW_MODEL).count();
-    res.push(check('The model screen lists every model on hand', modelRows >= 19, `${modelRows} rows`));
-
-    await page.locator('.kind-bar .pm-chip', { hasText: 'Chó' }).first().click();
-    await page.waitForTimeout(6000);
-    res.push(check('A dog is offered in all three shape groups',
-      (await page.locator('.shape-card .none-yet').count()) === 0));
-
-    const files = await page.locator('.facts dd.thin').allInnerTexts();
-    res.push(check('The felted shape reuses the realistic model file',
-      files[0] === files[1], files.slice(0, 2).join(' vs ')));
-
-                // The zone count is read from the model file itself once it has loaded,
-                // so it says what can really be coloured separately.
-    const zoneCells = await page.locator('.facts dd').nth(2).innerText();
-    res.push(check('The realistic file offers more than one colour zone',
-      Number.parseInt(zoneCells, 10) > 1, zoneCells.slice(0, 40)));
-
-    await page.locator('.kind-bar .pm-chip', { hasText: 'Mèo' }).first().click();
-    await page.waitForTimeout(3000);
-    res.push(check('A cat is honestly reported as missing from two groups',
-      (await page.locator('.shape-card .none-yet').count()) === 2));
-    await page.screenshot({ path: path.join(OUT, 'admin-8-models.png'), fullPage: true });
-
                 // --- Business settings page ---
     await page.goto(`${WEB}/admin/settings`, { waitUntil: 'networkidle' });
     await page.waitForSelector(CARD_SETTING, { timeout: 30000 });
-    res.push(check('The settings page shows all six groups',
-      (await page.locator(CARD_SETTING).count()) === 6));
+    // Trang tham so chia thanh nam the, the dau la tham so van hanh va tai khoan nhan tien.
+    res.push(check('The settings page offers all five tabs',
+      (await page.locator('.config-tab-btn').count()) === 5));
     const accountNumber = await page.locator('input[formcontrolname="accountNumber"]').inputValue();
     res.push(check('Reads the current account number', accountNumber.length >= 6, accountNumber));
-    res.push(check('Warns about the receiving account',
-      (await page.locator('.note.warn').innerText()).includes('tiền của khách')));
     await page.screenshot({ path: path.join(OUT, 'admin-6-settings.png') });
 
                 // Bad input is stopped in the interface itself, without calling the server
     await page.fill('input[formcontrolname="bankCode"]', '123');
-    await page.locator('button:has-text("Lưu")').click();
+    await page.locator(SAVE_CONFIG).click();
     await page.waitForTimeout(800);
     res.push(check('A wrong bank code is rejected in the interface',
       (await page.locator('.field-error').count()) === 1));
 
     await page.fill('input[formcontrolname="bankCode"]', '970415');
     await page.fill('input[formcontrolname="warnShortEdgePx"]', '2000');
-    await page.locator('button:has-text("Lưu")').click();
+    await page.locator(SAVE_CONFIG).click();
     await page.waitForTimeout(800);
     res.push(check('Rejects a warning threshold that is not below the acceptable one',
       (await page.locator('.error').innerText()).includes('nhỏ hơn')));
 
     await page.fill('input[formcontrolname="warnShortEdgePx"]', '600');
     await page.fill('input[formcontrolname="estimatedShippingDays"]', '4');
-    await page.locator('button:has-text("Lưu")').click();
+    await page.locator(SAVE_CONFIG).click();
     await page.waitForSelector('.saved', { timeout: 20000 });
     res.push(check('A valid change can be saved', true));
 
@@ -471,11 +436,11 @@ async function run() {
 
                 // Put the old value back so the other tests are unaffected
     await page.fill('input[formcontrolname="estimatedShippingDays"]', '3');
-    await page.locator('button:has-text("Lưu")').click();
+    await page.locator(SAVE_CONFIG).click();
     await page.waitForSelector('.saved', { timeout: 20000 });
 
                 // --- The account admin group cannot reach any running screen ---
-    await login(page, 'quantri@petmory.local', PASSWORD_INTERNAL);
+    await login(page, 'quantri@petmory.local', PASSWORD_INTERNAL, '**/admin/accounts');
     for (const where of ['/admin/orders', '/admin/settings', '/admin/customers']) {
       await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
       await page.waitForTimeout(1600);

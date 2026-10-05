@@ -76,21 +76,16 @@ async function makeCustomer() {
 
 async function signIn(page, email, password) {
   await page.goto(WEB, { waitUntil: 'load' });
-  const account = page.locator('.account-button');
-  await account.waitFor({ timeout: 15000 }).catch(() => undefined);
-  if ((await account.count()) > 0) {
-    await account.click();
-    await page.locator('.logout-item').click();
-    await page.waitForURL('**/login', { timeout: 20000 });
-  }
+  // Xoa phien dang mo ngay trong trinh duyet, khong phu thuoc nut dang xuat.
+  await page.evaluate(() => localStorage.clear());
   await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await settle(page);
   await page.fill('#login-email', email);
   await page.fill('#login-password', password);
-  await page.click('.submit');
-  await page.waitForURL('**/home', { timeout: 30000 }).catch(async () => {
-    await page.click('.submit');
-    await page.waitForURL('**/home', { timeout: 40000 });
+  await page.click('button[type="submit"]');
+  await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 30000 }).catch(async () => {
+    await page.click('button[type="submit"]');
+    await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 40000 });
   });
 }
 
@@ -103,7 +98,7 @@ async function signIn(page, email, password) {
   console.log('BA CHUC NANG TRI TUE NHAN TAO TREN GIAO DIEN');
   console.log('='.repeat(64));
 
-  const { petId } = await makeCustomer();
+  const { petId, token } = await makeCustomer();
   await signIn(page, EMAIL, PASSWORD);
 
   // ---------- Muc 15: goi y thiet ke ----------
@@ -119,8 +114,21 @@ async function signIn(page, email, password) {
   ok('Co bon phong cach mau de chon',
     (await page.locator('.style-chip').count()) === 4,
     String(await page.locator('.style-chip').count()));
-  ok('Man hinh cho biet con bao nhieu luot',
-    (await page.locator('#suggest-quota').count()) === 1);
+  /*
+   * Dong so luot chi hien khi cau hinh co dat han muc. Khong dat han muc thi
+   * may chu bao khong gioi han va man hinh phai giau dong do di.
+   */
+  const quota = await (await fetch(`${API}/design-suggestions/quota`, {
+    headers: { authorization: `Bearer ${token}` },
+  })).json();
+  if (quota.left >= 0) {
+    ok('Man hinh cho biet con bao nhieu luot',
+      await page.waitForSelector('#suggest-quota', { timeout: 15000 }).then(() => true, () => false));
+  } else {
+    await page.waitForTimeout(1500);
+    ok('Khong dat han muc thi khong hien dong so luot',
+      (await page.locator('#suggest-quota').count()) === 0);
+  }
 
   await page.locator('.style-chip', { hasText: 'Dịu nhẹ' }).click();
   await page.locator('.ask-button').click();
@@ -179,53 +187,55 @@ async function signIn(page, email, password) {
   console.log('Muc 18 — Hoi thoai ban day du');
   await page.goto(`${WEB}/home`, { waitUntil: 'networkidle' });
   await settle(page);
-  await page.locator('.open-button').click();
-  await page.waitForSelector('#assistant-panel', { timeout: 20000 });
-  await page.waitForSelector('.history .message', { timeout: 30000 });
+  await page.locator('pm-chat-widget .launcher').click();
+  await page.waitForSelector('#assistant-input', { timeout: 20000 });
+  await page.waitForSelector('pm-chat-widget .row', { timeout: 30000 });
 
   ok('Mo cua so thi thay ngay loi chao',
-    (await page.locator('.history .message').count()) >= 1,
-    String(await page.locator('.history .message').count()));
+    (await page.locator('pm-chat-widget .row').count()) >= 1,
+    String(await page.locator('pm-chat-widget .row').count()));
   ok('Cua so cho biet dang tro chuyen voi may',
-    (await page.locator('.state-line').innerText()).includes('tự động'),
-    (await page.locator('.state-line').innerText()).trim());
+    (await page.locator('pm-chat-widget .head-state').innerText()).includes('tự động'),
+    (await page.locator('pm-chat-widget .head-state').innerText()).trim());
 
   await page.fill('#assistant-input', 'Giá bao nhiêu?');
-  await page.locator('.send-button').click();
+  await page.locator('pm-chat-widget .send-button').click();
   await page.waitForFunction(
-    () => document.querySelectorAll('.history .message').length >= 3,
+    () => document.querySelectorAll('pm-chat-widget .row').length >= 3,
     undefined,
     { timeout: 30000 },
   );
   await page.fill('#assistant-input', 'Làm bao lâu?');
-  await page.locator('.send-button').click();
+  await page.locator('pm-chat-widget .send-button').click();
   await page.waitForFunction(
-    () => document.querySelectorAll('.history .message').length >= 5,
+    () => document.querySelectorAll('pm-chat-widget .row').length >= 5,
     undefined,
     { timeout: 30000 },
   );
   ok('Cuoc tro chuyen giu lai ca hai cau da hoi',
-    (await page.locator('.history .message').count()) >= 5,
-    String(await page.locator('.history .message').count()));
+    (await page.locator('pm-chat-widget .row').count()) >= 5,
+    String(await page.locator('pm-chat-widget .row').count()));
 
-  // Mo lai trang: mach hoi thoai phai con nguyen.
+  // Cho cau tra loi cuoi ghi xong roi moi mo lai trang, mach hoi thoai phai con nguyen.
+  await page.waitForSelector('pm-chat-widget .bubble.typing', { state: 'detached', timeout: 60000 });
+  const kept = await page.locator('pm-chat-widget .row').count();
   await page.reload({ waitUntil: 'networkidle' });
   await settle(page);
-  await page.locator('.open-button').click();
-  await page.waitForSelector('.history .message', { timeout: 30000 });
+  await page.locator('pm-chat-widget .launcher').click();
+  await page.waitForSelector('pm-chat-widget .row', { timeout: 30000 });
   await page.waitForFunction(
-    () => document.querySelectorAll('.history .message').length >= 5,
-    undefined,
+    (want) => document.querySelectorAll('pm-chat-widget .row').length >= want,
+    kept,
     { timeout: 30000 },
   );
   ok('Mo lai trang van thay mach hoi thoai cu',
-    (await page.locator('.history .message').count()) >= 5,
-    String(await page.locator('.history .message').count()));
+    (await page.locator('pm-chat-widget .row').count()) >= kept,
+    `${await page.locator('pm-chat-widget .row').count()} / ${kept}`);
 
-  await page.locator('.handover-button').click();
+  await page.locator('pm-chat-widget .handover-link').click();
   await page.waitForFunction(
     () => {
-      const line = document.querySelector('.state-line');
+      const line = document.querySelector('pm-chat-widget .head-state');
       return line ? line.textContent.includes('chờ tư vấn viên') : false;
     },
     undefined,
@@ -233,7 +243,7 @@ async function signIn(page, email, password) {
   );
   ok('Xin gap nguoi thi cua so bao dang cho tu van vien', true);
   ok('Dang cho thi khong con nut xin gap nua',
-    (await page.locator('.handover-button').count()) === 0);
+    (await page.locator('pm-chat-widget .handover-link').count()) === 0);
   await page.screenshot({ path: path.join(OUT, 'ai-4-chat-waiting.png') });
 
   // ---------- Nhan vien truc nhan va tra loi ----------
@@ -277,7 +287,7 @@ async function signIn(page, email, password) {
   // Khach phai thay cau tra loi ma khong phai tai lai trang.
   await page.waitForFunction(
     () => {
-      const bubbles = [...document.querySelectorAll('.history .bubble')];
+      const bubbles = [...document.querySelectorAll('pm-chat-widget .bubble')];
       return bubbles.some((one) => one.textContent.includes('tu van vien cua PETMORY'));
     },
     undefined,
@@ -285,14 +295,14 @@ async function signIn(page, email, password) {
   );
   ok('Khach thay cau tra loi ngay tren cua so dang mo, khong phai tai lai trang', true);
   ok('Cua so bao dang tro chuyen voi tu van vien',
-    (await page.locator('.state-line').innerText()).includes('tư vấn viên'),
-    (await page.locator('.state-line').innerText()).trim());
+    (await page.locator('pm-chat-widget .head-state').innerText()).includes('tư vấn viên'),
+    (await page.locator('pm-chat-widget .head-state').innerText()).trim());
   await page.screenshot({ path: path.join(OUT, 'ai-6-chat-answered.png') });
 
   await staff.locator('#chat-close').click();
   await page.waitForFunction(
     () => {
-      const line = document.querySelector('.state-line');
+      const line = document.querySelector('pm-chat-widget .head-state');
       return line ? line.textContent.includes('kết thúc') : false;
     },
     undefined,

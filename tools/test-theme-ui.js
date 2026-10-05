@@ -76,14 +76,14 @@ function ok(name, passed, note = '') {
   await page.waitForTimeout(800);
   ok('Nho lua chon sau khi tai lai trang', (await attribute()) === 'dark', String(await attribute()));
 
-  // Nguoi dung de he dieu hanh o che do toi thi lan dau vao phai la toi.
+  // Lan dau vao luon la giao dien sang, du he dieu hanh dang de che do toi (quyet dinh san pham).
   const fresh = await browser.newContext({ colorScheme: 'dark' });
   const other = await fresh.newPage();
   await other.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await other.waitForTimeout(600);
   const firstVisit = await other.evaluate(() =>
     document.documentElement.getAttribute('data-theme'));
-  ok('May dang de che do toi thi lan dau vao cung toi', firstVisit === 'dark', String(firstVisit));
+  ok('Lan dau vao luon la giao dien sang, khong theo he dieu hanh', firstVisit === 'light', String(firstVisit));
 
   await browser.close();
   console.log('');

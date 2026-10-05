@@ -45,6 +45,14 @@ function daysAgoAt(count, clock) {
   return `${daysAgo(count)}T${clock}`;
 }
 
+/** Gia tri cua muc trong o loc chu de co nhan bat dau bang chu cho truoc. */
+async function topicValue(page, label) {
+  return page.$eval('#memory-topic-filter', (box, want) => {
+    const hit = Array.from(box.options).find((one) => one.textContent.trim().startsWith(want));
+    return hit ? hit.value : '';
+  }, label);
+}
+
 async function run() {
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch();
@@ -67,14 +75,14 @@ async function run() {
     await settle(page);
     await page.fill('#login-email', email);
     await page.fill('#login-password', PASSWORD);
-    await page.click('.submit');
+    await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 30000 });
 
     // --- The bar along the bottom ---
     res.push(ok('Thanh duoi day hien tren man hinh dien thoai',
       await page.locator('pm-bottom-nav .bar').isVisible()));
-    res.push(ok('Thanh duoi day co bon cho den',
-      (await page.locator('pm-bottom-nav .stop').count()) === 4));
+    res.push(ok('Thanh duoi day co nam cho den',
+      (await page.locator('pm-bottom-nav .stop').count()) === 5));
 
     // Nut tro giup noi phai nam tren thanh, khong duoc che cho den nao.
     const covered = await page.evaluate(() => {
@@ -154,8 +162,11 @@ async function run() {
     await page.screenshot({ path: path.join(OUT, 'mobile-3-profile.png'), fullPage: true });
 
     // --- The memory book ---
-    await page.locator('a:has-text("Mở quyển kỷ niệm")').click();
-    await page.waitForURL('**/journal', { timeout: 20000 });
+    // Nut mo quyen ky niem dua sang tu sach chung, trang viet tung trang nam o so cua be.
+    await page.locator('button:has-text("Mở quyển kỷ niệm")').click();
+    await page.waitForURL('**/journals**', { timeout: 20000 });
+    res.push(ok('Nut mo quyen ky niem dua sang tu sach', page.url().includes(petId), page.url().slice(-40)));
+    await page.goto(`${WEB}/pets/${petId}/journal`, { waitUntil: 'networkidle' });
     await settle(page);
     await page.waitForSelector('.title', { timeout: 20000 });
     res.push(ok('Quyen ky niem mang ten be',
@@ -196,11 +207,12 @@ async function run() {
     await page.screenshot({ path: path.join(OUT, 'mobile-2-journal.png'), fullPage: true });
 
     // Filtering must keep only the chosen topic.
-    await page.locator('.filter:has-text("Sinh nhật")').click();
+    // Bo loc chu de la mot o chon, nhan moi muc kem so dem nen tim theo chu dau.
+    await page.selectOption('#memory-topic-filter', await topicValue(page, 'Sinh nhật'));
     await page.waitForTimeout(800);
     res.push(ok('Loc theo chu de khac thi khong con gi',
       (await page.locator('.moment').count()) === 0));
-    await page.locator('.filter:has-text("Tất cả")').click();
+    await page.selectOption('#memory-topic-filter', await topicValue(page, 'Tất cả'));
     await page.waitForTimeout(800);
     res.push(ok('Bo loc thi khoanh khac tro lai',
       (await page.locator('.moment').count()) === 1));
@@ -208,18 +220,20 @@ async function run() {
     // --- The day's page now has something to show ---
     await page.goto(`${WEB}/today`, { waitUntil: 'networkidle' });
     await settle(page);
-    await page.waitForSelector('.spotlight', { timeout: 20000 });
-    res.push(ok('Trang hom nay nhac den be', true,
-      await page.locator('.spot-name').innerText()));
+    await page.waitForSelector('.pet strong', { timeout: 20000 });
+    res.push(ok('Trang hom nay nhac den be',
+      (await page.locator('.pet strong').first().innerText()).includes('Be Bo'),
+      await page.locator('.pet strong').first().innerText()));
     // Dem tu ngay be ve nha chu khong phai tu ngay sinh, nen la 380 chu khong phai 420.
     res.push(ok('Trang hom nay dem so ngay gan bo tu luc be ve nha',
-      (await page.locator('.spot-days').innerText()).includes('380'),
-      await page.locator('.spot-days').innerText()));
+      (await page.locator('.pet .tag-accent').innerText()).includes('380'),
+      await page.locator('.pet .tag-accent').innerText()));
+    await page.waitForSelector('.entry-title', { timeout: 20000 });
     res.push(ok('Trang hom nay hien khoanh khac gan nhat',
-      (await page.locator('.polaroid-words').innerText()).includes('duoi buom')));
-    res.push(ok('Khoanh khac giu duoc gio da ghi',
-      (await page.locator('.polaroid-when').innerText()).includes('16:45'),
-      await page.locator('.polaroid-when').innerText()));
+      (await page.locator('.entry-title').first().innerText()).includes('duoi buom')));
+    res.push(ok('Khoanh khac ghi kem ten be',
+      (await page.locator('.entry-meta').first().innerText()).includes('Be Bo'),
+      (await page.locator('.entry-meta').first().innerText()).trim()));
     await page.screenshot({ path: path.join(OUT, 'mobile-1-today.png'), fullPage: true });
 
     // --- The record now counts the moment ---

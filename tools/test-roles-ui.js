@@ -2,8 +2,8 @@
  * Kiem thu ba nhom quyen tren trinh duyet.
  *
  * Trong tam la nguoi dung nhin thay gi: nhom Quan ly thay phan van hanh, nhom
- * Quan tri vien chi thay man quan ly tai khoan, va goi thang duong dan cua
- * nhom kia thi bi day ra.
+ * Quan tri vien chi thay kiem duyet, nhat ky va quan ly tai khoan, va goi thang
+ * duong dan cua nhom kia thi bi day ra.
  *
  * Chay: node tools/test-roles-ui.js
  */
@@ -50,21 +50,16 @@ async function settle(page) {
 
 async function signIn(page, email) {
   await page.goto(WEB, { waitUntil: 'load' });
-  const account = page.locator('.account-button');
-  await account.waitFor({ timeout: 15000 }).catch(() => undefined);
-  if ((await account.count()) > 0) {
-    await account.click();
-    await page.locator('.logout-item').click();
-    await page.waitForURL('**/login', { timeout: 20000 }).catch(() => undefined);
-  }
+  // Xoa phien dang mo ngay trong trinh duyet, khong phu thuoc nut dang xuat.
+  await page.evaluate(() => localStorage.clear());
   await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await settle(page);
   await page.fill('#login-email', email);
   await page.fill('#login-password', PASSWORD);
-  await page.click('.submit');
-  await page.waitForURL('**/home', { timeout: 30000 }).catch(async () => {
-    await page.click('.submit');
-    await page.waitForURL('**/home', { timeout: 40000 });
+  await page.click('button[type="submit"]');
+  await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 30000 }).catch(async () => {
+    await page.click('button[type="submit"]');
+    await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 40000 });
   });
 }
 
@@ -109,7 +104,10 @@ async function signIn(page, email) {
     page.url().includes('/admin/accounts'), page.url().slice(-32));
 
   const railAdmin = await page.locator('.rail-link').allInnerTexts();
-  ok('Thanh ben chi con mot muc', railAdmin.length === 1, railAdmin.join(' · '));
+  // Quan tri vien co kiem duyet cong dong, nhat ky thao tac va quan ly tai khoan.
+  ok('Thanh ben chi co ba muc cua quan tri vien', railAdmin.length === 3, railAdmin.join(' · '));
+  ok('Thanh ben quan tri vien co muc tai khoan',
+    railAdmin.some((one) => one.includes('Tài khoản')), railAdmin.join(' · '));
 
   for (const where of ['/admin/orders', '/admin/reports', '/admin/settings', '/admin/goods']) {
     await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
@@ -125,8 +123,8 @@ async function signIn(page, email) {
   await settle(page);
   await page.waitForSelector('#account-table', { timeout: 30000 });
 
-  ok('Co ba o dem so tai khoan theo nhom',
-    (await page.locator('.count-tile').count()) === 3,
+  ok('Co bon o dem so tai khoan theo nhom',
+    (await page.locator('.count-tile').count()) === 4,
     String(await page.locator('.count-tile').count()));
   ok('Bang liet ke duoc tai khoan',
     (await page.locator('#account-table tbody tr').count()) > 0,

@@ -26,6 +26,10 @@ async function scenario(report) {
   report.require('There is a free stand and a paid stand',
     Boolean(noBase && paidBase), `${bases.body.length} stands`);
 
+  // Hang tuy bien can ban thiet ke va du anh (muc 7): chuan bi san cho tung kich co.
+  const smallDesign = await h.readyDesign(customer, 'PT-01', small.code);
+  const largeDesign = await h.readyDesign(customer, 'PT-01', large.code);
+
   // --- The server owns the price ---
   report.step('A price sent by the browser is ignored');
   const forgedPrice = await h.call('/cart/items', {
@@ -35,6 +39,7 @@ async function scenario(report) {
       productTypeCode: 'PT-01',
       sizeCode: small.code,
       quantity: 1,
+      designId: smallDesign,
       unitPrice: '1',
     }),
   });
@@ -48,6 +53,7 @@ async function scenario(report) {
       productTypeCode: 'PT-01',
       sizeCode: small.code,
       quantity: 1,
+      designId: smallDesign,
       displayBaseCode: 'BASE-DOES-NOT-EXIST',
     }),
   });
@@ -63,6 +69,7 @@ async function scenario(report) {
       productTypeCode: 'PT-01',
       sizeCode: large.code,
       quantity: 3,
+      designId: largeDesign,
       displayBaseCode: paidBase.code,
     }),
   });
@@ -86,6 +93,7 @@ async function scenario(report) {
       productTypeCode: 'PT-01',
       sizeCode: large.code,
       quantity: 1,
+      designId: largeDesign,
       displayBaseCode: noBase.code,
     }),
   });

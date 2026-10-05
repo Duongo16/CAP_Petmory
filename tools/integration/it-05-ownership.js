@@ -39,7 +39,7 @@ async function scenario(report) {
     headers: owner.auth,
     body: JSON.stringify({
       name: 'Rieng tu',
-      modelCode: 'TEMP-DOG',
+      modelCode: 'BASE-DOG-STAND',
       paint: [{ mesh: 'body', color: 'aabbccaabbccaabbcc' }],
     }),
   });
@@ -47,10 +47,11 @@ async function scenario(report) {
 
   const product = await h.call('/catalog/products/PT-02');
   const size = product.body.sizes.find((s) => s.enabled);
+  const ownerDesignId = await h.readyDesign(owner, 'PT-02', size.code);
   await h.call('/cart/items', {
     method: 'POST',
     headers: owner.auth,
-    body: JSON.stringify({ productTypeCode: 'PT-02', sizeCode: size.code, quantity: 1 }),
+    body: JSON.stringify({ productTypeCode: 'PT-02', sizeCode: size.code, quantity: 1, designId: ownerDesignId }),
   });
   const order = await h.call('/orders', {
     method: 'POST',
@@ -85,7 +86,7 @@ async function scenario(report) {
    * boundary and the ownership check never runs, which would prove nothing.
    */
   const payload = {
-    PATCH_DESIGN: { name: 'Doi ten', modelCode: 'TEMP-DOG' },
+    PATCH_DESIGN: { name: 'Doi ten', modelCode: 'BASE-DOG-STAND' },
     PATCH_PET: { name: 'Doi ten' },
     POST: { operation: ['SHARPEN'] },
   };
