@@ -32,7 +32,6 @@ type ScreenState = 'LOADING' | 'READY' | 'ERROR';
  */
 const KEY_ROLE: Record<string, string> = {
   MANAGER: 'ADMIN.ACCOUNT.ROLE_MANAGER',
-  ADMIN: 'ADMIN.ACCOUNT.ROLE_ADMIN',
   SUPPORT: 'ADMIN.ACCOUNT.ROLE_SUPPORT',
   CUSTOMER: 'ADMIN.ACCOUNT.ROLE_CUSTOMER',
 };
@@ -41,7 +40,7 @@ const KEY_ROLE: Record<string, string> = {
 const ROLE_FALLBACK: Role = 'CUSTOMER';
 
 /** Ba nhom quyen, viet ra day du de man hinh khong phai doan. */
-const ROLES: Role[] = ['MANAGER', 'SUPPORT', 'ADMIN', ROLE_FALLBACK];
+const ROLES: Role[] = ['MANAGER', 'SUPPORT', ROLE_FALLBACK];
 
 /** Kich thuoc hop thoai, giong cac hop thoai khac trong trang. */
 const SHEET = { width: 'min(560px, 96vw)', maxHeight: '94vh', panelClass: 'pm-dialog' };
@@ -55,10 +54,10 @@ interface AccountRow {
 }
 
 /**
- * Quan ly tai khoan, theo Phu luc 01 muc 1 da rut xuong ba nhom quyen.
+ * Quan ly tai khoan, chi nhom Quan ly mo duoc.
  *
- * Man hinh nay la ranh gioi giua ba nhom: chi nhom Quan tri vien mo duoc, va
- * nhom do khong mo duoc man hinh van hanh nao khac.
+ * Nhom Quan tri vien rieng da gop vao nhom Quan ly, nen man hinh nay nam chung
+ * voi cac man van hanh.
  *
  * Them va sua deu mo ra hop thoai. Quy tac khong cho tu doi quyen hay tu tat
  * tai khoan cua chinh minh duoc may chu giu, o day chi khoa nut cho do nham.

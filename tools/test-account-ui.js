@@ -12,7 +12,7 @@ const API = 'http://localhost:3000/api';
 const EMAIL = `taikhoan.${Date.now()}@petmory.local`;
 const PASSWORD = 'Password@123';
 const NEW_PASSWORD = 'MatKhauMoi@456';
-const ADMIN = { email: 'quantri@petmory.local', password: 'Petmory@2026' };
+const MANAGER = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
 const OUT = path.join(__dirname, '..', 'test-screenshots');
 
 function check(name, passed, note = '') {
@@ -76,8 +76,8 @@ async function run() {
     await page.reload({ waitUntil: 'networkidle' });
     res.push(check('The current browser stays signed in', page.url().endsWith('/account')));
 
-    const admin = { Authorization: `Bearer ${(await (await api.post(`${API}/auth/login`, { data: ADMIN })).json()).accessToken}` };
-    const log = await (await api.get(`${API}/admin/audit?resourceType=User&resourceId=${userId}`, { headers: admin })).json();
+    const manager = { Authorization: `Bearer ${(await (await api.post(`${API}/auth/login`, { data: MANAGER })).json()).accessToken}` };
+    const log = await (await api.get(`${API}/admin/audit?resourceType=User&resourceId=${userId}`, { headers: manager })).json();
     const actions = (log.rows ?? []).map((one) => one.action);
     res.push(check('The profile change and password change are logged, without the password',
       actions.includes('USER_PROFILE_UPDATED') && actions.includes('ACCOUNT_PASSWORD_CHANGED')

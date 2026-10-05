@@ -83,7 +83,7 @@ async function run() {
 
   const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
   const workshopToken = managerToken;
-  const supportToken = await login('quantri@petmory.local', PASSWORD_INTERNAL);
+  const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
   check('Hai tai khoan noi bo deu dang nhap duoc', Boolean(managerToken && supportToken));
 
   const customer = await makeCustomerWithOrder('Nguyen Van Kiem Thu');
@@ -185,14 +185,17 @@ async function run() {
 
         // --- Permissions ---
   const supportRead = await call('/admin/orders', { headers: authHeaders(supportToken) });
-  check('The account admin group cannot read orders', supportRead.status === 403,
+  check('The support desk can read the order list', supportRead.status === 200 && supportRead.body.total >= 1,
     String(supportRead.status));
+
+  const supportDetail = await call(`/admin/orders/${customer.orderCode}`, { headers: authHeaders(supportToken) });
+  check('The support desk can open one order', supportDetail.status === 200, String(supportDetail.status));
 
   const supportWrite = await call(`/admin/orders/${customer.orderCode}/status`, {
     method: 'PATCH', headers: authHeaders(supportToken),
     body: JSON.stringify({ status: 'SHIPPING' }),
   });
-  check('The account admin group cannot change a status', supportWrite.status === 403,
+  check('The support desk cannot change a status', supportWrite.status === 403,
     String(supportWrite.status));
 
   const customerRead = await call('/admin/orders', { headers: authHeaders(customer.token) });

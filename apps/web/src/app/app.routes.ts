@@ -5,7 +5,6 @@ import {
   authGuard,
   managerGuard,
   deskGuard,
-  accountAdminGuard,
   moderatorGuard,
   customerOnlyGuard,
   guestGuard,
@@ -226,15 +225,12 @@ export const routes: Routes = [
         children: [
           {
             /*
-             * Mo khu noi bo thi di thang toi cho tai khoan lam viec duoc.
-             *
-             * Nhom Quan ly vao ban dieu phoi don, nhom Quan tri vien vao man
-             * quan ly tai khoan. De cung mot dich cho ca hai thi mot nhom se
-             * bi day ra ngay khi vua vao.
+             * Mo khu noi bo thi di thang toi ban dieu phoi don, noi ca nhom
+             * Quan ly lan nhom Cham soc khach hang deu lam viec duoc.
              */
             path: '',
             pathMatch: 'full',
-            redirectTo: () => (inject(AuthService).isDesk() ? 'orders' : 'accounts'),
+            redirectTo: 'orders',
           },
           {
             path: 'orders',
@@ -350,7 +346,7 @@ export const routes: Routes = [
           },
           {
             path: 'accounts',
-            canActivate: [accountAdminGuard],
+            canActivate: [managerGuard],
             loadComponent: () =>
               import('./features/admin/admin-accounts-page').then((m) => m.AdminAccountsPage),
           },

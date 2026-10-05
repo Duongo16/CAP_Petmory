@@ -52,7 +52,7 @@ async function run() {
     const customers = await (await api.get(`${API}/admin/customers?keyword=petmory.local&pageSize=50`, { headers: manager })).json();
     const emails = (customers.rows ?? []).map((one) => one.email);
     res.push(check('The customer list leaves out internal accounts',
-      !emails.includes('quanly@petmory.local') && !emails.includes('quantri@petmory.local'), `${emails.length} rows`));
+      !emails.includes('quanly@petmory.local') && !emails.includes('cskh@petmory.local'), `${emails.length} rows`));
 
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
     await page.fill('input[formcontrolname="email"]', MANAGER.email);

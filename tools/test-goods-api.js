@@ -14,7 +14,7 @@ const STAMP = Date.now();
 const WEBHOOK_KEY = process.env.PETMORY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const PASSWORD = 'Password@123';
 const BOSS = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
-const ACCOUNT_ADMIN = { email: 'quantri@petmory.local', password: 'Petmory@2026' };
+const SUPPORT = { email: 'cskh@petmory.local', password: 'Petmory@2026' };
 
 let failed = 0;
 let passed = 0;
@@ -118,7 +118,7 @@ async function run() {
   console.log('='.repeat(64));
 
   const boss = await signIn(BOSS);
-  const support = await signIn(ACCOUNT_ADMIN);
+  const support = await signIn(SUPPORT);
   const mine = await makeCustomer('a');
   const other = await makeCustomer('b');
 
@@ -308,17 +308,17 @@ async function run() {
     asJson(boss, { delta: -999999, note: 'Thu tru qua so hang dang co' }, 'PATCH'));
   ok('Khong tru duoc nhieu hon so hang dang co', tooDeep.status === 400, String(tooDeep.status));
 
-  // --- NT-23.11 Cham soc khach hang chi duoc xem ---
+  // --- Nhom Cham soc khach hang khong dung vao kho hang ---
   const supportRead = await call('/admin/goods', withToken(support));
-  ok('Nhom Quan tri vien khong xem duoc danh muc hang', supportRead.status === 403,
+  ok('Nhom CSKH khong xem duoc danh muc hang', supportRead.status === 403,
     String(supportRead.status));
   const supportWrite = await call('/admin/goods/G-BAT-AN',
     asJson(support, { name: 'Ten moi khong duoc phep dat' }, 'PATCH'));
-  ok('Nhom Quan tri vien khong sua duoc gia hay ten', supportWrite.status === 403,
+  ok('Nhom CSKH khong sua duoc gia hay ten', supportWrite.status === 403,
     String(supportWrite.status));
   const supportStock = await call('/admin/goods/G-BAT-AN/stock/BAT-600',
     asJson(support, { delta: 1, note: 'Khong duoc phep lam dieu nay' }, 'PATCH'));
-  ok('Nhom Quan tri vien khong sua duoc ton kho', supportStock.status === 403,
+  ok('Nhom CSKH khong sua duoc ton kho', supportStock.status === 403,
     String(supportStock.status));
   const plainWrite = await call('/admin/goods', asJson(mine, {
     code: 'G-KHONG-HOP-LE', name: 'Hang tu tao', category: '000000000000000000000000',

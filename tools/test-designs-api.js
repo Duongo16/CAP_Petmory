@@ -257,7 +257,7 @@ async function run() {
 
         // --- Production file ---
   const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
-  const supportToken = await login('quantri@petmory.local', PASSWORD_INTERNAL);
+  const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
 
   const file = await call(`/admin/orders/${orderCode}/production-file`, { headers: authHeaders(managerToken) });
   check('The production file can be opened', file.status === 200, String(file.status));
@@ -287,7 +287,7 @@ async function run() {
   check('Internal staff can view the design images of a customer', photoInternal.status === 200,
     String(photoInternal.status));
 
-  check('Support cannot open the production file',
+  check('The support desk cannot open the production file',
     (await call(`/admin/orders/${orderCode}/production-file`, { headers: authHeaders(supportToken) }))
       .status === 403);
   check('A customer cannot open the production file',

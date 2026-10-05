@@ -32,15 +32,15 @@ const WORKSHOP_STOPS: Stop[] = [
   { path: '/admin/settings', key: 'NAV.SETTINGS', icon: 'bulb' },
 ];
 
-/** Phan quan ly tai khoan, thuoc nhom Quan tri vien. */
+/** Phan quan ly tai khoan, thuoc nhom Quan ly. */
 const ACCOUNT_STOPS: Stop[] = [
   { path: '/admin/accounts', key: 'NAV.ACCOUNTS', icon: 'shield' },
 ];
 
-/** Kiem duyet cong dong: nhom Quan tri vien theo hop dong, kem nhom Quan ly. */
+/** Kiem duyet cong dong, thuoc nhom Quan ly. */
 const MODERATION_STOP: Stop = { path: '/admin/moderation', key: 'NAV.MODERATION', icon: 'eye' };
 
-/** Nhat ky thao tac: Quan tri vien va Quan ly cung doc duoc. */
+/** Nhat ky thao tac, thuoc nhom Quan ly. */
 const AUDIT_STOP: Stop = { path: '/admin/audit', key: 'NAV.AUDIT', icon: 'book' };
 
 /**
@@ -63,12 +63,11 @@ export class AdminShell {
   private readonly auth = inject(AuthService);
 
   readonly isManager = this.auth.isManager;
-  readonly isAccountAdmin = this.auth.isAccountAdmin;
 
   /*
    * Thanh ben chi hien nhung cho tai khoan mo duoc.
    *
-   * Nhom Quan ly thay phan van hanh, nhom Quan tri vien thay phan tai khoan.
+   * Nhom Quan ly thay het, nhom Cham soc khach hang chi thay ban dieu phoi.
    * Day chi la viec an hien: may chu kiem lai quyen o moi yeu cau.
    */
   readonly coreStops = computed(() => [
@@ -76,10 +75,7 @@ export class AdminShell {
     ...(this.isManager() ? MANAGER_STOPS : []),
   ]);
   readonly workshopStops = computed(() => (this.isManager() ? WORKSHOP_STOPS : []));
-  readonly accountStops = computed(() => [
-    ...(this.isAccountAdmin() || this.isManager() ? [MODERATION_STOP, AUDIT_STOP] : []),
-    ...(this.isAccountAdmin() ? ACCOUNT_STOPS : []),
-  ]);
+  readonly accountStops = computed(() => (this.isManager() ? [MODERATION_STOP, AUDIT_STOP, ...ACCOUNT_STOPS] : []));
   readonly who = computed(() => this.auth.user()?.fullName ?? '');
   readonly avatar = computed(() => this.auth.user()?.avatarUrl ?? null);
 

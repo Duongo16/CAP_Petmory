@@ -1,7 +1,7 @@
 /**
- * Browser test of community moderation (SOW item 20): the account administrator
- * (Quan tri vien) hides a public journal with a reason, it disappears from the
- * public community, and showing it again brings it back.
+ * Browser test of community moderation (SOW item 20): the manager hides a public
+ * journal with a reason, it disappears from the public community, and showing it
+ * again brings it back. The support desk cannot open moderation.
  * Run: node tools/test-moderation-ui.js
  */
 const { chromium } = require('playwright');
@@ -9,8 +9,8 @@ const path = require('path');
 
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
-const ADMIN = { email: 'quantri@petmory.local', password: 'Petmory@2026' };
 const MANAGER = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
+const SUPPORT = { email: 'cskh@petmory.local', password: 'Petmory@2026' };
 const OUT = path.join(__dirname, '..', 'test-screenshots');
 const PET_NAME = `KiemDuyet${Date.now() % 100000}`;
 
@@ -45,8 +45,8 @@ async function run() {
     await page.request.patch(`${API}/memories/pet/${pet._id}/privacy`, { headers: owner, data: { isPublic: true } });
     res.push(check('The journal starts out public', (await page.request.get(`${API}/diaries/${pet._id}`)).status() === 200));
 
-    await signIn(page, ADMIN);
-    res.push(check('The account administrator sees the moderation menu',
+    await signIn(page, MANAGER);
+    res.push(check('The manager sees the moderation menu',
       (await page.locator('a[href="/admin/moderation"]').count()) >= 1));
     await page.goto(`${WEB}/admin/moderation`, { waitUntil: 'networkidle' });
     await page.fill('#search-diary', PET_NAME);
@@ -79,9 +79,20 @@ async function run() {
     res.push(check('Showing it again puts it back in the community',
       (await page.request.get(`${API}/diaries/${pet._id}`)).status() === 200));
 
-    await signIn(page, MANAGER);
+    await signIn(page, SUPPORT);
+    await page.waitForSelector('a[href="/admin/orders"]', { timeout: 15000 });
+    res.push(check('The support desk has no moderation menu',
+      (await page.locator('a[href="/admin/moderation"]').count()) === 0));
     await page.goto(`${WEB}/admin/moderation`, { waitUntil: 'networkidle' });
-    res.push(check('The manager can open moderation too', page.url().includes('/admin/moderation')));
+    await page.waitForTimeout(1500);
+    res.push(check('The support desk is turned away from moderation',
+      !page.url().includes('/admin/moderation'), page.url()));
+    const deskLogin = await (await page.request.post(`${API}/auth/login`, { data: SUPPORT })).json();
+    const deskList = await page.request.get(`${API}/admin/diaries`, {
+      headers: { Authorization: `Bearer ${deskLogin.accessToken}` },
+    });
+    res.push(check('The moderation list API refuses the support desk', deskList.status() === 403,
+      String(deskList.status())));
   } finally {
     await browser.close();
   }

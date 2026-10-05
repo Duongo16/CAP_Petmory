@@ -18,7 +18,7 @@ const INTERNAL_PASSWORD = 'Petmory@2026';
 
 const ACCOUNT_MANAGER = 'quanly@petmory.local';
 const ACCOUNT_WORKSHOP = 'quanly@petmory.local';
-const ACCOUNT_SUPPORT = 'quantri@petmory.local';
+const ACCOUNT_SUPPORT = 'cskh@petmory.local';
 
 /** Collects the outcome of one scenario so the runner can total them up. */
 class Report {

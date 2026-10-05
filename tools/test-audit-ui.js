@@ -1,7 +1,7 @@
 /**
- * Kiem thu man hinh nhat ky thao tac (SOW muc 14): Quan tri vien va Quan ly doc
- * duoc, loc theo loai du lieu va hanh dong, mo mot dong de xem gia tri truoc va
- * sau; khach khong doc duoc. Chi doc, khong ghi gi.
+ * Kiem thu man hinh nhat ky thao tac theo SOW muc 14. Nhom Quan ly doc duoc,
+ * loc theo loai du lieu va hanh dong, mo mot dong de xem gia tri truoc va sau.
+ * Nhom Cham soc khach hang va khach khong doc duoc. Chi doc, khong ghi gi.
  * Run: node tools/test-audit-ui.js
  */
 const { chromium, request } = require('playwright');
@@ -9,7 +9,8 @@ const path = require('path');
 
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
-const ADMIN = { email: 'quantri@petmory.local', password: 'Petmory@2026' };
+const MANAGER = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
+const SUPPORT = { email: 'cskh@petmory.local', password: 'Petmory@2026' };
 const OUT = path.join(__dirname, '..', 'test-screenshots');
 
 function check(name, passed, note = '') {
@@ -32,13 +33,16 @@ async function run() {
     })).json();
     const denied = await api.get(`${API}/admin/audit`, { headers: { Authorization: `Bearer ${customer.accessToken}` } });
     res.push(check('A customer cannot read the activity log', denied.status() === 403, String(denied.status())));
-    const admin = { Authorization: `Bearer ${(await (await api.post(`${API}/auth/login`, { data: ADMIN })).json()).accessToken}` };
-    const bad = await api.get(`${API}/admin/audit?action=drop%20table`, { headers: admin });
+    const support = { Authorization: `Bearer ${(await (await api.post(`${API}/auth/login`, { data: SUPPORT })).json()).accessToken}` };
+    const deskDenied = await api.get(`${API}/admin/audit`, { headers: support });
+    res.push(check('The support desk cannot read the activity log', deskDenied.status() === 403, String(deskDenied.status())));
+    const manager = { Authorization: `Bearer ${(await (await api.post(`${API}/auth/login`, { data: MANAGER })).json()).accessToken}` };
+    const bad = await api.get(`${API}/admin/audit?action=drop%20table`, { headers: manager });
     res.push(check('A malformed filter is refused', bad.status() === 400, String(bad.status())));
 
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
-    await page.fill('input[formcontrolname="email"]', ADMIN.email);
-    await page.fill('input[formcontrolname="password"]', ADMIN.password);
+    await page.fill('input[formcontrolname="email"]', MANAGER.email);
+    await page.fill('input[formcontrolname="password"]', MANAGER.password);
     await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 20000 });
     res.push(check('The side rail links to the activity log', (await page.locator('a[href="/admin/audit"]').count()) >= 1));

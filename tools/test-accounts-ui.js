@@ -1,6 +1,6 @@
 /**
- * Browser test of the per-account pet profile limit (SOW item 2): the account
- * administrator sets a limit for one customer, the server enforces it, and
+ * Browser test of the per-account pet profile limit (SOW item 2): the shop
+ * manager sets a limit for one customer, the server enforces it, and
  * clearing it goes back to the shop default.
  * Run: node tools/test-accounts-ui.js
  */
@@ -9,7 +9,7 @@ const path = require('path');
 
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
-const ADMIN = { email: 'quantri@petmory.local', password: 'Petmory@2026' };
+const MANAGER = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
 const EMAIL = `limit.${Date.now()}@petmory.local`;
 const PASSWORD = 'Password@123';
 const OUT = path.join(__dirname, '..', 'test-screenshots');
@@ -30,8 +30,8 @@ async function run() {
     const customer = { Authorization: `Bearer ${(await made.json()).accessToken}` };
 
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
-    await page.fill('input[formcontrolname="email"]', ADMIN.email);
-    await page.fill('input[formcontrolname="password"]', ADMIN.password);
+    await page.fill('input[formcontrolname="email"]', MANAGER.email);
+    await page.fill('input[formcontrolname="password"]', MANAGER.password);
     await page.click('button[type="submit"]');
     await page.waitForURL('**/admin/**', { timeout: 20000 });
     await page.goto(`${WEB}/admin/accounts`, { waitUntil: 'networkidle' });

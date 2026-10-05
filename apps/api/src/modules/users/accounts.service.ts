@@ -18,7 +18,7 @@ const PAGE_SIZE = 20;
 const SELF_GUARD = 'Khong tu doi quyen hoac tu tat tai khoan cua chinh minh';
 
 /** Loi bao khi dinh bo di nguoi quan tri cuoi cung. */
-const LAST_ADMIN = 'Phai con it nhat mot tai khoan nhom Quan tri vien dang bat';
+const LAST_MANAGER = 'Phai con it nhat mot tai khoan nhom Quan ly dang bat';
 
 /**
  * Quan ly tai khoan, danh cho nhom Quan tri vien.
@@ -128,8 +128,8 @@ export class AccountsService {
     if (one._id.toString() === actor) {
       throw new BadRequestException(SELF_GUARD);
     }
-    if (one.roles.includes(Role.ADMIN) && role !== Role.ADMIN) {
-      await this.keepOneAdmin(one._id.toString());
+    if (one.roles.includes(Role.MANAGER) && role !== Role.MANAGER) {
+      await this.keepOneManager(one._id.toString());
     }
     const before = [...one.roles];
     one.roles = [role as Role];
@@ -152,8 +152,8 @@ export class AccountsService {
     if (one._id.toString() === actor) {
       throw new BadRequestException(SELF_GUARD);
     }
-    if (!active && one.roles.includes(Role.ADMIN)) {
-      await this.keepOneAdmin(one._id.toString());
+    if (!active && one.roles.includes(Role.MANAGER)) {
+      await this.keepOneManager(one._id.toString());
     }
     const before = one.active;
     one.active = active;
@@ -205,17 +205,17 @@ export class AccountsService {
   }
 
   /**
-   * Khong cho bo di nguoi quan tri cuoi cung.
+   * Khong cho bo di nguoi quan ly cuoi cung.
    *
-   * Het sach nguoi quan tri dang bat thi khong con ai tao lai duoc tai khoan
+   * Het sach nguoi quan ly dang bat thi khong con ai tao lai duoc tai khoan
    * nao nua, va he thong tu khoa chinh minh.
    */
-  private async keepOneAdmin(exceptId: string): Promise<void> {
+  private async keepOneManager(exceptId: string): Promise<void> {
     const left = await this.model
-      .countDocuments({ roles: Role.ADMIN, active: true, _id: { $ne: exceptId } })
+      .countDocuments({ roles: Role.MANAGER, active: true, _id: { $ne: exceptId } })
       .exec();
     if (left === 0) {
-      throw new BadRequestException(LAST_ADMIN);
+      throw new BadRequestException(LAST_MANAGER);
     }
   }
 }

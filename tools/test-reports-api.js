@@ -14,7 +14,7 @@ const STAMP = Date.now();
 const WEBHOOK_KEY = process.env.PETMORY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const PASSWORD = 'Password@123';
 const BOSS = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
-const ACCOUNT_ADMIN = { email: 'quantri@petmory.local', password: 'Petmory@2026' };
+const SUPPORT = { email: 'cskh@petmory.local', password: 'Petmory@2026' };
 
 let failed = 0;
 let passed = 0;
@@ -124,7 +124,7 @@ async function run() {
   console.log('='.repeat(64));
 
   const boss = await signIn(BOSS);
-  const workshop = await signIn(ACCOUNT_ADMIN);
+  const desk = await signIn(SUPPORT);
   const email = `bc.${STAMP}@petmory.local`;
   const mine = (await call('/auth/register', asJson(null, {
     email, password: PASSWORD, fullName: 'Khach bao cao',
@@ -250,15 +250,15 @@ async function run() {
   ok('Tai duoc tep CSV tien do san xuat', progressCsv.status === 200, String(progressCsv.status));
 
   // --- NT-22.7 Phan quyen ---
-  const workshopRevenue = await call('/admin/reports/revenue', withToken(workshop));
-  ok('Quan tri vien khong mo duoc bao cao doanh thu', workshopRevenue.status === 403,
-    String(workshopRevenue.status));
-  const workshopCost = await call('/admin/reports/ai-cost', withToken(workshop));
-  ok('Quan tri vien khong mo duoc bao cao chi phi', workshopCost.status === 403,
-    String(workshopCost.status));
-  const workshopProgress = await call('/admin/reports/progress', withToken(workshop));
-  ok('Quan tri vien khong mo duoc bao cao tien do', workshopProgress.status === 403,
-    String(workshopProgress.status));
+  const deskRevenue = await call('/admin/reports/revenue', withToken(desk));
+  ok('Nhom CSKH khong mo duoc bao cao doanh thu', deskRevenue.status === 403,
+    String(deskRevenue.status));
+  const deskCost = await call('/admin/reports/ai-cost', withToken(desk));
+  ok('Nhom CSKH khong mo duoc bao cao chi phi', deskCost.status === 403,
+    String(deskCost.status));
+  const deskProgress = await call('/admin/reports/progress', withToken(desk));
+  ok('Nhom CSKH khong mo duoc bao cao tien do', deskProgress.status === 403,
+    String(deskProgress.status));
   const plain = await call('/admin/reports/progress', withToken(mine));
   ok('Khach thuong khong mo duoc bao cao nao', plain.status === 403, String(plain.status));
   const signedOut = await call('/admin/reports/revenue');

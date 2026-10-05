@@ -432,11 +432,11 @@ async function sweepLeftovers() {
 
   await page.screenshot({ path: path.join(OUT, 'goods-4-admin.png'), fullPage: true });
 
-  // --- Nhom Quan tri vien khong vao duoc kho hang ---
-  await signIn(page, 'quantri@petmory.local', BOSS_PASSWORD);
+  // --- Nhom Cham soc khach hang khong vao duoc kho hang ---
+  await signIn(page, 'cskh@petmory.local', BOSS_PASSWORD);
   await page.goto(`${WEB}/admin/goods`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(2000);
-  ok('Nhom Quan tri vien bi dua ra khoi man kho hang',
+  ok('Nhom CSKH bi dua ra khoi man kho hang',
     !page.url().includes('/admin/goods'), page.url());
 
   ok('Khong co loi nao trong trang', broken.length === 0, broken.slice(0, 2).join(' | '));

@@ -119,8 +119,8 @@ export class AdminController {
     return this.service.changeOrderStatus(orderCode, dto.status, user.userId, dto.reason.trim());
   }
 
-  /** Nhat ky thao tac (muc 14): Quan tri vien va Quan ly doc duoc, khong ai sua duoc. */
-  @Roles(Role.ADMIN, Role.MANAGER)
+  /** Nhat ky thao tac (muc 14): nhom Quan ly doc duoc, khong ai sua duoc. */
+  @Roles(Role.MANAGER)
   @Get('audit')
   auditLog(@Query() query: AuditQueryDto) {
     return this.audit.search({
@@ -133,7 +133,7 @@ export class AdminController {
     });
   }
 
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @Roles(Role.MANAGER)
   @Get('audit/facets')
   auditFacets() {
     return this.audit.facets();
@@ -168,13 +168,13 @@ export class AdminController {
    * vi day la mot quyet dinh cham den noi dung cua nguoi khac.
    */
   /** Man kiem duyet nhat ky cong dong: nhom Quan tri vien theo hop dong, kem nhom Quan ly. */
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @Roles(Role.MANAGER)
   @Get('diaries')
   moderationList(@Query() query: ModerationQueryDto) {
     return this.diary.moderationList(query.page ?? 1, query.state ?? 'PUBLIC', query.keyword);
   }
 
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @Roles(Role.MANAGER)
   @Patch('diaries/:petId/block')
   async blockDiary(
     @Param('petId') petId: string,
@@ -193,7 +193,7 @@ export class AdminController {
     return pet;
   }
 
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @Roles(Role.MANAGER)
   @Patch('diaries/:petId/unblock')
   async unblockDiary(@Param('petId') petId: string, @CurrentUser() user: AuthUser) {
     const pet = await this.diary.unblockDiary(petId);

@@ -1,27 +1,26 @@
 /**
- * Ba nhom quyen.
+ * Cac nhom quyen.
  *
  * PETMORY dung o giua: viec dat mo hinh va dat hang chi can ghi nhan ket qua
- * va doi trang thai, nen bo may khong can nhieu tang quyen. Ba nhom la:
+ * va doi trang thai, nen bo may khong can nhieu tang quyen. Cac nhom la:
  *
- * - Quan ly: san pham, don hang, vat lieu, tham so, bao cao, kho hang, truc
- *   hoi thoai. Toan bo phan van hanh.
- * - Quan tri vien: chi quan ly tai khoan. Khong cham vao don hang hay tien.
+ * - Quan ly: toan bo phan van hanh va quan ly tai khoan, kiem duyet, nhat ky.
+ *   Nhom Quan tri vien rieng da gop vao day.
+ * - Cham soc khach hang: truc hoi thoai, xem don va khach.
  * - Khach hang: nguoi mua.
  *
- * Luu y ve hop dong: Phu luc 01 muc 1 ghi bon nhom quyen, gom ca nhom Cham soc
- * khach hang. Ban rut xuong ba nhom nay lech voi cho do va can Ben A ky nhan.
+ * Luu y ve hop dong: Phu luc 01 muc 1 ghi bon nhom quyen. Gop nhom Quan tri
+ * vien vao nhom Quan ly lech voi cho do va can Ben A ky nhan.
  */
 export enum Role {
   MANAGER = 'MANAGER',
-  ADMIN = 'ADMIN',
   /** Cham soc khach hang: truc hoi thoai, xem don va khach, khong sua gi. */
   SUPPORT = 'SUPPORT',
   CUSTOMER = 'CUSTOMER',
 }
 
 /** Cac nhom duoc tinh la nguoi cua PETMORY. */
-export const INTERNAL: Role[] = [Role.MANAGER, Role.ADMIN, Role.SUPPORT];
+export const INTERNAL: Role[] = [Role.MANAGER, Role.SUPPORT];
 
 /** Nhung nhom duoc xem don, khach hang va truc hoi thoai. */
 export const DESK: Role[] = [Role.MANAGER, Role.SUPPORT];

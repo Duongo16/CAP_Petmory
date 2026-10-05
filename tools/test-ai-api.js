@@ -15,7 +15,7 @@ const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
 const STAMP = Date.now();
 const PASSWORD = 'Password@123';
 const BOSS = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
-const ACCOUNT_ADMIN = { email: 'quantri@petmory.local', password: 'Petmory@2026' };
+const SUPPORT = { email: 'cskh@petmory.local', password: 'Petmory@2026' };
 
 let failed = 0;
 let passed = 0;
@@ -26,6 +26,11 @@ function ok(name, good, note = '') {
     failed += 1;
   }
   console.log(`  ${good ? 'PASS  ' : 'FAIL  '}${name}${note ? '  ' + note : ''}`);
+}
+
+/** Bo dau tieng Viet va chu hoa de so sanh noi dung. */
+function withoutMarks(text) {
+  return text.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase();
 }
 
 async function call(where, options = {}) {
@@ -86,9 +91,8 @@ async function run() {
   console.log('='.repeat(64));
 
   const boss = await signIn(BOSS);
-  const accountAdmin = await signIn(ACCOUNT_ADMIN);
-  /* Truc hoi thoai nay thuoc nhom Quan ly, nen chinh tai khoan quan ly lam viec do. */
-  const support = boss;
+  /* Truc hoi thoai thuoc ban cham soc khach hang, nen tai khoan nhom CSKH lam viec do. */
+  const support = await signIn(SUPPORT);
   const mine = await makeCustomer('chu');
   const other = await makeCustomer('nguoila');
   const petId = await makePet(mine, `Mun ${STAMP}`);
@@ -193,8 +197,12 @@ async function run() {
   ok('Ban dau tien duoc danh so mot', wrote.body?.version === 1, String(wrote.body?.version));
   ok('Ban moi viet duoc danh dau la do may viet',
     wrote.body?.hand === 'MACHINE', String(wrote.body?.hand));
+  /*
+   * Khi co nha cung cap that, cau chuyen duoc viet bang tieng Viet co dau, nen
+   * bo dau truoc khi tim y chu vua nhap.
+   */
   ok('Noi dung co nhac y chu vua nhap',
-    String(wrote.body?.content ?? '').includes('nam canh cua so'),
+    withoutMarks(String(wrote.body?.content ?? '')).includes('cua so'),
     String(wrote.body?.content ?? '').slice(0, 50));
 
   const again = await call(`/pet-stories/${wrote.body._id}/rewrite`, asJson(mine, {}));
@@ -263,7 +271,8 @@ async function run() {
     opened2.body?.state === 'BOT', String(opened2.body?.state));
 
   const guest = await call('/assistant/sessions', asJson(null, {}));
-  ok('Khach chua dang nhap cung mo duoc phien', guest.status === 201, String(guest.status));
+  /* Phien luon gan voi mot tai khoan, nen nguoi chua dang nhap bi tu choi. */
+  ok('Nguoi chua dang nhap khong mo duoc phien', guest.status === 401, String(guest.status));
 
   const asked1 = await call(`/assistant/sessions/${code}/ask`, asJson(mine, { question: 'Gia bao nhieu?' }));
   ok('Hoi mot cau thi nhan duoc cau tra loi', asked1.status === 200, String(asked1.status));
@@ -299,6 +308,10 @@ async function run() {
 
   const notStaff = await call('/admin/chats', withToken(mine));
   ok('Khach thuong khong xem duoc hang cho', notStaff.status === 403, String(notStaff.status));
+
+  const deskKnowledge = await call('/admin/assistant/knowledge', withToken(support));
+  ok('Nhom CSKH khong mo duoc kho tri thuc cua tro ly', deskKnowledge.status === 403,
+    String(deskKnowledge.status));
 
   const replyEarly = await call(
     `/admin/chats/${code}/reply`,

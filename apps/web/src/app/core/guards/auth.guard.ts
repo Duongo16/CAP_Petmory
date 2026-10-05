@@ -32,7 +32,7 @@ export const guestGuard: CanActivateFn = () => {
 export const customerGuard: CanActivateFn = guestGuard;
 
 /**
- * Chan cac role khac khach hang (MANAGER, ADMIN) khoi cac trang danh cho khach hang.
+ * Chan nguoi noi bo khoi cac trang danh cho khach hang.
  * Hien thong bao khong thich hop va redirect ve dung trang quan ly cua role do.
  */
 export const customerOnlyGuard: CanActivateFn = () => {
@@ -67,7 +67,6 @@ export const managerGuard: CanActivateFn = () => {
   return auth.isManager() ? true : router.createUrlTree([auth.getDefaultRoute()]);
 };
 
-/** Man hinh quan ly tai khoan chi mo cho nhom Quan tri vien. */
 /** Quan ly va Cham soc khach hang: don, khach hang, hoi thoai, nhat ky thanh toan. */
 export const deskGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
@@ -78,21 +77,13 @@ export const deskGuard: CanActivateFn = () => {
   return auth.isDesk() ? true : router.createUrlTree([auth.getDefaultRoute()]);
 };
 
-/** Kiem duyet cong dong: nhom Quan tri vien theo hop dong, kem nhom Quan ly. */
+/** Kiem duyet cong dong: nhom Quan ly, da gop ca phan viec cua Quan tri vien. */
 export const moderatorGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
   if (!auth.isSignedIn()) {
     return router.createUrlTree(['/login']);
   }
-  return auth.isAccountAdmin() || auth.isManager() ? true : router.createUrlTree([auth.getDefaultRoute()]);
+  return auth.isManager() ? true : router.createUrlTree([auth.getDefaultRoute()]);
 };
 
-export const accountAdminGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
-  const router = inject(Router);
-  if (!auth.isSignedIn()) {
-    return router.createUrlTree(['/login']);
-  }
-  return auth.isAccountAdmin() ? true : router.createUrlTree([auth.getDefaultRoute()]);
-};

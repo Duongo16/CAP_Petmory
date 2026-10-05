@@ -151,14 +151,12 @@ async function scenario(report) {
   // --- Internal staff see only what their role allows ---
   report.step('Internal roles are separated from each other');
   /*
-   * Nhom quan tri tai khoan khong doc duoc don hang.
-   *
-   * Tu khi rut xuong ba nhom quyen, nhom nay chi quan ly tai khoan va khong
-   * cham vao don hang hay tien nua.
+   * Nhom Cham soc khach hang doc duoc don de tra loi khach, nhung khong doi
+   * duoc trang thai, tham so hay bang mau.
    */
   const supportReads = await h.call(`/admin/orders/${order.body.orderCode}`, { headers: support.auth });
-  report.check('The account admin group cannot read an order',
-    supportReads.status === 403, String(supportReads.status));
+  report.check('Support can read an order to answer the customer',
+    supportReads.status === 200, String(supportReads.status));
 
   const supportWrites = await h.call(`/admin/orders/${order.body.orderCode}/status`, {
     method: 'PATCH',

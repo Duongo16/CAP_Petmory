@@ -44,8 +44,7 @@ async function run() {
   console.log('='.repeat(66));
 
   const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
-  const supportToken = await login('quantri@petmory.local', PASSWORD_INTERNAL);
-  const workshopToken = supportToken;
+  const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
 
   const dk = await call('/auth/register', {
     method: 'POST',
@@ -67,15 +66,15 @@ async function run() {
   }
 
         // --- Permissions ---
-  check('A workshop dispatcher can read the settings',
-    (await call('/settings', { headers: authHeaders(workshopToken) })).status === 403);
-  check('Support cannot read the settings',
+  check('The manager can read the settings',
+    (await call('/settings', { headers: authHeaders(managerToken) })).status === 200);
+  check('The support desk cannot read the settings',
     (await call('/settings', { headers: authHeaders(supportToken) })).status === 403);
   check('A customer cannot read the settings',
     (await call('/settings', { headers: authHeaders(customerToken) })).status === 403);
   check('Signed out requests cannot read the settings', (await call('/settings')).status === 401);
-  check('A workshop dispatcher cannot change the settings',
-    (await update(workshopToken, { qrExpiryHours: 12 })).status === 403);
+  check('The support desk cannot change the settings',
+    (await update(supportToken, { qrExpiryHours: 12 })).status === 403);
 
         // --- Reject fields outside the list ---
   check('Rejects an undeclared field', (await update(managerToken, { key: 'BAY' })).status === 400);

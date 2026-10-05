@@ -1,4 +1,4 @@
-export type Role = 'MANAGER' | 'ADMIN' | 'SUPPORT' | 'CUSTOMER';
+export type Role = 'MANAGER' | 'SUPPORT' | 'CUSTOMER';
 
 /** Mot tai khoan, nhin tu man hinh quan ly tai khoan. */
 export interface Account {
@@ -336,6 +336,8 @@ export interface CartLine {
   id: string;
   /** Phu kien gan len mau, chot luc them vao gio. */
   accessories?: AccessoryLine[];
+  /** Hop va khung chon them, chot luc them vao gio. */
+  packaging?: PackagingLine[];
   /** Dong hang tuy bien hay dong hang co san. */
   kind: LineKind;
   /** Ma mon hang co san. Rong voi dong hang tuy bien. */
@@ -951,6 +953,8 @@ export interface Quote {
   sizePrice: string;
   standPrice: string;
   accessoryPrice: string;
+  /** Tien hop va khung, rong khi chua chon. */
+  packagingPrice?: string;
   totalPrice: string;
   maxAccessories: number;
 }
@@ -980,6 +984,14 @@ export interface AccessoryLine {
   priceDelta: string;
 }
 
+/** Hop hoac khung tren dong hang, chot loai, ten va gia. */
+export interface PackagingLine {
+  code: string;
+  kind: PackagingKind;
+  displayName: string;
+  priceDelta: string;
+}
+
 export interface WoolRoll {
   code: string;
   displayName: string;
@@ -1003,6 +1015,8 @@ export interface ProductionItem {
   productionDays: number;
   /** Phu kien gan len mau, chot luc dat. */
   accessories: { code: string; displayName: string }[];
+  /** Hop va khung khach chon, xuong dong goi kem. */
+  packaging?: { code: string; kind: PackagingKind; displayName: string }[];
   /** Dac diem rieng cua be khach ghi. */
   featureNote?: string;
   /** Vi tri dong trong don, de doc anh tu ban chup cua dong. */

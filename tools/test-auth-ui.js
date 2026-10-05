@@ -158,8 +158,8 @@ async function run() {
   const pageQuick = await quick.newPage();
   await pageQuick.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await pageQuick.waitForSelector('.ap-quick-btn', { timeout: 20000 });
-  ok('Man hinh dang nhap co bon nut vao nhanh theo vai tro',
-    (await pageQuick.locator('.ap-quick-btn').count()) === 4,
+  ok('Man hinh dang nhap co ba nut vao nhanh theo vai tro',
+    (await pageQuick.locator('.ap-quick-btn').count()) === 3,
     (await pageQuick.locator('.ap-quick-btn').allInnerTexts()).join(' | '));
 
   // Nut dau la tai khoan Quan ly, bam vao la sang thang ban dieu phoi don.

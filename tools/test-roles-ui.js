@@ -1,9 +1,12 @@
 /**
  * Kiem thu ba nhom quyen tren trinh duyet.
  *
- * Trong tam la nguoi dung nhin thay gi: nhom Quan ly thay phan van hanh, nhom
- * Quan tri vien chi thay kiem duyet, nhat ky va quan ly tai khoan, va goi thang
- * duong dan cua nhom kia thi bi day ra.
+ * Trong tam la nguoi dung nhin thay gi: nhom Quan ly thay toan bo phan van
+ * hanh cung voi quan ly tai khoan, kiem duyet cong dong va nhat ky thao tac.
+ * Nhom Cham soc khach hang chi thay ban truc va goi thang duong dan khac thi
+ * bi day ra. Khach khong vao duoc khu noi bo.
+ *
+ * Bai kiem chi doi nhom quyen cua tai khoan do chinh no tao ra.
  *
  * Chay: node tools/test-roles-ui.js
  */
@@ -63,73 +66,49 @@ async function signIn(page, email) {
   });
 }
 
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
-  const broken = [];
-  page.on('pageerror', (e) => broken.push(String(e)));
+/** Ten cac muc tren thanh ben, dung lai nhieu lan. */
+const RAIL_ACCOUNTS = 'Tài khoản';
+const RAIL_MODERATION = 'Kiểm duyệt cộng đồng';
+const RAIL_AUDIT = 'Nhật ký thao tác';
 
-  console.log('BA NHOM QUYEN TREN GIAO DIEN');
-  console.log('='.repeat(64));
+/** Ban truc ma nhom Cham soc khach hang duoc vao. */
+const DESK_SCREENS = ['/admin/orders', '/admin/customers', '/admin/chats', '/admin/payment-log'];
 
-  // --- Nhom Quan ly ---
-  console.log('');
-  console.log('Nhom Quan ly');
-  await signIn(page, 'quanly@petmory.local');
+/** Cac man chi nhom Quan ly duoc vao. */
+const MANAGER_SCREENS = [
+  '/admin/goods', '/admin/assistant', '/admin/catalog', '/admin/reports',
+  '/admin/settings', '/admin/moderation', '/admin/audit', '/admin/accounts',
+];
+
+async function openAdminHome(page) {
   await page.goto(`${WEB}/admin`, { waitUntil: 'networkidle' });
   await settle(page);
   await page.waitForURL('**/admin/orders', { timeout: 30000 }).catch(() => undefined);
+}
+
+async function checkManager(page) {
+  console.log('');
+  console.log('Nhom Quan ly');
+  await signIn(page, 'quanly@petmory.local');
+  await openAdminHome(page);
   ok('Mo khu noi bo thi vao thang ban dieu phoi don',
     page.url().includes('/admin/orders'), page.url().slice(-32));
 
-  const railManager = await page.locator('.rail-link').allInnerTexts();
-  ok('Thanh ben co day du phan van hanh', railManager.length >= 8, String(railManager.length));
-  ok('Thanh ben khong co muc quan ly tai khoan',
-    !railManager.some((one) => one.includes('Tài khoản')),
-    railManager.join(' · ').slice(0, 70));
-
-  await page.goto(`${WEB}/admin/accounts`, { waitUntil: 'load' });
-  await page.waitForTimeout(2000);
-  ok('Nhom Quan ly bi day ra khoi man quan ly tai khoan',
-    !page.url().includes('/admin/accounts'), page.url().slice(-28));
-
-  // --- Nhom Quan tri vien ---
-  console.log('');
-  console.log('Nhom Quan tri vien');
-  await signIn(page, 'quantri@petmory.local');
-  await page.goto(`${WEB}/admin`, { waitUntil: 'networkidle' });
-  await settle(page);
-  await page.waitForURL('**/admin/accounts', { timeout: 30000 }).catch(() => undefined);
-  ok('Mo khu noi bo thi vao thang man quan ly tai khoan',
-    page.url().includes('/admin/accounts'), page.url().slice(-32));
-
-  const railAdmin = await page.locator('.rail-link').allInnerTexts();
-  // Quan tri vien co kiem duyet cong dong, nhat ky thao tac va quan ly tai khoan.
-  ok('Thanh ben chi co ba muc cua quan tri vien', railAdmin.length === 3, railAdmin.join(' · '));
-  ok('Thanh ben quan tri vien co muc tai khoan',
-    railAdmin.some((one) => one.includes('Tài khoản')), railAdmin.join(' · '));
-
-  for (const where of ['/admin/orders', '/admin/reports', '/admin/settings', '/admin/goods']) {
-    await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
-    await page.waitForTimeout(1800);
-    ok(`Nhom Quan tri vien bi day ra khoi ${where}`,
-      !page.url().includes(where), page.url().slice(-26));
+  const rail = await page.locator('.rail-link').allInnerTexts();
+  ok('Thanh ben co du muoi hai muc', rail.length === 12, String(rail.length));
+  for (const label of [RAIL_ACCOUNTS, RAIL_MODERATION, RAIL_AUDIT]) {
+    ok(`Thanh ben nhom Quan ly co muc ${label}`, rail.some((one) => one.includes(label)),
+      rail.join(' · ').slice(0, 90));
   }
 
-  // --- Man quan ly tai khoan lam viec duoc ---
-  console.log('');
-  console.log('Man quan ly tai khoan');
-  await page.goto(`${WEB}/admin/accounts`, { waitUntil: 'networkidle' });
-  await settle(page);
-  await page.waitForSelector('#account-table', { timeout: 30000 });
+  for (const where of [...DESK_SCREENS, ...MANAGER_SCREENS]) {
+    await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
+    await page.waitForTimeout(1500);
+    ok(`Nhom Quan ly mo duoc ${where}`, page.url().includes(where), page.url().slice(-26));
+  }
+}
 
-  ok('Co bon o dem so tai khoan theo nhom',
-    (await page.locator('.count-tile').count()) === 4,
-    String(await page.locator('.count-tile').count()));
-  ok('Bang liet ke duoc tai khoan',
-    (await page.locator('#account-table tbody tr').count()) > 0,
-    String(await page.locator('#account-table tbody tr').count()));
-
+async function findOwnRow(page) {
   /*
    * Tim dung dong cua chinh minh truoc khi kiem.
    *
@@ -137,7 +116,7 @@ async function signIn(page, email) {
    * sinh them tai khoan la dong cua minh troi sang trang sau. Tim theo dia chi
    * thu thi bao nhieu tai khoan cung khong lam hong bai kiem.
    */
-  await page.fill('#account-search', 'quantri@petmory.local');
+  await page.fill('#account-search', 'quanly@petmory.local');
   await page.locator('button:has-text("Tìm")').click();
   await page.waitForFunction(
     () => document.querySelectorAll('#account-table tbody tr').length === 1,
@@ -150,18 +129,25 @@ async function signIn(page, email) {
   // Nut sua cua dong minh bi khoa, nen khong tu doi quyen hay tu tat duoc.
   ok('Dong cua chinh minh khong sua duoc',
     await selfRow.locator('button:has-text("Sửa")').isDisabled());
+}
 
-  // Tao mot tai khoan moi.
-  const email = `ui.vaitro.${STAMP}@petmory.local`;
+async function createAccount(page, email) {
   await page.fill('#account-search', '');
   await page.locator('button:has-text("Tìm")').click();
   await page.waitForTimeout(1200);
   await page.locator('#account-new').click();
   await page.waitForSelector(BOX_EMAIL, { timeout: 20000 });
+
+  const choices = await page.locator(`${BOX_ROLE} option`).evaluateAll(
+    (all) => all.map((one) => one.value).sort((a, b) => a.localeCompare(b)),
+  );
+  ok('O chon nhom chi con ba nhom, khong con Quan tri vien',
+    JSON.stringify(choices) === JSON.stringify(['CUSTOMER', 'MANAGER', 'SUPPORT']), choices.join(','));
+
   await page.fill(BOX_EMAIL, email);
   await page.fill('#account-name', 'Nguoi thu giao dien');
   await page.fill('#account-password', 'Password@123');
-  await page.selectOption(BOX_ROLE, 'MANAGER');
+  await page.selectOption(BOX_ROLE, 'SUPPORT');
   await page.locator(BTN_SAVE).click();
   await page.waitForSelector(BTN_SAVE, { state: GONE, timeout: 20000 });
 
@@ -170,12 +156,14 @@ async function signIn(page, email) {
     email,
     { timeout: 30000 },
   );
-  ok('Tai khoan vua tao hien ra trong bang', true);
-
-  /*
-   * Sua tai khoan vua tao: doi nhom quyen va tat di, deu qua hop thoai.
-   */
   const madeRow = page.locator('#account-table tbody tr', { hasText: email });
+  ok('Tai khoan vua tao hien ra trong bang voi nhom CSKH',
+    (await madeRow.innerText()).includes('Chăm sóc khách hàng'),
+    (await madeRow.innerText()).replace(NEWLINE, ' ').slice(0, 70));
+  return madeRow;
+}
+
+async function editAccount(page, email, madeRow) {
   await madeRow.locator('button:has-text("Sửa")').click();
   /*
    * Cho den khi o dia chi thu mang dung tai khoan dang sua. Chi cho o do hien
@@ -209,18 +197,80 @@ async function signIn(page, email) {
   ok('Sua xong thi nhom quyen doi theo',
     (await madeRow.innerText()).includes('Khách hàng'),
     (await madeRow.innerText()).replace(NEWLINE, ' ').slice(0, 70));
+}
 
+async function checkAccountsScreen(page) {
+  console.log('');
+  console.log('Man quan ly tai khoan cua nhom Quan ly');
+  await page.goto(`${WEB}/admin/accounts`, { waitUntil: 'networkidle' });
+  await settle(page);
+  await page.waitForSelector('#account-table', { timeout: 30000 });
+
+  ok('Co ba o dem so tai khoan theo nhom',
+    (await page.locator('.count-tile').count()) === 3,
+    String(await page.locator('.count-tile').count()));
+  ok('Bang liet ke duoc tai khoan',
+    (await page.locator('#account-table tbody tr').count()) > 0,
+    String(await page.locator('#account-table tbody tr').count()));
+
+  await findOwnRow(page);
+  const email = `ui.vaitro.${STAMP}@petmory.local`;
+  const madeRow = await createAccount(page, email);
+  await editAccount(page, email, madeRow);
   await page.screenshot({ path: path.join(OUT, 'roles-1-accounts.png'), fullPage: true });
+}
 
-  // --- Khach thuong khong vao duoc cho nao trong khu noi bo ---
+async function checkSupport(page) {
+  console.log('');
+  console.log('Nhom Cham soc khach hang');
+  await signIn(page, 'cskh@petmory.local');
+  await openAdminHome(page);
+  ok('Mo khu noi bo thi vao thang ban dieu phoi don',
+    page.url().includes('/admin/orders'), page.url().slice(-32));
+  await page.waitForSelector('.rail-link', { timeout: 20000 });
+
+  const rail = await page.locator('.rail-link').allInnerTexts();
+  ok('Thanh ben chi co bon muc cua ban truc', rail.length === 4, rail.join(' · '));
+  ok('Thanh ben khong co tai khoan, kiem duyet hay nhat ky thao tac',
+    !rail.some((one) => [RAIL_ACCOUNTS, RAIL_MODERATION, RAIL_AUDIT].some((label) => one.includes(label))),
+    rail.join(' · '));
+
+  for (const where of DESK_SCREENS) {
+    await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
+    await page.waitForTimeout(1500);
+    ok(`Nhom CSKH mo duoc ${where}`, page.url().includes(where), page.url().slice(-26));
+  }
+  for (const where of MANAGER_SCREENS) {
+    await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
+    await page.waitForTimeout(1800);
+    ok(`Nhom CSKH bi day ra khoi ${where}`, !page.url().includes(where), page.url().slice(-26));
+  }
+}
+
+async function checkCustomer(page) {
   console.log('');
   console.log('Khach hang');
   await signIn(page, 'khachhang@petmory.local');
-  for (const where of ['/admin/accounts', '/admin/orders']) {
+  for (const where of ['/admin/accounts', '/admin/orders', '/admin/moderation']) {
     await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
     await page.waitForTimeout(1800);
     ok(`Khach bi day ra khoi ${where}`, !page.url().includes(where), page.url().slice(-24));
   }
+}
+
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
+  const broken = [];
+  page.on('pageerror', (e) => broken.push(String(e)));
+
+  console.log('BA NHOM QUYEN TREN GIAO DIEN');
+  console.log('='.repeat(64));
+
+  await checkManager(page);
+  await checkAccountsScreen(page);
+  await checkSupport(page);
+  await checkCustomer(page);
 
   ok('Khong co loi nao trong trang', broken.length === 0, broken.slice(0, 2).join(' | '));
 

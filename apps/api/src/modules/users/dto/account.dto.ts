@@ -19,7 +19,7 @@ import { Role } from '../../../common/constants/roles';
  * Khai ra day du thay vi nhan chuoi tu do, de khong ai gan duoc mot nhom quyen
  * khong ton tai bang cach go thang vao yeu cau.
  */
-export const ROLE_NAMES: string[] = [Role.MANAGER, Role.ADMIN, Role.SUPPORT, Role.CUSTOMER];
+export const ROLE_NAMES: string[] = [Role.MANAGER, Role.SUPPORT, Role.CUSTOMER];
 
 /** Do dai mat khau toi thieu, giu bang cho dang ky thuong. */
 const PASSWORD_MIN = 8;

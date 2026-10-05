@@ -25,11 +25,10 @@ import { AuthUser, CurrentUser } from '../../common/decorators/current-user.deco
 /**
  * Quan ly tai khoan.
  *
- * Chi nhom Quan tri vien vao duoc. Day la ranh gioi cua ba nhom quyen: nhom
- * Quan ly lo van hanh nhung khong tao duoc tai khoan, nhom Quan tri vien tao
- * duoc tai khoan nhung khong mo duoc don hang hay bao cao.
+ * Chi nhom Quan ly vao duoc. Nhom nay lo ca van hanh lan tai khoan, khong con
+ * nhom Quan tri vien rieng.
  */
-@Roles(Role.ADMIN)
+@Roles(Role.MANAGER)
 @Controller('admin/accounts')
 export class AccountsController {
   constructor(private readonly service: AccountsService) {}

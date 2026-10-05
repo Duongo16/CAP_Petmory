@@ -1,8 +1,8 @@
 /**
  * Kiem thu tren trinh duyet ba bao cao quan tri, theo Phu luc 01 muc 22.
  *
- * Kiem ca phan phan quyen: nhom Quan ly thay ca ba bao cao, nhom Quan tri
- * vien chi thay tien do san xuat.
+ * Kiem ca phan phan quyen: nhom Quan ly thay ca ba bao cao, nhom Cham soc
+ * khach hang khong mo duoc trang bao cao nao.
  *
  * Chay: node tools/test-reports-ui.js
  */
@@ -115,11 +115,11 @@ async function signIn(page, email) {
     (await page.locator('.ready-file a').getAttribute('download')) === 'revenue.csv',
     String(await page.locator('.ready-file a').getAttribute('download')));
 
-  // --- Nhom Quan tri vien khong mo duoc bao cao nao ---
-  await signIn(page, 'quantri@petmory.local');
+  // --- Nhom Cham soc khach hang khong mo duoc bao cao nao ---
+  await signIn(page, 'cskh@petmory.local');
   await page.goto(`${WEB}/admin/reports`, { waitUntil: 'load' });
   await page.waitForTimeout(2200);
-  ok('Nhom Quan tri vien bi dua ra khoi trang bao cao',
+  ok('Nhom CSKH bi dua ra khoi trang bao cao',
     !page.url().includes('/admin/reports'), page.url());
 
   ok('Khong co loi nao trong trang', broken.length === 0, broken.slice(0, 2).join(' | '));

@@ -67,7 +67,6 @@ export class Shell implements OnInit {
   readonly cartItemCount = this.cart.countItem;
   readonly isInternal = this.auth.isInternal;
   readonly isManager = this.auth.isManager;
-  readonly isAccountAdmin = this.auth.isAccountAdmin;
 
   readonly brandRoute = computed(() =>
     this.isInternal() ? this.auth.getManagementRoute() : '/home',
@@ -104,10 +103,8 @@ export class Shell implements OnInit {
     { path: '/admin/customers', key: 'NAV.CUSTOMER' },
     { path: '/admin/payment-log', key: 'NAV.LOG_PAYMENT' },
     { path: '/admin/settings', key: 'NAV.SETTINGS' },
+    { path: '/admin/accounts', key: 'NAV.ACCOUNTS' },
   ];
-
-  /** Man hinh quan ly tai khoan, chi mo cho nhom Quan tri vien. */
-  readonly staffAccountMenu: MenuItem[] = [{ path: '/admin/accounts', key: 'NAV.ACCOUNTS' }];
 
   ngOnInit(): void {
     if (!this.isInternal()) {

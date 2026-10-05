@@ -44,17 +44,6 @@
             >{{ item.key | translate }}</a>
           }
         }
-        @if (isAccountAdmin()) {
-          @for (item of staffAccountMenu; track item.path) {
-            <a
-              class="px-3 py-2 rounded-full text-ink-muted no-underline text-sm font-medium whitespace-nowrap
-                     transition-colors duration-150
-                     hover:text-ink hover:bg-muted
-                     [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
-              [routerLink]="item.path" routerLinkActive="selected"
-            >{{ item.key | translate }}</a>
-          }
-        }
       </nav>
     }
 
@@ -128,17 +117,6 @@
                 </p>
                 @if (isManager()) {
                   @for (item of managerMenu; track item.path) {
-                    <a
-                      class="internal-link px-3 py-2 rounded-md no-underline text-ink text-sm
-                             transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
-                      role="menuitem"
-                      [routerLink]="item.path" routerLinkActive="selected"
-                      (click)="closeMenu()"
-                    >{{ item.key | translate }}</a>
-                  }
-                }
-                @if (isAccountAdmin()) {
-                  @for (item of staffAccountMenu; track item.path) {
                     <a
                       class="internal-link px-3 py-2 rounded-md no-underline text-ink text-sm
                              transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"

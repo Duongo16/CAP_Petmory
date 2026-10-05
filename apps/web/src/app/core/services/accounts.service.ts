@@ -5,10 +5,9 @@ import { API_BASE } from './api-base';
 import { Account, AccountPage, Role } from '../models/api.model';
 
 /**
- * Quan ly tai khoan, danh cho nhom Quan tri vien.
+ * Quan ly tai khoan, danh cho nhom Quan ly.
  *
- * Nhom nay khong cham vao don hang hay tien, nen dich vu nay khong co duong
- * nao doc du lieu kinh doanh.
+ * Dich vu nay chi lo tai khoan, khong co duong nao doc du lieu kinh doanh.
  */
 @Injectable({ providedIn: 'root' })
 export class AccountsService {

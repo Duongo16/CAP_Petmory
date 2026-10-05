@@ -1,8 +1,8 @@
 const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Browser test: the order dispatch board, order detail, customer profiles and the
- * payment log. Also checks the difference between an operations account and one
- * that may only read.
+ * payment log. Also checks the difference between the manager and the support
+ * desk, which only sees the desk screens.
  * Run: node tools/test-admin-ui.js
  */
 const { chromium } = require('playwright');
@@ -439,20 +439,25 @@ async function run() {
     await page.locator(SAVE_CONFIG).click();
     await page.waitForSelector('.saved', { timeout: 20000 });
 
-                // --- The account admin group cannot reach any running screen ---
-    await login(page, 'quantri@petmory.local', PASSWORD_INTERNAL, '**/admin/accounts');
-    for (const where of ['/admin/orders', '/admin/settings', '/admin/customers']) {
-      await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
-      await page.waitForTimeout(1600);
-      res.push(check(`The account admin group is turned away from ${where}`,
-        !page.url().includes(where), page.url()));
-    }
-
-                // --- but it does reach its own screen ---
+                // --- The manager also reaches the account screen ---
     await page.goto(`${WEB}/admin/accounts`, { waitUntil: 'networkidle' });
     await page.waitForSelector('#account-table', { timeout: 20000 });
-    res.push(check('The account admin group reaches the account screen',
+    res.push(check('The manager reaches the account screen',
       page.url().includes('/admin/accounts'), page.url()));
+
+                // --- The support desk only reaches the desk screens ---
+    await login(page, 'cskh@petmory.local', PASSWORD_INTERNAL, '**/admin/orders');
+    for (const where of ['/admin/settings', '/admin/catalog', '/admin/accounts']) {
+      await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
+      await page.waitForTimeout(1600);
+      res.push(check(`The support desk is turned away from ${where}`,
+        !page.url().includes(where), page.url()));
+    }
+    for (const where of ['/admin/orders', '/admin/customers']) {
+      await page.goto(`${WEB}${where}`, { waitUntil: 'load' });
+      await page.waitForTimeout(1600);
+      res.push(check(`The support desk reaches ${where}`, page.url().includes(where), page.url()));
+    }
 
     /*
      * Loi 400 khi thu chuyen sang cho giao luc phieu con do la co y: bai kiem

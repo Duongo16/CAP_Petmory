@@ -7,7 +7,7 @@ import { TokenStore } from './token-store';
 import { DemoAccount, LoginResult, Role } from '../models/api.model';
 
 /** Cac nhom duoc tinh la nguoi cua PETMORY. */
-const INTERNAL: Role[] = ['MANAGER', 'ADMIN', 'SUPPORT'];
+const INTERNAL: Role[] = ['MANAGER', 'SUPPORT'];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -30,8 +30,6 @@ export class AuthService {
    */
   readonly isManager = computed(() => (this.user()?.roles ?? []).includes('MANAGER'));
 
-  /** Nhom Quan tri vien: chi quan ly tai khoan. */
-  readonly isAccountAdmin = computed(() => (this.user()?.roles ?? []).includes('ADMIN'));
 
   /** Duoc vao ban dieu phoi: xem don, khach hang, truc hoi thoai. Quan ly va Cham soc khach hang. */
   readonly isDesk = computed(() => {
@@ -46,9 +44,6 @@ export class AuthService {
   getManagementRoute(): string {
     if (this.isDesk()) {
       return '/admin/orders';
-    }
-    if (this.isAccountAdmin()) {
-      return '/admin/accounts';
     }
     return '/home';
   }

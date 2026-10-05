@@ -68,7 +68,6 @@
       "NOTE": "Chỉ hiện khi máy chủ chạy ở chế độ phát triển. Bản dùng thật không có khối này.",
       "MANAGER": "Quản lý",
       "CUSTOMER": "Khách hàng",
-      "ADMIN": "Quản trị viên",
       "SUPPORT": "Chăm sóc KH"
     },
     "ROLE_RESTRICTED": "Tài khoản không thích hợp để tham gia tính năng này. Đã chuyển về trang quản lý.",
@@ -586,7 +585,13 @@
     "CART_NEED_PHOTOS_HINT": "Cần gắn bé và đủ {{need}} ảnh ở bước Ảnh của bé trước khi thêm vào giỏ.",
     "CART_NEED_DESIGN": "Hãy lưu bản thiết kế trước khi thêm vào giỏ.",
     "CART_NEED_PET": "Bản thiết kế cần gắn với một bé. Chọn bé ở bước Ảnh của bé rồi lưu lại.",
-    "CART_NEED_PHOTOS": "Bé chưa đủ số ảnh tối thiểu của kích cỡ này. Hãy tải thêm ảnh ở bước Ảnh của bé."
+    "CART_NEED_PHOTOS": "Bé chưa đủ số ảnh tối thiểu của kích cỡ này. Hãy tải thêm ảnh ở bước Ảnh của bé.",
+    "PACK": {
+      "BOX": "Hộp đựng",
+      "FRAME": "Khung trưng bày",
+      "NONE": "Không lấy",
+      "LINE": "Hộp & khung:"
+    }
   },
   "HOME": {
     "BADGE": "THỦ CÔNG • VẬT LIỆU TÁI CHẾ • 100% CÁ NHÂN HÓA",
@@ -774,7 +779,8 @@
     "DESIGN_EDIT": "Sửa thiết kế",
     "DESIGN_MISSING": "Bản thiết kế của dòng này đã bị xoá. Hãy bỏ dòng này hoặc thiết kế lại.",
     "PER_ITEM": "{{price}} / món",
-    "SPEC_ACCESSORY": "Phụ kiện:"
+    "SPEC_ACCESSORY": "Phụ kiện:",
+    "SPEC_PACK": "Đóng gói:"
   },
   "CHECKOUT": {
     "TITLE": "Thông tin nhận hàng",
@@ -1675,7 +1681,9 @@
       "DOWNLOAD_FULL": "Tải bản mô hình đầy đủ cho xưởng (.glb)",
       "QC": "Phiếu kiểm tra chất lượng",
       "QC_NONE": "Đơn này chưa có phiếu kiểm tra.",
-      "QC_DRAFT": "Đơn chưa vào sản xuất nên đây là mẫu phiếu theo cấu hình hiện tại. Phiếu riêng của đơn được tạo khi chuyển sang Đang sản xuất."
+      "QC_DRAFT": "Đơn chưa vào sản xuất nên đây là mẫu phiếu theo cấu hình hiện tại. Phiếu riêng của đơn được tạo khi chuyển sang Đang sản xuất.",
+      "PACKAGING": "Hộp & khung",
+      "PACKAGING_NONE": "Không lấy hộp hay khung."
     },
     "CHAT": {
       "TITLE": "Trực hội thoại",
@@ -1713,7 +1721,6 @@
       "PASSWORD": "Mật khẩu",
       "ROLE": "Nhóm quyền",
       "ROLE_MANAGER": "Quản lý",
-      "ROLE_ADMIN": "Quản trị viên",
       "ROLE_CUSTOMER": "Khách hàng",
       "LAST_LOGIN": "Đăng nhập lần cuối",
       "STATE": "Trạng thái",
