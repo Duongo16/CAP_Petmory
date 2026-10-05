@@ -21,6 +21,8 @@ const SUITES = [
   { name: 'diary', file: 'test-diary-ui.js' },
   { name: 'diary-book', file: 'test-diary-book-ui.js' },
   { name: 'restore', file: 'test-restore-ui.js' },
+  { name: 'restore-ai', file: 'test-restore-ai-ui.js' },
+  { name: 'restore-quota', file: 'test-restore-quota-ui.js' },
   { name: 'studio', file: 'test-studio-ui.js' },
   { name: 'studio-full', file: 'test-studio-full-ui.js' },
   { name: 'shopping', file: 'test-shopping-ui.js' },

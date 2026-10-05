@@ -1,8 +1,8 @@
 /**
  * Kiem thu phuc hoi anh co chon thao tac (SOW muc 4): khach chon cach phuc hoi,
- * gom hai thao tac AI (tang chi tiet mat, tach nen) qua Gemini; man hinh noi ro
- * da dung AI that hay chi bo loc; xac nhan bang cach luu vao album cua be.
- * Thao tac tach nen goi Gemini that mot lan.
+ * gom hai thao tac AI (tang chi tiet mat, tach nen) qua dich vu anh; man hinh
+ * noi ro da dung AI that hay chi bo loc; xac nhan bang cach luu vao album cua be.
+ * Thao tac tach nen goi dich vu anh that mot lan.
  * Run: node tools/test-restore-ai-ui.js
  */
 const { chromium, request } = require('playwright');

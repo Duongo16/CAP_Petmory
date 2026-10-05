@@ -98,7 +98,7 @@
           <p class="ops-hint">{{ 'RESTORE.AI_HINT' | translate }}</p>
         </fieldset>
         <div class="actions">
-          <button type="button" class="tw-btn-primary" id="restore-run" [disabled]="working()" (click)="run()">
+          <button type="button" class="tw-btn-primary" id="restore-run" [disabled]="working() || outOfTurns()" (click)="run()">
             <pm-icon name="sparkle" [size]="16" />
             {{ (working() ? 'RESTORE.WORKING' : 'RESTORE.RUN') | translate }}
           </button>
@@ -106,6 +106,13 @@
             <label class="tw-btn-secondary" for="restore-file">{{ 'RESTORE.CHANGE' | translate }}</label>
           }
         </div>
+      }
+      @if (quota(); as q) {
+        @if (q.left >= 0) {
+          <p class="quota-line" id="restore-quota" [class.out]="q.left === 0" role="status">
+            {{ 'RESTORE.QUOTA_LEFT' | translate: { left: q.left, day: q.day } }}
+          </p>
+        }
       }
     </section>
   } @else {

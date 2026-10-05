@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signa
 import { HttpErrorResponse } from '@angular/common/http';
 import { TranslatePipe } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { PhotoRestoreService, RestoreOperation } from '../../core/services/photo-restore.service';
+import { PhotoRestoreService, RestoreOperation, RestoreQuota } from '../../core/services/photo-restore.service';
 import { PetsService } from '../../core/services/pets.service';
 import { PhotosService } from '../../core/services/photos.service';
 import { Pet } from '../../core/models/api.model';
@@ -70,6 +70,12 @@ export class RestorePage {
   readonly afterUrl = signal<string | null>(null);
   readonly resemblance = signal<number | null>(null);
   readonly working = signal(false);
+
+  /** So luot phuc hoi con lai do Quan ly dat; null khi chua doc duoc. */
+  readonly quota = signal<RestoreQuota | null>(null);
+
+  /** Da het luot thi khoa nut phuc hoi, de khach khong bam roi moi biet. */
+  readonly outOfTurns = computed(() => this.quota()?.left === 0);
   readonly error = signal<string | null>(null);
   readonly hovering = signal(false);
 
@@ -87,6 +93,7 @@ export class RestorePage {
 
   constructor() {
     this.destroyRef.onDestroy(() => this.dropUrls());
+    this.readQuota();
     this.petsService
       .list()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -183,11 +190,23 @@ export class RestorePage {
           this.mode.set(mode);
           this.skipped.set(skipped);
           this.split.set(50);
+          this.readQuota();
         },
         error: (problem: HttpErrorResponse) => {
           this.working.set(false);
           this.error.set(problem.status === 429 ? 'RESTORE.QUOTA' : 'RESTORE.FAILED');
+          this.readQuota();
         },
+      });
+  }
+
+  private readQuota(): void {
+    this.restorer
+      .quota()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (got) => this.quota.set(got),
+        error: () => this.quota.set(null),
       });
   }
 

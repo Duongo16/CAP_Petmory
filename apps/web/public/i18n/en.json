@@ -2025,7 +2025,7 @@
     "RUN": "Restore this picture",
     "CHANGE": "Choose another picture",
     "ANOTHER": "Restore another picture",
-    "QUOTA": "You have used all your restorations for this period",
+    "QUOTA": "You have used all your photo restores. Please come back once your turns are topped up.",
     "OPERATIONS": "Choose how to restore",
     "AI_HINT": "The two options marked AI use an image model and count towards your restorations.",
     "PICK_ONE": "Choose at least one option.",
@@ -2043,7 +2043,8 @@
       "CONTRAST": "Boost contrast",
       "FACE_DETAIL": "Face detail",
       "REMOVE_BACKGROUND": "Remove background"
-    }
+    },
+    "QUOTA_LEFT": "{{left}} restores left, up to {{day}} a day."
   },
   "SUGGEST": {
     "TITLE": "Design suggestions",

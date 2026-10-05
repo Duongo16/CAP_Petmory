@@ -32,6 +32,12 @@ const QUOTA_WINDOWS: { name: 'day' | 'month' | 'year'; hours: number }[] = [
   { name: 'year', hours: 24 * 365 },
 ];
 
+/** So luot phuc hoi con lai: han muc moi ngay va so luot con dung duoc, am la khong gioi han. */
+export interface RestoreQuotaLeft {
+  day: number;
+  left: number;
+}
+
 /** Ket qua phuc hoi: noi dung anh moi va do giong voi anh goc. */
 export interface RestoreOutcome {
   data: Buffer;
@@ -116,6 +122,29 @@ export class PhotoRestoreService {
     const resemblance = await measureResemblance(file.buffer, data);
     await this.usage.record(AiKind.RESTORE_PHOTO, owner, mode, undefined, problem);
     return { data, resemblance, mode, skipped };
+  }
+
+  /**
+   * So luot phuc hoi con lai cua khach, de man hinh bao truoc khi khach bam.
+   *
+   * Lay khung chat nhat trong cac khung da dat han muc. Khong dat han muc nao
+   * thi bao khong gioi han bang so am.
+   */
+  async remaining(owner: string): Promise<RestoreQuotaLeft> {
+    const cf = await this.businessConfig.get();
+    const quota = cf.aiQuota?.[KEY_QUOTA_RESTORE];
+    let left = -1;
+    for (const window of QUOTA_WINDOWS) {
+      const cap = quota?.[window.name] ?? 0;
+      if (cap <= 0) {
+        continue;
+      }
+      const since = new Date(Date.now() - window.hours * 60 * 60 * 1000);
+      const used = await this.usage.countFor(owner, AiKind.RESTORE_PHOTO, since);
+      const here = Math.max(0, cap - used);
+      left = left < 0 ? here : Math.min(left, here);
+    }
+    return { day: quota?.day ?? 0, left };
   }
 
   /** So so luot da dung trong tung khung voi han muc nhom Quan ly dat ra. */

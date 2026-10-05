@@ -2025,7 +2025,7 @@
     "RUN": "Phục hồi ảnh này",
     "CHANGE": "Chọn ảnh khác",
     "ANOTHER": "Phục hồi ảnh khác",
-    "QUOTA": "Bạn đã dùng hết lượt phục hồi ảnh của kỳ này",
+    "QUOTA": "Bạn đã dùng hết lượt phục hồi ảnh. Hãy quay lại sau khi lượt được cộng lại.",
     "OPERATIONS": "Chọn cách phục hồi",
     "AI_HINT": "Hai thao tác có nhãn AI dùng mô hình sửa ảnh, tính vào lượt phục hồi.",
     "PICK_ONE": "Hãy chọn ít nhất một cách phục hồi.",
@@ -2043,7 +2043,8 @@
       "CONTRAST": "Tăng tương phản",
       "FACE_DETAIL": "Tăng chi tiết khuôn mặt",
       "REMOVE_BACKGROUND": "Tách nền"
-    }
+    },
+    "QUOTA_LEFT": "Còn {{left}} lượt phục hồi, tối đa {{day}} lượt mỗi ngày."
   },
   "SUGGEST": {
     "TITLE": "Gợi ý thiết kế",

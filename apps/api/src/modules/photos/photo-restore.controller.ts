@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { RestoreToolDto } from './dto/photo.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
@@ -14,6 +14,12 @@ export const HEADER_SKIPPED = 'X-Restore-Skipped';
 @Controller('photo-restore')
 export class PhotoRestoreController {
   constructor(private readonly service: PhotoRestoreService) {}
+
+  /** So luot phuc hoi con lai cua chinh nguoi dang dang nhap. */
+  @Get('quota')
+  quota(@CurrentUser() user: AuthUser) {
+    return this.service.remaining(user.userId);
+  }
 
   /** Nhan mot tam anh, tra lai ngay ban da phuc hoi dang PNG. */
   @Post()

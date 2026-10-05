@@ -14,6 +14,12 @@ export interface RestoredPicture {
   skipped: string[];
 }
 
+/** So luot phuc hoi con lai: han muc moi ngay va so luot con dung duoc, am la khong gioi han. */
+export interface RestoreQuota {
+  day: number;
+  left: number;
+}
+
 /** Cac thao tac phuc hoi khach chon duoc; hai thao tac cuoi dung mo hinh sua anh. */
 export type RestoreOperation = 'UPSCALE' | 'SHARPEN' | 'DENOISE' | 'EXPOSURE' | 'CONTRAST' | 'FACE_DETAIL' | 'REMOVE_BACKGROUND';
 
@@ -25,6 +31,10 @@ export type RestoreOperation = 'UPSCALE' | 'SHARPEN' | 'DENOISE' | 'EXPOSURE' | 
 export class PhotoRestoreService {
   private readonly http = inject(HttpClient);
   private readonly base = inject(API_BASE);
+
+  quota(): Observable<RestoreQuota> {
+    return this.http.get<RestoreQuota>(`${this.base}/photo-restore/quota`);
+  }
 
   restore(file: File, operations: RestoreOperation[] = []): Observable<RestoredPicture> {
     const form = new FormData();
