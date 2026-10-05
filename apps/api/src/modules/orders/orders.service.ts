@@ -154,6 +154,13 @@ export class OrdersService {
           productionDays,
           estimatedDelivery: deliveryDate,
           paymentDeadline,
+          // Chot tai khoan nhan tien luc dat (muc 13): doi tai khoan sau do khong doi QR cua don nay.
+          payee: {
+            bankCode: config.bankCode,
+            bankName: config.bankName,
+            accountNumber: config.accountNumber,
+            accountHolder: config.accountHolder,
+          },
         });
       } catch (trouble) {
         // Ma don trung voi mot don da co thi lay so ke tiep, chi trong vai lan.

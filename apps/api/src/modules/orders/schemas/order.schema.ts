@@ -185,11 +185,33 @@ export class DeliveryInfo {
 
 export const DeliveryInfoSchema = SchemaFactory.createForClass(DeliveryInfo);
 
+/** Tai khoan nhan tien chot cung don. */
+@Schema({ _id: false })
+export class Payee {
+  @Prop({ trim: true, default: '' })
+  bankCode!: string;
+
+  @Prop({ trim: true, default: '' })
+  bankName!: string;
+
+  @Prop({ trim: true, default: '' })
+  accountNumber!: string;
+
+  @Prop({ trim: true, default: '' })
+  accountHolder!: string;
+}
+
+export const PayeeSchema = SchemaFactory.createForClass(Payee);
+
 @Schema({ timestamps: true, collection: 'orders' })
 export class Order {
   /** The order code shown to the customer, and the basis of the transfer reference. */
   @Prop({ required: true, unique: true, uppercase: true, trim: true, index: true })
   orderCode!: string;
+
+  /** Tai khoan nhan tien chot luc dat; don cu chua co thi doc cau hinh hien tai. */
+  @Prop({ type: PayeeSchema, default: null })
+  payee!: Payee | null;
 
   /** The unique string placed in the transfer message for automatic matching. */
   @Prop({ required: true, unique: true, uppercase: true, trim: true, index: true })

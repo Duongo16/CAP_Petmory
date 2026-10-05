@@ -83,10 +83,12 @@ export class PaymentsService {
 
     const amount = order.total.toString().split('.')[0];
     const content = normalizeContent(order.reference);
+    // QR doc tai khoan da chot trong don; don cu chua chot thi dung cau hinh hien tai.
+    const payee = order.payee?.accountNumber ? order.payee : cf;
 
     const qrString = buildQrString({
-      bankCode: cf.bankCode,
-      accountNumber: cf.accountNumber,
+      bankCode: payee.bankCode,
+      accountNumber: payee.accountNumber,
       amount,
       content,
     });
@@ -99,9 +101,9 @@ export class PaymentsService {
       amount,
       currency: order.currency,
       transferMessage: content,
-      bankName: cf.bankName,
-      accountNumber: cf.accountNumber,
-      accountHolder: cf.accountHolder,
+      bankName: payee.bankName,
+      accountNumber: payee.accountNumber,
+      accountHolder: payee.accountHolder,
       qrImage,
       paymentDeadline: order.paymentDeadline.toISOString(),
       expired: order.status === OrderStatus.AWAITING_PAYMENT && order.paymentDeadline.getTime() < Date.now(),
@@ -205,11 +207,7 @@ export class PaymentsService {
     let reference = candidates[0] ?? '';
     let result: ReconcileResult;
 
-    const otherAccount =
-      Boolean(dto.accountNumber) && dto.accountNumber !== cf.accountNumber && dto.subAccount !== cf.accountNumber;
-    if (dto.transferType === 'out' || otherAccount) {
-      result = ReconcileResult.IGNORED;
-    } else {
+    if (dto.transferType !== 'out') {
       for (const code of candidates) {
         const found = await this.orders.findByReference(code);
         if (found) {
@@ -218,6 +216,15 @@ export class PaymentsService {
           break;
         }
       }
+    }
+    // Tien phai vao tai khoan hien tai, hoac tai khoan da chot trong chinh don do.
+    const accepted = new Set([cf.accountNumber, order?.payee?.accountNumber].filter(Boolean));
+    const otherAccount =
+      Boolean(dto.accountNumber) && !accepted.has(dto.accountNumber ?? '') && !accepted.has(dto.subAccount ?? '');
+    if (dto.transferType === 'out' || otherAccount) {
+      result = ReconcileResult.IGNORED;
+      order = null;
+    } else {
       result = order ? this.classify(order, amount) : ReconcileResult.NO_REFERENCE;
     }
 
