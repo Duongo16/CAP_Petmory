@@ -198,7 +198,7 @@ function catLying(k) {
 
 const MODELS = [
   { file: 'base-dog-standing', build: dogStanding, palette: {} },
-  { file: 'base-dog-sitting', build: dogSitting, palette: { MAIN: '#f1f1ee', BELLY: '#ffffff', EARS: '#3b3532', TAIL: '#f1f1ee' } },
+  { file: 'base-dog-sitting', build: dogSitting, palette: { MAIN: '#c8742f', BELLY: '#fbf1e2', EARS: '#a55a20', TAIL: '#c8742f' } },
   { file: 'base-cat-sitting', build: catSitting, palette: { MAIN: '#9b9a98', BELLY: '#f3f1ec', EARS: '#7b7a78', TAIL: '#8a8987', EYES: '#4b7a3a', NOSE: '#d98c8c' } },
   { file: 'base-cat-lying', build: catLying, palette: { MAIN: '#e8a35c', BELLY: '#fbefe0', EARS: '#cf8a45', TAIL: '#d98f48', EYES: '#6b4a1e', NOSE: '#d98c8c' } },
 ];
