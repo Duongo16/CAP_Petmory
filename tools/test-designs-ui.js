@@ -1,3 +1,4 @@
+const { petWithPhotos } = require('./lib/made-to-order');
 /**
  * Browser test of the "My designs" page and of the cart telling which design
  * each line carries: list, preview pictures, rename without losing paint, add
@@ -53,10 +54,12 @@ async function run() {
     const products = await (await page.request.get(`${API}/catalog/products`, auth)).json();
     const product = products.find((p) => p.enabled && p.sizes.some((s) => s.enabled));
     const size = product.sizes.find((s) => s.enabled);
+    // Hang tuy bien can mot be du anh (muc 7).
+    const petId = await petWithPhotos(token, size.minPhotos ?? 4, 'Mun');
     const ready = await (await page.request.post(`${API}/designs`, {
       ...auth,
       data: {
-        name: 'Mun deo vong', modelCode: 'Q-PUG', productTypeCode: product.code, sizeCode: size.code,
+        name: 'Mun deo vong', modelCode: 'Q-PUG', productTypeCode: product.code, sizeCode: size.code, pet: petId,
         engraving: { name: 'Mun' }, stand: { baseCode: 'BASE-ROUND', tone: 'OAK', decorations: ['HEART'] },
         paint: [{ mesh: 'Pug', color: 'aabbccddeeff' }],
       },

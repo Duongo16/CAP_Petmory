@@ -1,3 +1,4 @@
+const { samplePhoto: extraPhoto } = require('./lib/made-to-order');
 /**
  * Kiem thu ho so san xuat day du (SOW muc 11): anh tham chieu hien thanh anh,
  * mo hinh 3D do duoc kich thuoc, bang thong so kich co, phu kien, dac diem
@@ -50,6 +51,13 @@ async function run() {
     });
     const photo = await upload.json();
     res.push(check('The customer photo is uploaded', upload.ok(), String(upload.status())));
+    // Kich co Vua can bon anh (muc 7): tai them ba tam nua.
+    for (let at = 1; at <= 3; at += 1) {
+      await api.post(`${API}/pet-photos/${pet._id}`, {
+        headers: auth,
+        multipart: { file: { name: `bap-${at}.jpg`, mimeType: 'image/jpeg', buffer: await extraPhoto(at) } },
+      });
+    }
     const design = await (await api.post(`${API}/designs`, {
       headers: auth,
       data: {

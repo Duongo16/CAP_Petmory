@@ -29,6 +29,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const message = this.readMessage(exception, status);
+    const code = this.readCode(exception);
 
     if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(`${traceId} ${request.method} ${request.url}`, exception as Error);
@@ -39,9 +40,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
       traceId,
       status,
       message,
+      // Ma loi nghiep vu (neu co) de giao dien noi dung cho can sua, khong phai doan chu.
+      ...(code ? { code } : {}),
       path: request.url,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  private readCode(exception: unknown): string | null {
+    if (!(exception instanceof HttpException)) {
+      return null;
+    }
+    const body = exception.getResponse();
+    const code = typeof body === 'object' && body !== null ? (body as Record<string, unknown>).code : null;
+    return typeof code === 'string' && /^[A-Z_]{2,40}$/.test(code) ? code : null;
   }
 
   private readMessage(exception: unknown, status: number): string | string[] {

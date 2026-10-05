@@ -289,21 +289,10 @@
                   <span>{{ 'STUDIO.ENGRAVED_NAME' | translate }}</span>
                   <input type="text" formControlName="engravedName" maxlength="60" class="tw-input" />
                 </label>
-                <div class="field-row">
-                  <label class="field">
-                    <span>{{ 'STUDIO.MEMORIAL_DATE' | translate }}</span>
-                    <input type="date" formControlName="memorialDate" class="tw-input" />
-                  </label>
-                  <label class="field">
-                    <span>{{ 'STUDIO.PET_LABEL' | translate }}</span>
-                    <select formControlName="petId" class="tw-select">
-                      <option value="">{{ 'STUDIO.PET_NONE' | translate }}</option>
-                      @for (pet of facade.pets(); track pet._id) {
-                        <option [value]="pet._id">{{ pet.name }}</option>
-                      }
-                    </select>
-                  </label>
-                </div>
+                <label class="field">
+                  <span>{{ 'STUDIO.MEMORIAL_DATE' | translate }}</span>
+                  <input type="date" formControlName="memorialDate" class="tw-input" />
+                </label>
                 <label class="field">
                   <span>{{ 'STUDIO.MESSAGE' | translate }}</span>
                   <textarea formControlName="message" rows="2" maxlength="300" class="tw-textarea"></textarea>
@@ -318,6 +307,31 @@
                   <input type="text" formControlName="name" maxlength="100" class="tw-input" />
                 </label>
               </div>
+            }
+
+            @case ('PHOTOS') {
+              <h2 class="panel-title">{{ 'STUDIO.PANEL.PHOTOS' | translate }}</h2>
+              <p class="hint">{{ 'STUDIO.PHOTOS_SUB' | translate }}</p>
+              <div class="form" [formGroup]="facade.form">
+                <label class="field">
+                  <span>{{ 'STUDIO.PET_LABEL' | translate }}</span>
+                  <select id="studio-pet" formControlName="petId" class="tw-select">
+                    <option value="">{{ 'STUDIO.PET_NONE' | translate }}</option>
+                    @for (pet of facade.pets(); track pet._id) {
+                      <option [value]="pet._id">{{ pet.name }}</option>
+                    }
+                  </select>
+                </label>
+              </div>
+              @if (facade.pets().length === 0) {
+                <a class="suggest-link" routerLink="/pets">{{ 'STUDIO.PET_CREATE' | translate }}</a>
+              }
+              @if (facade.petChosen(); as pet) {
+                <p class="photo-need" [class.ok]="facade.photosReady()" id="studio-photo-need">
+                  {{ 'STUDIO.PHOTOS_NEED' | translate: { have: facade.photoCount() ?? 0, need: facade.minPhotos() } }}
+                </p>
+                <pm-pet-photos [petId]="pet" (changed)="facade.refreshPhotos()" />
+              }
             }
 
             @case ('FINISH') {
@@ -429,6 +443,9 @@
             <button type="button" class="tw-btn-primary grow" [disabled]="!facade.canAddToCart()" (click)="addToCart()">
               <pm-icon name="cart" [size]="16" />{{ 'STUDIO.ADD_IN_HOUR' | translate }}
             </button>
+            @if (facade.chosenProduct() && !facade.photosReady()) {
+              <p class="cart-block" id="studio-cart-block">{{ 'STUDIO.CART_NEED_PHOTOS_HINT' | translate: { need: facade.minPhotos() } }}</p>
+            }
           } @else {
             <button type="button" class="tw-btn-secondary" [disabled]="isFirst()" (click)="back()">
               {{ 'STUDIO.BACK' | translate }}

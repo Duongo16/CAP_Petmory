@@ -1,3 +1,4 @@
+const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Internal operations API test: order list, filtering, search, status changes,
  * customer profiles and the permission split between the three internal groups.
@@ -50,11 +51,7 @@ async function makeCustomerWithOrder(fullName) {
   });
   const token = dk.body.accessToken;
 
-  await call('/cart/items', {
-    method: 'POST',
-    headers: authHeaders(token),
-    body: JSON.stringify({ productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 1 }),
-  });
+  await addCustomLine(token, { productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 1 });
   const order = await call('/orders', {
     method: 'POST',
     headers: authHeaders(token),

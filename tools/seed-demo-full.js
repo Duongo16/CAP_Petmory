@@ -1,3 +1,4 @@
+const { addCustomLine, ensurePhotos, minPhotosOf } = require('./lib/made-to-order');
 /**
  * Lam day tai khoan khach hang demo (khachhang@petmory.local) bang du lieu
  * nhu that: ba be voi anh va nhat ky, ba ban thiet ke len, sau don hang o du
@@ -133,7 +134,7 @@ const DESIGNS = [
   { key: 'mochi', pet: 'mochi', name: 'Mochi cười híp mắt', modelCode: 'Q-SHIBA', productTypeCode: 'PT-01', sizeCode: 'FIG-M',
     zonePaint: { MAIN_FUR: 'WOOL-Y02', BELLY_FUR: 'WOOL-W01', EAR: 'WOOL-Y02', TAIL: 'WOOL-W02', EYE: 'WOOL-K01', NOSE: 'WOOL-NS01' },
     engraving: { name: 'MOCHI', message: 'Cậu Shiba của phố Hàng Bút' } },
-  { key: 'bong', pet: 'bong', name: 'Móc khóa Bông lông trắng', modelCode: 'TEMP-CAT', productTypeCode: 'PT-02', sizeCode: 'KEY-S',
+  { key: 'bong', pet: 'bong', name: 'Móc khóa Bông lông trắng', modelCode: 'BASE-CAT-SIT', productTypeCode: 'PT-02', sizeCode: 'KEY-S',
     zonePaint: { MAIN_FUR: 'WOOL-W01', BELLY_FUR: 'WOOL-W02', EAR: 'WOOL-AC02', TAIL: 'WOOL-W01', EYE: 'WOOL-EY03', NOSE: 'WOOL-NS02' },
     engraving: { name: 'BÔNG' } },
   { key: 'vang', pet: 'vang', name: 'Vàng dưới gốc bưởi', modelCode: 'TEMP-DOG', productTypeCode: 'PT-05', sizeCode: 'BOX-M',
@@ -248,7 +249,7 @@ async function seedDesigns(token, pets) {
       engraving: one.engraving,
       pet: pets[one.pet].id,
     })), `thiet ke ${one.name}`);
-    designs[one.key] = { id: made._id, productTypeCode: one.productTypeCode, sizeCode: one.sizeCode };
+    designs[one.key] = { id: made._id, productTypeCode: one.productTypeCode, sizeCode: one.sizeCode, petId: pets[one.pet].id };
   }
   console.log(`  + ${DESIGNS.length} ban thiet ke`);
   return designs;
@@ -258,6 +259,13 @@ async function fillCart(token, plan, designs) {
   await call('/cart', { method: 'DELETE', headers: auth(token) });
   for (const line of plan.made ?? []) {
     const design = line.design ? designs[line.design] : null;
+    // Hang tuy bien can ban thiet ke va du anh (muc 7).
+    if (!design) {
+      const added = await addCustomLine(token, { productTypeCode: line.productTypeCode, sizeCode: line.sizeCode, petName: line.petName });
+      must({ status: added.status, body: added.body, text: JSON.stringify(added.body) }, 'gio: hang lam theo yeu cau');
+      continue;
+    }
+    await ensurePhotos(token, design.petId, await minPhotosOf(design.productTypeCode, design.sizeCode));
     must(await call('/cart/items', asJson(token, {
       productTypeCode: design?.productTypeCode ?? line.productTypeCode,
       sizeCode: design?.sizeCode ?? line.sizeCode,

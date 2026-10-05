@@ -1,3 +1,4 @@
+const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Kiem thu quan tri don va khach (SOW muc 10): doi trang thai bang tay bat buoc
  * ly do, bo duoc co can xu ly kem ghi chu, danh sach khach khong lan tai khoan
@@ -33,7 +34,7 @@ async function run() {
     })).json();
     const auth = { Authorization: `Bearer ${made.accessToken}` };
     const manager = { Authorization: `Bearer ${(await (await api.post(`${API}/auth/login`, { data: MANAGER })).json()).accessToken}` };
-    await api.post(`${API}/cart/items`, { headers: auth, data: { productTypeCode: 'PT-01', sizeCode: 'FIG-M', quantity: 1 } });
+    await addCustomLine(made.accessToken, { productTypeCode: 'PT-01', sizeCode: 'FIG-M', quantity: 1 });
     const order = await (await api.post(`${API}/orders`, {
       headers: auth, data: { fullName: 'Don Quan Tri', phone: '0901234567', address: '2 Duong Don', province: 'Hue' },
     })).json();

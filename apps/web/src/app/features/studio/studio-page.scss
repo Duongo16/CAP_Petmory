@@ -1088,3 +1088,26 @@ ul {
   font-size: var(--pm-text-sm);
   color: var(--pm-text-muted);
 }
+
+// --- Anh cua be ---
+
+.photo-need,
+.cart-block {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+
+  &.ok {
+    background: var(--pm-accent-soft);
+    color: var(--pm-ink);
+  }
+}
+
+.cart-block {
+  flex-basis: 100%;
+  margin: 0;
+}

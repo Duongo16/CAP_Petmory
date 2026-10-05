@@ -1,3 +1,4 @@
+const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Kiem thu dong hang co san (Phu luc 01 muc 23, Dieu 2).
  *
@@ -225,9 +226,7 @@ async function run() {
 
   // --- NT-23.6 Ngay giao lay theo dong hang lau nhat ---
   await call('/cart', { method: 'DELETE', ...withToken(mine) });
-  await call('/cart/items', asJson(mine, {
-    productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 1,
-  }));
+  await addCustomLine(mine, { productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 1 });
   await call('/cart/goods', asJson(mine, {
     goodsCode: 'G-HOP-QUA', sku: 'HOP-NHO', quantity: 1,
   }));

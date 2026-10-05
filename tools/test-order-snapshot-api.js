@@ -1,3 +1,4 @@
+const { petWithPhotos } = require('./lib/made-to-order');
 /**
  * Kiem thu ban chup thiet ke trong don (SOW muc 7, 11): khach sua anh xem truoc
  * cua ban thiet ke sau khi dat hang thi ho so xuong van hien anh luc dat.
@@ -46,9 +47,10 @@ async function run() {
   }));
   const token = made.accessToken;
   const head = { 'content-type': 'application/json', Authorization: `Bearer ${token}` };
+  const petId = await petWithPhotos(token, 4, 'Be ban chup');
   const design = await json(await fetch(`${API}/designs`, {
     method: 'POST', headers: head,
-    body: JSON.stringify({ name: 'Ban chup', modelCode: 'BASE-DOG-STAND', productTypeCode: 'PT-01', sizeCode: 'FIG-M' }),
+    body: JSON.stringify({ name: 'Ban chup', modelCode: 'BASE-DOG-STAND', productTypeCode: 'PT-01', sizeCode: 'FIG-M', pet: petId }),
   }));
   const first = await upload(token, design._id, 'FRONT', await square(200, 30, 30));
   check('The first preview is uploaded', first.ok, String(first.status));

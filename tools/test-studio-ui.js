@@ -1,3 +1,6 @@
+const { petWithPhotos } = require('./lib/made-to-order');
+
+let PET_ID = '';
 /**
  * Browser test of the "yarn table" customiser: one screen, a stage on the left
  * and a tabbed drawer on the right.
@@ -42,9 +45,11 @@ function tabOpen(page) {
 }
 
 async function signIn(page) {
-  await page.request.post(`${API}/auth/register`, {
+  const made = await (await page.request.post(`${API}/auth/register`, {
     data: { email: EMAIL, password: PASSWORD, fullName: 'Studio test' },
-  });
+  })).json();
+  // Hang tuy bien can mot be du anh (muc 7).
+  PET_ID = await petWithPhotos(made.accessToken, 4, 'Be studio');
   await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await page.fill('input[formcontrolname="email"]', EMAIL);
   await page.fill('input[formcontrolname="password"]', PASSWORD);
@@ -79,7 +84,7 @@ async function run() {
 
     const overflow = await page.evaluate(() => document.scrollingElement.scrollHeight - window.innerHeight);
     res.push(check('The workbench fits on one screen without page scroll', overflow <= 2, `${overflow}px extra`));
-    res.push(check('All four tabs are shown', (await page.locator('.tab').count()) === 4));
+    res.push(check('All five tabs are shown', (await page.locator('.tab').count()) === 5));
     res.push(check('The first tab is open', (await tabOpen(page)) === 1));
 
     const countModel = await page.locator('.model').count();
@@ -188,8 +193,13 @@ async function run() {
     await page.waitForTimeout(800);
     await page.screenshot({ path: path.join(OUT, 'studio-3b-stand.png') });
 
-    // --- Tab 4: wrap up, photos are taken by themselves ---
-    await page.locator('.tab').nth(3).click();
+    // --- Tab 4: anh cua be ---
+    await page.locator('.tab[data-step="PHOTOS"]').click();
+    await page.selectOption('#studio-pet', PET_ID);
+    await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
+
+    // --- Tab 5: wrap up, photos are taken by themselves ---
+    await page.locator('.tab[data-step="FINISH"]').click();
     await page.waitForSelector('.photo', { timeout: 15000 });
     await page.waitForTimeout(600);
     const countPhoto = await page.locator('.photo').count();
@@ -223,7 +233,7 @@ async function run() {
 
     await page.locator('.drawer .tab').nth(2).click();
     await page.locator('.tone').nth(0).click();
-    await page.locator('.drawer .tab').nth(3).click();
+    await page.locator('.drawer .tab[data-step="FINISH"]').click();
     await page.waitForTimeout(400);
     res.push(check('Changing the stand after saving asks for another save',
       (await page.locator('.note.warn').count()) === 1

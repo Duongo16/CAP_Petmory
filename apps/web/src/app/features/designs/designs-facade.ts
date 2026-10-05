@@ -44,6 +44,8 @@ export interface DesignCard {
  * them vao gio. Gio hang doc tu dich vu dung chung, nen the biet ban nao dang
  * nam trong gio ma khong phai hoi them may chu.
  */
+import { cartErrorKey } from '../studio/studio-facade';
+
 @Injectable()
 export class DesignsFacade {
   private readonly http = inject(HttpClient);
@@ -203,7 +205,8 @@ export class DesignsFacade {
       },
       error: (trouble: HttpErrorResponse) => {
         this.busyId.set(null);
-        this.problem.set(trouble.status === 409 ? 'DESIGNS.ERROR_IN_CART' : 'COMMON.GENERIC_ERROR');
+        const code = (trouble.error as { code?: string } | null)?.code;
+        this.problem.set(trouble.status === 409 ? 'DESIGNS.ERROR_IN_CART' : cartErrorKey(code));
       },
     });
   }

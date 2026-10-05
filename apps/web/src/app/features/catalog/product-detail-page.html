@@ -162,19 +162,14 @@
 
             <!-- Buy -->
             <div class="flex items-center gap-3 flex-wrap">
-              <div class="inline-flex items-center gap-1 min-h-11 p-1 border-[1.5px] border-edge rounded-md bg-card" role="group" [attr.aria-label]="'PRODUCT.QUANTITY' | translate">
-                <button type="button" class="w-9 h-9 border-0 rounded-sm bg-muted text-ink text-base cursor-pointer hover:bg-accent-soft disabled:opacity-40 disabled:cursor-not-allowed" (click)="changeQuantity(-1)" [disabled]="quantity() <= 1">−</button>
-                <span class="min-w-7 text-lg font-bold text-center">{{ quantity() }}</span>
-                <button type="button" class="w-9 h-9 border-0 rounded-sm bg-muted text-ink text-base cursor-pointer hover:bg-accent-soft" (click)="changeQuantity(1)">+</button>
-              </div>
               <button
                 type="button"
                 class="to-cart tw-btn-primary flex-1 min-w-48"
-                [disabled]="pendingAdd() || !sizeSelected()"
+                [disabled]="!sizeSelected()"
                 (click)="addToCart()"
               >
-                <pm-icon name="cart" [size]="16" />
-                {{ 'PRODUCT.ADD_IN_HOUR' | translate }}
+                <pm-icon name="star" [size]="16" />
+                {{ 'PRODUCT.START_DESIGN' | translate }}
               </button>
             </div>
 

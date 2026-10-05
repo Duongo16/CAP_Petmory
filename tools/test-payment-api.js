@@ -1,3 +1,4 @@
+const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Ordering and payment flow test at the API level.
  * Also covers the awkward cases: wrong shared secret, duplicate notification, short payment.
@@ -41,11 +42,7 @@ async function run() {
   check('Create an account', dk.status === 201);
 
         // --- Cart ---
-  const add = await call('/cart/items', {
-    method: 'POST',
-    headers: auth,
-    body: JSON.stringify({ productTypeCode: 'PT-01', sizeCode: 'FIG-M', quantity: 2 }),
-  });
+  const add = await addCustomLine(token, { productTypeCode: 'PT-01', sizeCode: 'FIG-M', quantity: 2 });
   check('Add to the cart', add.status === 201, `total ${add.body.total}`);
   check('The cart totals correctly', add.body.total === '1500000');
 
@@ -168,7 +165,7 @@ async function run() {
 
   /** Dat mot don moi mot mon, tra ve ma tham chieu. */
   async function newOrder() {
-    await call('/cart/items', { method: 'POST', headers: auth, body: JSON.stringify({ productTypeCode: 'PT-01', sizeCode: 'FIG-M', quantity: 1 }) });
+    await addCustomLine(token, { productTypeCode: 'PT-01', sizeCode: 'FIG-M', quantity: 1 });
     const made = await call('/orders', {
       method: 'POST',
       headers: auth,

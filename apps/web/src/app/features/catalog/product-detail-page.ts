@@ -1,4 +1,4 @@
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,7 +16,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs';
 import { CatalogService } from '../../core/services/catalog.service';
-import { CartService } from '../../core/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
 import {
   DisplayBase,
@@ -58,7 +57,7 @@ export class ProductDetailPage implements OnInit {
   readonly inPopup = input(false);
 
   private readonly catalog = inject(CatalogService);
-  private readonly cart = inject(CartService);
+  private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
   private readonly location = inject(Location);
   private readonly notification = inject(MatSnackBar);
@@ -70,7 +69,6 @@ export class ProductDetailPage implements OnInit {
   readonly product = signal<ProductType | null>(null);
   readonly sizeSelected = signal<ProductSize | null>(null);
   readonly quantity = signal(1);
-  readonly pendingAdd = signal(false);
   readonly favourite = signal(false);
   readonly descriptionOpen = signal(false);
 
@@ -173,9 +171,6 @@ export class ProductDetailPage implements OnInit {
     this.descriptionOpen.update((open) => !open);
   }
 
-  changeQuantity(step: number): void {
-    this.quantity.update((s) => Math.min(99, Math.max(1, s + step)));
-  }
 
   toggleFavourite(): void {
     this.catalog
@@ -184,31 +179,19 @@ export class ProductDetailPage implements OnInit {
       .subscribe({ next: (r) => this.favourite.set(r.favourite), error: () => undefined });
   }
 
+  /**
+   * Hang tuy bien lam theo anh va ban thiet ke cua tung be (muc 7), nen khong
+   * them thang vao gio: chuyen sang studio voi san pham, kich co va de da chon.
+   */
   addToCart(): void {
     const product = this.product();
     const size = this.sizeSelected();
-    if (!product || !size || this.pendingAdd()) {
+    if (!product || !size) {
       return;
     }
-    this.pendingAdd.set(true);
-    this.cart
-      .add({
-        productTypeCode: product.code,
-        sizeCode: size.code,
-        quantity: this.quantity(),
-        displayBaseCode: this.baseSelected()?.code,
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.pendingAdd.set(false);
-          this.openNotification('PRODUCT.ADDED');
-        },
-        error: () => {
-          this.pendingAdd.set(false);
-          this.openNotification('COMMON.GENERIC_ERROR');
-        },
-      });
+    void this.router.navigate(['/studio'], {
+      queryParams: { product: product.code, size: size.code, base: this.baseSelected()?.code || null },
+    });
   }
 
   sendReview(): void {

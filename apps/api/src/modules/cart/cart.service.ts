@@ -8,6 +8,7 @@ import { CatalogService } from '../catalog/catalog.service';
 import { DesignsService } from '../designs/designs.service';
 import { GoodsService } from '../goods/goods.service';
 import { MSG } from '../../common/constants/messages';
+import { PetPhoto, PetPhotoDocument } from '../photos/schemas/pet-photo.schema';
 
 /** Ban tom tat ban thiet ke gan voi mot dong hang, de gio hang cho biet dang mua mau nao. */
 export interface CartDesignView {
@@ -58,6 +59,7 @@ function addMoney(price: Types.Decimal128, delta?: Types.Decimal128 | null): Typ
 export class CartService {
   constructor(
     @InjectModel(Cart.name) private readonly model: Model<CartDocument>,
+    @InjectModel(PetPhoto.name) private readonly photoModel: Model<PetPhotoDocument>,
     private readonly catalog: CatalogService,
     private readonly designs: DesignsService,
     private readonly goods: GoodsService,
@@ -80,6 +82,7 @@ export class CartService {
     const design = dto.designId
       ? await this.designs.findOwned(dto.designId, owner)
       : null;
+    await this.checkReadyToMake(design, size.minPhotos);
 
     // The stand is looked up on the server too, so its price cannot be forged.
     const base = await this.catalog.findDisplayBase(dto.displayBaseCode);
@@ -140,6 +143,31 @@ export class CartService {
 
     await cart.save();
     return this.format(cart);
+  }
+
+  /**
+   * Hang tuy bien lam theo anh cua be (muc 7, 12): phai co ban thiet ke, ban
+   * thiet ke phai gan voi mot be, va be phai du so anh toi thieu cua kich co.
+   * Thieu thi tu choi kem ma loi rieng de man hinh noi dung cho can bo sung.
+   */
+  private async checkReadyToMake(design: Awaited<ReturnType<DesignsService['findOwned']>> | null, minPhotos: number): Promise<void> {
+    if (!design) {
+      throw new BadRequestException({ code: 'NEED_DESIGN', message: 'Can co ban thiet ke truoc khi them vao gio' });
+    }
+    if (!design.pet) {
+      throw new BadRequestException({ code: 'NEED_PET', message: 'Ban thiet ke can gan voi mot be' });
+    }
+    const have = await this.photoModel
+      .countDocuments({ pet: design.pet, isHidden: false, isRestored: false })
+      .exec();
+    if (have < minPhotos) {
+      throw new BadRequestException({
+        code: 'NEED_PHOTOS',
+        message: `Can it nhat ${minPhotos} anh cua be, hien co ${have}`,
+        need: minPhotos,
+        have,
+      });
+    }
   }
 
   /**

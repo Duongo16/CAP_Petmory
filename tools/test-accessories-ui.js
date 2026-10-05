@@ -1,3 +1,4 @@
+const { petWithPhotos } = require('./lib/made-to-order');
 /**
  * Kiem thu phu kien tu dau den cuoi (SOW muc 5, 6, 12): khach gan va thao phu kien
  * tren mau nen, moi diem neo mot mon, gioi han theo kich co, gia cong vao bao gia,
@@ -34,6 +35,7 @@ async function run() {
       data: { email: EMAIL, password: PASSWORD, fullName: 'Phu kien test' },
     })).json();
     const auth = { Authorization: `Bearer ${made.accessToken}` };
+    const petId = await petWithPhotos(made.accessToken, 4, 'Be phu kien');
     const catalog = await (await api.get(`${API}/catalog/accessories`)).json();
     const price = Object.fromEntries(catalog.map((one) => [one.code, digits(one.priceDelta.$numberDecimal ?? one.priceDelta)]));
     res.push(check('The shop lists six accessories', catalog.length === 6, String(catalog.length)));
@@ -77,6 +79,9 @@ async function run() {
     await page.screenshot({ path: path.join(OUT, 'accessories-studio.png') });
 
     await page.fill('input[formcontrolname="name"]', 'Cun ngoi co phu kien');
+    await page.locator('[data-step="PHOTOS"]').click();
+    await page.selectOption('#studio-pet', petId);
+    await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
     await page.locator('[data-step="FINISH"]').click();
     const expected = plain + price['ACC-BOW'] + price['ACC-COLLAR-TAG'] + price['ACC-GLASSES'];
     await page.waitForFunction((want) => Number((document.querySelector('.quote-price')?.textContent ?? '').replace(/\D/g, '')) === want,

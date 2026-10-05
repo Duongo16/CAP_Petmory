@@ -1,3 +1,4 @@
+const { petWithPhotos } = require('./lib/made-to-order');
 /**
  * Full browser test of the customiser flow: painting, capturing the six angles,
  * choosing a product and size, showing the real price, engraving, saving a draft,
@@ -78,9 +79,11 @@ async function run() {
     console.log('FULL CUSTOMISER FLOW TEST');
     console.log('='.repeat(66));
 
-    await page.request.post(`${API}/auth/register`, {
+    const registered = await (await page.request.post(`${API}/auth/register`, {
       data: { email: EMAIL, password: PASSWORD, fullName: 'Studio test' },
-    });
+    })).json();
+    // Hang tuy bien can mot be du anh (muc 7); tao san be Mun voi bon anh.
+    const petId = await petWithPhotos(registered.accessToken, 4, 'Mun');
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
     await page.fill('input[formcontrolname="email"]', EMAIL);
     await page.fill('input[formcontrolname="password"]', PASSWORD);
@@ -89,7 +92,8 @@ async function run() {
 
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
     await page.waitForSelector('.drawer .tab', { timeout: 40000 });
-    res.push(check('The customiser screen opens', (await page.locator('.drawer .tab').count()) === 4));
+    res.push(check('The customiser screen opens with the pet photos step', (await page.locator('.drawer .tab').count()) === 5
+      && (await page.locator('.drawer .tab[data-step="PHOTOS"]').count()) === 1));
 
                 // --- Painting, in step two ---
     await page.locator('.drawer .tab').nth(1).click();
@@ -100,7 +104,7 @@ async function run() {
 
                 // --- Capture the six angles ---
     await page.locator('.round-button.camera').click();
-    await page.locator('.drawer .tab').nth(3).click();
+    await page.locator('.drawer .tab[data-step="FINISH"]').click();
     await page.waitForSelector('.photo', { timeout: 30000 });
     res.push(check('All six preview angles are captured',
       (await page.locator('.photo').count()) === 6,
@@ -138,7 +142,12 @@ async function run() {
     await page.fill('input[formcontrolname="engravedName"]', 'Mun');
     await page.fill('input[formcontrolname="memorialDate"]', '2019-05-20');
     await page.fill('textarea[formcontrolname="message"]', 'Nho be nhieu lam');
-    await page.locator('.drawer .tab').nth(3).click();
+    // Buoc anh cua be: chon be, khung anh hien du so anh da tai.
+    await page.locator('.drawer .tab[data-step="PHOTOS"]').click();
+    await page.selectOption('#studio-pet', petId);
+    await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
+    res.push(check('The pet photos step confirms the pet has enough photos', true));
+    await page.locator('.drawer .tab[data-step="FINISH"]').click();
     await page.waitForSelector('.quote-price', { timeout: 20000 });
     await page.screenshot({ path: path.join(OUT, 'studio-full-1-final-step.png') });
 
@@ -200,7 +209,7 @@ async function run() {
       (await page.locator('input[formcontrolname="engravedName"]').inputValue()) === 'Mun'));
     res.push(check('Reopening the draft keeps the memorial date',
       (await page.locator('input[formcontrolname="memorialDate"]').inputValue()) === '2019-05-20'));
-    await page.locator('.drawer .tab').nth(3).click();
+    await page.locator('.drawer .tab[data-step="FINISH"]').click();
     await page.waitForSelector('.quote-price', { timeout: 30000 });
     // Mo ngan cuoi thi tu chup sau goc, cho chup xong de camera dung yen.
     await page.waitForSelector('.photo', { timeout: 30000 });
@@ -281,10 +290,10 @@ async function run() {
     res.push(check('The production file carries the engraving',
       wordItem.includes('Nho be nhieu lam'), wordItem.slice(0, 90).replace(SPLIT_LINES, ' / ')));
 
-    await page.waitForSelector('.photo-grid img', { timeout: 30000 });
+    await page.waitForSelector('.photo-grid:not(.reference-grid) img', { timeout: 30000 });
     res.push(check('The production file shows the six angles the customer approved',
-      (await page.locator('.photo-grid img').count()) === 6,
-      `${await page.locator('.photo-grid img').count()} photo`));
+      (await page.locator('.photo-grid:not(.reference-grid) img').count()) === 6,
+      `${await page.locator('.photo-grid:not(.reference-grid) img').count()} photo`));
     const standText = (await page.locator('.stand-line').first().innerText()).trim();
     res.push(check('The production file names the stand and its wood', standText.includes('Gỗ tròn')
       && standText.includes('óc chó'), standText));

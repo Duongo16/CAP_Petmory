@@ -6,10 +6,14 @@ import { CartController } from './cart.controller';
 import { CatalogModule } from '../catalog/catalog.module';
 import { DesignsModule } from '../designs/designs.module';
 import { GoodsModule } from '../goods/goods.module';
+import { PetPhoto, PetPhotoSchema } from '../photos/schemas/pet-photo.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Cart.name, schema: CartSchema }]),
+    MongooseModule.forFeature([
+      { name: Cart.name, schema: CartSchema },
+      { name: PetPhoto.name, schema: PetPhotoSchema },
+    ]),
     CatalogModule,
     DesignsModule,
     GoodsModule,

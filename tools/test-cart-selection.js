@@ -1,3 +1,4 @@
+const { addCustomLine } = require('./lib/made-to-order');
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
@@ -36,15 +37,10 @@ async function run() {
 
     // 2. Add two products to cart via API
     // First product: PT-01, size FIG-S
-    await page.request.post(`${API}/cart/items`, {
-      headers: { Authorization: `Bearer ${token}` },
-      data: { productTypeCode: 'PT-01', sizeCode: 'FIG-S', quantity: 1 },
-    });
+    // Hang tuy bien can ban thiet ke va du anh (muc 7), nen tao qua ham dung chung.
+    await addCustomLine(token, { productTypeCode: 'PT-01', sizeCode: 'FIG-S', quantity: 1 });
     // Second product: PT-02, size KEY-S
-    await page.request.post(`${API}/cart/items`, {
-      headers: { Authorization: `Bearer ${token}` },
-      data: { productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 2 },
-    });
+    await addCustomLine(token, { productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 2 });
     res.push(check('Added 2 distinct items to cart', true));
 
     // 3. Login through UI to set tokens in browser

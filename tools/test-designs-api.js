@@ -1,3 +1,4 @@
+const { samplePhoto } = require('./lib/made-to-order');
 /**
  * Design test: saving and reopening a draft, quoting from the server,
  * the six preview images, carrying a design through the cart into an order,
@@ -104,13 +105,19 @@ async function run() {
     headers: authHeaders(customer.token),
     body: JSON.stringify({ name: 'Shadow', kind: 'CAT' }),
   });
+  // Hang tuy bien can be du so anh toi thieu cua kich co (muc 7), nen tai truoc bon anh.
+  for (let at = 0; at < 4; at += 1) {
+    const form = new FormData();
+    form.append('file', new Blob([await samplePhoto(at)], { type: 'image/jpeg' }), `anh-${at}.jpg`);
+    await fetch(`${API}/pet-photos/${pet.body._id}`, { method: 'POST', headers: { Authorization: `Bearer ${customer.token}` }, body: form });
+  }
 
   const create = await call('/designs', {
     method: 'POST',
     headers: authHeaders(customer.token),
     body: JSON.stringify({
       name: 'Ban nhap cua Bong',
-      modelCode: 'TEMP-CAT',
+      modelCode: 'BASE-CAT-SIT',
       paint: PAINT_COLOR,
       colorCodesUsed: ['WOOL-W01', 'WOOL-B01', 'CODE-NOT-SIZE'],
       productTypeCode: 'PT-01',
@@ -148,7 +155,7 @@ async function run() {
       headers: authHeaders(customer.token),
       body: JSON.stringify({
         name: 'Thu du lieu xau',
-        modelCode: 'TEMP-CAT',
+        modelCode: 'BASE-CAT-SIT',
         productTypeCode: 'PT-01',
         sizeCode: 'FIG-M',
         ...part,
@@ -255,7 +262,7 @@ async function run() {
   const file = await call(`/admin/orders/${orderCode}/production-file`, { headers: authHeaders(managerToken) });
   check('The production file can be opened', file.status === 200, String(file.status));
   const item = file.body?.items?.[0];
-  check('The production file names the base model', item?.modelCode === 'TEMP-CAT', item?.modelCode);
+  check('The production file names the base model', item?.modelCode === 'BASE-CAT-SIT', item?.modelCode);
   check('The production file turns colour codes into readable names',
     item?.woolRolls?.length === 3 &&
       item.woolRolls[0].displayName === 'Trắng tuyết' &&
@@ -287,29 +294,15 @@ async function run() {
     (await call(`/admin/orders/${orderCode}/production-file`, { headers: authHeaders(customer.token) }))
       .status === 403);
 
-        // --- An order with no design must be reported as incomplete ---
+        // --- A made-to-order line without a design is refused (muc 7) ---
   const khach2 = await register('Khach khong thiet ke');
-  await call('/cart/items', {
+  const noDesign = await call('/cart/items', {
     method: 'POST',
     headers: authHeaders(khach2.token),
     body: JSON.stringify({ productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 1 }),
   });
-  const don2 = await call('/orders', {
-    method: 'POST',
-    headers: authHeaders(khach2.token),
-    body: JSON.stringify({
-      fullName: 'Khach khong thiet ke',
-      phone: '0911111111',
-      address: '1 Duong GHI',
-      province: 'Ha Noi',
-    }),
-  });
-  const hs2 = await call(`/admin/orders/${don2.body.orderCode}/production-file`, {
-    headers: authHeaders(managerToken),
-  });
-  check('Reports a missing design when the order has none',
-    (hs2.body?.missing ?? []).includes('NO_DESIGN'),
-    (hs2.body?.missing ?? []).join(','));
+  check('A made-to-order line without a design is refused', noDesign.status === 400 && noDesign.body?.code === 'NEED_DESIGN',
+    `${noDesign.status} ${noDesign.body?.code}`);
 
         // --- Editing and deleting a draft ---
   const update = await call(`/designs/${designId}`, {
@@ -317,7 +310,7 @@ async function run() {
     headers: authHeaders(customer.token),
     body: JSON.stringify({
       name: 'Ban nhap da sua',
-      modelCode: 'TEMP-CAT',
+      modelCode: 'BASE-CAT-SIT',
       productTypeCode: 'PT-01',
       sizeCode: 'FIG-L',
     }),
@@ -334,7 +327,7 @@ async function run() {
     headers: authHeaders(managerToken),
   });
   check('A placed order still reads its design after the customer deletes the draft',
-    fileAfterDelete.body?.items?.[0]?.modelCode === 'TEMP-CAT',
+    fileAfterDelete.body?.items?.[0]?.modelCode === 'BASE-CAT-SIT',
     fileAfterDelete.body?.items?.[0]?.modelCode);
 
   console.log('='.repeat(68));

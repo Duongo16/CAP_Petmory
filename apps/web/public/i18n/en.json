@@ -403,7 +403,8 @@
     "PROCESS_TITLE": "Four steps from photograph to keepsake",
     "PROCESS_TEXT": "You pick a model and paint it in 3D. The workshop receives a production file with the colour of each zone, six-angle photos and the engraving, then builds the frame and felts the shape. Handwork takes 7 to 14 days depending on size.",
     "CARE_TITLE": "Keeping a wool keepsake well",
-    "CARE_TEXT": "Keep it somewhere dry and out of long direct sunlight, since ultraviolet light fades wool. Brush dust away with a soft brush, or blow it off with a hairdryer on cool. Never wash or wring it. If a strand fluffs up, trim it close with small scissors rather than pulling it."
+    "CARE_TEXT": "Keep it somewhere dry and out of long direct sunlight, since ultraviolet light fades wool. Brush dust away with a soft brush, or blow it off with a hairdryer on cool. Never wash or wring it. If a strand fluffs up, trim it close with small scissors rather than pulling it.",
+    "START_DESIGN": "Start designing"
   },
   "MODEL": {
     "NOT_READY": "The 3D model is being prepared",
@@ -518,13 +519,15 @@
       "MODEL": "Pick",
       "COLOR": "Yarn",
       "FINISH": "Wrap up",
-      "STAND": "Stand & name"
+      "STAND": "Stand & name",
+      "PHOTOS": "Pet photos"
     },
     "PANEL": {
       "MODEL": "Who are we making today?",
       "COLOR": "Pick a yarn, then tap the plush",
       "FINISH": "Time to wrap it up!",
-      "STAND": "Pick a stand, engrave a name"
+      "STAND": "Pick a stand, engrave a name",
+      "PHOTOS": "Pet photos"
     },
     "SUGGEST_LINK": "Not sure? Send a photo for a suggestion",
     "TAG_PLACEHOLDER": "Pet name",
@@ -576,7 +579,14 @@
       }
     },
     "FEATURE_NOTE": "Distinctive features",
-    "FEATURE_NOTE_HINT": "For example: white spot on the left paw, right ear folds a little, two-coloured eyes..."
+    "FEATURE_NOTE_HINT": "For example: white spot on the left paw, right ear folds a little, two-coloured eyes...",
+    "PHOTOS_SUB": "Pick the pet this product is made from and upload enough photos. The workshop uses them to get the shape and colours right.",
+    "PET_CREATE": "Create a pet profile first",
+    "PHOTOS_NEED": "This pet has {{have}} photos; this size needs at least {{need}}.",
+    "CART_NEED_PHOTOS_HINT": "Link a pet with at least {{need}} photos in the Pet photos step before adding to the cart.",
+    "CART_NEED_DESIGN": "Save the design before adding it to the cart.",
+    "CART_NEED_PET": "The design needs a pet. Pick one in the Pet photos step and save again.",
+    "CART_NEED_PHOTOS": "The pet does not have enough photos for this size yet. Add more in the Pet photos step."
   },
   "HOME": {
     "BADGE": "HANDMADE • RECYCLED MATERIAL • 100% PERSONALISED",

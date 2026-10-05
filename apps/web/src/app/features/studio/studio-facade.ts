@@ -6,6 +6,7 @@ import { DesignsService } from '../../core/services/designs.service';
 import { CatalogService } from '../../core/services/catalog.service';
 import { CartService } from '../../core/services/cart.service';
 import { PetsService } from '../../core/services/pets.service';
+import { PhotosService } from '../../core/services/photos.service';
 import {
   Quote,
   PreviewAngle,
@@ -55,6 +56,7 @@ export class StudioFacade {
   private readonly catalog = inject(CatalogService);
   private readonly cart = inject(CartService);
   private readonly petsService = inject(PetsService);
+  private readonly photosService = inject(PhotosService);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -80,6 +82,43 @@ export class StudioFacade {
     message: ['', [Validators.maxLength(300)]],
     featureNote: ['', [Validators.maxLength(500)]],
   });
+
+  /** Be dang gan voi ban thiet ke; hang tuy bien lam theo anh cua chinh be nay. */
+  readonly petChosen = signal('');
+
+  /** So anh goc cua be dang chon; rong khi chua biet. */
+  readonly photoCount = signal<number | null>(null);
+
+  /** So anh toi thieu cua kich co dang chon (muc 7, 12). */
+  readonly minPhotos = computed(() => {
+    const fromQuote = this.quote()?.minPhotos;
+    if (fromQuote !== undefined) {
+      return fromQuote;
+    }
+    return this.sizes().find((one) => one.code === this.sizeCodeSelected())?.minPhotos ?? 0;
+  });
+
+  /** Da gan be va be du anh cho kich co nay chua. */
+  readonly photosReady = computed(() => {
+    const have = this.photoCount();
+    return Boolean(this.petChosen()) && have !== null && have >= this.minPhotos();
+  });
+
+  /** Dem lai anh cua be dang chon, goi sau khi doi be hoac vua tai them anh. */
+  refreshPhotos(): void {
+    const pet = this.form.controls.petId.value;
+    if (!pet) {
+      this.photoCount.set(null);
+      return;
+    }
+    this.photosService
+      .list(pet)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (rows) => this.photoCount.set(rows.filter((one) => !one.isRestored).length),
+        error: () => this.photoCount.set(null),
+      });
+  }
 
   /** The customer's pet profiles, so a design can be tied to one of them. */
   readonly pets = signal<Pet[]>([]);
@@ -127,11 +166,25 @@ export class StudioFacade {
   );
 
   readonly canAddToCart = computed(
-    () => this.chosenProduct() && this.designId() !== null && !this.addedToCart() && !this.standDirty(),
+    () =>
+      this.chosenProduct() &&
+      this.designId() !== null &&
+      !this.addedToCart() &&
+      !this.standDirty() &&
+      this.photosReady(),
   );
 
   /** Loads the pet profiles the design can be tied to. */
   loadPets(): void {
+    // Doi be thi dem lai anh; ban da luu gan voi be cu nen phai luu lai moi them vao gio.
+    this.form.controls.petId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((pet) => {
+      this.petChosen.set(pet);
+      this.refreshPhotos();
+      if (this.designId()) {
+        this.standDirty.set(true);
+        this.addedToCart.set(false);
+      }
+    });
     this.petsService
       .list()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -346,7 +399,7 @@ export class StudioFacade {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.addedToCart.set(true),
-        error: () => this.error.set('COMMON.GENERIC_ERROR'),
+        error: (trouble: { error?: { code?: string } }) => this.error.set(cartErrorKey(trouble?.error?.code)),
       });
   }
 
@@ -376,6 +429,10 @@ export class StudioFacade {
             message: tk.engraving?.message ?? '',
             featureNote: tk.featureNote ?? '',
           });
+          // Dat be ma khong phat su kien doi be, de ban vua mo khong bi coi la chua luu.
+          this.form.controls.petId.setValue(tk.pet ?? '', { emitEvent: false });
+          this.petChosen.set(tk.pet ?? '');
+          this.refreshPhotos();
           if (tk.productTypeCode && tk.sizeCode) {
             this.fetchQuote();
           }
@@ -384,4 +441,15 @@ export class StudioFacade {
         error: () => this.error.set('STUDIO.ERROR_OPEN_DRAFT'),
       });
   }
+}
+
+/** Ma loi may chu tra khi them hang tuy bien vao gio, doi ra cau de hieu. */
+const CART_ERROR: Record<string, string> = {
+  NEED_DESIGN: 'STUDIO.CART_NEED_DESIGN',
+  NEED_PET: 'STUDIO.CART_NEED_PET',
+  NEED_PHOTOS: 'STUDIO.CART_NEED_PHOTOS',
+};
+
+export function cartErrorKey(code: string | undefined): string {
+  return (code && CART_ERROR[code]) || 'COMMON.GENERIC_ERROR';
 }

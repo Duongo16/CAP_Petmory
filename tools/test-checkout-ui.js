@@ -1,3 +1,4 @@
+const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Browser test of the whole ordering flow, from the cart through to payment.
  * Run: node tools/test-checkout-ui.js
@@ -42,9 +43,9 @@ async function run() {
     console.log('ORDERING FLOW BROWSER TEST');
     console.log('='.repeat(64));
 
-    await page.request.post(`${API}/auth/register`, {
+    const registered = await (await page.request.post(`${API}/auth/register`, {
       data: { email: EMAIL, password: PASSWORD, fullName: 'Checkout test' },
-    });
+    })).json();
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
     await settle(page);
     await page.fill('input[formcontrolname="email"]', EMAIL);
@@ -56,9 +57,15 @@ async function run() {
     await page.goto(`${WEB}/products/PT-02`, { waitUntil: 'networkidle' });
     await settle(page);
     await page.waitForSelector('.picker .name', { timeout: 15000 });
-    await page.locator('button:has-text("Thêm vào giỏ hàng")').click();
-    await page.waitForTimeout(1200);
-    res.push(check('A product can be added to the cart', (await page.locator('a[href="/cart"] [role="status"]').innerText()) === '1'));
+    // Hang tuy bien khong them thang vao gio nua: nut dua sang studio voi san pham da chon (muc 7).
+    await page.locator('button.to-cart').click();
+    await page.waitForURL('**/studio?product=PT-02**', { timeout: 15000 });
+    res.push(check('The product page leads into the customiser with the product chosen', page.url().includes('size=')));
+    const line = await addCustomLine(registered.accessToken, { productTypeCode: 'PT-02', sizeCode: 'KEY-S', quantity: 1 });
+    await page.goto(`${WEB}/home`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('a[href="/cart"] [role="status"]', { timeout: 15000 });
+    res.push(check('A product can be added to the cart', line.status === 201
+      && (await page.locator('a[href="/cart"] [role="status"]').innerText()) === '1'));
 
                 // Move on to the details form
     await page.goto(`${WEB}/cart`, { waitUntil: 'networkidle' });
@@ -157,10 +164,7 @@ async function run() {
     const bearer = { Authorization: `Bearer ${access}` };
     const products = await (await page.request.get(`${API}/catalog/products`, { headers: bearer })).json();
     const product = products.find((p) => p.enabled && p.sizes.some((one) => one.enabled));
-    await page.request.post(`${API}/cart/items`, {
-      headers: bearer,
-      data: { productTypeCode: product.code, sizeCode: product.sizes.find((one) => one.enabled).code, quantity: 1 },
-    });
+    await addCustomLine(access, { productTypeCode: product.code, sizeCode: product.sizes.find((one) => one.enabled).code, quantity: 1 });
     const placed = await (await page.request.post(`${API}/orders`, {
       headers: bearer,
       data: { fullName: 'Nguyen Van B', phone: '0901234567', address: '12 Duong ABC, Phuong 1', province: 'Ha Noi' },

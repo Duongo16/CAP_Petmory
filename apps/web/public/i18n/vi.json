@@ -403,7 +403,8 @@
     "PROCESS_TITLE": "Bốn bước từ tấm ảnh đến kỷ vật",
     "PROCESS_TEXT": "Bạn chọn mẫu và tô màu trên mô hình 3D, xưởng nhận hồ sơ sản xuất gồm mã màu từng vùng, ảnh sáu góc và chữ khắc, rồi dựng phôi và chọc len định hình. Thời gian thủ công tùy kích cỡ, thường từ 7 đến 14 ngày.",
     "CARE_TITLE": "Giữ kỷ vật len bền đẹp",
-    "CARE_TEXT": "Đặt nơi khô ráo, tránh ánh nắng chiếu trực tiếp kéo dài vì tia cực tím làm phai màu len. Bụi bám thì dùng cọ mềm hoặc máy sấy chế độ gió mát thổi nhẹ, không giặt nước và không vắt. Nếu sợi len bị xù, dùng kéo nhỏ tỉa sát chứ đừng kéo sợi ra."
+    "CARE_TEXT": "Đặt nơi khô ráo, tránh ánh nắng chiếu trực tiếp kéo dài vì tia cực tím làm phai màu len. Bụi bám thì dùng cọ mềm hoặc máy sấy chế độ gió mát thổi nhẹ, không giặt nước và không vắt. Nếu sợi len bị xù, dùng kéo nhỏ tỉa sát chứ đừng kéo sợi ra.",
+    "START_DESIGN": "Bắt đầu tùy biến"
   },
   "MODEL": {
     "NOT_READY": "Mô hình 3D đang được chuẩn bị",
@@ -518,13 +519,15 @@
       "MODEL": "Chọn bé",
       "COLOR": "Tô len",
       "FINISH": "Gói quà",
-      "STAND": "Đế & tên"
+      "STAND": "Đế & tên",
+      "PHOTOS": "Ảnh của bé"
     },
     "PANEL": {
       "MODEL": "Hôm nay mình làm bé nào?",
       "COLOR": "Chọn len rồi chạm lên bé",
       "FINISH": "Gói bé lại thôi!",
-      "STAND": "Chọn đế, khắc tên cho bé"
+      "STAND": "Chọn đế, khắc tên cho bé",
+      "PHOTOS": "Ảnh của bé"
     },
     "SUGGEST_LINK": "Chưa biết chọn? Gửi ảnh để mình gợi ý",
     "TAG_PLACEHOLDER": "Tên bé",
@@ -576,7 +579,14 @@
       }
     },
     "FEATURE_NOTE": "Đặc điểm riêng của bé",
-    "FEATURE_NOTE_HINT": "Ví dụ: đốm trắng ở chân trái, tai phải hơi cụp, mắt hai màu..."
+    "FEATURE_NOTE_HINT": "Ví dụ: đốm trắng ở chân trái, tai phải hơi cụp, mắt hai màu...",
+    "PHOTOS_SUB": "Chọn bé mà sản phẩm làm theo và tải đủ ảnh. Xưởng dựa vào ảnh để làm đúng dáng và màu lông.",
+    "PET_CREATE": "Tạo hồ sơ bé trước",
+    "PHOTOS_NEED": "Bé có {{have}} ảnh, kích cỡ này cần ít nhất {{need}} ảnh.",
+    "CART_NEED_PHOTOS_HINT": "Cần gắn bé và đủ {{need}} ảnh ở bước Ảnh của bé trước khi thêm vào giỏ.",
+    "CART_NEED_DESIGN": "Hãy lưu bản thiết kế trước khi thêm vào giỏ.",
+    "CART_NEED_PET": "Bản thiết kế cần gắn với một bé. Chọn bé ở bước Ảnh của bé rồi lưu lại.",
+    "CART_NEED_PHOTOS": "Bé chưa đủ số ảnh tối thiểu của kích cỡ này. Hãy tải thêm ảnh ở bước Ảnh của bé."
   },
   "HOME": {
     "BADGE": "THỦ CÔNG • VẬT LIỆU TÁI CHẾ • 100% CÁ NHÂN HÓA",

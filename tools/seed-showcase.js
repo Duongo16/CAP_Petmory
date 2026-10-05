@@ -1,3 +1,4 @@
+const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Bo du lieu trinh dien nho nhung day du, di qua chinh API nhu nguoi dung that.
  *
@@ -536,7 +537,9 @@ async function seedOrders(people, boss) {
     const person = PEOPLE.find((one) => one.key === plan.by);
     await call('/cart', { method: 'DELETE', headers: auth(who.token) });
     if (plan.made) {
-      must(await call('/cart/items', asJson(who.token, { ...plan.made, quantity: 1 })), 'gio: hang lam theo yeu cau');
+      // Hang tuy bien can ban thiet ke gan voi mot be du anh (muc 7).
+      const added = await addCustomLine(who.token, { ...plan.made, quantity: 1 });
+      must({ status: added.status, body: added.body, text: JSON.stringify(added.body) }, 'gio: hang lam theo yeu cau');
     }
     for (const [goodsCode, sku, quantity] of plan.goods) {
       must(await call('/cart/goods', asJson(who.token, { goodsCode, sku, quantity })), `gio: ${goodsCode}`);

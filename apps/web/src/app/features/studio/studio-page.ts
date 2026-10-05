@@ -46,15 +46,16 @@ function isZero(value: string): boolean {
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
 /** Bon ngan do nghe cua ban len, theo thu tu nguoi dung di qua. */
-export type Step = 'MODEL' | 'COLOR' | 'STAND' | 'FINISH';
+export type Step = 'MODEL' | 'COLOR' | 'STAND' | 'PHOTOS' | 'FINISH';
 
-export const STEPS: Step[] = ['MODEL', 'COLOR', 'STAND', 'FINISH'];
+export const STEPS: Step[] = ['MODEL', 'COLOR', 'STAND', 'PHOTOS', 'FINISH'];
 
 /** Nhan va bieu tuong cua tung ngan, viet ra tung key de tim duoc. */
 const STEP_VIEW: Record<Step, { key: string; icon: string }> = {
   MODEL: { key: 'STUDIO.TAB.MODEL', icon: 'paw' },
   COLOR: { key: 'STUDIO.TAB.COLOR', icon: 'sparkle' },
   STAND: { key: 'STUDIO.TAB.STAND', icon: 'pencil' },
+  PHOTOS: { key: 'STUDIO.TAB.PHOTOS', icon: 'camera' },
   FINISH: { key: 'STUDIO.TAB.FINISH', icon: 'gift' },
 };
 
@@ -97,10 +98,12 @@ export interface ZoneView {
   colorSelected: string;
 }
 
+import { PetPhotos } from '../memories/pet-photos/pet-photos';
+
 @Component({
   selector: 'pm-studio-page',
   standalone: true,
-  imports: [Icon, Viewer3d, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe],
+  imports: [Icon, Viewer3d, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe, PetPhotos],
   providers: [StudioFacade],
   templateUrl: './studio-page.html',
   styleUrl: './studio-page.scss',
@@ -337,7 +340,21 @@ export class StudioPage implements OnInit {
   ngOnInit(): void {
     this.facade.loadCatalog();
     this.facade.loadPets();
-    const codeDraft = this.route.snapshot.queryParamMap.get('draft');
+    const query = this.route.snapshot.queryParamMap;
+    const codeDraft = query.get('draft');
+    // Tu trang san pham sang: chon san san pham, kich co va de khach vua chon.
+    const product = query.get('product');
+    if (!codeDraft && product) {
+      this.facade.selectKind(product);
+      const size = query.get('size');
+      if (size) {
+        this.facade.selectSize(size);
+      }
+      const base = query.get('base');
+      if (base) {
+        this.facade.selectBase(base);
+      }
+    }
     this.http
       .get<ModelLibrary>('/models/manifest.json')
       .pipe(takeUntilDestroyed(this.destroyRef))
