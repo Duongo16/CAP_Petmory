@@ -751,6 +751,7 @@ export interface AuditEntry {
   before: Record<string, unknown> | null;
   after: Record<string, unknown> | null;
   reason: string;
+  ipAddress?: string;
   createdAt: string;
 }
 

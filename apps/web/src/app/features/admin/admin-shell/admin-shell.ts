@@ -40,6 +40,9 @@ const ACCOUNT_STOPS: Stop[] = [
 /** Kiem duyet cong dong: nhom Quan tri vien theo hop dong, kem nhom Quan ly. */
 const MODERATION_STOP: Stop = { path: '/admin/moderation', key: 'NAV.MODERATION', icon: 'eye' };
 
+/** Nhat ky thao tac: Quan tri vien va Quan ly cung doc duoc. */
+const AUDIT_STOP: Stop = { path: '/admin/audit', key: 'NAV.AUDIT', icon: 'book' };
+
 /**
  * The frame every internal screen sits in: a side rail of destinations beside
  * the screen itself. The rail only hides what an account may not open. The
@@ -74,7 +77,7 @@ export class AdminShell {
   ]);
   readonly workshopStops = computed(() => (this.isManager() ? WORKSHOP_STOPS : []));
   readonly accountStops = computed(() => [
-    ...(this.isAccountAdmin() || this.isManager() ? [MODERATION_STOP] : []),
+    ...(this.isAccountAdmin() || this.isManager() ? [MODERATION_STOP, AUDIT_STOP] : []),
     ...(this.isAccountAdmin() ? ACCOUNT_STOPS : []),
   ]);
   readonly who = computed(() => this.auth.user()?.fullName ?? '');

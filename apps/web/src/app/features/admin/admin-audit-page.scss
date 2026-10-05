@@ -1,0 +1,133 @@
+.audit-filter {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  align-items: end;
+  margin-block-end: 14px;
+}
+
+.audit-field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8125rem;
+  color: var(--pm-text-muted);
+
+  input,
+  select {
+    inline-size: 100%;
+    min-block-size: 40px;
+    padding: 0 10px;
+    border: 1.5px solid var(--pm-border);
+    border-radius: 10px;
+    background: var(--pm-bg-card);
+    color: var(--pm-ink);
+    font: inherit;
+  }
+}
+
+.audit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.audit-count {
+  margin: 0 0 10px;
+  font-size: 0.875rem;
+  color: var(--pm-text-muted);
+}
+
+.audit-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.audit-row {
+  border: 1px solid var(--pm-border);
+  border-radius: 12px;
+
+  &.open {
+    border-color: var(--pm-accent);
+  }
+}
+
+.audit-line {
+  display: grid;
+  grid-template-columns: 170px 1fr auto;
+  gap: 12px;
+  inline-size: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--pm-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: start;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--pm-accent);
+    border-radius: 12px;
+  }
+}
+
+.audit-when,
+.audit-who {
+  color: var(--pm-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-what {
+  overflow-wrap: anywhere;
+}
+
+.audit-detail {
+  display: grid;
+  gap: 8px;
+  padding: 0 12px 12px;
+  font-size: 0.8125rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.audit-diff {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 0.8125rem;
+  }
+
+  pre {
+    max-block-size: 260px;
+    margin: 0;
+    padding: 8px;
+    overflow: auto;
+    border-radius: 8px;
+    background: var(--pm-bg-muted);
+    font-size: 0.75rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+.audit-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-block-start: 12px;
+}
+
+@media (max-width: 720px) {
+  .audit-line,
+  .audit-diff {
+    grid-template-columns: 1fr;
+  }
+}

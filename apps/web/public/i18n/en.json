@@ -57,7 +57,8 @@
     "ASSISTANT_KNOWLEDGE": "Assistant knowledge",
     "DESIGNS": "My designs",
     "MODERATION": "Community moderation",
-    "CATALOG": "Catalogue"
+    "CATALOG": "Catalogue",
+    "AUDIT": "Activity log"
   },
   "AUTH": {
     "QUICK": {
@@ -1819,6 +1820,22 @@
       "DUPLICATE": "This code already exists.",
       "INVALID": "Some fields are missing or invalid (codes use letters, digits and dashes; prices are whole dong).",
       "EMPTY": "Nothing here yet."
+    },
+    "AUDIT": {
+      "TITLE": "Activity log",
+      "SUB": "Who did what, on which record, when, with values before and after. The log is read-only.",
+      "RESOURCE": "Record type",
+      "ACTION": "Action",
+      "RESOURCE_ID": "Record id",
+      "FROM": "From",
+      "TO": "To",
+      "ALL": "All",
+      "RESET": "Clear filters",
+      "EMPTY": "No entries match the filters.",
+      "SYSTEM": "Written by the system",
+      "REASON": "Reason:",
+      "BEFORE": "Before",
+      "AFTER": "After"
     }
   },
   "FOOTER": {

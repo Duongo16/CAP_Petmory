@@ -57,7 +57,8 @@
     "ASSISTANT_KNOWLEDGE": "Kho tri thức trợ lý",
     "DESIGNS": "Thiết kế của tôi",
     "MODERATION": "Kiểm duyệt cộng đồng",
-    "CATALOG": "Danh mục"
+    "CATALOG": "Danh mục",
+    "AUDIT": "Nhật ký thao tác"
   },
   "AUTH": {
     "QUICK": {
@@ -1819,6 +1820,22 @@
       "DUPLICATE": "Mã này đã có rồi.",
       "INVALID": "Còn ô thiếu hoặc chưa đúng định dạng (mã chỉ gồm chữ, số, gạch ngang; giá là số nguyên đồng).",
       "EMPTY": "Chưa có mục nào."
+    },
+    "AUDIT": {
+      "TITLE": "Nhật ký thao tác",
+      "SUB": "Ai đã làm gì, trên dữ liệu nào, lúc nào, giá trị trước và sau. Nhật ký chỉ xem được, không sửa hay xoá được.",
+      "RESOURCE": "Loại dữ liệu",
+      "ACTION": "Hành động",
+      "RESOURCE_ID": "Mã dữ liệu",
+      "FROM": "Từ ngày",
+      "TO": "Đến ngày",
+      "ALL": "Tất cả",
+      "RESET": "Bỏ lọc",
+      "EMPTY": "Không có dòng nào khớp bộ lọc.",
+      "SYSTEM": "Hệ thống tự ghi",
+      "REASON": "Lý do:",
+      "BEFORE": "Trước",
+      "AFTER": "Sau"
     }
   },
   "FOOTER": {

@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsBoolean, IsDateString, IsEnum, IsInt, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderStatus } from '../../orders/schemas/order.schema';
 
@@ -73,4 +73,34 @@ export class CustomerSearchDto {
 export class QualityTickDto {
   @IsBoolean()
   done!: boolean;
+}
+
+/** Bo loc nhat ky thao tac. */
+export class AuditQueryDto {
+  @IsOptional()
+  @Matches(/^[A-Za-z]{1,40}$/)
+  resourceType?: string;
+
+  @IsOptional()
+  @Matches(/^[A-Z_]{1,60}$/)
+  action?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  resourceId?: string;
+
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @IsOptional()
+  @IsDateString()
+  to?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
 }

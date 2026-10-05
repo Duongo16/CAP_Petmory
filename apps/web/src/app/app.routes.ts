@@ -329,6 +329,11 @@ export const routes: Routes = [
               import('./features/admin/admin-payments-page').then((m) => m.AdminPaymentsPage),
           },
           {
+            path: 'audit',
+            canActivate: [moderatorGuard],
+            loadComponent: () => import('./features/admin/admin-audit-page').then((m) => m.AdminAuditPage),
+          },
+          {
             /*
              * Quan ly tai khoan la ranh gioi cua ba nhom quyen: chi nhom Quan
              * tri vien vao duoc, va nhom do khong mo duoc man hinh nao khac.

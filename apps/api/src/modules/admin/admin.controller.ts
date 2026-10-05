@@ -7,6 +7,7 @@ import { PreviewAngle } from '../designs/schemas/design.schema';
 import {
   ChangeStatusDto,
   ClearAttentionDto,
+  AuditQueryDto,
   OrderFilterDto,
   CustomerSearchDto,
   QualityTickDto,
@@ -101,6 +102,26 @@ export class AdminController {
     @CurrentUser() user: AuthUser,
   ) {
     return this.service.changeOrderStatus(orderCode, dto.status, user.userId, dto.reason.trim());
+  }
+
+  /** Nhat ky thao tac (muc 14): Quan tri vien va Quan ly doc duoc, khong ai sua duoc. */
+  @Roles(Role.ADMIN, Role.MANAGER)
+  @Get('audit')
+  auditLog(@Query() query: AuditQueryDto) {
+    return this.audit.search({
+      resourceType: query.resourceType,
+      action: query.action,
+      resourceId: query.resourceId,
+      from: query.from ? new Date(query.from) : undefined,
+      to: query.to ? new Date(query.to) : undefined,
+      page: query.page,
+    });
+  }
+
+  @Roles(Role.ADMIN, Role.MANAGER)
+  @Get('audit/facets')
+  auditFacets() {
+    return this.audit.facets();
   }
 
   /** Bo co can xu ly khi nhan vien da xu ly xong, kem ghi chu. */

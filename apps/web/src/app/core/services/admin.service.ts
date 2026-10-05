@@ -3,20 +3,21 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE } from './api-base';
 import {
+  AdminOrderDetail,
+  AuditEntry,
   BusinessConfig,
+  CustomerProfile,
+  CustomerRow,
   DiaryModerationPage,
   MusicTrack,
-  AdminOrderDetail,
   Order,
-  CustomerRow,
-  CustomerProfile,
-  ProductionFile,
   OrderFilter,
-  UpdateBusinessConfig,
-  TransferNotification,
-  ReconcileSummary,
-  PageResult,
   OrderStatus,
+  PageResult,
+  ProductionFile,
+  ReconcileSummary,
+  TransferNotification,
+  UpdateBusinessConfig,
 } from '../models/api.model';
 
 @Injectable({ providedIn: 'root' })
@@ -55,6 +56,16 @@ export class AdminService {
       `${this.base}/admin/orders/${orderCode}/status`,
       { status, reason },
     );
+  }
+
+  /** Doc nhat ky thao tac theo bo loc. */
+  auditLog(filter: Record<string, string | number>): Observable<PageResult<AuditEntry>> {
+    const params = Object.fromEntries(Object.entries(filter).filter(([, value]) => value !== '' && value !== undefined));
+    return this.http.get<PageResult<AuditEntry>>(`${this.base}/admin/audit`, { params });
+  }
+
+  auditFacets(): Observable<{ resourceType: string[]; action: string[] }> {
+    return this.http.get<{ resourceType: string[]; action: string[] }>(`${this.base}/admin/audit/facets`);
   }
 
   /** Bo co can xu ly tren don, kem ghi chu da xu ly the nao. */

@@ -1,0 +1,99 @@
+<div class="pm-page-head">
+  <div class="pm-page-head-text">
+    <h1 class="title pm-page-title">{{ 'ADMIN.AUDIT.TITLE' | translate }}</h1>
+    <p class="description">{{ 'ADMIN.AUDIT.SUB' | translate }}</p>
+  </div>
+</div>
+
+<form class="pm-card tw-card-pad audit-filter" [formGroup]="filter" (submit)="$event.preventDefault(); search()">
+  <label class="audit-field">
+    <span>{{ 'ADMIN.AUDIT.RESOURCE' | translate }}</span>
+    <select id="audit-resource" formControlName="resourceType">
+      <option value="">{{ 'ADMIN.AUDIT.ALL' | translate }}</option>
+      @for (one of resourceTypes(); track one) {
+        <option [value]="one">{{ one }}</option>
+      }
+    </select>
+  </label>
+  <label class="audit-field">
+    <span>{{ 'ADMIN.AUDIT.ACTION' | translate }}</span>
+    <select id="audit-action" formControlName="action">
+      <option value="">{{ 'ADMIN.AUDIT.ALL' | translate }}</option>
+      @for (one of actions(); track one) {
+        <option [value]="one">{{ one }}</option>
+      }
+    </select>
+  </label>
+  <label class="audit-field">
+    <span>{{ 'ADMIN.AUDIT.RESOURCE_ID' | translate }}</span>
+    <input id="audit-id" type="search" maxlength="80" formControlName="resourceId" />
+  </label>
+  <label class="audit-field">
+    <span>{{ 'ADMIN.AUDIT.FROM' | translate }}</span>
+    <input type="date" formControlName="from" />
+  </label>
+  <label class="audit-field">
+    <span>{{ 'ADMIN.AUDIT.TO' | translate }}</span>
+    <input type="date" formControlName="to" />
+  </label>
+  <div class="audit-actions">
+    <button type="submit" class="pm-button-primary audit-search">{{ 'ADMIN.FIND' | translate }}</button>
+    <button type="button" class="pm-button-secondary" (click)="reset()">{{ 'ADMIN.AUDIT.RESET' | translate }}</button>
+  </div>
+</form>
+
+<section class="pm-card tw-card-pad">
+  <p class="audit-count">{{ 'ADMIN.RESULT_COUNT' | translate: { count: total() } }}</p>
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+    }
+    @case ('READY') {
+      @if (view().length === 0) {
+        <p class="pm-empty">{{ 'ADMIN.AUDIT.EMPTY' | translate }}</p>
+      } @else {
+        <ul class="audit-list" id="audit-list">
+          @for (one of view(); track one.raw._id) {
+            <li class="audit-row" [class.open]="one.open">
+              <button type="button" class="audit-line" [attr.aria-expanded]="one.open" (click)="toggle(one.raw._id)">
+                <span class="audit-when">{{ one.raw.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+                <span class="audit-what"><strong>{{ one.raw.action }}</strong> · {{ one.raw.resourceType }} {{ one.raw.resourceId }}</span>
+                <span class="audit-who">{{ one.who || ('ADMIN.AUDIT.SYSTEM' | translate) }}</span>
+              </button>
+              @if (one.open) {
+                <div class="audit-detail">
+                  @if (one.raw.reason) {
+                    <p><strong>{{ 'ADMIN.AUDIT.REASON' | translate }}</strong> {{ one.raw.reason }}</p>
+                  }
+                  @if (one.raw.ipAddress) {
+                    <p><strong>IP</strong> {{ one.raw.ipAddress }}</p>
+                  }
+                  <div class="audit-diff">
+                    <div>
+                      <h3>{{ 'ADMIN.AUDIT.BEFORE' | translate }}</h3>
+                      <pre>{{ one.beforeText || '—' }}</pre>
+                    </div>
+                    <div>
+                      <h3>{{ 'ADMIN.AUDIT.AFTER' | translate }}</h3>
+                      <pre>{{ one.afterText || '—' }}</pre>
+                    </div>
+                  </div>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+        @if (pageCount() > 1) {
+          <nav class="audit-pager">
+            <button type="button" class="pm-button-secondary" [disabled]="page() <= 1" (click)="goTo(page() - 1)">‹</button>
+            <span>{{ page() }} / {{ pageCount() }}</span>
+            <button type="button" class="pm-button-secondary audit-next" [disabled]="page() >= pageCount()" (click)="goTo(page() + 1)">›</button>
+          </nav>
+        }
+      }
+    }
+  }
+</section>
