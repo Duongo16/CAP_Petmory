@@ -59,6 +59,10 @@
             <pm-icon name="image" [size]="15" />
             {{ 'MEMORY.SLIDESHOW' | translate }}
           </a>
+          <a class="tool tw-btn-secondary story-link" [routerLink]="['/pets', facade.pet()?._id, 'story']">
+            <pm-icon name="sparkle" [size]="15" />
+            {{ 'MEMORY.STORY' | translate }}
+          </a>
           <button type="button" class="write tw-btn-primary" [disabled]="facade.pending()" (click)="openWriter()">
             <pm-icon name="bookmark" [size]="16" />
             {{ 'MEMORY.ADD' | translate }}

@@ -447,6 +447,27 @@ export interface DiaryCard {
   slide: { trackCode: string; effect: string; seconds: number };
 }
 
+/** Giong van cua cau chuyen AI, trung danh sach phia may chu. */
+export type StoryTone = 'WARM' | 'PLAYFUL' | 'TENDER' | 'SHORT';
+
+/** Mot ban cau chuyen ve mot be. Moi lan viet lai la mot ban moi. */
+export interface PetStory {
+  _id: string;
+  pet: string;
+  title: string;
+  content: string;
+  tone: StoryTone;
+  notes: string;
+  /** LIVE la ban do dich vu that viet, SAMPLE la ban ghep tu ho so. */
+  mode: 'LIVE' | 'SAMPLE' | 'LOCAL';
+  /** MACHINE la ban may viet, PERSON la ban chu da sua tay. */
+  hand: 'MACHINE' | 'PERSON';
+  version: number;
+  attachedMemory: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /** Mot ban nhac trong kho cua he thong, do Ben A cung cap kem ban quyen. */
 export interface MusicTrack {
   code: string;

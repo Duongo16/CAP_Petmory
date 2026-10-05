@@ -1116,7 +1116,8 @@
     "BACK": "Quay lại",
     "NEXT": "Tiếp tục",
     "SKIP_PHOTOS": "Bỏ qua ảnh",
-    "MAP_START": "Ngày {{name}} về nhà — nơi hành trình bắt đầu"
+    "MAP_START": "Ngày {{name}} về nhà — nơi hành trình bắt đầu",
+    "STORY": "Câu chuyện AI"
   },
   "TODAY": {
     "GREET_MORNING": "Chào buổi sáng, {{name}} ơi!",
@@ -2090,5 +2091,49 @@
     "SWITCH_TO": "Chuyển sang {{name}}",
     "VI": "Tiếng Việt",
     "EN": "English"
+  },
+  "STORY": {
+    "TITLE": "Câu chuyện của {{name}}",
+    "SUB": "Trợ lý viết một câu chuyện từ hồ sơ của bé và những ý bạn gợi. Mỗi lần viết lại là một bản mới, bản cũ vẫn được giữ để bạn so sánh.",
+    "NEW": "Viết bản mới",
+    "TONE_LABEL": "Giọng văn",
+    "TONE": {
+      "WARM": "Ấm áp",
+      "PLAYFUL": "Vui tươi",
+      "TENDER": "Lắng đọng",
+      "SHORT": "Ngắn gọn"
+    },
+    "NOTES": "Ý bạn muốn kể",
+    "NOTES_HINT": "Ví dụ: bé thích nằm phơi nắng ở bậu cửa, lần đầu đi biển rất sợ sóng...",
+    "WRITE": "Nhờ trợ lý viết",
+    "WRITING": "Đang viết...",
+    "QUOTA_LEFT": "Bạn còn {{count}} lượt viết trong kỳ này.",
+    "QUOTA_OVER": "Bạn đã dùng hết lượt viết câu chuyện trong kỳ này.",
+    "TOO_MANY": "Bé đã có tối đa 30 bản. Hãy bỏ bớt bản không dùng rồi viết tiếp.",
+    "GONE": "Không tìm thấy câu chuyện hoặc kỷ niệm này nữa.",
+    "VERSIONS": "Các bản đã viết ({{count}})",
+    "VERSION_NO": "Bản {{no}}",
+    "EMPTY": "Chưa có bản nào. Chọn giọng văn rồi nhờ trợ lý viết bản đầu tiên.",
+    "EDITED": "Đã sửa tay",
+    "SAMPLE": "Bản mẫu",
+    "IN_BOOK": "Đã gắn vào nhật ký",
+    "SAMPLE_NOTE": "Đây là bản ghép từ hồ sơ của bé vì trợ lý chưa kết nối được. Bạn vẫn có thể sửa lại cho vừa ý.",
+    "FIELD_TITLE": "Tiêu đề",
+    "FIELD_CONTENT": "Nội dung",
+    "EDIT_INVALID": "Tiêu đề và nội dung không được để trống.",
+    "SAVED": "Đã lưu bản sửa.",
+    "REMOVE": "Bỏ bản này",
+    "REMOVE_CONFIRM": "Chắc chắn bỏ",
+    "REWRITE_TITLE": "Viết lại từ bản này",
+    "REWRITE_HINT": "Gợi ý thêm cho lần viết lại (không bắt buộc)",
+    "REWRITE": "Viết lại",
+    "ATTACH_TITLE": "Gắn vào một khoảnh khắc",
+    "PICK_MOMENT": "Chọn khoảnh khắc trong nhật ký",
+    "ATTACH_HINT": "Nội dung khoảnh khắc sẽ được thay bằng câu chuyện này.",
+    "ATTACH": "Gắn vào nhật ký",
+    "ATTACHED": "Đã gắn câu chuyện vào nhật ký.",
+    "ATTACHED_TO": "Đang gắn với: {{title}}",
+    "NO_MOMENTS": "Nhật ký chưa có khoảnh khắc nào để gắn.",
+    "BLANK": "Chọn một bản bên trái, hoặc viết bản mới."
   }
 }

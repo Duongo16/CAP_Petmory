@@ -1,0 +1,168 @@
+<div class="pm-page story-page">
+  <header class="head">
+    <a class="back tw-back" [routerLink]="['/pets', pet()?._id, 'journal']">
+      <pm-icon name="chevron" [size]="13" />
+      {{ 'MEMORY.BACK_TO_BOOK' | translate }}
+    </a>
+    <h1 class="pm-section-title pm-page-title">{{ 'STORY.TITLE' | translate: { name: pet()?.name } }}</h1>
+    <p class="sub">{{ 'STORY.SUB' | translate }}</p>
+  </header>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="tw-empty">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <p class="tw-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+    }
+    @case ('DONE') {
+      @if (problem(); as message) {
+        <p class="story-alert" role="alert">{{ message | translate }}</p>
+      }
+
+      <div class="story-layout">
+        <aside class="story-side">
+          <section class="tw-card story-new">
+            <h2 class="tw-card-title">{{ 'STORY.NEW' | translate }}</h2>
+            <div class="tw-field">
+              <span class="tw-label" id="tone-label">{{ 'STORY.TONE_LABEL' | translate }}</span>
+              <div class="tone-chips" role="group" aria-labelledby="tone-label">
+                @for (one of tones(); track one.code) {
+                  <button type="button" class="tw-chip" [class.on]="one.on" [attr.aria-pressed]="one.on"
+                    [attr.data-tone]="one.code" (click)="pickTone(one.code)">
+                    {{ one.key | translate }}
+                  </button>
+                }
+              </div>
+            </div>
+            <label class="tw-field">
+              <span class="tw-label">{{ 'STORY.NOTES' | translate }}</span>
+              <textarea id="story-notes" class="tw-textarea" rows="4" maxlength="2000" [formControl]="notes"
+                [placeholder]="'STORY.NOTES_HINT' | translate"></textarea>
+            </label>
+            <button id="story-write" type="button" class="tw-btn-primary" [disabled]="busy() !== null || outOfTurns()"
+              (click)="write()">
+              <pm-icon name="sparkle" [size]="16" />
+              {{ (busy() === 'WRITE' ? 'STORY.WRITING' : 'STORY.WRITE') | translate }}
+            </button>
+            @if (quotaLeft() >= 0) {
+              <p class="tw-hint quota" id="story-quota">{{ 'STORY.QUOTA_LEFT' | translate: { count: quotaLeft() } }}</p>
+            }
+          </section>
+
+          <section class="story-versions">
+            <h2 class="versions-title">{{ 'STORY.VERSIONS' | translate: { count: stories().length } }}</h2>
+            @if (stories().length === 0) {
+              <p class="tw-hint">{{ 'STORY.EMPTY' | translate }}</p>
+            }
+            <ul class="version-list">
+              @for (one of stories(); track one._id) {
+                <li>
+                  <button type="button" class="version" [class.on]="one._id === chosenId()"
+                    [attr.aria-pressed]="one._id === chosenId()" [attr.data-id]="one._id" (click)="choose(one._id)">
+                    <span class="version-top">
+                      <strong>{{ 'STORY.VERSION_NO' | translate: { no: one.version } }}</strong>
+                      <span class="version-date">{{ one.createdAt | date: 'dd/MM HH:mm' }}</span>
+                    </span>
+                    <span class="version-title">{{ one.title }}</span>
+                    <span class="version-tags">
+                      <span class="tw-badge tw-badge-muted">{{ toneKey[one.tone] | translate }}</span>
+                      @if (one.hand === 'PERSON') {
+                        <span class="tw-badge tw-badge-accent">{{ 'STORY.EDITED' | translate }}</span>
+                      }
+                      @if (one.mode === 'SAMPLE') {
+                        <span class="tw-badge tw-badge-amber">{{ 'STORY.SAMPLE' | translate }}</span>
+                      }
+                      @if (one.attachedMemory) {
+                        <span class="tw-badge tw-badge-success">{{ 'STORY.IN_BOOK' | translate }}</span>
+                      }
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          </section>
+        </aside>
+
+        <section class="tw-card story-main">
+          @if (chosen(); as one) {
+            @if (one.mode === 'SAMPLE') {
+              <p class="sample-note">{{ 'STORY.SAMPLE_NOTE' | translate }}</p>
+            }
+            <form class="story-editor" [formGroup]="editor" (submit)="$event.preventDefault(); save()">
+              <label class="tw-field">
+                <span class="tw-label">{{ 'STORY.FIELD_TITLE' | translate }}</span>
+                <input id="story-title" class="tw-input" formControlName="title" maxlength="200" />
+              </label>
+              <label class="tw-field">
+                <span class="tw-label">{{ 'STORY.FIELD_CONTENT' | translate }}</span>
+                <textarea id="story-content" class="tw-textarea story-text" rows="14" maxlength="6000"
+                  formControlName="content"></textarea>
+              </label>
+              @if (editor.touched && editor.invalid) {
+                <p class="tw-error">{{ 'STORY.EDIT_INVALID' | translate }}</p>
+              }
+              <div class="editor-actions">
+                <button id="story-save" type="submit" class="tw-btn-primary" [disabled]="busy() !== null || editor.pristine">
+                  {{ 'COMMON.SAVE' | translate }}
+                </button>
+                @if (confirmRemove()) {
+                  <button id="story-remove" type="button" class="tw-btn-danger" [disabled]="busy() !== null" (click)="remove()">
+                    {{ 'STORY.REMOVE_CONFIRM' | translate }}
+                  </button>
+                  <button type="button" class="tw-btn-ghost" (click)="confirmRemove.set(false)">{{ 'COMMON.CANCEL' | translate }}</button>
+                } @else {
+                  <button id="story-remove" type="button" class="tw-btn-ghost" (click)="remove()">
+                    <pm-icon name="trash" [size]="15" /> {{ 'STORY.REMOVE' | translate }}
+                  </button>
+                }
+              </div>
+              @if (notice(); as message) {
+                <p class="story-notice" role="status">{{ message | translate }}</p>
+              }
+            </form>
+
+            <div class="story-tools">
+              <div class="tool-block">
+                <h3>{{ 'STORY.REWRITE_TITLE' | translate }}</h3>
+                <textarea id="story-rewrite-notes" class="tw-textarea" rows="2" maxlength="2000" [formControl]="rewriteNotes"
+                  [placeholder]="'STORY.REWRITE_HINT' | translate"></textarea>
+                <button id="story-rewrite" type="button" class="tw-btn-secondary" [disabled]="busy() !== null || outOfTurns()"
+                  (click)="rewrite()">
+                  {{ (busy() === 'REWRITE' ? 'STORY.WRITING' : 'STORY.REWRITE') | translate }}
+                </button>
+              </div>
+              <div class="tool-block">
+                <h3>{{ 'STORY.ATTACH_TITLE' | translate }}</h3>
+                @if (moments().length === 0) {
+                  <p class="tw-hint">{{ 'STORY.NO_MOMENTS' | translate }}</p>
+                } @else {
+                  <label class="sr-only" for="story-attach-to">{{ 'STORY.ATTACH_TITLE' | translate }}</label>
+                  <select id="story-attach-to" class="tw-select" [formControl]="attachTo">
+                    <option value="">{{ 'STORY.PICK_MOMENT' | translate }}</option>
+                    @for (moment of moments(); track moment._id) {
+                      <option [value]="moment._id">{{ moment.happenedAt | date: 'dd/MM/yyyy' }} · {{ moment.title }}</option>
+                    }
+                  </select>
+                  <p class="tw-hint">{{ 'STORY.ATTACH_HINT' | translate }}</p>
+                  <button id="story-attach" type="button" class="tw-btn-secondary" [disabled]="busy() !== null || !attachTo.value"
+                    (click)="attach()">
+                    {{ 'STORY.ATTACH' | translate }}
+                  </button>
+                }
+                @if (attachedTitle(); as title) {
+                  <p class="attached-now">{{ 'STORY.ATTACHED_TO' | translate: { title: title } }}</p>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="story-blank">
+              <pm-icon name="book" [size]="28" />
+              <p>{{ 'STORY.BLANK' | translate }}</p>
+            </div>
+          }
+        </section>
+      </div>
+    }
+  }
+</div>

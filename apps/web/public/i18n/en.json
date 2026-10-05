@@ -1116,7 +1116,8 @@
     "BACK": "Back",
     "NEXT": "Continue",
     "SKIP_PHOTOS": "Skip photos",
-    "MAP_START": "The day {{name}} came home — where the journey began"
+    "MAP_START": "The day {{name}} came home — where the journey began",
+    "STORY": "AI story"
   },
   "TODAY": {
     "GREET_MORNING": "Good morning, {{name}}!",
@@ -2090,5 +2091,49 @@
     "SWITCH_TO": "Switch to {{name}}",
     "VI": "Tiếng Việt",
     "EN": "English"
+  },
+  "STORY": {
+    "TITLE": "{{name}}'s story",
+    "SUB": "The assistant writes a story from your pet's profile and your notes. Every rewrite is a new version, older ones stay so you can compare.",
+    "NEW": "Write a new version",
+    "TONE_LABEL": "Tone",
+    "TONE": {
+      "WARM": "Warm",
+      "PLAYFUL": "Playful",
+      "TENDER": "Tender",
+      "SHORT": "Short"
+    },
+    "NOTES": "What you want to tell",
+    "NOTES_HINT": "For example: loves napping in the sun by the window, was scared of waves at the first beach trip...",
+    "WRITE": "Ask the assistant",
+    "WRITING": "Writing...",
+    "QUOTA_LEFT": "You have {{count}} writes left this period.",
+    "QUOTA_OVER": "You have used all story writes for this period.",
+    "TOO_MANY": "This pet already has 30 versions. Remove some before writing more.",
+    "GONE": "This story or moment no longer exists.",
+    "VERSIONS": "Versions ({{count}})",
+    "VERSION_NO": "Version {{no}}",
+    "EMPTY": "No versions yet. Pick a tone and ask the assistant for the first one.",
+    "EDITED": "Edited",
+    "SAMPLE": "Sample",
+    "IN_BOOK": "In journal",
+    "SAMPLE_NOTE": "This version was assembled from your pet's profile because the assistant could not be reached. You can still edit it.",
+    "FIELD_TITLE": "Title",
+    "FIELD_CONTENT": "Content",
+    "EDIT_INVALID": "Title and content cannot be empty.",
+    "SAVED": "Changes saved.",
+    "REMOVE": "Remove this version",
+    "REMOVE_CONFIRM": "Yes, remove",
+    "REWRITE_TITLE": "Rewrite from this version",
+    "REWRITE_HINT": "Extra hints for the rewrite (optional)",
+    "REWRITE": "Rewrite",
+    "ATTACH_TITLE": "Attach to a moment",
+    "PICK_MOMENT": "Pick a journal moment",
+    "ATTACH_HINT": "The moment's text will be replaced by this story.",
+    "ATTACH": "Attach to journal",
+    "ATTACHED": "Story attached to the journal.",
+    "ATTACHED_TO": "Attached to: {{title}}",
+    "NO_MOMENTS": "The journal has no moments to attach to yet.",
+    "BLANK": "Pick a version on the left, or write a new one."
   }
 }

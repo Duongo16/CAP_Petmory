@@ -207,7 +207,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/memories/memories-page').then((m) => m.MemoriesPage),
       },
-      { path: 'pets/:id/story', redirectTo: 'pets/:id/journal' },
+      {
+        path: 'pets/:id/story',
+        canActivate: [customerOnlyGuard],
+        loadComponent: () => import('./features/memories/story-page').then((m) => m.StoryPage),
+      },
       {
         // The internal screens share a side rail, so they sit inside one frame.
         path: 'admin',

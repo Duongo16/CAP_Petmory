@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 import { API_BASE } from './api-base';
 import {
   DecorItem,
@@ -33,6 +33,19 @@ export interface WriteMemoryInput {
 export class MemoriesService {
   private readonly http = inject(HttpClient);
   private readonly base = inject(API_BASE);
+
+  /** Ca cuon nhat ky: doc trang dau roi lay not cac trang con lai. */
+  allForPet(petId: string): Observable<Memory[]> {
+    return this.forPet(petId, 1).pipe(
+      switchMap((first) => {
+        if (first.pageCount <= 1) {
+          return of(first.rows);
+        }
+        const rest = Array.from({ length: first.pageCount - 1 }, (_, at) => this.forPet(petId, at + 2));
+        return forkJoin(rest).pipe(map((pages) => [first, ...pages].flatMap((one) => one.rows)));
+      }),
+    );
+  }
 
   /** One page of a pet's diary, newest moment first. */
   forPet(petId: string, page = 1, topic?: MemoryTopic): Observable<DiaryPage> {
