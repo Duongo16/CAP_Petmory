@@ -104,6 +104,11 @@ export class AdminService {
     );
   }
 
+  /** Anh xem truoc cua mot dong don, doc tu ban chup luc dat. */
+  pathRowPreview(orderCode: string, rowIndex: number, angle: string): string {
+    return `${this.base}/admin/orders/${orderCode}/rows/${rowIndex}/preview/${angle}`;
+  }
+
   /** Duong doc anh tham chieu khach gui cho mot don. */
   pathOrderPhoto(orderCode: string, photoId: string): string {
     return `${this.base}/admin/orders/${orderCode}/photos/${photoId}`;

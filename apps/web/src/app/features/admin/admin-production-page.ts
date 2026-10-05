@@ -115,7 +115,7 @@ export class AdminProductionPage implements OnInit {
       photos: m.anglesPreview.map((angle) => ({
         angle,
         key: KEY_ANGLE[angle] ?? angle,
-        keyPhoto: `${m.designId}:${angle}`,
+        keyPhoto: `${m.rowIndex}:${angle}`,
       })),
     })),
   );
@@ -161,13 +161,14 @@ export class AdminProductionPage implements OnInit {
    */
   private loadPreview(profile: ProductionFile): void {
     for (const item of profile.items) {
-      if (!item.designId) {
+      if (item.rowIndex === undefined) {
         continue;
       }
       for (const angle of item.anglesPreview) {
-        const key = `${item.designId}:${angle}`;
+        // Doc tu ban chup trong don, khong tu ban thiet ke hien tai cua khach.
+        const key = `${item.rowIndex}:${angle}`;
         this.http
-          .get(this.service.pathPhotoDesign(item.designId, angle), { responseType: 'blob' })
+          .get(this.service.pathRowPreview(profile.orderCode, item.rowIndex, angle), { responseType: 'blob' })
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: (blob) =>

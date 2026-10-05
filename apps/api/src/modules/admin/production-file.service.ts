@@ -40,6 +40,8 @@ export interface ProductionItem {
   /** Phu kien gan len mau. */
   accessories: { code: string; displayName: string }[];
   featureNote?: string;
+  /** Vi tri dong trong don. */
+  rowIndex?: number;
   pet?: { name: string; breed: string; kind: string; trait: string[] } | null;
   sizeSpec?: { displayName: string; dimensions: string; explainer: string; productionDays: number } | null;
   model?: { code: string; file: string; fileFull: string } | null;
@@ -75,6 +77,29 @@ export class ProductionFileService {
     private readonly storage: StorageService,
     private readonly config: BusinessConfigService,
   ) {}
+
+  /**
+   * Doc anh xem truoc cua mot dong don tu ban chup luc dat (muc 7, 11).
+   *
+   * Khach sua ban thiet ke sau khi dat thi anh moi khong duoc lan vao ho so;
+   * xuong luon thay dung anh cua thu khach da dong y. Don cu chua co ban chup
+   * thi moi doc tu ban thiet ke goc.
+   */
+  async readRowPreview(orderCode: string, rowIndex: number, angle: string): Promise<Buffer> {
+    const order = await this.orderModel.findOne({ orderCode: orderCode.toUpperCase() }).exec();
+    const row = order?.rows[rowIndex];
+    if (!row) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    const taken = row.design?.preview.find((one) => one.angle === angle);
+    if (taken) {
+      return this.storage.read(StorageFolder.DESIGN, taken.fileName);
+    }
+    if (row.design || !row.designId) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    return this.designs.readPhotoAwaitingInternal(row.designId.toString(), angle as never);
+  }
 
   /**
    * Doc mot anh tham chieu cho xuong.
@@ -131,7 +156,9 @@ export class ProductionFileService {
     const items: ProductionItem[] = [];
     for (const line of madeRows) {
       const item = this.buildItem(line, byCode.get(line.designId?.toString() ?? ''), palette);
-      items.push({ ...item, ...(await this.extraOf(line, byCode.get(line.designId?.toString() ?? ''))) });
+      // Vi tri dong trong don, de doc anh xem truoc tu chinh ban chup cua dong nay.
+      const rowIndex = order.rows.indexOf(line);
+      items.push({ ...item, rowIndex, ...(await this.extraOf(line, byCode.get(line.designId?.toString() ?? ''))) });
     }
 
     /** Cac dong hang co san cua don, chi de khau dong goi biet phai lay gi. */

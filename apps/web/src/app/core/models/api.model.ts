@@ -1005,6 +1005,8 @@ export interface ProductionItem {
   accessories: { code: string; displayName: string }[];
   /** Dac diem rieng cua be khach ghi. */
   featureNote?: string;
+  /** Vi tri dong trong don, de doc anh tu ban chup cua dong. */
+  rowIndex?: number;
   pet?: { name: string; breed: string; kind: string; trait: string[] } | null;
   /** Bang thong so cua kich co da dat. */
   sizeSpec?: { displayName: string; dimensions: string; explainer: string; productionDays: number } | null;

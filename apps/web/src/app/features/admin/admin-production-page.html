@@ -61,7 +61,7 @@
           </dl>
         </section>
 
-        @for (item of items(); track item.designId) {
+        @for (item of items(); track item.rowIndex) {
           <section class="card">
             <h2>{{ item.displayName }} ×{{ item.quantity }}</h2>
 
