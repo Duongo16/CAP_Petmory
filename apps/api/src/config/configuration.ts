@@ -44,6 +44,8 @@ export interface AppConfig {
     model: string;
     /** Mo hinh sua anh cua Gemini, dung cho phuc hoi anh. Rong thi dung mac dinh. */
     imageModel: string;
+    /** Noi sua anh khi phuc hoi: cloudinary hoac gemini. Rong thi uu tien dich vu anh neu da cau hinh. */
+    imageProvider: string;
     timeoutMs: number;
   };
   storage: {
@@ -106,6 +108,7 @@ export default (): AppConfig => ({
     geminiKey: process.env.GEMINI_API_KEY ?? '',
     model: (process.env.AI_MODEL ?? '').trim(),
     imageModel: (process.env.AI_IMAGE_MODEL ?? '').trim(),
+    imageProvider: (process.env.AI_IMAGE_PROVIDER ?? '').trim().toLowerCase(),
     timeoutMs: Number(process.env.AI_TIMEOUT_MS ?? 45000),
   },
   storage: {

@@ -6,6 +6,7 @@ import { PhotosService } from './photos.service';
 import { PhotosController } from './photos.controller';
 import { PhotoRestoreController } from './photo-restore.controller';
 import { PhotoRestoreService } from './photo-restore.service';
+import { CloudinaryImageAi } from './cloudinary-image-ai';
 import { PetsModule } from '../pets/pets.module';
 import { BusinessConfigModule } from '../business-config/business-config.module';
 
@@ -18,7 +19,7 @@ import { BusinessConfigModule } from '../business-config/business-config.module'
     BusinessConfigModule,
   ],
   controllers: [PhotosController, PhotoRestoreController],
-  providers: [PhotosService, PhotoRestoreService],
+  providers: [PhotosService, PhotoRestoreService, CloudinaryImageAi],
   exports: [PhotosService],
 })
 export class PhotosModule {}

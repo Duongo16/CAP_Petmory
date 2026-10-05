@@ -73,7 +73,8 @@ async function run() {
     await page.waitForSelector('#restore-mode', { timeout: 120000 });
     const live = (await page.locator('#restore-mode.note-ok').count()) === 1;
     const skipped = (await page.locator('#restore-skipped').count()) === 1;
-    res.push(check('An AI operation either runs for real or is reported as not done', live !== skipped,
+    // Dich vu anh chay duoc tren goi mien phi, nen tach nen phai chay that chu khong duoc bo qua.
+    res.push(check('Background removal runs for real through the image service', live && !skipped,
       live ? 'AI that' : 'bao khong lam duoc'));
     await page.screenshot({ path: path.join(OUT, 'restore-ai.png'), fullPage: true });
 

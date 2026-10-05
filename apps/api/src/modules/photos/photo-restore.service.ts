@@ -1,7 +1,9 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AI_OPERATIONS, RestoreOperation } from './dto/photo.dto';
 import sharp from 'sharp';
+import { ConfigService } from '@nestjs/config';
 import { AiClientService } from '../ai/ai-client.service';
+import { CloudinaryImageAi } from './cloudinary-image-ai';
 import { measureResemblance, restorePhoto, scorePhoto } from './image-tool';
 import { BusinessConfigService } from '../business-config/business-config.service';
 import { AiUsageService } from '../ai/ai-usage.service';
@@ -43,9 +45,13 @@ export interface RestoreOutcome {
 /**
  * Phuc hoi mot tam anh rieng le, khong dinh dang gi toi ho so thu cung.
  *
- * Anh gui len chi nam trong bo nho trong luc xu ly roi tra thang ve cho nguoi
- * goi; khong tep nao duoc ghi xuong kho va khong ban ghi anh nao duoc tao. Chi
- * so luot dung duoc ghi lai, vi han muc va bao cao chi phi doc tu so do.
+ * Anh gui len khong duoc ghi xuong kho va khong ban ghi anh nao duoc tao. Khi
+ * chon thao tac AI, anh duoc gui tam sang dich vu sua anh roi bi xoa ngay sau
+ * khi doc ket qua. Chi so luot dung duoc ghi lai, vi han muc va bao cao chi
+ * phi doc tu so do.
+ *
+ * Dich vu sua anh mac dinh la Cloudinary, chay duoc tren goi mien phi. Dat
+ * bien moi truong chon nha cung cap anh la gemini de quay ve mo hinh Gemini.
  */
 @Injectable()
 export class PhotoRestoreService {
@@ -53,7 +59,15 @@ export class PhotoRestoreService {
     private readonly businessConfig: BusinessConfigService,
     private readonly usage: AiUsageService,
     private readonly ai: AiClientService,
+    private readonly cloud: CloudinaryImageAi,
+    private readonly config: ConfigService,
   ) {}
+
+  /** Dung dich vu anh tru khi da chon ro Gemini, hoac dich vu anh chua cau hinh. */
+  private get useCloud(): boolean {
+    const wanted = this.config.get<string>('ai.imageProvider') ?? '';
+    return wanted !== 'gemini' && this.cloud.ready;
+  }
 
   async run(owner: string, file: Express.Multer.File | undefined, chosen: RestoreOperation[] = []): Promise<RestoreOutcome> {
     if (!file?.buffer?.length) {
@@ -87,8 +101,9 @@ export class PhotoRestoreService {
     let skipped: string[] = [];
     let problem = '';
     if (aiWanted.length > 0) {
-      const instruction = aiWanted.map((one) => AI_INSTRUCTION[one]).join(' ');
-      const edited = await this.ai.editImage(data, 'image/png', instruction);
+      const edited = this.useCloud
+        ? await this.cloud.edit(data, aiWanted)
+        : await this.ai.editImage(data, 'image/png', aiWanted.map((one) => AI_INSTRUCTION[one]).join(' '));
       if (edited.data) {
         data = await sharp(edited.data).png({ compressionLevel: 8 }).toBuffer();
         mode = AiMode.LIVE;
