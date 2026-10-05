@@ -1,0 +1,36 @@
+<div class="model-card">
+  <div class="model-stage">
+    <pm-viewer-3d
+      [pathModel]="path()"
+      [compact]="true"
+      [statusPaint]="paint()"
+      [accessories]="accessories()"
+      [measureMode]="measuring()"
+      (isReady)="ready()"
+      (measured)="onMeasured($event)"
+    />
+  </div>
+  <div class="model-tools">
+    <label class="model-field">
+      <span>{{ 'ADMIN.PROFILE.REAL_HEIGHT' | translate }}</span>
+      <input class="real-height" type="text" inputmode="decimal" [value]="height()" (change)="setHeight($event)" />
+    </label>
+    @if (sizeCm(); as cm) {
+      <p class="model-size">
+        {{ 'ADMIN.PROFILE.SIZE_CM' | translate: { w: (cm.width | number: '1.1-1'), d: (cm.depth | number: '1.1-1'), h: (cm.height | number: '1.1-1') } }}
+      </p>
+    }
+    <button type="button" class="pm-button-secondary measure-toggle no-print" [attr.aria-pressed]="measuring()" (click)="toggleMeasure()">
+      {{ (measuring() ? 'ADMIN.PROFILE.MEASURE_STOP' : 'ADMIN.PROFILE.MEASURE_START') | translate }}
+    </button>
+    @if (measuring()) {
+      <p class="model-hint no-print">{{ 'ADMIN.PROFILE.MEASURE_HINT' | translate }}</p>
+    }
+    @if (distanceCm(); as cm) {
+      <p class="model-distance" role="status">{{ 'ADMIN.PROFILE.MEASURED' | translate: { cm: (cm | number: '1.1-1') } }}</p>
+    }
+    @if (fullPath(); as full) {
+      <a class="full-link no-print" [href]="full" download>{{ 'ADMIN.PROFILE.DOWNLOAD_FULL' | translate }}</a>
+    }
+  </div>
+</div>

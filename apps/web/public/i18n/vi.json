@@ -571,7 +571,9 @@
         "NECK": "Ở cổ",
         "BACK": "Trên lưng"
       }
-    }
+    },
+    "FEATURE_NOTE": "Đặc điểm riêng của bé",
+    "FEATURE_NOTE_HINT": "Ví dụ: đốm trắng ở chân trái, tai phải hơi cụp, mắt hai màu..."
   },
   "HOME": {
     "BADGE": "THỦ CÔNG • VẬT LIỆU TÁI CHẾ • 100% CÁ NHÂN HÓA",
@@ -1610,7 +1612,28 @@
       "NOT_SIZE_PHOTO": "Khách chưa gắn hồ sơ thú cưng nào vào bản thiết kế.",
       "STAND": "Đế trưng bày",
       "STAND_DECOR": "Trang trí trên đế",
-      "STAND_DECOR_NONE": "Không có"
+      "STAND_DECOR_NONE": "Không có",
+      "SIZE_SPEC": "Thông số kích cỡ",
+      "SIZE_SPEC_NONE": "Không còn đọc được thông số của kích cỡ này trong danh mục.",
+      "ACCESSORIES": "Phụ kiện",
+      "ACCESSORIES_NONE": "Không gắn phụ kiện.",
+      "FEATURES": "Đặc điểm riêng của bé",
+      "BREED": "Giống",
+      "UNKNOWN": "Chưa rõ",
+      "TRAITS": "Tính cách, đặc điểm",
+      "FEATURE_NOTE": "Khách ghi chú",
+      "FEATURE_NOTE_NONE": "Khách không ghi chú thêm.",
+      "MODEL_3D": "Mô hình 3D để đo kích thước",
+      "REAL_HEIGHT": "Chiều cao thành phẩm (cm)",
+      "SIZE_CM": "Ngang {{w}} cm · sâu {{d}} cm · cao {{h}} cm",
+      "MEASURE_START": "Đo khoảng cách",
+      "MEASURE_STOP": "Thôi đo",
+      "MEASURE_HINT": "Bấm hai điểm trên bé để đo; bấm điểm thứ ba để đo lại.",
+      "MEASURED": "Khoảng cách: {{cm}} cm",
+      "DOWNLOAD_FULL": "Tải bản mô hình đầy đủ cho xưởng (.glb)",
+      "QC": "Phiếu kiểm tra chất lượng",
+      "QC_NONE": "Đơn này chưa có phiếu kiểm tra.",
+      "QC_DRAFT": "Đơn chưa vào sản xuất nên đây là mẫu phiếu theo cấu hình hiện tại. Phiếu riêng của đơn được tạo khi chuyển sang Đang sản xuất."
     },
     "CHAT": {
       "TITLE": "Trực hội thoại",

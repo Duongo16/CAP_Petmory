@@ -74,7 +74,7 @@ export class CreateProductSizeDto {
   @IsOptional() @IsInt() @Min(1) @Max(20)
   minPhotos?: number;
 
-  @IsOptional() @IsInt() @Min(0) @Max(4)
+  @IsOptional() @IsInt() @Min(0) @Max(10)
   maxAccessories?: number;
 
   @IsOptional() @IsString() @MaxLength(500)
@@ -103,7 +103,7 @@ export class UpdateProductSizeDto {
   @IsOptional() @IsInt() @Min(1) @Max(20)
   minPhotos?: number;
 
-  @IsOptional() @IsInt() @Min(0) @Max(4)
+  @IsOptional() @IsInt() @Min(0) @Max(10)
   maxAccessories?: number;
 
   @IsOptional() @IsString() @MaxLength(500)

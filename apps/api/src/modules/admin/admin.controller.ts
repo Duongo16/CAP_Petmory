@@ -59,6 +59,20 @@ export class AdminController {
    * The workshop needs to see what the customer approved, so ownership is not
    * checked here; in exchange this path is open only to the two operations groups.
    */
+  /** Anh tham chieu khach gui cho mot don, chi khi anh thuoc dung don do. */
+  @Roles(Role.MANAGER)
+  @Get('orders/:orderCode/photos/:photoId')
+  async orderPhoto(
+    @Param('orderCode') orderCode: string,
+    @Param('photoId') photoId: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const found = await this.profile.readOrderPhoto(orderCode, photoId);
+    res.setHeader('Content-Type', found.fileType || 'image/jpeg');
+    res.setHeader('Cache-Control', 'private, max-age=300');
+    res.send(found.data);
+  }
+
   @Roles(Role.MANAGER)
   @Get('designs/:id/preview/:angle')
   async photoDesign(

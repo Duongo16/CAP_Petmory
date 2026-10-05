@@ -29,6 +29,6 @@ import { PhotosModule } from '../photos/photos.module';
   ],
   controllers: [DesignsController, DesignSuggestController],
   providers: [DesignsService, DesignSuggestService, ModelLibraryService],
-  exports: [DesignsService],
+  exports: [DesignsService, ModelLibraryService],
 })
 export class DesignsModule {}

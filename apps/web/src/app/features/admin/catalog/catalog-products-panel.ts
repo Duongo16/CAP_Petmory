@@ -32,7 +32,7 @@ const SIZE_FIELDS: CatalogField[] = [
   { key: 'price', labelKey: 'ADMIN.CATALOG.PRICE', type: 'money', required: true },
   { key: 'productionDays', labelKey: 'ADMIN.CATALOG.PRODUCTION_DAYS', type: 'int', required: true, min: 1, max: 120 },
   { key: 'minPhotos', labelKey: 'ADMIN.CATALOG.MIN_PHOTOS', type: 'int', min: 1, max: 20 },
-  { key: 'maxAccessories', labelKey: 'ADMIN.CATALOG.MAX_ACCESSORIES', type: 'int', min: 0, max: 4 },
+  { key: 'maxAccessories', labelKey: 'ADMIN.CATALOG.MAX_ACCESSORIES', type: 'int', min: 0, max: 10 },
   { key: 'imageUrl', labelKey: 'ADMIN.CATALOG.IMAGE', type: 'text', maxLength: 500 },
   { key: 'explainer', labelKey: 'ADMIN.CATALOG.EXPLAINER', type: 'textarea', required: true, maxLength: 300 },
   { key: 'enabled', labelKey: 'ADMIN.CATALOG.ENABLED', type: 'toggle' },

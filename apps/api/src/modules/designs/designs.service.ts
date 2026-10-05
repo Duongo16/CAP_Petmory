@@ -273,6 +273,7 @@ export class DesignsService {
       },
       pet: dto.pet ? new Types.ObjectId(dto.pet) : null,
       accessories: dto.accessories ?? [],
+      featureNote: dto.featureNote?.trim() ?? '',
     };
   }
 }

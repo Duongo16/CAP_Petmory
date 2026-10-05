@@ -276,6 +276,7 @@ export class OrdersService {
         preview: design.preview.map((one) => ({ angle: one.angle, fileName: one.fileName })),
         pet: design.pet,
         petPhoto: photos.filter((one) => !one.isHidden).map((one) => one._id),
+        featureNote: design.featureNote ?? '',
         takenAt: new Date(),
       };
     } catch {

@@ -309,6 +309,11 @@
                   <textarea formControlName="message" rows="2" maxlength="300" class="tw-textarea"></textarea>
                 </label>
                 <label class="field">
+                  <span>{{ 'STUDIO.FEATURE_NOTE' | translate }}</span>
+                  <textarea formControlName="featureNote" rows="2" maxlength="500" class="tw-textarea feature-note"
+                    [placeholder]="'STUDIO.FEATURE_NOTE_HINT' | translate"></textarea>
+                </label>
+                <label class="field">
                   <span>{{ 'STUDIO.NAME_DRAFT' | translate }}</span>
                   <input type="text" formControlName="name" maxlength="100" class="tw-input" />
                 </label>

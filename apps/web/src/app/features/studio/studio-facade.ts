@@ -78,6 +78,7 @@ export class StudioFacade {
     engravedName: ['', [Validators.maxLength(60)]],
     memorialDate: [''],
     message: ['', [Validators.maxLength(300)]],
+    featureNote: ['', [Validators.maxLength(500)]],
   });
 
   /** The customer's pet profiles, so a design can be tied to one of them. */
@@ -293,6 +294,7 @@ export class StudioFacade {
       },
       stand: { ...this.stand(), decorations: [...this.stand().decorations] },
       accessories: [...this.accessoryPicked()],
+      featureNote: v.featureNote.trim(),
     };
 
     const existing = this.designId();
@@ -372,6 +374,7 @@ export class StudioFacade {
             engravedName: tk.engraving?.name ?? '',
             memorialDate: tk.engraving?.memorialDate ? tk.engraving.memorialDate.slice(0, 10) : '',
             message: tk.engraving?.message ?? '',
+            featureNote: tk.featureNote ?? '',
           });
           if (tk.productTypeCode && tk.sizeCode) {
             this.fetchQuote();

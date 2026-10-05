@@ -19,7 +19,7 @@ import { Icon } from '../../shared/icon/icon';
 import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { StudioFacade } from './studio-facade';
-import { AccessoryMount, StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
+import { ANCHOR_NODE, AccessoryMount, StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
 import { PaintMode } from '../../shared/viewer-3d/painter';
 import { CatalogService } from '../../core/services/catalog.service';
 import { AccessoryAnchor, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
@@ -70,14 +70,6 @@ const KEY_POSE: Record<string, string> = {
   SITTING: 'STUDIO.POSE.SITTING',
   STANDING: 'STUDIO.POSE.STANDING',
   LYING: 'STUDIO.POSE.LYING',
-};
-
-/** Ten nut neo trong tep mo hinh ung voi tung diem neo cua phu kien. */
-const ANCHOR_NODE: Record<AccessoryAnchor, string> = {
-  HEAD: 'PM_ANCHOR_HEAD',
-  FACE: 'PM_ANCHOR_FACE',
-  NECK: 'PM_ANCHOR_NECK',
-  BACK: 'PM_ANCHOR_BACK',
 };
 
 const KEY_ANCHOR: Record<AccessoryAnchor, string> = {

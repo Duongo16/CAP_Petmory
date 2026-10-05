@@ -8,6 +8,10 @@ import { PetPhoto, PetPhotoDocument } from '../photos/schemas/pet-photo.schema';
 import { DesignDocument } from '../designs/schemas/design.schema';
 import { LineKind } from '../cart/schemas/cart.schema';
 import { MSG } from '../../common/constants/messages';
+import { Pet, PetDocument } from '../pets/schemas/pet.schema';
+import { ModelLibraryService } from '../designs/model-library.service';
+import { BusinessConfigService } from '../business-config/business-config.service';
+import { StorageFolder, StorageService } from '../../common/storage/storage.service';
 
 /** One wool colour needed, with a readable name rather than just a code. */
 export interface WoolRoll {
@@ -35,6 +39,11 @@ export interface ProductionItem {
   stand: { baseName: string; tone: string; decorations: string[] } | null;
   /** Phu kien gan len mau. */
   accessories: { code: string; displayName: string }[];
+  featureNote?: string;
+  pet?: { name: string; breed: string; kind: string; trait: string[] } | null;
+  sizeSpec?: { displayName: string; dimensions: string; explainer: string; productionDays: number } | null;
+  model?: { code: string; file: string; fileFull: string } | null;
+  paint?: { mesh: string; color: string }[];
   anglesPreview: string[];
   productionDays: number;
 }
@@ -59,9 +68,36 @@ export class ProductionFileService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(PetPhoto.name) private readonly photoModel: Model<PetPhotoDocument>,
+    @InjectModel(Pet.name) private readonly petModel: Model<PetDocument>,
     private readonly designs: DesignsService,
     private readonly catalog: CatalogService,
+    private readonly library: ModelLibraryService,
+    private readonly storage: StorageService,
+    private readonly config: BusinessConfigService,
   ) {}
+
+  /**
+   * Doc mot anh tham chieu cho xuong.
+   *
+   * Chi tra anh nam trong danh sach anh cua chinh don nay, de duong nay khong
+   * thanh loi doc anh bat ky cua khach nao chi bang ma anh.
+   */
+  async readOrderPhoto(orderCode: string, photoId: string): Promise<{ data: Buffer; fileType: string }> {
+    const order = await this.orderModel.findOne({ orderCode: orderCode.toUpperCase() }).exec();
+    if (!order) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    const olderIds = order.rows.filter((line) => !line.design && line.designId).map((line) => line.designId!.toString());
+    const allowed = await this.petPhotoOfOrder(order, await this.designs.findByIds(olderIds));
+    if (!allowed.some((one) => one.code === photoId)) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    const photo = await this.photoModel.findById(photoId).exec();
+    if (!photo) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    return { data: await this.storage.read(StorageFolder.PET, photo.fileName), fileType: photo.fileType };
+  }
 
   async buildProfile(orderCode: string) {
     const order = await this.orderModel.findOne({ orderCode: orderCode.toUpperCase() }).exec();
@@ -92,9 +128,11 @@ export class ProductionFileService {
      * quan den viec cua minh.
      */
     const madeRows = order.rows.filter((line) => line.kind !== LineKind.READY_MADE);
-    const items: ProductionItem[] = madeRows.map((line) =>
-      this.buildItem(line, byCode.get(line.designId?.toString() ?? ''), palette),
-    );
+    const items: ProductionItem[] = [];
+    for (const line of madeRows) {
+      const item = this.buildItem(line, byCode.get(line.designId?.toString() ?? ''), palette);
+      items.push({ ...item, ...(await this.extraOf(line, byCode.get(line.designId?.toString() ?? ''))) });
+    }
 
     /** Cac dong hang co san cua don, chi de khau dong goi biet phai lay gi. */
     const packRows = order.rows
@@ -116,13 +154,57 @@ export class ProductionFileService {
       items,
       packRows,
       petPhoto: await this.petPhotoOfOrder(order, designs),
-      // Phieu kiem tra di kem ho so, de xuong tich ngay tren mot trang.
-      qualityCheck: order.qualityCheck.map((one) => ({
-        label: one.label,
-        done: one.done,
-        doneAt: one.doneAt,
-      })),
+      // Phieu kiem tra di kem ho so, de xuong tich ngay tren mot trang. Don chua vao
+      // san xuat thi chua co phieu rieng, nen in mau phieu theo cau hinh hien tai.
+      ...(await this.qualityOf(order)),
       missing: this.listMissing(items),
+    };
+  }
+
+  /**
+   * Phan bo sung cua ho so theo muc 11: bang thong so kich co, tep mo hinh de
+   * do kich thuoc, mau da to de dung lai mo hinh, dac diem rieng cua be.
+   */
+  private async extraOf(line: OrderDocument['rows'][number], older: DesignDocument | undefined) {
+    const taken = line.design;
+    const modelCode = taken?.modelCode ?? older?.modelCode ?? '';
+    const model = modelCode ? this.library.byCode(modelCode) : null;
+    let sizeSpec: { displayName: string; dimensions: string; explainer: string; productionDays: number } | null = null;
+    try {
+      const kind = line.productTypeCode ? await this.catalog.detailProductType(line.productTypeCode) : null;
+      const size = kind?.sizes.find((one) => one.code === line.sizeCode);
+      sizeSpec = size
+        ? { displayName: size.displayName, dimensions: size.dimensions, explainer: size.explainer, productionDays: size.productionDays }
+        : null;
+    } catch (trouble) {
+      // Loai san pham da bi doi ma thi khong con bang thong so; loi khac van bao len.
+      if (!(trouble instanceof NotFoundException)) {
+        throw trouble;
+      }
+      sizeSpec = null;
+    }
+    const petId = taken?.pet ?? older?.pet ?? null;
+    const pet = petId ? await this.petModel.findById(petId).select('name breed trait kind').exec() : null;
+    return {
+      featureNote: taken?.featureNote ?? older?.featureNote ?? '',
+      pet: pet ? { name: pet.name, breed: pet.breed, kind: pet.kind, trait: [...(pet.trait ?? [])] } : null,
+      sizeSpec,
+      model: model ? { code: model.code, file: model.file, fileFull: model.fileFull ?? model.file } : null,
+      paint: (taken?.paint ?? older?.paint ?? []).map((one) => ({ mesh: one.mesh, color: one.color })),
+    };
+  }
+
+  private async qualityOf(order: OrderDocument) {
+    if (order.qualityCheck.length > 0) {
+      return {
+        qualityCheck: order.qualityCheck.map((one) => ({ label: one.label, done: one.done, doneAt: one.doneAt })),
+        qualityDraft: false,
+      };
+    }
+    const setting = await this.config.get();
+    return {
+      qualityCheck: (setting.qcChecklist ?? []).map((label) => ({ label, done: false, doneAt: null })),
+      qualityDraft: true,
     };
   }
 

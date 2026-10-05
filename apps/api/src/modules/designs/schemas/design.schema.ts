@@ -178,6 +178,10 @@ export class Design {
   @Prop({ type: [String], default: [] })
   accessories!: string[];
 
+  /** Dac diem rieng cua be do khach ghi, de xuong lam dung (muc 11). */
+  @Prop({ trim: true, default: '', maxlength: 500 })
+  featureNote!: string;
+
   @Prop({ type: [PreviewImageSchema], default: [] })
   preview!: Preview[];
 

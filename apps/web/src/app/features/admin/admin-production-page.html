@@ -103,6 +103,56 @@
               }
             </dl>
 
+            <h3>{{ 'ADMIN.PROFILE.SIZE_SPEC' | translate }}</h3>
+            @if (item.sizeSpec; as spec) {
+              <table class="spec-table">
+                <tbody>
+                  <tr><th>{{ 'ADMIN.CATALOG.NAME' | translate }}</th><td>{{ spec.displayName }}</td></tr>
+                  <tr><th>{{ 'ADMIN.CATALOG.DIMENSIONS' | translate }}</th><td>{{ spec.dimensions }}</td></tr>
+                  <tr><th>{{ 'ADMIN.CATALOG.PRODUCTION_DAYS' | translate }}</th><td>{{ spec.productionDays }}</td></tr>
+                  <tr><th>{{ 'ADMIN.CATALOG.EXPLAINER' | translate }}</th><td>{{ spec.explainer }}</td></tr>
+                </tbody>
+              </table>
+            } @else {
+              <p class="note">{{ 'ADMIN.PROFILE.SIZE_SPEC_NONE' | translate }}</p>
+            }
+
+            <h3>{{ 'ADMIN.PROFILE.ACCESSORIES' | translate }}</h3>
+            @if (item.accessories.length === 0) {
+              <p class="note">{{ 'ADMIN.PROFILE.ACCESSORIES_NONE' | translate }}</p>
+            } @else {
+              <ul class="accessory-list">
+                @for (one of item.accessories; track one.code) {
+                  <li><strong>{{ one.displayName }}</strong> <span class="sub">{{ one.code }}</span></li>
+                }
+              </ul>
+            }
+
+            <h3>{{ 'ADMIN.PROFILE.FEATURES' | translate }}</h3>
+            <dl class="info-pair feature-pair">
+              @if (item.pet; as pet) {
+                <dt>{{ 'ADMIN.PROFILE.BREED' | translate }}</dt>
+                <dd>{{ pet.breed || ('ADMIN.PROFILE.UNKNOWN' | translate) }}</dd>
+                @if (item.traits) {
+                  <dt>{{ 'ADMIN.PROFILE.TRAITS' | translate }}</dt>
+                  <dd>{{ item.traits }}</dd>
+                }
+              }
+              <dt>{{ 'ADMIN.PROFILE.FEATURE_NOTE' | translate }}</dt>
+              <dd class="feature-note">{{ item.featureNote || ('ADMIN.PROFILE.FEATURE_NOTE_NONE' | translate) }}</dd>
+            </dl>
+
+            @if (item.model; as model) {
+              <h3>{{ 'ADMIN.PROFILE.MODEL_3D' | translate }}</h3>
+              <pm-production-model-card
+                [file]="model.file"
+                [fullFile]="model.fileFull"
+                [paint]="item.paint ?? []"
+                [accessories]="item.mounts"
+                [dimensions]="item.sizeSpec?.dimensions ?? ''"
+              />
+            }
+
             <h3>{{ 'ADMIN.PROFILE.ZONE_COLOUR' | translate }}</h3>
             @if (item.zoneColours.length === 0) {
               <p class="note">{{ 'ADMIN.PROFILE.ZONE_NONE' | translate }}</p>
@@ -158,13 +208,41 @@
           @if (profile.petPhoto.length === 0) {
             <p class="note">{{ 'ADMIN.PROFILE.NOT_SIZE_PHOTO' | translate }}</p>
           } @else {
-            <ul class="source-photo-list">
-              @for (a of profile.petPhoto; track a.code) {
-                <li>
-                  <strong>{{ a.angle }}</strong>
-                  <span class="sub">{{ a.labelQuality }}</span>
-                  @if (a.isRestored) {
-                    <span class="sub">{{ 'PHOTO.VERSION_RESTORE' | translate }}</span>
+            <div class="photo-grid reference-grid">
+              @for (a of references(); track a.code) {
+                <figure [attr.data-photo]="a.code">
+                  @if (referencePhoto()[a.code]; as src) {
+                    <img [src]="src" [alt]="a.key | translate" />
+                  } @else {
+                    <div class="photo-placeholder"><mat-spinner diameter="22" /></div>
+                  }
+                  <figcaption>
+                    {{ a.key | translate }} · {{ a.labelQuality }}
+                    @if (a.isRestored) {
+                      · {{ 'PHOTO.VERSION_RESTORE' | translate }}
+                    }
+                  </figcaption>
+                </figure>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="card qc-card">
+          <h2>{{ 'ADMIN.PROFILE.QC' | translate }}</h2>
+          @if (profile.qualityDraft) {
+            <p class="note qc-draft">{{ 'ADMIN.PROFILE.QC_DRAFT' | translate }}</p>
+          }
+          @if ((profile.qualityCheck ?? []).length === 0) {
+            <p class="note">{{ 'ADMIN.PROFILE.QC_NONE' | translate }}</p>
+          } @else {
+            <ul class="qc-list">
+              @for (tick of profile.qualityCheck; track $index) {
+                <li [class.done]="tick.done">
+                  <span class="qc-box" aria-hidden="true">{{ tick.done ? '✓' : '' }}</span>
+                  <span>{{ tick.label }}</span>
+                  @if (tick.doneAt) {
+                    <span class="sub">{{ tick.doneAt | date: 'dd/MM HH:mm' }}</span>
                   }
                 </li>
               }

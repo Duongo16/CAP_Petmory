@@ -89,6 +89,10 @@ export class Viewer3d {
   readonly stand = input<StandView | null>(null);
   /** Phu kien gan len mau dang xem. */
   readonly accessories = input<AccessoryMount[]>([]);
+  /** Bat che do do: bam hai diem tren be de do khoang cach. */
+  readonly measureMode = input(false);
+  /** Khoang cach vua do, theo don vi trong canh; trang goi doi ra cm. */
+  readonly measured = output<number>();
 
   /** Reports the set of six still images once the user presses capture. */
   readonly capturedSixAngles = output<Record<StandardAngle, string>>();
@@ -111,6 +115,7 @@ export class Viewer3d {
   readonly angles = ANGLES_PREPARE;
   readonly canPaint = signal(false);
   private draggingBrush = false;
+  private measureStart: { x: number; y: number } | null = null;
 
   constructor() {
     // Chi nap lai khi doi tep mo hinh. Cac tin hieu doc ben trong luc nap, nhu
@@ -159,7 +164,20 @@ export class Viewer3d {
     return this.colorPendingPaint() !== null && this.canPaint();
   }
 
+  /** Kich thuoc khung bao cua be, de trang goi quy ra cm theo chieu cao that. */
+  modelSize(): { x: number; y: number; z: number } {
+    return this.engine?.modelSize() ?? { x: 0, y: 0, z: 0 };
+  }
+
+  clearMeasure(): void {
+    this.engine?.clearMeasure();
+  }
+
   startPaint(su: PointerEvent): void {
+    if (this.measureMode() && su.button === 0) {
+      this.measureStart = { x: su.clientX, y: su.clientY };
+      return;
+    }
     if (!this.pendingPaint || su.button !== 0) {
       return;
     }
@@ -179,6 +197,17 @@ export class Viewer3d {
   }
 
   endPaint(su: PointerEvent): void {
+    const start = this.measureStart;
+    this.measureStart = null;
+    // Chi tinh la bam khi chuot gan nhu khong di chuyen, keo thi van la xoay be.
+    if (this.measureMode() && start && Math.hypot(su.clientX - start.x, su.clientY - start.y) < 5) {
+      const box = (su.currentTarget as HTMLElement).getBoundingClientRect();
+      const distance = this.engine?.measureAt((su.clientX - box.left) / box.width, (su.clientY - box.top) / box.height);
+      if (distance !== null && distance !== undefined) {
+        this.measured.emit(distance);
+      }
+      return;
+    }
     if (!this.draggingBrush) {
       return;
     }

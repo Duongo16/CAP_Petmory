@@ -17,6 +17,10 @@ import { AdminService } from '../../core/services/admin.service';
 import { ProductionFile } from '../../core/models/api.model';
 import { KEY_STATUS_ORDER } from '../../shared/order-status';
 import { STAND_DECORATIONS, STAND_TONES } from '../../shared/viewer-3d/stand-options';
+import { ANCHOR_NODE, AccessoryMount } from '../../shared/viewer-3d/engine-3d';
+import { CatalogService } from '../../core/services/catalog.service';
+import { Accessory } from '../../core/models/api.model';
+import { ProductionModelCard } from './production-model-card';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
@@ -57,9 +61,9 @@ const DECOR_KEY: Partial<Record<string, string>> = Object.fromEntries(STAND_DECO
 @Component({
   selector: 'pm-admin-production-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, MatProgressSpinnerModule, TranslatePipe],
+  imports: [RouterLink, DatePipe, MatProgressSpinnerModule, TranslatePipe, ProductionModelCard],
   templateUrl: './admin-production-page.html',
-  styleUrl: './admin-shared.scss',
+  styleUrls: ['./admin-shared.scss', './admin-production-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminProductionPage implements OnInit {
@@ -76,6 +80,10 @@ export class AdminProductionPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(AdminService);
   private readonly http = inject(HttpClient);
+  private readonly catalog = inject(CatalogService);
+  private readonly accessoryList = signal<Accessory[]>([]);
+  /** Anh tham chieu khach gui, doc qua duong co kiem quyen roi doi ra dia chi tam. */
+  readonly referencePhoto = signal<Record<string, string>>({});
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly data = signal<ProductionFile | null>(null);
@@ -102,6 +110,8 @@ export class AdminProductionPage implements OnInit {
   readonly items = computed(() =>
     (this.data()?.items ?? []).map((m) => ({
       ...m,
+      mounts: this.mountsOf(m.accessories ?? []),
+      traits: (m.pet?.trait ?? []).join(', '),
       photos: m.anglesPreview.map((angle) => ({
         angle,
         key: KEY_ANGLE[angle] ?? angle,
@@ -110,12 +120,22 @@ export class AdminProductionPage implements OnInit {
     })),
   );
 
+  /** Anh tham chieu theo goc, kem nhan goc da dich. */
+  readonly references = computed(() =>
+    (this.data()?.petPhoto ?? []).map((one) => ({ ...one, key: KEY_ANGLE[one.angle] ?? one.angle })),
+  );
+
   private readonly cleanup = this.destroyRef.onDestroy(() => {
     Object.values(this.sourcePhoto()).forEach((d) => URL.revokeObjectURL(d));
+    Object.values(this.referencePhoto()).forEach((d) => URL.revokeObjectURL(d));
   });
 
   ngOnInit(): void {
     this.orderCode.set(this.route.snapshot.paramMap.get('orderCode') ?? '');
+    this.catalog.accessory$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (list) => this.accessoryList.set(list),
+      error: () => this.accessoryList.set([]),
+    });
     this.reload();
   }
 
@@ -129,6 +149,7 @@ export class AdminProductionPage implements OnInit {
           this.data.set(profile);
           this.status.set('READY');
           this.loadPreview(profile);
+          this.loadReferences(profile);
         },
         error: () => this.status.set('ERROR'),
       });
@@ -155,6 +176,27 @@ export class AdminProductionPage implements OnInit {
           });
       }
     }
+  }
+
+  private loadReferences(profile: ProductionFile): void {
+    for (const photo of profile.petPhoto) {
+      this.http
+        .get(this.service.pathOrderPhoto(profile.orderCode, photo.code), { responseType: 'blob' })
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (blob) => this.referencePhoto.update((old) => ({ ...old, [photo.code]: URL.createObjectURL(blob) })),
+          error: () => undefined,
+        });
+    }
+  }
+
+  /** Phu kien cua dong hang doi ra tep va nut neo de khung 3D gan len. */
+  private mountsOf(list: { code: string }[]): AccessoryMount[] {
+    const byCode = new Map(this.accessoryList().map((one) => [one.code, one]));
+    return list.flatMap((pick) => {
+      const one = byCode.get(pick.code);
+      return one ? [{ code: one.code, path: `/models/${one.modelFile}`, anchor: ANCHOR_NODE[one.anchor] }] : [];
+    });
   }
 
   inRa(): void {

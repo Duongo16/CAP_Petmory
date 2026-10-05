@@ -154,6 +154,12 @@ export class SaveDesignDto {
   @ArrayUnique()
   @Matches(/^[A-Za-z0-9-]{2,30}$/, { each: true, message: 'Ma phu kien khong hop le' })
   accessories?: string[];
+
+  /** Dac diem rieng cua be ma xuong can biet (vet lang, dom long...), khach tu ghi. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  featureNote?: string;
 }
 
 /** Doi ten mot ban thiet ke. */

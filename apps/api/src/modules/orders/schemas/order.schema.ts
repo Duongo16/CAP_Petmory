@@ -72,6 +72,10 @@ export class DesignSnapshot {
   @Prop({ type: [Types.ObjectId], ref: 'PetPhoto', default: [] })
   petPhoto!: Types.ObjectId[];
 
+  /** Dac diem rieng cua be khach ghi trong ban thiet ke. */
+  @Prop({ trim: true, default: '' })
+  featureNote!: string;
+
   @Prop({ type: Date, required: true })
   takenAt!: Date;
 }

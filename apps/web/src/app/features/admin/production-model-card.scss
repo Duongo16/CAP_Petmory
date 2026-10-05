@@ -1,0 +1,64 @@
+:host {
+  display: block;
+}
+
+.model-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 16px;
+  align-items: start;
+}
+
+.model-stage {
+  min-inline-size: 0;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.model-tools {
+  display: grid;
+  gap: 10px;
+}
+
+.model-field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8125rem;
+  color: var(--pm-text-muted);
+
+  input {
+    inline-size: 100%;
+    min-block-size: 40px;
+    padding: 0 10px;
+    border: 1.5px solid var(--pm-border);
+    border-radius: 10px;
+    background: var(--pm-bg-card);
+    color: var(--pm-ink);
+    font: inherit;
+  }
+}
+
+.model-size,
+.model-distance {
+  margin: 0;
+  font-weight: 700;
+  color: var(--pm-ink);
+}
+
+.model-hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--pm-text-muted);
+}
+
+@media (max-width: 760px) {
+  .model-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

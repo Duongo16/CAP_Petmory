@@ -5,6 +5,14 @@ import { Painter, PaintMode, PaintState } from './painter';
 import { StandBuilder } from './stand-builder';
 import { StandView } from './stand-options';
 
+/** Ten nut neo trong tep mo hinh ung voi tung diem neo cua phu kien. */
+export const ANCHOR_NODE: Record<'HEAD' | 'FACE' | 'NECK' | 'BACK', string> = {
+  HEAD: 'PM_ANCHOR_HEAD',
+  FACE: 'PM_ANCHOR_FACE',
+  NECK: 'PM_ANCHOR_NECK',
+  BACK: 'PM_ANCHOR_BACK',
+};
+
 /** Mot phu kien can gan: ma, duong dan tep va ten nut neo trong mau. */
 export interface AccessoryMount {
   code: string;
@@ -71,6 +79,8 @@ export class Engine3d {
   private materialByZone = new Map<string, THREE.MeshStandardMaterial[]>();
   private attachedAccessories = new Map<string, THREE.Object3D>();
   private wantedAccessories = new Set<string>();
+  private readonly measureGroup = new THREE.Group();
+  private measurePoints: THREE.Vector3[] = [];
   private radius = 1;
   private modelCenter = new THREE.Vector3();
   private frameHandle = 0;
@@ -103,6 +113,7 @@ export class Engine3d {
 
     this.addLights();
     this.scene.add(this.stand.group);
+    this.scene.add(this.measureGroup);
 
     wrap.appendChild(this.renderer.domElement);
     this.renderer.domElement.style.width = '100%';
@@ -291,6 +302,62 @@ export class Engine3d {
    * Paints at a point on the canvas. Coordinates are ratios from 0 to 1 relative to
    * the canvas size, so they do not depend on screen resolution.
    */
+  /** Kich thuoc khung bao cua be (khong tinh de), theo don vi trong canh. */
+  modelSize(): { x: number; y: number; z: number } {
+    if (!this.angle) {
+      return { x: 0, y: 0, z: 0 };
+    }
+    const size = new THREE.Box3().setFromObject(this.angle).getSize(new THREE.Vector3());
+    return { x: size.x, y: size.y, z: size.z };
+  }
+
+  /**
+   * Chon mot diem tren be de do, them dau cham va noi voi diem truoc.
+   *
+   * Tra ve khoang cach giua hai diem gan nhat theo don vi trong canh, hoac rong
+   * khi moi co mot diem. Diem thu ba bat dau mot lan do moi.
+   */
+  measureAt(ratioX: number, ratioY: number): number | null {
+    if (!this.angle) {
+      return null;
+    }
+    this.raycaster.setFromCamera(new THREE.Vector2(ratioX * 2 - 1, -(ratioY * 2 - 1)), this.camera);
+    const hit = this.raycaster.intersectObject(this.angle, true)[0];
+    if (!hit) {
+      return null;
+    }
+    if (this.measurePoints.length >= 2) {
+      this.clearMeasure();
+    }
+    this.measurePoints.push(hit.point.clone());
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(this.radius * 0.012, 12, 8),
+      new THREE.MeshBasicMaterial({ color: '#d1495b', depthTest: false }),
+    );
+    dot.position.copy(hit.point);
+    dot.renderOrder = 10;
+    this.measureGroup.add(dot);
+    if (this.measurePoints.length < 2) {
+      return null;
+    }
+    const [from, to] = this.measurePoints;
+    const line = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([from, to]),
+      new THREE.LineBasicMaterial({ color: '#d1495b', depthTest: false }),
+    );
+    line.renderOrder = 10;
+    this.measureGroup.add(line);
+    return from.distanceTo(to);
+  }
+
+  clearMeasure(): void {
+    this.measurePoints = [];
+    for (const child of [...this.measureGroup.children]) {
+      child.removeFromParent();
+      this.disposeTree(child);
+    }
+  }
+
   paintAtPoint(ratioX: number, ratioY: number, color: string, mode: PaintMode, radius: number): boolean {
     if (!this.painter?.ready) {
       return false;
@@ -446,6 +513,7 @@ export class Engine3d {
   }
 
   private disposeOldModel(): void {
+    this.clearMeasure();
         // The list has to be copied before anything is detached, because each removal
         // deletes an entry from the very collection being walked.
     const codes = Array.from(this.attachedAccessories.keys());

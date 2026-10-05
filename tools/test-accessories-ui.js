@@ -108,6 +108,7 @@ async function run() {
     await page.locator('.model[data-model="Q-SHIBA"]').click();
     await page.waitForTimeout(1500);
     await page.locator('[data-step="STAND"]').click();
+    await page.waitForSelector('.acc-hint', { timeout: 10000 }).catch(() => undefined);
     res.push(check('A model without anchors explains it cannot take accessories',
       (await page.locator('.acc-hint').count()) === 1 && (await page.locator('.accessory').count()) === 0));
 

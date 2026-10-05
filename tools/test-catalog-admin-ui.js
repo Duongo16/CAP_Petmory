@@ -46,7 +46,7 @@ async function run() {
     });
     res.push(check('A price with a fraction of a dong is refused', badMoney.status() === 400, String(badMoney.status())));
     const badSize = await api.post(`${API}/catalog/products/KHONG-CO-LOAI/sizes`, {
-      headers: manager, data: { code: 'S', displayName: 'Nho', dimensions: '10cm', explainer: 'x', price: '1000', productionDays: 3, maxAccessories: 9 },
+      headers: manager, data: { code: 'S', displayName: 'Nho', dimensions: '10cm', explainer: 'x', price: '1000', productionDays: 3, maxAccessories: 11 },
     });
     res.push(check('Too many accessories for a size is refused', badSize.status() === 400, String(badSize.status())));
     const badKind = await api.post(`${API}/catalog/packaging`, {

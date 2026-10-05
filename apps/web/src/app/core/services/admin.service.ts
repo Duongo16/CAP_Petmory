@@ -88,6 +88,11 @@ export class AdminService {
     );
   }
 
+  /** Duong doc anh tham chieu khach gui cho mot don. */
+  pathOrderPhoto(orderCode: string, photoId: string): string {
+    return `${this.base}/admin/orders/${orderCode}/photos/${photoId}`;
+  }
+
   /** URL of a design preview, used by the image tiles in the production file. */
   pathPhotoDesign(designId: string, angle: string): string {
     return `${this.base}/admin/designs/${designId}/preview/${angle}`;

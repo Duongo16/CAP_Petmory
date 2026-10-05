@@ -571,7 +571,9 @@
         "NECK": "On the neck",
         "BACK": "On the back"
       }
-    }
+    },
+    "FEATURE_NOTE": "Distinctive features",
+    "FEATURE_NOTE_HINT": "For example: white spot on the left paw, right ear folds a little, two-coloured eyes..."
   },
   "HOME": {
     "BADGE": "HANDMADE • RECYCLED MATERIAL • 100% PERSONALISED",
@@ -1610,7 +1612,28 @@
       "NOT_SIZE_PHOTO": "The customer has not linked a pet profile to the design.",
       "STAND": "Display stand",
       "STAND_DECOR": "Stand decorations",
-      "STAND_DECOR_NONE": "None"
+      "STAND_DECOR_NONE": "None",
+      "SIZE_SPEC": "Size specification",
+      "SIZE_SPEC_NONE": "The specification of this size can no longer be read from the catalogue.",
+      "ACCESSORIES": "Accessories",
+      "ACCESSORIES_NONE": "No accessories.",
+      "FEATURES": "Distinctive features",
+      "BREED": "Breed",
+      "UNKNOWN": "Unknown",
+      "TRAITS": "Traits",
+      "FEATURE_NOTE": "Customer note",
+      "FEATURE_NOTE_NONE": "No extra note from the customer.",
+      "MODEL_3D": "3D model for measuring",
+      "REAL_HEIGHT": "Finished height (cm)",
+      "SIZE_CM": "Width {{w}} cm · depth {{d}} cm · height {{h}} cm",
+      "MEASURE_START": "Measure a distance",
+      "MEASURE_STOP": "Stop measuring",
+      "MEASURE_HINT": "Click two points on the pet to measure; a third click starts again.",
+      "MEASURED": "Distance: {{cm}} cm",
+      "DOWNLOAD_FULL": "Download the full model for the workshop (.glb)",
+      "QC": "Quality checklist",
+      "QC_NONE": "This order has no checklist yet.",
+      "QC_DRAFT": "The order is not in production yet, so this is the checklist template from the current settings. The order gets its own checklist when it moves to In production."
     },
     "CHAT": {
       "TITLE": "Chat desk",

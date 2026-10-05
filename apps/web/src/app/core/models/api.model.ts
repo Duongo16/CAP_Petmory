@@ -887,6 +887,7 @@ export interface Design {
   name: string;
   modelCode: string;
   accessories?: string[];
+  featureNote?: string;
   paint: MeshPaint[];
   colorCodesUsed: string[];
   /**
@@ -923,6 +924,7 @@ export interface SaveDesign {
   name: string;
   modelCode: string;
   accessories?: string[];
+  featureNote?: string;
   paint?: MeshPaint[];
   colorCodesUsed?: string[];
   /** Mau tung vung co ten, de ho so san xuat ghi ma mau theo vung. */
@@ -998,6 +1000,17 @@ export interface ProductionItem {
   stand: { baseName: string; tone: string; decorations: string[] } | null;
   anglesPreview: PreviewAngle[];
   productionDays: number;
+  /** Phu kien gan len mau, chot luc dat. */
+  accessories: { code: string; displayName: string }[];
+  /** Dac diem rieng cua be khach ghi. */
+  featureNote?: string;
+  pet?: { name: string; breed: string; kind: string; trait: string[] } | null;
+  /** Bang thong so cua kich co da dat. */
+  sizeSpec?: { displayName: string; dimensions: string; explainer: string; productionDays: number } | null;
+  /** Tep mo hinh: ban nhe va ban day du cho xuong. */
+  model?: { code: string; file: string; fileFull: string } | null;
+  /** Mau da to tren tung mang, de dung lai dung mo hinh khach da duyet. */
+  paint?: MeshPaint[];
 }
 
 export interface ReferencedPhoto {
@@ -1018,4 +1031,8 @@ export interface ProductionFile {
   items: ProductionItem[];
   petPhoto: ReferencedPhoto[];
   missing: string[];
+  /** Phieu kiem tra chat luong di kem ho so. */
+  qualityCheck?: { label: string; done: boolean; doneAt: string | null }[];
+  /** Don chua vao san xuat: day la mau phieu theo cau hinh, chua phai phieu cua don. */
+  qualityDraft?: boolean;
 }
