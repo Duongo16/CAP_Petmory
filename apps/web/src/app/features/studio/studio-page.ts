@@ -125,6 +125,7 @@ export class StudioPage implements OnInit {
   readonly capturing = signal(false);
 
   readonly kindSelected = signal<string | null>(null);
+  readonly poseSelected = signal<string | null>(null);
 
   private declaredZones: DeclaredZone[] = [];
   private zoneByFile: Record<string, Record<string, ZoneName>> = {};
@@ -187,16 +188,23 @@ export class StudioPage implements OnInit {
     return kinds.map((kind) => ({ kind, key: KEY_KIND[kind] ?? 'STUDIO.KIND.OTHER' }));
   });
 
-  /** The mau nen sau khi loc theo loai, kem hinh minh hoa va nhan dang. */
+  /** Cac dang co trong thu vien, de loc theo dang (ngoi, dung, nam). */
+  readonly poseTabs = computed(() => {
+    const poses = [...new Set(this.baseModel().map((m) => m.pose))].filter((pose) => KEY_POSE[pose]);
+    return poses.map((pose) => ({ pose, key: KEY_POSE[pose], on: this.poseSelected() === pose }));
+  });
+
+  /** The mau nen sau khi loc theo loai va dang, kem hinh minh hoa va nhan dang. */
   readonly modelCards = computed(() => {
     const kind = this.kindSelected();
+    const pose = this.poseSelected();
     const chosen = this.baseModelSelected()?.code;
     return this.baseModel()
-      .filter((m) => !kind || m.kind === kind)
+      .filter((m) => (!kind || m.kind === kind) && (!pose || m.pose === pose))
       .map((m) => ({
         raw: m,
         thumb: `/models/thumbs/${m.code}.webp`,
-        tagKey: m.styleGroup === 'BLOCKY' ? 'STUDIO.BLOCKY' : (KEY_POSE[m.pose] ?? 'STUDIO.REALISTIC'),
+        tagKey: m.core || m.styleGroup !== 'BLOCKY' ? (KEY_POSE[m.pose] ?? 'STUDIO.REALISTIC') : 'STUDIO.BLOCKY',
         sitting: m.pose === 'SITTING',
         on: m.code === chosen,
       }));
@@ -338,6 +346,10 @@ export class StudioPage implements OnInit {
     if (!this.isFirst()) {
       this.go(STEPS[this.stepIndex() - 1]);
     }
+  }
+
+  selectPose(pose: string): void {
+    this.poseSelected.set(this.poseSelected() === pose ? null : pose);
   }
 
   selectKind(kind: string): void {

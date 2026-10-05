@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "description": "Declares the base models and their material zones. The viewer reads the zones straight from the model file; this file only attaches a display label and the colour group each zone may use.",
   "zoneMaterial": [
     {
@@ -148,6 +148,78 @@
     }
   ],
   "baseModel": [
+    {
+      "code": "BASE-DOG-STAND",
+      "name": "Cún đứng",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "base-dog-standing.glb",
+      "fileFull": "base-dog-standing-full.glb",
+      "ready": true,
+      "core": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK",
+        "PM_ANCHOR_BACK"
+      ]
+    },
+    {
+      "code": "BASE-DOG-SIT",
+      "name": "Cún ngồi",
+      "kind": "DOG",
+      "pose": "SITTING",
+      "file": "base-dog-sitting.glb",
+      "fileFull": "base-dog-sitting-full.glb",
+      "ready": true,
+      "core": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK",
+        "PM_ANCHOR_BACK"
+      ]
+    },
+    {
+      "code": "BASE-CAT-SIT",
+      "name": "Mèo ngồi",
+      "kind": "CAT",
+      "pose": "SITTING",
+      "file": "base-cat-sitting.glb",
+      "fileFull": "base-cat-sitting-full.glb",
+      "ready": true,
+      "core": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK",
+        "PM_ANCHOR_BACK"
+      ]
+    },
+    {
+      "code": "BASE-CAT-LIE",
+      "name": "Mèo nằm",
+      "kind": "CAT",
+      "pose": "LYING",
+      "file": "base-cat-lying.glb",
+      "fileFull": "base-cat-lying-full.glb",
+      "ready": true,
+      "core": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK",
+        "PM_ANCHOR_BACK"
+      ]
+    },
     {
       "code": "DOG-GOLDEN",
       "name": "Cún lông vàng",
@@ -391,6 +463,70 @@
     "q-Pug.glb": {
       "Beige": "MAIN_FUR",
       "Brown": "EAR"
+    },
+    "base-dog-standing.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_TAIL": "TAIL",
+      "PM_EYES": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "base-dog-standing-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_TAIL": "TAIL",
+      "PM_EYES": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "base-dog-sitting.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_TAIL": "TAIL",
+      "PM_EYES": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "base-dog-sitting-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_TAIL": "TAIL",
+      "PM_EYES": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "base-cat-sitting.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_TAIL": "TAIL",
+      "PM_EYES": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "base-cat-sitting-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_TAIL": "TAIL",
+      "PM_EYES": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "base-cat-lying.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_TAIL": "TAIL",
+      "PM_EYES": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "base-cat-lying-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_TAIL": "TAIL",
+      "PM_EYES": "EYE",
+      "PM_NOSE": "NOSE"
     }
   },
   "retired": {
@@ -404,5 +540,6 @@
     "Q-DEER": "Q-FOX",
     "TEMP-FOX": "Q-FOX",
     "TEMP-DOG": "DOG-GOLDEN"
-  }
+  },
+  "coreNote": "Bon mau co core la thu vien mau nen theo muc 6: du sau vung vat lieu, co diem neo phu kien, co ban nhe (file) va ban day du cho xuong (fileFull)."
 }

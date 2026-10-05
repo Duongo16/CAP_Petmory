@@ -481,7 +481,7 @@
     "ERROR_SAVE": "Could not save the design. Please try again.",
     "ERROR_OPEN_DRAFT": "Could not open this design.",
     "KIND_LABEL": "Species",
-    "POSE_LABEL": "Pose",
+    "POSE_LABEL": "Choose a pose",
     "POSE_NOTE": "Only the standing pose is built so far. Sitting and lying are on the way.",
     "KIND": {
       "DOG": "Dog",

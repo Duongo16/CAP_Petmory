@@ -15,6 +15,22 @@ Danh mục được chắt lọc ngày 04/10/2026: chỉ giữ thú cưng, ưu t
 `node tools/render-model-thumbs.js`. Hiện chưa có mèo: bốn mẫu mèo thêm cùng
 ngày đã bị bỏ sau khi xem thử.
 
+## Bốn mẫu nền theo mục 6 và sáu phụ kiện (tự dựng, CC0 1.0)
+
+Petmory tự dựng bằng `node tools/build-base-models.mjs` (three.js), nên thuộc miền
+công cộng và không cần ghi nguồn. Mỗi mẫu chia đúng sáu vùng vật liệu
+(`PM_FUR_MAIN`, `PM_FUR_SECONDARY`, `PM_EARS`, `PM_TAIL`, `PM_EYES`, `PM_NOSE`), có
+bốn điểm neo phụ kiện (`PM_ANCHOR_HEAD`, `PM_ANCHOR_FACE`, `PM_ANCHOR_NECK`,
+`PM_ANCHOR_BACK`) và hai bản: bản nhẹ cho điện thoại, bản `-full` cho xưởng.
+
+| Tệp | Mẫu |
+|---|---|
+| `base-dog-standing.glb` / `-full.glb` | Cún đứng |
+| `base-dog-sitting.glb` / `-full.glb` | Cún ngồi |
+| `base-cat-sitting.glb` / `-full.glb` | Mèo ngồi |
+| `base-cat-lying.glb` / `-full.glb` | Mèo nằm |
+| `acc-knit-hat.glb`, `acc-bow.glb`, `acc-collar-tag.glb`, `acc-scarf.glb`, `acc-round-glasses.glb`, `acc-cape.glb` | Sáu phụ kiện dùng chung |
+
 ## Chó
 
 | Tệp | Mẫu | Tác giả | Giấy phép | Nguồn |

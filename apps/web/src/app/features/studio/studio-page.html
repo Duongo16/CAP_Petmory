@@ -116,6 +116,14 @@
                   </button>
                 }
               </div>
+              <div class="chips pose-chips" role="group" [attr.aria-label]="'STUDIO.POSE_LABEL' | translate">
+                @for (one of poseTabs(); track one.pose) {
+                  <button type="button" class="chip" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-pose]="one.pose"
+                    (click)="selectPose(one.pose)">
+                    {{ one.key | translate }}
+                  </button>
+                }
+              </div>
               <ul class="models">
                 @for (card of modelCards(); track card.raw.code) {
                   <li>

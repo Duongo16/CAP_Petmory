@@ -59,6 +59,7 @@ const UNDO_LIMIT = 30;
 export class Painter {
   private readonly meshes: MeshPaint[] = [];
   private readonly undoStack: Map<THREE.Mesh, Float32Array>[] = [];
+  private readonly pendingMaterials = new Set<THREE.MeshStandardMaterial>();
 
   constructor(angle: THREE.Object3D) {
     const photo = this.getTexture(angle);
@@ -69,6 +70,15 @@ export class Painter {
         this.prepareMesh(node, photo);
       }
     });
+    // Doi vat lieu sang mau theo dinh sau cung. Nhieu mang dung chung mot vat lieu,
+    // doi som thi mang sau doc phai mau trang thay vi mau that cua vung.
+    for (const material of this.pendingMaterials) {
+      material.map = null;
+      material.vertexColors = true;
+      material.color.set('#ffffff');
+      material.needsUpdate = true;
+    }
+    this.pendingMaterials.clear();
   }
 
   get ready(): boolean {
@@ -348,7 +358,8 @@ export class Painter {
     const faceMaterial: string[] = new Array(Math.floor(countVertex / 3)).fill('');
 
     for (const g of group) {
-      const material = materials[g.materialIndex ?? 0] as THREE.MeshStandardMaterial | undefined;
+      // Nhom tro toi chi so vat lieu khong co thi dung vat lieu dau, thay vi roi ve mau xam.
+      const material = (materials[g.materialIndex ?? 0] ?? materials[0]) as THREE.MeshStandardMaterial | undefined;
       const faceFirst = Math.floor(g.start / 3);
       const faceLast = Math.floor((g.start + g.count) / 3);
       for (let face = faceFirst; face < faceLast; face += 1) {
@@ -370,11 +381,7 @@ export class Painter {
 
     const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const material of list) {
-      const prepare = material as THREE.MeshStandardMaterial;
-      prepare.map = null;
-      prepare.vertexColors = true;
-      prepare.color.set('#ffffff');
-      prepare.needsUpdate = true;
+      this.pendingMaterials.add(material as THREE.MeshStandardMaterial);
     }
 
     this.meshes.push({

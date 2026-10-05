@@ -27,6 +27,12 @@ export interface BaseModel {
   /** Goc xoay quanh truc dung, do theo do, de con vat quay mat ve phia truoc. */
   rotateY?: number;
   credit?: ModelCredit;
+  /** Thuoc thu vien mau nen theo muc 6: du sau vung va co diem neo phu kien. */
+  core?: boolean;
+  /** Ban day du cho xuong. Rong thi xuong dung chung tep voi trang khach. */
+  fileFull?: string;
+  /** Ten cac diem neo phu kien co trong tep. */
+  anchors?: string[];
 }
 
 /**

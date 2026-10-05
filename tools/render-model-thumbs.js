@@ -42,7 +42,7 @@ async function run() {
   const codes = await page.locator('.model[data-model]').evaluateAll((all) => all.map((b) => b.dataset.model));
   for (const code of codes) {
     await page.locator(`.model[data-model="${code}"]`).click();
-    await page.waitForTimeout(2600);
+    await page.waitForTimeout(4200);
     // Tat tu xoay roi chon goc, de anh nao cung cung mot huong.
     const rotating = page.locator('.stage-tools .round-button[aria-pressed="true"]');
     if (await rotating.count()) {
@@ -57,7 +57,7 @@ async function run() {
     const edge = Math.round(Math.max(meta.width, meta.height) * 1.12);
     const background = await sharp(raw).extract({ left: 2, top: 2, width: 1, height: 1 }).raw().toBuffer();
     const bg = { r: background[0], g: background[1], b: background[2], alpha: 1 };
-    const out = await sharp(trimmed)
+    const square = await sharp(trimmed)
       .extend({
         top: Math.floor((edge - meta.height) / 2),
         bottom: Math.ceil((edge - meta.height) / 2),
@@ -65,7 +65,10 @@ async function run() {
         right: Math.ceil((edge - meta.width) / 2),
         background: bg,
       })
-      .resize(SIZE, SIZE);
+      .toBuffer();
+    // sharp luon thu nho truoc khi noi khung, nen phai noi xong o mot luot rieng
+    // roi moi thu nho; lam chung mot luot thi mau dang cao bi cat mat dau.
+    const out = sharp(square).resize(SIZE, SIZE);
     const file = path.join(work, front ? `${code}.png` : `${code}.webp`);
     await (front ? out.png() : out.webp({ quality: 82 })).toFile(file);
     console.log('saved', path.basename(file));

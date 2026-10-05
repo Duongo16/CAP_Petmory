@@ -92,6 +92,9 @@ async function run() {
     const brokenThumbs = await page.locator('.model-thumb').evaluateAll((all) =>
       all.filter((img) => img.complete && img.naturalWidth === 0).map((img) => img.getAttribute('src')));
     res.push(check('Every model card shows its picture', brokenThumbs.length === 0, brokenThumbs.join(', ')));
+    // Mau nen tu dung la CC0 nen khong co dong ghi cong; kiem tren mot mau CC-BY.
+    await page.locator('.model[data-model="DOG-GOLDEN"]').click();
+    await page.waitForSelector('.credit', { timeout: 10000 });
     const creditText = (await page.locator('.credit').innerText()).trim();
     res.push(check('The chosen model credits its author and licence',
       /CC0|CC-BY/.test(creditText) && (await page.locator('.credit a').getAttribute('href'))?.startsWith('https://'),

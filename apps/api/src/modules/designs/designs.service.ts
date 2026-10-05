@@ -12,6 +12,7 @@ import {
 } from './schemas/design.schema';
 import { SaveDesignDto, COUNT_DESIGN_MAX } from './dto/design.dto';
 import { CatalogService } from '../catalog/catalog.service';
+import { ModelLibraryService } from './model-library.service';
 import { Cart, CartDocument } from '../cart/schemas/cart.schema';
 import { MSG } from '../../common/constants/messages';
 import { StorageFolder, StorageService } from '../../common/storage/storage.service';
@@ -29,6 +30,7 @@ export class DesignsService {
     @InjectModel(Cart.name) private readonly carts: Model<CartDocument>,
     private readonly catalog: CatalogService,
     private readonly storage: StorageService,
+    private readonly library: ModelLibraryService,
   ) {}
 
   listMine(owner: string) {
@@ -214,6 +216,12 @@ export class DesignsService {
 
   /** If a product type and size are given, they must exist and be on sale. */
   private async checkProduct(dto: SaveDesignDto): Promise<void> {
+    // Chi nhan mau nen co trong thu vien (muc 5, 6, 21); ma da bo duoc doi sang mau thay the.
+    const model = this.library.byCode(dto.modelCode);
+    if (!model) {
+      throw new BadRequestException('Mau nen nay khong co trong thu vien');
+    }
+    dto.modelCode = model.code;
     // Ma de phai co trong danh muc va dang ban; ma rong nghia la chua chon de.
     await this.catalog.findDisplayBase(dto.stand?.baseCode);
     if (!dto.productTypeCode || !dto.sizeCode) {
