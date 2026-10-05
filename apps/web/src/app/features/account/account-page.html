@@ -1,0 +1,79 @@
+<div class="tw-page account-page">
+  <header class="tw-page-head">
+    <div>
+      <h1 class="pm-page-title tw-page-title">{{ 'ACCOUNT.TITLE' | translate }}</h1>
+      <p class="tw-page-sub">{{ 'ACCOUNT.SUB' | translate }}</p>
+    </div>
+  </header>
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="tw-empty">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <p class="tw-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+    }
+    @case ('READY') {
+      <div class="account-grid">
+        <section class="tw-card tw-card-pad account-card">
+          <h2 class="tw-card-title">{{ 'ACCOUNT.PROFILE' | translate }}</h2>
+          <div class="avatar-row">
+            <span class="avatar">
+              @if (avatar(); as src) {
+                <img [src]="src" alt="" />
+              } @else {
+                <span aria-hidden="true">{{ initial() }}</span>
+              }
+            </span>
+            <label class="tw-btn-secondary tw-btn-sm" for="account-avatar">{{ 'ACCOUNT.CHANGE_AVATAR' | translate }}</label>
+            <input id="account-avatar" class="sr-only" type="file" accept="image/png,image/jpeg" (change)="pickAvatar($event)" />
+          </div>
+          <form class="account-form" [formGroup]="profile" (submit)="$event.preventDefault(); saveProfile()">
+            <label class="tw-field">
+              <span class="tw-label">{{ 'ACCOUNT.EMAIL' | translate }}</span>
+              <input class="tw-input" type="email" [value]="user()?.email ?? ''" disabled />
+            </label>
+            <label class="tw-field">
+              <span class="tw-label">{{ 'ACCOUNT.FULL_NAME' | translate }}</span>
+              <input id="account-name" class="tw-input" type="text" maxlength="100" formControlName="fullName" />
+            </label>
+            <label class="tw-field">
+              <span class="tw-label">{{ 'ACCOUNT.PHONE' | translate }}</span>
+              <input id="account-phone" class="tw-input" type="tel" maxlength="10" inputmode="numeric" formControlName="phone" />
+              <span class="tw-hint">{{ 'ACCOUNT.PHONE_HINT' | translate }}</span>
+            </label>
+            @if (profileNote(); as note) {
+              <p class="account-note" [class.bad]="note.bad" [attr.role]="note.bad ? 'alert' : 'status'">{{ note.key | translate }}</p>
+            }
+            <button id="account-save" type="submit" class="tw-btn-primary" [disabled]="profileBusy()">{{ 'COMMON.SAVE' | translate }}</button>
+          </form>
+        </section>
+
+        <section class="tw-card tw-card-pad account-card">
+          <h2 class="tw-card-title">{{ 'ACCOUNT.PASSWORD' | translate }}</h2>
+          <p class="tw-hint">{{ 'ACCOUNT.PASSWORD_SUB' | translate }}</p>
+          <form class="account-form" [formGroup]="password" (submit)="$event.preventDefault(); changePassword()">
+            <label class="tw-field">
+              <span class="tw-label">{{ 'ACCOUNT.CURRENT_PASSWORD' | translate }}</span>
+              <input id="account-current" class="tw-input" type="password" autocomplete="current-password" formControlName="current" />
+            </label>
+            <label class="tw-field">
+              <span class="tw-label">{{ 'ACCOUNT.NEW_PASSWORD' | translate }}</span>
+              <input id="account-new" class="tw-input" type="password" autocomplete="new-password" maxlength="72" formControlName="password" />
+            </label>
+            <label class="tw-field">
+              <span class="tw-label">{{ 'ACCOUNT.CONFIRM_PASSWORD' | translate }}</span>
+              <input id="account-confirm" class="tw-input" type="password" autocomplete="new-password" maxlength="72" formControlName="confirm" />
+            </label>
+            @if (passwordNote(); as note) {
+              <p class="account-note" [class.bad]="note.bad" [attr.role]="note.bad ? 'alert' : 'status'">{{ note.key | translate }}</p>
+            }
+            <button id="account-change-password" type="submit" class="tw-btn-primary" [disabled]="passwordBusy()">
+              {{ 'ACCOUNT.CHANGE_PASSWORD' | translate }}
+            </button>
+          </form>
+        </section>
+      </div>
+    }
+  }
+</div>

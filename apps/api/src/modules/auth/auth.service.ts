@@ -10,6 +10,7 @@ import { MSG } from '../../common/constants/messages';
 import { Role } from '../../common/constants/roles';
 import { PasswordReset, PasswordResetDocument } from './schemas/password-reset.schema';
 import { MailService } from '../../common/mail.service';
+import { AuditService } from '../../common/audit.service';
 
 /** How long a link to set a new password stays good for. */
 const RESET_VALID_MINUTES = 60;
@@ -46,6 +47,7 @@ export class AuthService {
     @InjectModel(PasswordReset.name)
     private readonly resets: Model<PasswordResetDocument>,
     private readonly mail: MailService,
+    private readonly audit: AuditService,
   ) {}
 
   /**
@@ -136,6 +138,31 @@ export class AuthService {
 
     // Moi phien dang mo bi cham dut, ke ca phien cua nguoi da chiem tai khoan.
     await this.users.bumpTokenEpoch(found.owner.toString());
+  }
+
+  /**
+   * Doi mat khau khi dang dang nhap.
+   *
+   * Phai dung mat khau cu. Doi xong thi moi phien khac bi dong, con phien dang
+   * dung duoc cap token moi de khong bi day ra. Nhat ky chi ghi viec doi, khong
+   * bao gio ghi mat khau.
+   */
+  async changePassword(userId: string, current: string, next: string): Promise<LoginResult> {
+    const user = await this.users.findByIdWithPassword(userId);
+    if (!user || !user.active) {
+      throw new UnauthorizedException(MSG.BAD_CREDENTIALS);
+    }
+    const match = await this.users.checkPassword(current, user.passwordHash);
+    if (!match) {
+      throw new BadRequestException('Mat khau hien tai khong dung');
+    }
+    if (current === next) {
+      throw new BadRequestException('Mat khau moi phai khac mat khau cu');
+    }
+    await this.users.setPassword(userId, next);
+    await this.users.bumpTokenEpoch(userId);
+    await this.audit.write({ actor: userId, action: 'ACCOUNT_PASSWORD_CHANGED', resourceType: 'User', resourceId: userId });
+    return this.issueTokens(user.id, user.email, user.fullName, user.roles, user.avatarUrl ?? null);
   }
 
   async register(dto: RegisterDto): Promise<LoginResult> {

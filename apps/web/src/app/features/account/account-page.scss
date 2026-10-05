@@ -1,0 +1,59 @@
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.account-card,
+.account-form {
+  display: grid;
+  gap: 12px;
+}
+
+.account-form button {
+  justify-self: start;
+}
+
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 64px;
+  block-size: 64px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--pm-accent-soft);
+  color: var(--pm-ink);
+  font-size: 1.5rem;
+  font-weight: 700;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.account-note {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--pm-accent-soft);
+  color: var(--pm-ink);
+  font-size: 0.875rem;
+
+  &.bad {
+    background: var(--pm-danger-soft);
+    color: var(--pm-on-danger-soft);
+  }
+}

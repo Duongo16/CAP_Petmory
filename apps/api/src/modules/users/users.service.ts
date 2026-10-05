@@ -37,6 +37,10 @@ export class UsersService {
     return this.model.findOne({ email: email.toLowerCase() }).select('+passwordHash').exec();
   }
 
+  findByIdWithPassword(id: string) {
+    return this.model.findById(new Types.ObjectId(id)).select('+passwordHash').exec();
+  }
+
   async findById(id: string): Promise<UserDocument> {
     const user = await this.model.findById(new Types.ObjectId(id)).exec();
     if (!user) {

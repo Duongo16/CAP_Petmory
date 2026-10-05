@@ -81,6 +81,18 @@ export class AuthService {
     return this.http.post<{ ok: boolean }>(`${this.base}/auth/reset-password`, { token, password });
   }
 
+  /** Doi mat khau khi dang dang nhap; may chu cap token moi cho phien nay. */
+  changePassword(currentPassword: string, newPassword: string): Observable<LoginResult> {
+    return this.http
+      .post<LoginResult>(`${this.base}/auth/change-password`, { currentPassword, newPassword })
+      .pipe(tap((result) => this.store.save(result.accessToken, result.refreshToken, result.user)));
+  }
+
+  /** Cap nhat ten va anh dang hien tren dau trang sau khi sua ho so. */
+  patchUser(patch: { fullName?: string; avatarUrl?: string | null }): void {
+    this.store.patchUser(patch as never);
+  }
+
   login(email: string, password: string): Observable<LoginResult> {
     return this.http
       .post<LoginResult>(`${this.base}/auth/login`, { email, password })

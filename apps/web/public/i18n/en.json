@@ -58,7 +58,8 @@
     "DESIGNS": "My designs",
     "MODERATION": "Community moderation",
     "CATALOG": "Catalogue",
-    "AUDIT": "Activity log"
+    "AUDIT": "Activity log",
+    "MY_ACCOUNT": "My account"
   },
   "AUTH": {
     "QUICK": {
@@ -2285,5 +2286,27 @@
     "ATTACHED_TO": "Attached to: {{title}}",
     "NO_MOMENTS": "The journal has no moments to attach to yet.",
     "BLANK": "Pick a version on the left, or write a new one."
+  },
+  "ACCOUNT": {
+    "TITLE": "My account",
+    "SUB": "Edit your personal details and change your password.",
+    "PROFILE": "Personal details",
+    "CHANGE_AVATAR": "Change picture",
+    "EMAIL": "Sign-in email",
+    "FULL_NAME": "Full name",
+    "PHONE": "Phone number",
+    "PHONE_HINT": "10 digits starting with 0. Leave empty to remove it.",
+    "PROFILE_SAVED": "Details saved.",
+    "PROFILE_INVALID": "The name needs at least 2 characters; the phone has 10 digits starting with 0.",
+    "PASSWORD": "Change password",
+    "PASSWORD_SUB": "Other devices will be signed out after the change.",
+    "CURRENT_PASSWORD": "Current password",
+    "NEW_PASSWORD": "New password (at least 8 characters)",
+    "CONFIRM_PASSWORD": "Repeat the new password",
+    "CHANGE_PASSWORD": "Change password",
+    "PASSWORD_CHANGED": "Password changed.",
+    "PASSWORD_WRONG": "The current password is wrong, or the new one is the same as the old one.",
+    "PASSWORD_MISMATCH": "The two new passwords do not match.",
+    "PASSWORD_INVALID": "Fill in every field; the new password needs at least 8 characters."
   }
 }

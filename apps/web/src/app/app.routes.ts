@@ -81,6 +81,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/today/today-page').then((m) => m.TodayPage),
       },
       {
+        path: 'account',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/account/account-page').then((m) => m.AccountPage),
+      },
+      {
         path: 'community',
         canActivate: [customerOnlyGuard],
         loadComponent: () =>

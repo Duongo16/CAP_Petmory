@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { IsString } from 'class-validator';
 import { AuthService } from './auth.service';
 import { DEMO_ACCOUNTS, DemoAccount } from './demo-accounts';
-import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, ChangePasswordDto } from './dto/auth.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -70,6 +70,12 @@ export class AuthController {
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.service.resetPassword(dto.token, dto.password);
     return { ok: true };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('change-password')
+  changePassword(@Body() dto: ChangePasswordDto, @CurrentUser() user: AuthUser) {
+    return this.service.changePassword(user.userId, dto.currentPassword, dto.newPassword);
   }
 
   @Get('me')

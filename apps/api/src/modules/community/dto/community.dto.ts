@@ -1,17 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  ArrayMaxSize,
-  IsArray,
-  IsEnum,
-  IsInt,
-  IsMongoId,
-  IsOptional,
-  IsString,
-  Matches,
-  MaxLength,
-  Min,
-  MinLength,
-} from 'class-validator';
+import { ArrayMaxSize, IsArray, IsEnum, IsInt, IsMongoId, IsOptional, IsString, Matches, MaxLength, Min, MinLength } from 'class-validator';
 import { PostTopic } from '../schemas/post.schema';
 
 const TAG_PATTERN = /^[\p{L}\p{N} _-]{1,30}$/u;
@@ -56,9 +44,10 @@ export class UpdateProfileDto {
   @MaxLength(100)
   fullName?: string;
 
+  /** Rong la bo so; neu co thi 10 chu so bat dau bang 0, giong luc dang ky. */
   @IsOptional()
   @IsString()
-  @MaxLength(20)
+  @Matches(/^(0\d{9})?$/, { message: 'So dien thoai phai gom 10 chu so va bat dau bang 0' })
   phone?: string;
 
   @IsOptional()

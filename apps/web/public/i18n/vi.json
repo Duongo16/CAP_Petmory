@@ -58,7 +58,8 @@
     "DESIGNS": "Thiết kế của tôi",
     "MODERATION": "Kiểm duyệt cộng đồng",
     "CATALOG": "Danh mục",
-    "AUDIT": "Nhật ký thao tác"
+    "AUDIT": "Nhật ký thao tác",
+    "MY_ACCOUNT": "Tài khoản của tôi"
   },
   "AUTH": {
     "QUICK": {
@@ -2285,5 +2286,27 @@
     "ATTACHED_TO": "Đang gắn với: {{title}}",
     "NO_MOMENTS": "Nhật ký chưa có khoảnh khắc nào để gắn.",
     "BLANK": "Chọn một bản bên trái, hoặc viết bản mới."
+  },
+  "ACCOUNT": {
+    "TITLE": "Tài khoản của tôi",
+    "SUB": "Sửa thông tin cá nhân và đổi mật khẩu.",
+    "PROFILE": "Thông tin cá nhân",
+    "CHANGE_AVATAR": "Đổi ảnh đại diện",
+    "EMAIL": "Email đăng nhập",
+    "FULL_NAME": "Họ và tên",
+    "PHONE": "Số điện thoại",
+    "PHONE_HINT": "10 chữ số, bắt đầu bằng 0. Để trống nếu không muốn lưu.",
+    "PROFILE_SAVED": "Đã lưu thông tin.",
+    "PROFILE_INVALID": "Họ tên cần ít nhất 2 ký tự; số điện thoại gồm 10 chữ số bắt đầu bằng 0.",
+    "PASSWORD": "Đổi mật khẩu",
+    "PASSWORD_SUB": "Đổi xong, các phiên đăng nhập ở máy khác sẽ bị đăng xuất.",
+    "CURRENT_PASSWORD": "Mật khẩu hiện tại",
+    "NEW_PASSWORD": "Mật khẩu mới (ít nhất 8 ký tự)",
+    "CONFIRM_PASSWORD": "Nhập lại mật khẩu mới",
+    "CHANGE_PASSWORD": "Đổi mật khẩu",
+    "PASSWORD_CHANGED": "Đã đổi mật khẩu.",
+    "PASSWORD_WRONG": "Mật khẩu hiện tại không đúng, hoặc mật khẩu mới trùng mật khẩu cũ.",
+    "PASSWORD_MISMATCH": "Hai lần nhập mật khẩu mới không giống nhau.",
+    "PASSWORD_INVALID": "Hãy nhập đủ các ô; mật khẩu mới cần ít nhất 8 ký tự."
   }
 }

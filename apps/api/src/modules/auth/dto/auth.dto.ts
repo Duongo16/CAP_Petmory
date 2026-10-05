@@ -44,3 +44,16 @@ export class ResetPasswordDto {
   @MaxLength(72, { message: 'Mat khau toi da 72 ky tu' })
   password!: string;
 }
+
+/** Doi mat khau khi dang dang nhap: phai nhap dung mat khau cu. */
+export class ChangePasswordDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(72)
+  currentPassword!: string;
+
+  @IsString()
+  @MinLength(8, { message: 'Mat khau toi thieu 8 ky tu' })
+  @MaxLength(72, { message: 'Mat khau toi da 72 ky tu' })
+  newPassword!: string;
+}

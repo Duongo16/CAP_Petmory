@@ -16,6 +16,7 @@ import { FeedQueryDto, UpdateProfileDto, WriteCommentDto, WritePostDto } from '.
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Pet, PetDocument } from '../pets/schemas/pet.schema';
 import { StorageFolder, StorageService } from '../../common/storage/storage.service';
+import { AuditService } from '../../common/audit.service';
 import { MSG } from '../../common/constants/messages';
 
 /** Mongo raises this code when a unique index rejects a duplicate row. */
@@ -91,6 +92,7 @@ export class CommunityService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Pet.name) private readonly petModel: Model<PetDocument>,
     private readonly storage: StorageService,
+    private readonly audit: AuditService,
   ) {}
 
   // --- Feed ---
@@ -501,7 +503,8 @@ export class CommunityService {
       fullName,
       initial: fullName.trim().charAt(0).toUpperCase() || '?',
       handle: `@${user.email.split('@')[0]}`,
-      phone: user.phone ?? null,
+      // So dien thoai la du lieu ca nhan: chi chinh chu thay, nguoi xem ho so cong khai thi khong.
+      phone: viewer === user._id.toString() ? (user.phone ?? null) : null,
       avatarUrl: user.avatarUrl ?? null,
       postCount,
       followerCount,
@@ -530,7 +533,15 @@ export class CommunityService {
     if (dto.avatarUrl !== undefined) {
       update['avatarUrl'] = dto.avatarUrl.trim() || null;
     }
-    await this.userModel.findByIdAndUpdate(id, { $set: update }).exec();
+    const before = await this.userModel.findByIdAndUpdate(id, { $set: update }).select('fullName phone avatarUrl').exec();
+    await this.audit.write({
+      actor: userId,
+      action: 'USER_PROFILE_UPDATED',
+      resourceType: 'User',
+      resourceId: userId,
+      before: before ? { fullName: before.fullName, phone: before.phone, avatarUrl: before.avatarUrl } : null,
+      after: update,
+    });
     return { ok: true };
   }
 

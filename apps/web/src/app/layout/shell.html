@@ -150,6 +150,14 @@
                 }
               }
 
+              <!-- Tai khoan cua toi: sua ho so va doi mat khau, cho moi nguoi dung -->
+              <a
+                class="account-link px-3 py-2 rounded-md no-underline text-ink text-sm transition-colors hover:bg-muted"
+                role="menuitem"
+                routerLink="/account"
+                (click)="closeMenu()"
+              >{{ 'NAV.MY_ACCOUNT' | translate }}</a>
+
               <!-- My profile (khach hang) -->
               @if (!isInternal()) {
                 <a
