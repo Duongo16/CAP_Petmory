@@ -59,7 +59,8 @@
     "MODERATION": "Kiểm duyệt cộng đồng",
     "CATALOG": "Danh mục",
     "AUDIT": "Nhật ký thao tác",
-    "MY_ACCOUNT": "Tài khoản của tôi"
+    "MY_ACCOUNT": "Tài khoản của tôi",
+    "PUBLIC_DIARIES": "Nhật ký công khai"
   },
   "AUTH": {
     "QUICK": {
@@ -1978,7 +1979,8 @@
       "SPREAD_TEXT": "Vì một cộng đồng yêu động vật ấm áp hơn"
     },
     "EYEBROW": "GÓC YÊU THƯƠNG",
-    "MEMBERS": "{{count}} thành viên đang chia sẻ"
+    "MEMBERS": "{{count}} thành viên đang chia sẻ",
+    "PUBLIC_DIARIES": "Xem các quyển nhật ký công khai"
   },
   "THEME": {
     "LIGHT": "Giao diện sáng",

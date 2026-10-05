@@ -95,7 +95,7 @@ export class Shell implements OnInit {
   ];
 
   /** The footer lists everything, since it has the room. */
-  readonly footerMenu: MenuItem[] = [...this.menu, ...this.accountMenu];
+  readonly footerMenu: MenuItem[] = [...this.menu, { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' }, ...this.accountMenu];
 
   /** Shown to internal staff only. The server re-checks permission on every request. */
   /** Cac man hinh van hanh, chi mo cho nhom Quan ly. */

@@ -59,7 +59,8 @@
     "MODERATION": "Community moderation",
     "CATALOG": "Catalogue",
     "AUDIT": "Activity log",
-    "MY_ACCOUNT": "My account"
+    "MY_ACCOUNT": "My account",
+    "PUBLIC_DIARIES": "Public journals"
   },
   "AUTH": {
     "QUICK": {
@@ -1978,7 +1979,8 @@
       "SPREAD_TEXT": "For a kinder community around animals"
     },
     "EYEBROW": "A CORNER OF LOVE",
-    "MEMBERS": "{{count}} members sharing"
+    "MEMBERS": "{{count}} members sharing",
+    "PUBLIC_DIARIES": "Browse public journals"
   },
   "THEME": {
     "LIGHT": "Light appearance",
