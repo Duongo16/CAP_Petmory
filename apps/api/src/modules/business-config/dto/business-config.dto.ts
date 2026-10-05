@@ -19,6 +19,33 @@ import { Type } from 'class-transformer';
 const MONEY_PATTERN = /^\d{1,12}(\.\d{1,2})?$/;
 const MONEY_MESSAGE = 'Don gia phai la so khong am, toi da hai chu so thap phan';
 
+/** Toi da bay nhieu bai trong kho nhac. */
+export const MUSIC_TRACK_MAX = 50;
+
+/**
+ * Mot bai trong kho nhac trinh chieu (muc 19). Nhac va ban quyen do Ben A cung
+ * cap; dia chi la duong dan http(s) cong khai, hoac tep di kem ung dung trong /music/.
+ */
+export class MusicTrackDto {
+  @Matches(/^[A-Z0-9_-]{1,60}$/, { message: 'Ma bai nhac chi gom chu in hoa, so, gach ngang, gach duoi' })
+  code!: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(200)
+  title!: string;
+
+  @Matches(/^(https?:\/\/\S{3,490}|\/music\/[A-Za-z0-9._-]{1,100})$/, {
+    message: 'Dia chi tep nhac phai la http(s) hoac /music/ten-tep',
+  })
+  url!: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  credit?: string;
+}
+
 /** How many times a feature may be used within one period. */
 export class PeriodQuotaDto {
   @IsInt()
@@ -143,6 +170,14 @@ export class UpdateConfigDto {
   @ValidateNested()
   @Type(() => AiUnitPriceDto)
   aiUnitPrice?: AiUnitPriceDto;
+
+  /** Ca kho nhac, gui nguyen danh sach moi lan luu. */
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(MUSIC_TRACK_MAX)
+  @ValidateNested({ each: true })
+  @Type(() => MusicTrackDto)
+  musicLibrary?: MusicTrackDto[];
 
   /**
    * Cac muc tren phieu kiem tra chat luong, theo dung thu tu xuong lam.

@@ -17,7 +17,7 @@ import { filter } from 'rxjs';
 import { AdminService } from '../../core/services/admin.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CatalogService } from '../../core/services/catalog.service';
-import { BusinessConfig, ColorCode, ColorGroup } from '../../core/models/api.model';
+import { BusinessConfig, MusicTrack, ColorCode, ColorGroup } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
 import {
   MaterialFormDialog,
@@ -25,7 +25,7 @@ import {
   MaterialFormResult,
 } from './material-form-dialog';
 
-export type ConfigTab = 'system' | 'ai' | 'materials' | 'qc';
+export type ConfigTab = 'system' | 'ai' | 'materials' | 'qc' | 'music';
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 type MaterialsScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -67,6 +67,8 @@ function asLines(typed: string): string[] {
     .filter((one) => one.length > 0);
 }
 
+import { MusicLibraryPanel } from './music-library-panel';
+
 @Component({
   selector: 'pm-admin-config-page',
   standalone: true,
@@ -75,6 +77,7 @@ function asLines(typed: string): string[] {
     MatProgressSpinnerModule,
     TranslatePipe,
     Icon,
+    MusicLibraryPanel,
   ],
   templateUrl: './admin-config-page.html',
   styleUrls: ['./admin-shared.scss', './admin-config-page.scss'],
@@ -98,7 +101,11 @@ export class AdminConfigPage implements OnInit {
     { id: 'ai', labelKey: 'ADMIN.CONFIG.TAB_AI', icon: 'sparkle' },
     { id: 'materials', labelKey: 'ADMIN.CONFIG.TAB_MATERIALS', icon: 'paw' },
     { id: 'qc', labelKey: 'ADMIN.CONFIG.TAB_QC', icon: 'check' },
+    { id: 'music', labelKey: 'ADMIN.CONFIG.TAB_MUSIC', icon: 'bell' },
   ];
+
+  /** Kho nhac trinh chieu, sua trong tab rieng va luu rieng. */
+  readonly musicTracks = signal<MusicTrack[]>([]);
 
   // Config State
   readonly status = signal<ScreenState>('LOADING');
@@ -178,13 +185,13 @@ export class AdminConfigPage implements OnInit {
 
   ngOnInit(): void {
     const qTab = this.route.snapshot.queryParamMap.get('tab') as ConfigTab | null;
-    if (qTab && ['system', 'ai', 'materials', 'qc'].includes(qTab)) {
+    if (qTab && ['system', 'ai', 'materials', 'qc', 'music'].includes(qTab)) {
       this.activeTab.set(qTab);
     }
 
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const tab = params.get('tab') as ConfigTab | null;
-      if (tab && ['system', 'ai', 'materials', 'qc'].includes(tab) && tab !== this.activeTab()) {
+      if (tab && ['system', 'ai', 'materials', 'qc', 'music'].includes(tab) && tab !== this.activeTab()) {
         this.activeTab.set(tab);
       }
     });
@@ -372,6 +379,7 @@ export class AdminConfigPage implements OnInit {
     const price = cf.aiUnitPrice;
     const qc = (cf.qcChecklist ?? []).join(LINE_BREAK);
     this.qcChecklistRaw.set(qc);
+    this.musicTracks.set(cf.musicLibrary ?? []);
     this.form.patchValue({
       defaultPetProfileLimit: cf.defaultPetProfileLimit,
       qrExpiryHours: cf.qrExpiryHours,

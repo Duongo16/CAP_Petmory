@@ -10,7 +10,7 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 import { MemoriesService } from '../../core/services/memories.service';
 import { PetsService } from '../../core/services/pets.service';
 import { PhotosService } from '../../core/services/photos.service';
@@ -64,7 +64,7 @@ export class SlideshowPage implements OnInit {
     this.petId = this.route.snapshot.paramMap.get('id') ?? '';
     forkJoin({
       pet: this.pets.byId(this.petId),
-      diary: this.service.forPet(this.petId, 1),
+      diary: this.allMoments(),
       music: this.service.music(),
       photos: this.photos.list(this.petId),
     })
@@ -72,7 +72,7 @@ export class SlideshowPage implements OnInit {
       .subscribe({
         next: (all) => {
           this.pet.set(all.pet);
-          this.moments.set(all.diary.rows);
+          this.moments.set(all.diary);
           this.tracks.set(all.music);
           this.status.set('DONE');
           this.loadShots(all.photos.filter((one) => !one.isRestored).map((one) => one._id));
@@ -87,6 +87,19 @@ export class SlideshowPage implements OnInit {
       .setSlide(this.petId, wanted)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: (fresh) => this.pet.set(fresh), error: () => undefined });
+  }
+
+  /** Trinh chieu ca cuon, nen doc trang dau roi lay not cac trang con lai. */
+  private allMoments(): Observable<Memory[]> {
+    return this.service.forPet(this.petId, 1).pipe(
+      switchMap((first) => {
+        if (first.pageCount <= 1) {
+          return of(first.rows);
+        }
+        const rest = Array.from({ length: first.pageCount - 1 }, (_, at) => this.service.forPet(this.petId, at + 2));
+        return forkJoin(rest).pipe(map((pages) => [first, ...pages].flatMap((one) => one.rows)));
+      }),
+    );
   }
 
   /** Doc bytes cua tung buc anh qua duong co kiem quyen. */

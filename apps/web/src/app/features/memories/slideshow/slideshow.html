@@ -18,6 +18,9 @@
               <span class="place">· {{ frame.place }}</span>
             }
           </p>
+          @if (frame.body) {
+            <p class="body">{{ frame.body }}</p>
+          }
         </div>
       }
       <span class="tally tw-badge">{{ at() + 1 }} / {{ total() }}</span>
@@ -52,7 +55,7 @@
         autoplay
         loop
       ></audio>
-      <p class="credit m-0 text-center text-xs text-ink-muted">{{ tune.title }} — {{ tune.credit }}</p>
+      <p class="credit m-0 text-center text-xs text-ink-muted">{{ tune.title }}@if (tune.credit) { — {{ tune.credit }}}</p>
     } @else {
       <p class="credit m-0 text-center text-xs text-ink-muted">{{ 'MEMORY.SHOW_NO_MUSIC' | translate }}</p>
     }

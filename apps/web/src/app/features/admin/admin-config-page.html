@@ -374,7 +374,7 @@
         </div>
 
         <!-- Config Save / Discard Actions Bar (for System, AI, and QC tabs) -->
-        @if (activeTab() !== 'materials' && isManager()) {
+        @if (activeTab() !== 'materials' && activeTab() !== 'music' && isManager()) {
           <div class="config-actions-bar">
             <div class="action-buttons">
               <button class="pm-button-primary" type="submit" [disabled]="saving()">
@@ -397,6 +397,10 @@
       </form>
 
       <!-- TAB 3: MATERIALS MANAGEMENT (Merged from /admin/materials) -->
+      <div [hidden]="activeTab() !== 'music'">
+        <pm-music-library-panel [tracks]="musicTracks()" [canEdit]="isManager()" />
+      </div>
+
       <div [hidden]="activeTab() !== 'materials'">
         <div class="materials-toolbar">
           <div class="filter-chips">

@@ -35,6 +35,7 @@ export class BusinessConfigService {
   ): Promise<BusinessConfigDocument> {
     const before = await this.get();
     this.checkThresholdOrder(replaceChange, before);
+    this.checkMusicCodes(replaceChange);
     const after = await this.model
       .findOneAndUpdate(
         { key: KEY_DEFAULT },
@@ -43,6 +44,14 @@ export class BusinessConfigService {
       )
       .exec();
     return after ?? before;
+  }
+
+  /** Ma bai nhac la khoa trong cai dat trinh chieu cua tung nhat ky, nen khong duoc trung. */
+  private checkMusicCodes(replaceChange: UpdateConfigDto): void {
+    const codes = (replaceChange.musicLibrary ?? []).map((one) => one.code);
+    if (new Set(codes).size !== codes.length) {
+      throw new BadRequestException('Ma bai nhac bi trung');
+    }
   }
 
   /**

@@ -452,7 +452,7 @@ export interface MusicTrack {
   code: string;
   title: string;
   url: string;
-  credit: string;
+  credit?: string;
 }
 
 /** Mot trang cua danh sach cac quyen dang de cong khai. */
@@ -805,6 +805,8 @@ export interface BusinessConfig {
   };
   aiUnitPrice: AiUnitPrice;
   qcChecklist: string[];
+  /** Kho nhac trinh chieu nhat ky (muc 19). */
+  musicLibrary?: MusicTrack[];
   bankCode: string;
   bankName: string;
   accountNumber: string;

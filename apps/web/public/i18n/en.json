@@ -1542,7 +1542,8 @@
       "QC_EMPTY": "No criteria yet. Enter at least one line on the left.",
       "LAST_EDITOR": "Last updated by:",
       "ENABLED_COUNT": "Switched on:",
-      "MATERIAL_NONE": "No materials match the filter."
+      "MATERIAL_NONE": "No materials match the filter.",
+      "TAB_MUSIC": "Music"
     },
     "PROFILE": {
       "ZONE_COLOUR": "Colour codes by zone",
@@ -1670,6 +1671,24 @@
       "NO_RIGHT": "This account cannot moderate",
       "EMPTY_PUBLIC": "No public journals yet.",
       "EMPTY_BLOCKED": "No hidden journals."
+    },
+    "MUSIC": {
+      "TITLE": "Slideshow music library",
+      "SUB": "Customers pick a track from this library as background music for their memories. {{count}}/{{max}} tracks.",
+      "EMPTY": "The library is empty. Slideshows will play without music.",
+      "NAME": "Track name",
+      "URL": "Audio file link",
+      "URL_HINT": "https://... or /music/file-name.mp3",
+      "URL_BAD": "The link must start with https:// or /music/",
+      "CREDIT": "Source and licence",
+      "LISTEN": "Preview",
+      "REMOVE": "Remove",
+      "ADD": "Add track",
+      "ADD_DEMO": "Add 2 sample tracks",
+      "SAVED": "Music library saved.",
+      "INVALID": "Some tracks are missing a name or have an invalid link.",
+      "DUPLICATE": "Two tracks share the same code, remove one of them.",
+      "TOO_MANY": "The library holds at most {{max}} tracks."
     }
   },
   "FOOTER": {

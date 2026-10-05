@@ -1542,7 +1542,8 @@
       "QC_EMPTY": "Chưa có tiêu chí nào. Hãy nhập ít nhất một dòng bên trái.",
       "LAST_EDITOR": "Cập nhật gần nhất bởi:",
       "ENABLED_COUNT": "Đang bật:",
-      "MATERIAL_NONE": "Không tìm thấy vật liệu phù hợp với điều kiện lọc."
+      "MATERIAL_NONE": "Không tìm thấy vật liệu phù hợp với điều kiện lọc.",
+      "TAB_MUSIC": "Kho nhạc"
     },
     "PROFILE": {
       "ZONE_COLOUR": "Mã màu theo từng vùng",
@@ -1670,6 +1671,24 @@
       "NO_RIGHT": "Tài khoản này không có quyền kiểm duyệt",
       "EMPTY_PUBLIC": "Chưa có nhật ký công khai nào.",
       "EMPTY_BLOCKED": "Chưa có nhật ký nào bị ẩn."
+    },
+    "MUSIC": {
+      "TITLE": "Kho nhạc nền trình chiếu",
+      "SUB": "Khách chọn một bài trong kho làm nhạc nền khi xem lại kỷ niệm. Đang có {{count}}/{{max}} bài.",
+      "EMPTY": "Kho chưa có bài nào. Khách sẽ xem trình chiếu không có nhạc.",
+      "NAME": "Tên bài",
+      "URL": "Đường dẫn tệp nhạc",
+      "URL_HINT": "https://... hoặc /music/ten-tep.mp3",
+      "URL_BAD": "Đường dẫn phải bắt đầu bằng https:// hoặc /music/",
+      "CREDIT": "Nguồn và bản quyền",
+      "LISTEN": "Nghe thử",
+      "REMOVE": "Bỏ bài",
+      "ADD": "Thêm bài",
+      "ADD_DEMO": "Thêm 2 bài nhạc mẫu",
+      "SAVED": "Đã lưu kho nhạc.",
+      "INVALID": "Còn bài thiếu tên hoặc đường dẫn chưa đúng.",
+      "DUPLICATE": "Có hai bài trùng mã, hãy bỏ bớt một bài.",
+      "TOO_MANY": "Kho chỉ chứa tối đa {{max}} bài."
     }
   },
   "FOOTER": {

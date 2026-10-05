@@ -5,6 +5,7 @@ import { API_BASE } from './api-base';
 import {
   BusinessConfig,
   DiaryModerationPage,
+  MusicTrack,
   AdminOrderDetail,
   Order,
   CustomerRow,
@@ -94,6 +95,11 @@ export class AdminService {
 
   getConfig(): Observable<BusinessConfig> {
     return this.http.get<BusinessConfig>(`${this.base}/settings`);
+  }
+
+  /** Luu ca kho nhac trinh chieu, khong dung toi cac tham so khac. */
+  updateMusicLibrary(musicLibrary: MusicTrack[]): Observable<BusinessConfig> {
+    return this.http.patch<BusinessConfig>(`${this.base}/settings`, { musicLibrary });
   }
 
   updateConfig(replaceChange: UpdateBusinessConfig): Observable<BusinessConfig> {

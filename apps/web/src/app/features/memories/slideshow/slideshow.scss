@@ -101,6 +101,17 @@
     font-size: var(--pm-text-sm);
     opacity: 0.86;
   }
+
+  .body {
+    display: -webkit-box;
+    margin: var(--pm-space-2) 0 0;
+    overflow: hidden;
+    font-size: var(--pm-text-sm);
+    line-height: 1.5;
+    white-space: pre-line;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
 }
 
 .tally {

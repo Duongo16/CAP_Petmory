@@ -1,0 +1,70 @@
+<section class="card card-compact music-panel">
+  <div class="card-head">
+    <h2>{{ 'ADMIN.MUSIC.TITLE' | translate }}</h2>
+    <p class="music-sub">{{ 'ADMIN.MUSIC.SUB' | translate: { count: count(), max: trackMax } }}</p>
+  </div>
+
+  @if (count() === 0) {
+    <p class="music-empty">{{ 'ADMIN.MUSIC.EMPTY' | translate }}</p>
+  }
+
+  <ol class="music-list">
+    @for (row of rows.controls; track row; let i = $index) {
+      <li class="music-row" [formGroup]="row" [attr.data-index]="i">
+        <div class="music-fields">
+          <label class="music-field">
+            <span>{{ 'ADMIN.MUSIC.NAME' | translate }}</span>
+            <input class="music-title" formControlName="title" maxlength="200" autocomplete="off" />
+          </label>
+          <label class="music-field">
+            <span>{{ 'ADMIN.MUSIC.URL' | translate }}</span>
+            <input class="music-url" formControlName="url" maxlength="500" autocomplete="off"
+              [placeholder]="'ADMIN.MUSIC.URL_HINT' | translate" />
+            @if (row.controls.url.touched && row.controls.url.invalid) {
+              <span class="field-error">{{ 'ADMIN.MUSIC.URL_BAD' | translate }}</span>
+            }
+          </label>
+          <label class="music-field wide">
+            <span>{{ 'ADMIN.MUSIC.CREDIT' | translate }}</span>
+            <input class="music-credit" formControlName="credit" maxlength="300" autocomplete="off" />
+          </label>
+        </div>
+        <div class="music-side">
+          @if (row.controls.url.valid) {
+            <audio controls preload="none" [src]="row.controls.url.value"
+              [attr.aria-label]="'ADMIN.MUSIC.LISTEN' | translate"></audio>
+          }
+          @if (row.controls.code.value) {
+            <span class="music-code">{{ row.controls.code.value }}</span>
+          }
+          @if (canEdit()) {
+            <button type="button" class="pm-button-secondary remove-track" (click)="remove(i)">
+              <pm-icon name="trash" [size]="16" /> {{ 'ADMIN.MUSIC.REMOVE' | translate }}
+            </button>
+          }
+        </div>
+      </li>
+    }
+  </ol>
+
+  @if (problem(); as message) {
+    <p class="field-error music-alert" role="alert">{{ message | translate: { max: trackMax } }}</p>
+  }
+  @if (saved()) {
+    <p class="music-saved" role="status">{{ 'ADMIN.MUSIC.SAVED' | translate }}</p>
+  }
+
+  @if (canEdit()) {
+    <div class="music-actions">
+      <button type="button" class="pm-button-secondary add-track" (click)="add()">
+        <pm-icon name="plus" [size]="16" /> {{ 'ADMIN.MUSIC.ADD' | translate }}
+      </button>
+      <button type="button" class="pm-button-secondary add-demo" (click)="addDemo()">
+        {{ 'ADMIN.MUSIC.ADD_DEMO' | translate }}
+      </button>
+      <button type="button" class="pm-button-primary save-music" [disabled]="saving()" (click)="save()">
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </div>
+  }
+</section>
