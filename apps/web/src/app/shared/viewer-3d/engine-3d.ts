@@ -5,6 +5,13 @@ import { Painter, PaintMode, PaintState } from './painter';
 import { StandBuilder } from './stand-builder';
 import { StandView } from './stand-options';
 
+/** Mot phu kien can gan: ma, duong dan tep va ten nut neo trong mau. */
+export interface AccessoryMount {
+  code: string;
+  path: string;
+  anchor: string;
+}
+
 /** Six standard angles for viewing and for capturing stills for the workshop. */
 export type StandardAngle = 'FRONT' | 'LEFT' | 'RIGHT' | 'BACK' | 'TOP' | 'ISO';
 
@@ -63,6 +70,7 @@ export class Engine3d {
   private readonly raycaster = new THREE.Raycaster();
   private materialByZone = new Map<string, THREE.MeshStandardMaterial[]>();
   private attachedAccessories = new Map<string, THREE.Object3D>();
+  private wantedAccessories = new Set<string>();
   private radius = 1;
   private modelCenter = new THREE.Vector3();
   private frameHandle = 0;
@@ -206,18 +214,42 @@ export class Engine3d {
     this.controls.update();
   }
 
-  /** Attaches an accessory to the model at a given anchor point. */
-  async attachAccessory(code: string, path: string, anchorName?: string): Promise<boolean> {
+  /**
+   * Attaches an accessory to the model at a given anchor point.
+   *
+   * Mau khong co diem neo do thi khong gan, thay vi treo phu kien lo lung o
+   * goc mo hinh. Diem neo mang san do lon, nen phu kien vua voi tung con.
+   */
+  async attachAccessory(code: string, path: string, anchorName: string): Promise<boolean> {
     const gltf = await this.loader.loadAsync(path);
-    if (this.disposed || !this.angle) {
+    if (this.disposed || !this.angle || !this.wantedAccessories.has(code)) {
+      this.disposeTree(gltf.scene);
+      return false;
+    }
+    const mountPoint = this.angle.getObjectByName(anchorName);
+    if (!mountPoint) {
+      this.disposeTree(gltf.scene);
       return false;
     }
     this.detachAccessory(code);
-    const mountPoint = anchorName ? this.angle.getObjectByName(anchorName) : null;
-    const target = mountPoint ?? this.angle;
-    target.add(gltf.scene);
+    mountPoint.add(gltf.scene);
     this.attachedAccessories.set(code, gltf.scene);
-    return mountPoint !== null;
+    return true;
+  }
+
+  /** Gan va go phu kien cho khop dung danh sach dang chon. */
+  syncAccessories(list: AccessoryMount[]): void {
+    this.wantedAccessories = new Set(list.map((one) => one.code));
+    for (const code of Array.from(this.attachedAccessories.keys())) {
+      if (!this.wantedAccessories.has(code)) {
+        this.detachAccessory(code);
+      }
+    }
+    for (const one of list) {
+      if (!this.attachedAccessories.has(one.code)) {
+        void this.attachAccessory(one.code, one.path, one.anchor);
+      }
+    }
   }
 
   detachAccessory(code: string): void {

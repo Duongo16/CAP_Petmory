@@ -15,6 +15,21 @@ export enum LineKind {
   READY_MADE = 'READY_MADE',
 }
 
+/** Mot phu kien tren dong hang, chot ten va gia luc chon. */
+@Schema({ _id: false })
+export class AccessoryLine {
+  @Prop({ required: true, uppercase: true, trim: true })
+  code!: string;
+
+  @Prop({ required: true, trim: true })
+  displayName!: string;
+
+  @Prop({ type: MongooseSchema.Types.Decimal128, required: true })
+  priceDelta!: Types.Decimal128;
+}
+
+export const AccessoryLineSchema = SchemaFactory.createForClass(AccessoryLine);
+
 @Schema({ _id: true })
 export class CartItem {
   _id!: Types.ObjectId;
@@ -52,6 +67,10 @@ export class CartItem {
 
   @Prop({ trim: true, default: '' })
   displayBaseName!: string;
+
+  /** Phu kien gan len mau, chot ten va gia luc them vao gio. */
+  @Prop({ type: [AccessoryLineSchema], default: [] })
+  accessories!: AccessoryLine[];
 
   /** The attached design, so the workshop knows which model to make. May be empty. */
   @Prop({ type: Types.ObjectId, ref: 'Design', default: null })

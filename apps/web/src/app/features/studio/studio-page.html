@@ -24,6 +24,7 @@
             [brushSize]="brushSize()"
             [statusPaint]="facade.paintSaved()"
             [stand]="standView()"
+            [accessories]="accessoryMounts()"
             (zoneDetected)="labelZoneDetected($event)"
             (capturedSixAngles)="onSixAnglesCaptured($event)"
             (painted)="recordPainted($event)"
@@ -192,7 +193,39 @@
             @case ('STAND') {
               <h2 class="panel-title">{{ 'STUDIO.PANEL.STAND' | translate }}</h2>
 
-              <h3 class="group-title first">{{ 'STUDIO.STAND.SHAPE' | translate }}</h3>
+              <h3 class="group-title first">
+                {{ 'STUDIO.ACC.TITLE' | translate }}
+                <span class="count">{{ facade.accessoryPicked().length }}/{{ facade.accessoryMax() }}</span>
+              </h3>
+              @if (!canAccessorize()) {
+                <p class="hint acc-hint">{{ 'STUDIO.ACC.NO_ANCHOR' | translate }}</p>
+              } @else if (accessoryCards().length === 0) {
+                <p class="hint acc-hint">{{ 'STUDIO.ACC.NONE' | translate }}</p>
+              } @else {
+                <ul class="accessories">
+                  @for (card of accessoryCards(); track card.raw.code) {
+                    <li>
+                      <button type="button" class="accessory" [class.on]="card.on" [attr.aria-pressed]="card.on"
+                        [attr.data-accessory]="card.raw.code" (click)="toggleAccessory(card.raw.code)">
+                        <span class="acc-name">{{ card.raw.displayName }}</span>
+                        <span class="acc-anchor">{{ card.anchorKey | translate }}</span>
+                        <span class="acc-price">
+                          @if (card.free) {
+                            {{ 'STUDIO.STAND.FREE' | translate }}
+                          } @else {
+                            +{{ card.raw.priceDelta | amount: card.raw.currency }}
+                          }
+                        </span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+                @if (accessoryNote(); as note) {
+                  <p class="hint acc-note" role="status">{{ note | translate: { max: facade.accessoryMax() } }}</p>
+                }
+              }
+
+              <h3 class="group-title">{{ 'STUDIO.STAND.SHAPE' | translate }}</h3>
               <ul class="bases">
                 @for (card of baseCards(); track card.raw.code) {
                   <li>
@@ -331,11 +364,19 @@
               }
               @if (facade.quote(); as bg) {
                 <p class="quote">
-                  <span class="quote-price">{{ bg.unitPrice | amount: bg.currency }}</span>
+                  <span class="quote-price">{{ bg.totalPrice | amount: bg.currency }}</span>
                   <span class="quote-days"><pm-icon name="truck" [size]="14" />{{ 'STUDIO.DAYS' | translate: { count: bg.productionDays } }}</span>
                 </p>
               }
 
+              @if (facade.quote(); as bg) {
+                @if (accessoryNames()) {
+                  <p class="base-line acc-line">
+                    <span>{{ 'STUDIO.ACC.LINE' | translate }} {{ accessoryNames() }}</span>
+                    <span>+{{ bg.accessoryPrice | amount: bg.currency }}</span>
+                  </p>
+                }
+              }
               @if (baseLine(); as base) {
                 <p class="base-line">
                   <span>{{ 'STUDIO.STAND.BASE_LINE' | translate }} {{ base.name }}</span>

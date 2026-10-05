@@ -228,15 +228,16 @@ function bow(detail) {
   const knot = accMaterial('PM_ACC_DETAIL', '#c25478');
   const g = new THREE.Group();
   for (const side of [-1, 1]) {
-    const wing = new THREE.Mesh(solid(new RoundedBoxGeometry(0.28, 0.2, 0.08, detail, 0.04)), cloth);
-    wing.position.set(side * 0.17, 0.12, 0);
-    wing.rotation.z = side * 0.25;
+    const wing = new THREE.Mesh(solid(new RoundedBoxGeometry(0.26, 0.22, 0.12, detail, 0.05)), cloth);
+    wing.position.set(side * 0.15, 0, 0);
+    wing.rotation.z = side * 0.3;
     g.add(wing);
   }
-  const mid = new THREE.Mesh(solid(new RoundedBoxGeometry(0.1, 0.12, 0.1, detail, 0.03)), knot);
-  mid.position.y = 0.12;
+  const mid = new THREE.Mesh(solid(new RoundedBoxGeometry(0.11, 0.13, 0.14, detail, 0.04)), knot);
   g.add(mid);
-  g.position.x = 0.22;
+  // Cai lech ve mot ben dinh dau, nam ngay tren mat dau chu khong treo len cao.
+  g.position.set(0.24, 0.08, 0.12);
+  g.rotation.z = -0.35;
   return g;
 }
 
@@ -288,14 +289,15 @@ function cape(detail) {
   const cloth = accMaterial('PM_ACC_MAIN', '#7b4fa0');
   const clasp = accMaterial('PM_ACC_DETAIL', '#e3b341');
   const g = new THREE.Group();
-  const sheet = new THREE.Mesh(solid(new RoundedBoxGeometry(1.08, 0.06, 1.25, detail, 0.025)), cloth);
-  sheet.position.set(0, 0.5, -0.12);
-  const flapL = new THREE.Mesh(solid(new RoundedBoxGeometry(0.06, 0.55, 1.15, detail, 0.025)), cloth);
-  flapL.position.set(-0.55, 0.26, -0.12);
+  // Diem neo lung nam ngay mat tren cua than: tam ao om sat do, hai vat ru xuong hai ben.
+  const sheet = new THREE.Mesh(solid(new RoundedBoxGeometry(1.12, 0.07, 1.1, detail, 0.03)), cloth);
+  sheet.position.set(0, 0.035, -0.05);
+  const flapL = new THREE.Mesh(solid(new RoundedBoxGeometry(0.07, 0.42, 1.02, detail, 0.03)), cloth);
+  flapL.position.set(-0.56, -0.17, -0.05);
   const flapR = flapL.clone();
-  flapR.position.x = 0.55;
-  const pin = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), clasp);
-  pin.position.set(0, 0.5, 0.52);
+  flapR.position.x = 0.56;
+  const pin = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), clasp);
+  pin.position.set(0, 0.06, 0.5);
   g.add(sheet, flapL, flapR, pin);
   return g;
 }

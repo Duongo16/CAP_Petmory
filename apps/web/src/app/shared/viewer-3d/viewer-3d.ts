@@ -14,7 +14,7 @@ import {
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ANGLES_PREPARE, Engine3d, StandardAngle, MaterialZone } from './engine-3d';
+import { ANGLES_PREPARE, AccessoryMount, Engine3d, StandardAngle, MaterialZone } from './engine-3d';
 import { PaintMode, PaintState } from './painter';
 import { StandView } from './stand-options';
 
@@ -87,6 +87,8 @@ export class Viewer3d {
   readonly statusPaint = input<PaintState[]>([]);
   /** De trung bay duoi chan be, rong la khong co de. */
   readonly stand = input<StandView | null>(null);
+  /** Phu kien gan len mau dang xem. */
+  readonly accessories = input<AccessoryMount[]>([]);
 
   /** Reports the set of six still images once the user presses capture. */
   readonly capturedSixAngles = output<Record<StandardAngle, string>>();
@@ -126,6 +128,15 @@ export class Viewer3d {
         return;
       }
       engine.setStand(view);
+    });
+
+    effect(() => {
+      const list = this.accessories();
+      const engine = this.engine;
+      if (!engine || this.status() !== READY) {
+        return;
+      }
+      engine.syncAccessories(list);
     });
 
     effect(() => {

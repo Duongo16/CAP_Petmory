@@ -16,6 +16,7 @@ import {
   MeshPaint,
   Pet,
   DisplayBase,
+  Accessory,
 } from '../../core/models/api.model';
 import {
   BASE_NONE,
@@ -85,6 +86,18 @@ export class StudioFacade {
   /** Danh muc de cua cua hang, kem gia, doc tu may chu. */
   readonly bases = signal<DisplayBase[]>([]);
 
+  /** Danh muc phu kien dung chung, kem gia, doc tu may chu. */
+  readonly accessoryCatalog = signal<Accessory[]>([]);
+
+  /** Ma phu kien dang gan len mau, moi diem neo mot mon. */
+  readonly accessoryPicked = signal<string[]>([]);
+
+  /** So phu kien toi da cua kich co dang chon; chua chon kich co thi theo so diem neo. */
+  readonly accessoryMax = computed(() => {
+    const size = this.sizes().find((one) => one.code === this.sizeCodeSelected());
+    return size ? size.maxAccessories : 4;
+  });
+
   /** Mac dinh khong de, de khong tu cong tien vao don cua khach. */
   readonly stand = signal<StandChoice>({ baseCode: BASE_NONE, tone: 'OAK', decorations: [] });
 
@@ -125,6 +138,10 @@ export class StudioFacade {
   }
 
   loadCatalog(): void {
+    this.catalog.accessory$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (list) => this.accessoryCatalog.set(list.filter((one) => one.enabled)),
+      error: () => this.accessoryCatalog.set([]),
+    });
     this.catalog.displayBase$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (ds) => this.bases.set(ds),
       error: () => this.bases.set([]),
@@ -157,10 +174,48 @@ export class StudioFacade {
 
   private changeStand(patch: Partial<StandChoice>): void {
     this.stand.update((now) => ({ ...now, ...patch }));
+    this.markChanged();
+  }
+
+  /**
+   * Gan hoac go mot phu kien.
+   *
+   * Chon mon moi o diem neo da co mon thi thay mon cu. Da du so mon cua kich
+   * co thi khong gan them; may chu cung chan lai lan nua khi luu va khi them vao gio.
+   */
+  toggleAccessory(code: string): boolean {
+    const now = this.accessoryPicked();
+    if (now.includes(code)) {
+      this.accessoryPicked.set(now.filter((one) => one !== code));
+      this.markChanged();
+      return true;
+    }
+    const anchorOf = new Map(this.accessoryCatalog().map((one) => [one.code, one.anchor]));
+    const anchor = anchorOf.get(code);
+    const kept = now.filter((one) => anchorOf.get(one) !== anchor);
+    if (kept.length >= this.accessoryMax()) {
+      return false;
+    }
+    this.accessoryPicked.set([...kept, code]);
+    this.markChanged();
+    return true;
+  }
+
+  /** Bo het phu kien, dung khi doi sang mau khong co diem neo. */
+  clearAccessories(): void {
+    if (this.accessoryPicked().length > 0) {
+      this.accessoryPicked.set([]);
+      this.markChanged();
+    }
+  }
+
+  /** De hay phu kien doi: gia doi theo, va ban da luu khong con khop voi man hinh. */
+  private markChanged(): void {
     this.addedToCart.set(false);
     if (this.designId()) {
       this.standDirty.set(true);
     }
+    this.fetchQuote();
   }
 
   selectKind(code: string): void {
@@ -173,6 +228,14 @@ export class StudioFacade {
   selectSize(code: string): void {
     this.sizeCodeSelected.set(code);
     this.addedToCart.set(false);
+    // Kich co nho nhan it phu kien hon: bo bot nhung mon chon sau cung cho vua.
+    const max = this.accessoryMax();
+    if (this.accessoryPicked().length > max) {
+      this.accessoryPicked.set(this.accessoryPicked().slice(0, max));
+      if (this.designId()) {
+        this.standDirty.set(true);
+      }
+    }
     this.fetchQuote();
   }
 
@@ -183,8 +246,9 @@ export class StudioFacade {
     if (!kind || !size) {
       return;
     }
+    const base = this.stand().baseCode;
     this.designs
-      .quote(kind, size)
+      .quote(kind, size, base === BASE_NONE ? '' : base, this.accessoryPicked())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (bg) => this.quote.set(bg),
@@ -228,6 +292,7 @@ export class StudioFacade {
         message: v.message.trim(),
       },
       stand: { ...this.stand(), decorations: [...this.stand().decorations] },
+      accessories: [...this.accessoryPicked()],
     };
 
     const existing = this.designId();
@@ -300,6 +365,7 @@ export class StudioFacade {
             tone: (tk.stand?.tone as StandTone) || 'OAK',
             decorations: [...((tk.stand?.decorations ?? []) as StandDecoration[])],
           });
+          this.accessoryPicked.set([...(tk.accessories ?? [])]);
           this.standDirty.set(false);
           this.form.patchValue({
             name: tk.name,

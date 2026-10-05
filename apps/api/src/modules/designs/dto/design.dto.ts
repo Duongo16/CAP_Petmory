@@ -23,6 +23,9 @@ import {
 
 /** Caps how many faces one mesh may carry, so a record cannot balloon. */
 export const COUNT_FACE_MAX = 20000;
+
+/** Bon diem neo nen mot mau gan nhieu nhat bon phu kien. */
+export const ACCESSORY_PICK_MAX = 4;
 export const COUNT_MESH_MAX = 30;
 export const COUNT_DESIGN_MAX = 30;
 
@@ -143,6 +146,14 @@ export class SaveDesignDto {
   @IsOptional()
   @IsMongoId()
   pet?: string;
+
+  /** Ma phu kien gan len mau, moi diem neo mot mon. May chu doc gia va kiem lai. */
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(ACCESSORY_PICK_MAX)
+  @ArrayUnique()
+  @Matches(/^[A-Za-z0-9-]{2,30}$/, { each: true, message: 'Ma phu kien khong hop le' })
+  accessories?: string[];
 }
 
 /** Doi ten mot ban thiet ke. */

@@ -4,6 +4,8 @@ import { CatalogService, RatingSummary } from './catalog.service';
 import { ColorGroup } from './schemas/color-code.schema';
 import { ProductTypeDocument } from './schemas/product-type.schema';
 import { CreateColorCodeDto, UpdateColorCodeDto } from './dto/color-code.dto';
+import { CreateAccessoryDto, UpdateAccessoryDto } from './dto/accessory.dto';
+import { AccessoryDocument } from './schemas/accessory.schema';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { INTERNAL, Role } from '../../common/constants/roles';
@@ -12,6 +14,7 @@ import { AuditService } from '../../common/audit.service';
 
 const NO_RATING: RatingSummary = { average: 0, count: 0 };
 const RESOURCE_COLOR = 'ColorCode';
+const RESOURCE_ACCESSORY = 'Accessory';
 
 class ToggleDto {
   @IsBoolean()
@@ -47,6 +50,46 @@ export class CatalogController {
   @Get('display-bases')
   listDisplayBase(@CurrentUser() user: AuthUser) {
     return this.service.listDisplayBase(!isInternal(user));
+  }
+
+  /** Phu kien dung chung. Noi bo thay ca phu kien dang tat. */
+  @Public()
+  @Get('accessories')
+  listAccessory(@CurrentUser() user: AuthUser) {
+    return this.service.listAccessory(!isInternal(user));
+  }
+
+  @Roles(Role.MANAGER)
+  @Post('accessories')
+  async createAccessory(@Body() dto: CreateAccessoryDto, @CurrentUser() user: AuthUser) {
+    const made = await this.service.createAccessory(dto);
+    await this.audit.write({
+      actor: user.userId,
+      action: 'CREATE_ACCESSORY',
+      resourceType: RESOURCE_ACCESSORY,
+      resourceId: made.code,
+      after: accessoryShort(made),
+    });
+    return made;
+  }
+
+  @Roles(Role.MANAGER)
+  @Patch('accessories/:code')
+  async updateAccessory(
+    @Param('code') code: string,
+    @Body() dto: UpdateAccessoryDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    const { before, after } = await this.service.updateAccessory(code, dto);
+    await this.audit.write({
+      actor: user.userId,
+      action: 'UPDATE_ACCESSORY',
+      resourceType: RESOURCE_ACCESSORY,
+      resourceId: after.code,
+      before: accessoryShort(before),
+      after: accessoryShort(after),
+    });
+    return after;
   }
 
   @Public()
@@ -121,4 +164,9 @@ export class CatalogController {
   private withRating(kind: ProductTypeDocument, rating: RatingSummary | undefined) {
     return { ...kind.toObject(), rating: rating ?? NO_RATING };
   }
+}
+
+/** Ban thu gon cua phu kien de ghi nhat ky, gia ghi bang chuoi cho chinh xac. */
+function accessoryShort(one: Pick<AccessoryDocument, 'displayName' | 'anchor' | 'priceDelta' | 'enabled'>) {
+  return { displayName: one.displayName, anchor: one.anchor, priceDelta: String(one.priceDelta), enabled: one.enabled };
 }

@@ -239,8 +239,9 @@ async function run() {
     const quote = (await page.locator('.quote-price').innerText()).replace(/[^0-9]/g, '');
     const unit = String(line?.unitPrice?.$numberDecimal ?? line?.unitPrice ?? '').split('.')[0];
     res.push(check('The cart line names the stand', line?.displayBaseCode === 'BASE-ROUND', line?.displayBaseName));
-    res.push(check('The server adds the stand price to the line',
-      BigInt(unit || '0') === BigInt(quote || '0') + 120000n, `${quote} + 120000 = ${unit}`));
+    // Gia tren man hinh da gom tien de, nen phai khop dung don gia may chu chot vao dong.
+    res.push(check('The screen price already includes the stand and matches the line',
+      BigInt(unit || '0') === BigInt(quote || '0'), `${quote} = ${unit}`));
 
     // --- A draft saved on a retired model opens on its replacement ---
     const retired = await page.request.post(`${API}/designs`, {

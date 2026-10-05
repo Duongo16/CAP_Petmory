@@ -174,6 +174,10 @@ export class Design {
   @Prop({ type: StandSchema, default: () => ({}) })
   stand!: Stand;
 
+  /** Ma phu kien da gan len mau, moi diem neo mot mon. */
+  @Prop({ type: [String], default: [] })
+  accessories!: string[];
+
   @Prop({ type: [PreviewImageSchema], default: [] })
   preview!: Preview[];
 

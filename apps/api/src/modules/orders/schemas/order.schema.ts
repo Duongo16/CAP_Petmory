@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
-import { LineKind } from '../../cart/schemas/cart.schema';
+import { AccessoryLine, AccessoryLineSchema, LineKind } from '../../cart/schemas/cart.schema';
 import {
   EngravingSchema,
   MeshPaintSchema,
@@ -127,6 +127,10 @@ export class OrderLine {
 
   @Prop({ trim: true, default: '' })
   displayBaseName!: string;
+
+  /** Phu kien gan len mau, chot ten va gia cung voi dong. */
+  @Prop({ type: [AccessoryLineSchema], default: [] })
+  accessories!: AccessoryLine[];
 
   /** Which design this line came from. Kept only so the two can be traced to each other. */
   @Prop({ type: Types.ObjectId, ref: 'Design', default: null })

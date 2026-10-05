@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ColorCode, ColorCodeSchema } from './schemas/color-code.schema';
 import { ProductType, ProductTypeSchema } from './schemas/product-type.schema';
 import { DisplayBase, DisplayBaseSchema } from './schemas/display-base.schema';
+import { Accessory, AccessorySchema } from './schemas/accessory.schema';
 import { ProductReview, ProductReviewSchema } from '../reviews/schemas/product-review.schema';
 import { CatalogService } from './catalog.service';
 import { CatalogController } from './catalog.controller';
@@ -14,6 +15,7 @@ import { CatalogController } from './catalog.controller';
       { name: ProductType.name, schema: ProductTypeSchema },
       { name: DisplayBase.name, schema: DisplayBaseSchema },
       { name: ProductReview.name, schema: ProductReviewSchema },
+      { name: Accessory.name, schema: AccessorySchema },
     ]),
   ],
   controllers: [CatalogController],

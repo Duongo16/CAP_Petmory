@@ -83,7 +83,21 @@ export class CartService {
 
     // The stand is looked up on the server too, so its price cannot be forged.
     const base = await this.catalog.findDisplayBase(dto.displayBaseCode);
-    const unitPrice = addMoney(size.price, base?.priceDelta);
+    // Phu kien lay tu ban thiet ke va gia doc lai tu danh muc, roi chot vao dong.
+    const accessories = await this.catalog.findAccessories(design?.accessories);
+    if (accessories.length > size.maxAccessories) {
+      throw new BadRequestException(`Kich co nay gan toi da ${size.maxAccessories} phu kien`);
+    }
+    const unitPrice = accessories.reduce(
+      (sum, one) => addMoney(sum, one.priceDelta),
+      addMoney(size.price, base?.priceDelta),
+    );
+    const accessoryLines = accessories.map((one) => ({
+      code: one.code,
+      displayName: one.displayName,
+      priceDelta: one.priceDelta,
+    }));
+    const accessoryKey = accessoryLines.map((one) => one.code).join(',');
 
     const cart = await this.getOrCreate(owner);
     // Two lines merge only when the design and the stand match as well, because
@@ -96,6 +110,7 @@ export class CartService {
         m.sizeCode === size.code &&
         m.petName === (dto.petName ?? '') &&
         m.displayBaseCode === baseCode &&
+        (m.accessories ?? []).map((one) => one.code).join(',') === accessoryKey &&
         (m.designId?.toString() ?? '') === (designId?.toString() ?? ''),
     );
 
@@ -114,6 +129,7 @@ export class CartService {
         petName: dto.petName ?? '',
         displayBaseCode: baseCode,
         displayBaseName: base?.displayName ?? '',
+        accessories: accessoryLines,
         designId,
         quantity: dto.quantity,
         unitPrice,
@@ -172,6 +188,7 @@ export class CartService {
         petName: '',
         displayBaseCode: '',
         displayBaseName: '',
+        accessories: [],
         designId: null,
         quantity: dto.quantity,
         unitPrice: found.variant.price,
@@ -327,6 +344,11 @@ export class CartService {
         petName: m.petName,
         displayBaseCode: m.displayBaseCode,
         displayBaseName: m.displayBaseName,
+        accessories: (m.accessories ?? []).map((one) => ({
+          code: one.code,
+          displayName: one.displayName,
+          priceDelta: one.priceDelta.toString(),
+        })),
         designId: m.designId?.toString() ?? null,
         design: m.designId ? (designs.get(m.designId.toString()) ?? missingDesign(m.designId.toString())) : null,
         quantity: m.quantity,

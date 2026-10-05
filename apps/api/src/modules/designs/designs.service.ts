@@ -99,13 +99,25 @@ export class DesignsService {
    * The quote is read from the catalog on the server.
    * A price sent by the browser is never trusted.
    */
-  async quote(productTypeCode: string, sizeCode: string) {
+  async quote(productTypeCode: string, sizeCode: string, baseCode?: string, accessoryCodes?: string[]) {
     const kind = await this.catalog.detailProductType(productTypeCode);
     const size = kind.sizes.find((s) => s.code === sizeCode.toUpperCase() && s.enabled);
     if (!size) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
+    // Tong la gia kich co cong de cong phu kien, deu doc tu danh muc tren may chu.
+    const base = await this.catalog.findDisplayBase(baseCode);
+    const accessories = await this.catalog.findAccessories(accessoryCodes);
+    const whole = (value: unknown) => BigInt(String(value ?? '0').split('.')[0]);
+    const standPrice = whole(base?.priceDelta);
+    const accessoryPrice = accessories.reduce((sum, one) => sum + whole(one.priceDelta), 0n);
+    const total = whole(size.price) + standPrice + accessoryPrice;
     return {
+      sizePrice: size.price.toString(),
+      standPrice: standPrice.toString(),
+      accessoryPrice: accessoryPrice.toString(),
+      totalPrice: total.toString(),
+      maxAccessories: size.maxAccessories,
       productTypeCode: kind.code,
       nameProductType: kind.name,
       sizeCode: size.code,
@@ -222,12 +234,21 @@ export class DesignsService {
       throw new BadRequestException('Mau nen nay khong co trong thu vien');
     }
     dto.modelCode = model.code;
+    // Phu kien chi gan duoc len mau co diem neo, va phai dang ban.
+    const accessories = await this.catalog.findAccessories(dto.accessories);
+    if (accessories.length > 0 && (model.anchors ?? []).length === 0) {
+      throw new BadRequestException('Mau nen nay khong gan duoc phu kien');
+    }
+    dto.accessories = accessories.map((one) => one.code);
     // Ma de phai co trong danh muc va dang ban; ma rong nghia la chua chon de.
     await this.catalog.findDisplayBase(dto.stand?.baseCode);
     if (!dto.productTypeCode || !dto.sizeCode) {
       return;
     }
-    await this.quote(dto.productTypeCode, dto.sizeCode);
+    const priced = await this.quote(dto.productTypeCode, dto.sizeCode);
+    if (accessories.length > priced.maxAccessories) {
+      throw new BadRequestException(`Kich co nay gan toi da ${priced.maxAccessories} phu kien`);
+    }
   }
 
   private prepare(dto: SaveDesignDto) {
@@ -251,6 +272,7 @@ export class DesignsService {
         decorations: [...(dto.stand?.decorations ?? [])],
       },
       pet: dto.pet ? new Types.ObjectId(dto.pet) : null,
+      accessories: dto.accessories ?? [],
     };
   }
 }

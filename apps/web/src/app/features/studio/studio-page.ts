@@ -19,10 +19,10 @@ import { Icon } from '../../shared/icon/icon';
 import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { StudioFacade } from './studio-facade';
-import { StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
+import { AccessoryMount, StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
 import { PaintMode } from '../../shared/viewer-3d/painter';
 import { CatalogService } from '../../core/services/catalog.service';
-import { PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
+import { AccessoryAnchor, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
 import { BaseModel, ModelLibrary, DeclaredZone, ZoneName, currentModelCode } from './model-manifest';
 import {
   STAND_DECORATIONS,
@@ -70,6 +70,21 @@ const KEY_POSE: Record<string, string> = {
   SITTING: 'STUDIO.POSE.SITTING',
   STANDING: 'STUDIO.POSE.STANDING',
   LYING: 'STUDIO.POSE.LYING',
+};
+
+/** Ten nut neo trong tep mo hinh ung voi tung diem neo cua phu kien. */
+const ANCHOR_NODE: Record<AccessoryAnchor, string> = {
+  HEAD: 'PM_ANCHOR_HEAD',
+  FACE: 'PM_ANCHOR_FACE',
+  NECK: 'PM_ANCHOR_NECK',
+  BACK: 'PM_ANCHOR_BACK',
+};
+
+const KEY_ANCHOR: Record<AccessoryAnchor, string> = {
+  HEAD: 'STUDIO.ACC.ANCHOR.HEAD',
+  FACE: 'STUDIO.ACC.ANCHOR.FACE',
+  NECK: 'STUDIO.ACC.ANCHOR.NECK',
+  BACK: 'STUDIO.ACC.ANCHOR.BACK',
 };
 
 const KEY_ANGLE: Record<StandardAngle, string> = {
@@ -248,6 +263,44 @@ export class StudioPage implements OnInit {
 
   readonly decorCount = computed(() => this.facade.stand().decorations.length);
 
+  // --- Phu kien ---
+
+  /** Mau dang chon co diem neo thi moi gan duoc phu kien. */
+  readonly canAccessorize = computed(() => (this.baseModelSelected()?.anchors ?? []).length > 0);
+  readonly accessoryNote = signal<string | null>(null);
+
+  readonly accessoryCards = computed(() => {
+    const picked = this.facade.accessoryPicked();
+    return this.facade.accessoryCatalog().map((raw) => ({
+      raw,
+      on: picked.includes(raw.code),
+      free: isZero(raw.priceDelta.$numberDecimal),
+      anchorKey: KEY_ANCHOR[raw.anchor],
+    }));
+  });
+
+  /** Phu kien dang chon, doi ra tep va nut neo de khung ba chieu gan len mau. */
+  readonly accessoryMounts = computed<AccessoryMount[]>(() => {
+    if (!this.canAccessorize()) {
+      return [];
+    }
+    const byCode = new Map(this.facade.accessoryCatalog().map((one) => [one.code, one]));
+    return this.facade.accessoryPicked().flatMap((code) => {
+      const one = byCode.get(code);
+      return one ? [{ code, path: `/models/${one.modelFile}`, anchor: ANCHOR_NODE[one.anchor] }] : [];
+    });
+  });
+
+  /** Ten cac phu kien dang chon, de dong gia ghi ro tien gom nhung gi. */
+  readonly accessoryNames = computed(() => {
+    const picked = new Set(this.facade.accessoryPicked());
+    return this.facade
+      .accessoryCatalog()
+      .filter((one) => picked.has(one.code))
+      .map((one) => one.displayName)
+      .join(', ');
+  });
+
   /** Nhung gi khung ba chieu can de ve de, cap nhat ngay khi go chu khac. */
   readonly standView = computed<StandView | null>(() => {
     const choice = this.facade.stand();
@@ -368,7 +421,17 @@ export class StudioPage implements OnInit {
     this.colorCodesUsed.set([]);
     this.zonePaintOpened.set([]);
     this.facade.paintSaved.set([]);
+    if ((model.anchors ?? []).length === 0) {
+      this.facade.clearAccessories();
+    }
     this.nameDraftFor(model);
+  }
+
+  toggleAccessory(code: string): void {
+    const done = this.facade.toggleAccessory(code);
+    this.accessoryNote.set(done ? null : 'STUDIO.ACC.FULL');
+    // Phu kien doi thi anh sau goc cu khong con dung, lan sang ngan hoan tat se chup lai.
+    this.preview.set([]);
   }
 
   recordPainted(swatch: string): void {

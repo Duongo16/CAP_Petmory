@@ -1,10 +1,12 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ColorCode, ColorCodeDocument, ColorGroup } from './schemas/color-code.schema';
 import { CreateColorCodeDto, UpdateColorCodeDto } from './dto/color-code.dto';
 import { ProductType, ProductTypeDocument } from './schemas/product-type.schema';
 import { DisplayBase, DisplayBaseDocument } from './schemas/display-base.schema';
+import { Accessory, AccessoryDocument } from './schemas/accessory.schema';
+import { CreateAccessoryDto, UpdateAccessoryDto } from './dto/accessory.dto';
 import {
   ProductReview,
   ProductReviewDocument,
@@ -32,7 +34,76 @@ export class CatalogService {
     @InjectModel(ProductType.name) private readonly productTypeModel: Model<ProductTypeDocument>,
     @InjectModel(DisplayBase.name) private readonly displayBaseModel: Model<DisplayBaseDocument>,
     @InjectModel(ProductReview.name) private readonly reviewModel: Model<ProductReviewDocument>,
+    @InjectModel(Accessory.name) private readonly accessoryModel: Model<AccessoryDocument>,
   ) {}
+
+  /** Phu kien dung chung. Khach chi thay phu kien dang ban. */
+  listAccessory(enabledOnly: boolean) {
+    const where = enabledOnly ? { enabled: true } : {};
+    return this.accessoryModel.find(where).sort({ sortOrder: 1, displayName: 1 }).exec();
+  }
+
+  /**
+   * Doc cac phu kien theo ma, giu nguyen thu tu, va kiem truoc khi dung.
+   *
+   * Ma la, phu kien dang tat, ma lap lai, hay hai phu kien cung mot diem neo
+   * deu bi tu choi: may chu tinh tien theo danh sach nay, va xuong lam theo no.
+   */
+  async findAccessories(codes: string[] | undefined): Promise<AccessoryDocument[]> {
+    const wanted = (codes ?? []).map((one) => one.trim().toUpperCase()).filter(Boolean);
+    if (wanted.length === 0) {
+      return [];
+    }
+    if (new Set(wanted).size !== wanted.length) {
+      throw new BadRequestException('Phu kien bi lap lai');
+    }
+    const found = await this.accessoryModel.find({ code: { $in: wanted }, enabled: true }).exec();
+    const byCode = new Map(found.map((one) => [one.code, one]));
+    const missing = wanted.filter((code) => !byCode.has(code));
+    if (missing.length > 0) {
+      throw new BadRequestException(`Phu kien khong con ban: ${missing.join(', ')}`);
+    }
+    const list = wanted.map((code) => byCode.get(code) as AccessoryDocument);
+    const anchors = list.map((one) => one.anchor);
+    if (new Set(anchors).size !== anchors.length) {
+      throw new BadRequestException('Moi diem neo chi gan duoc mot phu kien');
+    }
+    return list;
+  }
+
+  async createAccessory(dto: CreateAccessoryDto): Promise<AccessoryDocument> {
+    try {
+      return await this.accessoryModel.create({
+        ...dto,
+        code: dto.code.toUpperCase(),
+        priceDelta: Types.Decimal128.fromString(dto.priceDelta),
+      });
+    } catch (trouble) {
+      if ((trouble as { code?: number } | null)?.code === 11000) {
+        throw new ConflictException('Ma phu kien nay da co roi');
+      }
+      throw trouble;
+    }
+  }
+
+  async updateAccessory(code: string, dto: UpdateAccessoryDto) {
+    const one = await this.accessoryModel.findOne({ code: code.toUpperCase() }).exec();
+    if (!one) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    const before = one.toObject();
+    const { priceDelta, ...rest } = dto;
+    for (const [name, value] of Object.entries(rest)) {
+      if (value !== undefined) {
+        one.set(name, value);
+      }
+    }
+    if (priceDelta !== undefined) {
+      one.priceDelta = Types.Decimal128.fromString(priceDelta);
+    }
+    const after = await one.save();
+    return { before, after };
+  }
 
   /** Customers see enabled colours only. Internal staff see all of them. */
   listColor(enabledOnly: boolean, group?: ColorGroup) {

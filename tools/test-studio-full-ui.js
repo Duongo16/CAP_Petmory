@@ -205,8 +205,13 @@ async function run() {
     // Mo ngan cuoi thi tu chup sau goc, cho chup xong de camera dung yen.
     await page.waitForSelector('.photo', { timeout: 30000 });
     await page.waitForTimeout(800);
-    res.push(check('Reopening the draft keeps the size and the price',
-      (await page.locator('.quote-price').innerText()).includes('750.000')));
+    // Gia hien tren man hinh gom ca tien de da chon (BASE-ROUND).
+    const bases = await (await page.request.get(`${API}/catalog/display-bases`)).json();
+    const round = bases.find((one) => one.code === 'BASE-ROUND');
+    const roundPrice = Number(String(round?.priceDelta?.$numberDecimal ?? round?.priceDelta ?? '0').split('.')[0]);
+    const reopened = Number((await page.locator('.quote-price').innerText()).replace(/\D/g, ''));
+    res.push(check('Reopening the draft keeps the size and the price, stand included',
+      reopened === 750000 + roundPrice, `${reopened} vs ${750000 + roundPrice}`));
     await page.screenshot({ path: path.join(OUT, 'studio-full-3-reopened.png') });
 
                 // The most important check: reopening must give back exactly the colours that were painted

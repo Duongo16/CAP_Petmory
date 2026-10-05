@@ -192,6 +192,9 @@
                           {{ 'CART.SPEC_BASE' | translate }} {{ card.raw.displayBaseName }}
                         </span>
                       }
+                      @for (acc of card.raw.accessories ?? []; track acc.code) {
+                        <span class="line-chip acc-chip">{{ 'CART.SPEC_ACCESSORY' | translate }} {{ acc.displayName }}</span>
+                      }
                       <a
                         class="line-link"
                         [routerLink]="card.productLink"

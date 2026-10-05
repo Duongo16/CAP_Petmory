@@ -187,6 +187,11 @@ export class OrdersService {
         petName: m.petName,
         displayBaseCode: m.displayBaseCode ?? '',
         displayBaseName: m.displayBaseName ?? '',
+        accessories: (m.accessories ?? []).map((one) => ({
+          code: one.code,
+          displayName: one.displayName,
+          priceDelta: Types.Decimal128.fromString(one.priceDelta.toString()),
+        })),
         designId,
         design: await this.copyDesign(designId, customer),
         quantity: m.quantity,

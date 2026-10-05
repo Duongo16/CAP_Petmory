@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -14,7 +15,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { DesignsService } from './designs.service';
-import { RenameDesignDto, SaveDesignDto, UploadPreviewDto } from './dto/design.dto';
+import { ACCESSORY_PICK_MAX, RenameDesignDto, SaveDesignDto, UploadPreviewDto } from './dto/design.dto';
 import { PreviewAngle } from './schemas/design.schema';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -29,8 +30,18 @@ export class DesignsController {
 
   /** Quote comes from the catalog. Declared before the parameterised path so it is not shadowed. */
   @Get('quote')
-  quote(@Query('productTypeCode') kind: string, @Query('sizeCode') size: string) {
-    return this.service.quote(kind ?? '', size ?? '');
+  quote(
+    @Query('productTypeCode') kind: string,
+    @Query('sizeCode') size: string,
+    @Query('baseCode') baseCode?: string,
+    @Query('accessories') accessories?: string,
+  ) {
+    // Danh sach phu kien gui dang chuoi ngan cach bang dau phay; mot mau co toi da bon diem neo.
+    const codes = (accessories ?? '').split(',').map((one) => one.trim()).filter(Boolean);
+    if (codes.length > ACCESSORY_PICK_MAX) {
+      throw new BadRequestException('Qua nhieu phu kien');
+    }
+    return this.service.quote(kind ?? '', size ?? '', baseCode, codes);
   }
 
   @Get(':id')

@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, shareReplay } from 'rxjs';
 import { API_BASE } from './api-base';
 import {
+  Accessory,
   ColorCode,
   ColorGroup,
   DisplayBase,
@@ -28,6 +29,11 @@ export class CatalogService {
   /** The stands offered on the product page, shared for the same reason. */
   readonly displayBase$ = this.http
     .get<DisplayBase[]>(`${this.base}/catalog/display-bases`)
+    .pipe(shareReplay({ bufferSize: 1, refCount: false }));
+
+  /** Phu kien dung chung, doc mot lan roi dung lai. */
+  readonly accessory$ = this.http
+    .get<Accessory[]>(`${this.base}/catalog/accessories`)
     .pipe(shareReplay({ bufferSize: 1, refCount: false }));
 
   productDetail(code: string): Observable<ProductType> {

@@ -557,7 +557,20 @@
     "CREDIT": "3D model: {{author}} · {{licence}}",
     "CREDIT_SOURCE": "View source",
     "MANAGE_DESIGNS": "See it in My designs",
-    "SAVED_DESIGNS": "Saved designs"
+    "SAVED_DESIGNS": "Saved designs",
+    "ACC": {
+      "TITLE": "Accessories",
+      "NO_ANCHOR": "This model cannot take accessories. Pick one of the four base models: standing dog, sitting dog, sitting cat or lying cat.",
+      "NONE": "The shop has no accessories yet.",
+      "FULL": "This size takes at most {{max}} accessories. Remove one or pick a larger size.",
+      "LINE": "Accessories:",
+      "ANCHOR": {
+        "HEAD": "On the head",
+        "FACE": "On the face",
+        "NECK": "On the neck",
+        "BACK": "On the back"
+      }
+    }
   },
   "HOME": {
     "BADGE": "HANDMADE • RECYCLED MATERIAL • 100% PERSONALISED",
@@ -744,7 +757,8 @@
     "DESIGN_LABEL": "Design:",
     "DESIGN_EDIT": "Edit design",
     "DESIGN_MISSING": "The design for this line was deleted. Remove the line or design it again.",
-    "PER_ITEM": "{{price}} each"
+    "PER_ITEM": "{{price}} each",
+    "SPEC_ACCESSORY": "Accessory:"
   },
   "CHECKOUT": {
     "TITLE": "Delivery details",

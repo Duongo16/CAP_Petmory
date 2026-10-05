@@ -33,6 +33,8 @@ export interface ProductionItem {
   engraving: { name: string; memorialDate: Date | null; message: string } | null;
   /** De trung bay: ten de theo don, mau go va do trang tri. Rong khi khong co de. */
   stand: { baseName: string; tone: string; decorations: string[] } | null;
+  /** Phu kien gan len mau. */
+  accessories: { code: string; displayName: string }[];
   anglesPreview: string[];
   productionDays: number;
 }
@@ -187,6 +189,8 @@ export class ProductionFileService {
             decorations: [...(stand?.decorations ?? [])],
           }
         : null,
+      // Phu kien chot cung dong luc dat, dung nhu khach da tra tien (muc 11).
+      accessories: (line.accessories ?? []).map((one) => ({ code: one.code, displayName: one.displayName })),
       anglesPreview: preview.map((a) => a.angle),
     };
   }

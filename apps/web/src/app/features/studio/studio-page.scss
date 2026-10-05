@@ -1037,3 +1037,54 @@ ul {
 .pose-chips {
   margin-block-start: 6px;
 }
+
+// --- Phu kien ---
+
+.accessories {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accessory {
+  display: grid;
+  gap: 2px;
+  inline-size: 100%;
+  padding: 10px 12px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background: var(--pm-paper-cream);
+  color: var(--pm-ink);
+  text-align: start;
+  cursor: pointer;
+
+  &.on {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pm-accent-ring);
+  }
+}
+
+.acc-name {
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+}
+
+.acc-anchor,
+.acc-price {
+  font-size: 11px;
+  color: var(--pm-text-muted);
+}
+
+.acc-hint,
+.acc-note {
+  margin: 4px 0 0;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}

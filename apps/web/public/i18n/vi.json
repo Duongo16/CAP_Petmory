@@ -557,7 +557,20 @@
     "CREDIT": "Mô hình 3D: {{author}} · {{licence}}",
     "CREDIT_SOURCE": "Xem nguồn",
     "MANAGE_DESIGNS": "Xem trong Thiết kế của tôi",
-    "SAVED_DESIGNS": "Thiết kế đã lưu"
+    "SAVED_DESIGNS": "Thiết kế đã lưu",
+    "ACC": {
+      "TITLE": "Phụ kiện",
+      "NO_ANCHOR": "Mẫu này chưa gắn được phụ kiện. Hãy chọn một trong bốn mẫu nền Cún đứng, Cún ngồi, Mèo ngồi, Mèo nằm.",
+      "NONE": "Cửa hàng chưa có phụ kiện nào.",
+      "FULL": "Kích cỡ này gắn tối đa {{max}} phụ kiện. Bỏ bớt một món hoặc chọn kích cỡ lớn hơn.",
+      "LINE": "Phụ kiện:",
+      "ANCHOR": {
+        "HEAD": "Trên đầu",
+        "FACE": "Trên mặt",
+        "NECK": "Ở cổ",
+        "BACK": "Trên lưng"
+      }
+    }
   },
   "HOME": {
     "BADGE": "THỦ CÔNG • VẬT LIỆU TÁI CHẾ • 100% CÁ NHÂN HÓA",
@@ -744,7 +757,8 @@
     "DESIGN_LABEL": "Thiết kế:",
     "DESIGN_EDIT": "Sửa thiết kế",
     "DESIGN_MISSING": "Bản thiết kế của dòng này đã bị xoá. Hãy bỏ dòng này hoặc thiết kế lại.",
-    "PER_ITEM": "{{price}} / món"
+    "PER_ITEM": "{{price}} / món",
+    "SPEC_ACCESSORY": "Phụ kiện:"
   },
   "CHECKOUT": {
     "TITLE": "Thông tin nhận hàng",

@@ -314,6 +314,8 @@ export interface PendingReview {
 
 export interface CartLine {
   id: string;
+  /** Phu kien gan len mau, chot luc them vao gio. */
+  accessories?: AccessoryLine[];
   /** Dong hang tuy bien hay dong hang co san. */
   kind: LineKind;
   /** Ma mon hang co san. Rong voi dong hang tuy bien. */
@@ -864,6 +866,7 @@ export interface Design {
   _id: string;
   name: string;
   modelCode: string;
+  accessories?: string[];
   paint: MeshPaint[];
   colorCodesUsed: string[];
   /**
@@ -899,6 +902,7 @@ export interface ZonePaint {
 export interface SaveDesign {
   name: string;
   modelCode: string;
+  accessories?: string[];
   paint?: MeshPaint[];
   colorCodesUsed?: string[];
   /** Mau tung vung co ten, de ho so san xuat ghi ma mau theo vung. */
@@ -920,6 +924,37 @@ export interface Quote {
   currency: string;
   productionDays: number;
   minPhotos: number;
+  /** Tung khoan cua gia, deu do may chu tinh: kich co, de, phu kien va tong. */
+  sizePrice: string;
+  standPrice: string;
+  accessoryPrice: string;
+  totalPrice: string;
+  maxAccessories: number;
+}
+
+/** Diem neo tren mau nen ma phu kien gan vao. */
+export type AccessoryAnchor = 'HEAD' | 'FACE' | 'NECK' | 'BACK';
+
+/** Mot phu kien dung chung trong danh muc. */
+export interface Accessory {
+  _id: string;
+  code: string;
+  displayName: string;
+  description: string;
+  anchor: AccessoryAnchor;
+  modelFile: string;
+  priceDelta: Money;
+  currency: string;
+  imageUrl: string;
+  enabled: boolean;
+  sortOrder: number;
+}
+
+/** Mot phu kien tren dong hang, chot ten va gia. */
+export interface AccessoryLine {
+  code: string;
+  displayName: string;
+  priceDelta: string;
 }
 
 export interface WoolRoll {

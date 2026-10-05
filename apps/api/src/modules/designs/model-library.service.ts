@@ -10,6 +10,12 @@ export interface BaseModel {
   pose: string;
   file: string;
   ready: boolean;
+  /** Thuoc thu vien mau nen theo muc 6. */
+  core?: boolean;
+  /** Ban day du cho xuong. */
+  fileFull?: string;
+  /** Ten cac diem neo phu kien co trong tep. Rong thi khong gan duoc phu kien. */
+  anchors?: string[];
 }
 
 /**
