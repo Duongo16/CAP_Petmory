@@ -52,8 +52,8 @@ export class AccountsController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  create(@Body() dto: CreateAccountDto) {
-    return this.service.create(dto);
+  create(@Body() dto: CreateAccountDto, @CurrentUser() user: AuthUser) {
+    return this.service.create(dto, user.userId);
   }
 
   @Patch(':id/role')
@@ -75,12 +75,12 @@ export class AccountsController {
   }
 
   @Patch(':id/password')
-  resetPassword(@Param('id') id: string, @Body() dto: ResetPasswordDto) {
-    return this.service.resetPassword(id, dto.password);
+  resetPassword(@Param('id') id: string, @Body() dto: ResetPasswordDto, @CurrentUser() user: AuthUser) {
+    return this.service.resetPassword(id, dto.password, user.userId);
   }
 
   @Patch(':id/pet-limit')
-  setPetLimit(@Param('id') id: string, @Body() dto: SetPetLimitDto) {
-    return this.service.setPetLimit(id, dto.petProfileLimit);
+  setPetLimit(@Param('id') id: string, @Body() dto: SetPetLimitDto, @CurrentUser() user: AuthUser) {
+    return this.service.setPetLimit(id, dto.petProfileLimit, user.userId);
   }
 }

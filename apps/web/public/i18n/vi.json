@@ -55,7 +55,8 @@
     "JOURNALS": "Nhật ký",
     "SHOP": "Cửa hàng",
     "ASSISTANT_KNOWLEDGE": "Kho tri thức trợ lý",
-    "DESIGNS": "Thiết kế của tôi"
+    "DESIGNS": "Thiết kế của tôi",
+    "MODERATION": "Kiểm duyệt cộng đồng"
   },
   "AUTH": {
     "QUICK": {
@@ -1595,7 +1596,7 @@
       "ERROR_READ": "Không đọc được cuộc trò chuyện này.",
       "ERROR_ACT": "Thao tác chưa thực hiện được. Bạn thử lại."
     },
-    "GROUP_ACCOUNT": "Tài khoản",
+    "GROUP_ACCOUNT": "TÀI KHOẢN & CỘNG ĐỒNG",
     "ACCOUNT": {
       "EYEBROW": "PHÂN QUYỀN NGƯỜI DÙNG",
       "TITLE": "Quản lý tài khoản",
@@ -1624,7 +1625,11 @@
       "PASSWORD_SHORT": "Mật khẩu cần ít nhất 8 ký tự.",
       "ACTIVE_LABEL": "Cho phép tài khoản này đăng nhập",
       "SAVED": "Đã lưu thay đổi cho tài khoản.",
-      "ROLE_SUPPORT": "Chăm sóc khách hàng"
+      "ROLE_SUPPORT": "Chăm sóc khách hàng",
+      "PET_LIMIT": "Giới hạn hồ sơ thú cưng",
+      "PET_LIMIT_DEFAULT": "Theo mức chung",
+      "PET_LIMIT_HINT": "Để trống để dùng mức chung trong Tham số. Nhập số để đặt riêng cho tài khoản này.",
+      "PET_LIMIT_BAD": "Nhập số nguyên từ 0 đến 1000"
     },
     "MODELS": {
       "EYEBROW": "CHỌN DÁNG SẢN PHẨM",
@@ -1646,7 +1651,26 @@
     },
     "GROUP_OPERATE": "Vận hành",
     "GROUP_CATALOG": "Danh mục & xưởng",
-    "ERROR_ORDER_STALE": "Đơn vừa được cập nhật ở nơi khác. Trang đã tải lại, hãy xem trạng thái mới rồi thao tác tiếp."
+    "ERROR_ORDER_STALE": "Đơn vừa được cập nhật ở nơi khác. Trang đã tải lại, hãy xem trạng thái mới rồi thao tác tiếp.",
+    "MODERATION": {
+      "TITLE": "Kiểm duyệt cộng đồng",
+      "SUB": "Ẩn nhật ký công khai vi phạm khỏi trang cộng đồng. Lý do ẩn được ghi vào nhật ký thao tác; chủ nhật ký vẫn xem được nhật ký của mình.",
+      "TAB_PUBLIC": "Đang công khai",
+      "TAB_BLOCKED": "Đã ẩn",
+      "SEARCH": "Tìm theo tên thú cưng",
+      "OWNER": "Chủ:",
+      "MOMENTS": "{{count}} khoảnh khắc",
+      "REASON": "Lý do ẩn:",
+      "REASON_HINT": "Ghi rõ lý do vi phạm, tối thiểu {{min}} ký tự",
+      "REASON_SHORT": "Lý do ẩn cần tối thiểu {{min}} ký tự",
+      "CONFIRM_HIDE": "Ẩn nhật ký",
+      "HIDE": "Ẩn",
+      "UNHIDE": "Hiện lại",
+      "VIEW": "Xem",
+      "NO_RIGHT": "Tài khoản này không có quyền kiểm duyệt",
+      "EMPTY_PUBLIC": "Chưa có nhật ký công khai nào.",
+      "EMPTY_BLOCKED": "Chưa có nhật ký nào bị ẩn."
+    }
   },
   "FOOTER": {
     "TAGLINE": "Không chỉ là một sản phẩm, đó là một phần ký ức…",

@@ -46,6 +46,24 @@ export class PublicDiaryQueryDto {
 }
 
 /** Ly do quan tri vien an mot quyen khoi cong dong. Bat buoc phai co. */
+/** Bo loc man kiem duyet nhat ky. */
+export class ModerationQueryDto {
+  @IsOptional()
+  @IsIn(['PUBLIC', 'BLOCKED'])
+  state?: 'PUBLIC' | 'BLOCKED';
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  keyword?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+}
+
 export class HideDiaryDto {
   @IsString()
   @MinLength(5)

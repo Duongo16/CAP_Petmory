@@ -212,8 +212,9 @@ export class AdminAccountsPage implements OnInit {
 
     const roleMoved = result.role !== (before.roles[0] ?? ROLE_FALLBACK);
     const stateMoved = result.active !== before.active;
+    const limitMoved = result.petLimit !== (before.petProfileLimit ?? null);
 
-    if (!roleMoved && !stateMoved) {
+    if (!roleMoved && !stateMoved && !limitMoved) {
       this.working.set(false);
       return;
     }
@@ -222,6 +223,9 @@ export class AdminAccountsPage implements OnInit {
     }
     if (stateMoved) {
       this.acted.next(this.service.setActive(before._id, result.active));
+    }
+    if (limitMoved) {
+      this.acted.next(this.service.setPetLimit(before._id, result.petLimit));
     }
     this.note.set('ADMIN.ACCOUNT.SAVED');
   }

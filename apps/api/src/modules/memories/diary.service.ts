@@ -32,6 +32,17 @@ export interface DiaryCard {
   slide: { trackCode: string; effect: string; seconds: number };
 }
 
+/** Mot quyen tren man kiem duyet: the gioi thieu kem trang thai cong khai va ly do an. */
+export interface DiaryModerationCard extends DiaryCard {
+  diaryPublic: boolean;
+  diaryBlocked: boolean;
+  blockReason: string;
+  blockedAt: Date | null;
+}
+
+/** Nhom quyen tren man kiem duyet. */
+export type ModerationState = 'PUBLIC' | 'BLOCKED';
+
 /** Phan cong khai cua chu nhan mot quyen nhat ky. */
 interface OwnerInfo {
   id: string;
@@ -319,6 +330,43 @@ export class DiaryService {
       page,
       pageCount: Math.max(1, Math.ceil(kept.length / PAGE_SIZE)),
     };
+  }
+
+  /**
+   * Danh sach cho nguoi kiem duyet: quyen dang cong khai, hoac quyen da bi an.
+   *
+   * Khac danh sach cong dong o cho thay ca quyen da bi an kem ly do, de bo an
+   * duoc. Van chi tra ve phan nguoi ngoai duoc nhin, khong co du lieu dinh danh.
+   */
+  async moderationList(
+    page: number,
+    state: ModerationState,
+    keyword?: string,
+  ): Promise<{ rows: DiaryModerationCard[]; total: number; page: number; pageCount: number }> {
+    const where: Record<string, unknown> =
+      state === 'BLOCKED'
+        ? { isHidden: false, diaryBlocked: true }
+        : { isHidden: false, diaryPublic: true, diaryBlocked: false };
+    const word = keyword?.trim();
+    if (word) {
+      where.name = new RegExp(escapeWord(word), 'i');
+    }
+    const total = await this.petModel.countDocuments(where).exec();
+    const pets = await this.petModel
+      .find(where)
+      .sort({ diaryBlockedAt: -1, updatedAt: -1 })
+      .skip((page - 1) * PAGE_SIZE)
+      .limit(PAGE_SIZE)
+      .exec();
+    const cards = await this.cardsOf(pets);
+    const rows = cards.map((card, i) => ({
+      ...card,
+      diaryPublic: pets[i].diaryPublic,
+      diaryBlocked: pets[i].diaryBlocked,
+      blockReason: pets[i].diaryBlockReason ?? '',
+      blockedAt: pets[i].diaryBlockedAt ?? null,
+    }));
+    return { rows, total, page, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
   }
 
   /** Dem khoanh khac va lay ten chu cho tung quyen. */

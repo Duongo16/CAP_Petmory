@@ -24,6 +24,8 @@ export interface AccountFormResult {
   password: string;
   role: Role;
   active: boolean;
+  /** Gioi han rieng so ho so thu cung; rong la theo muc chung cua cua hang. */
+  petLimit: number | null;
 }
 
 /** Do dai mat khau toi thieu, giu bang phia may chu. */
@@ -69,6 +71,12 @@ export class AccountFormDialog {
     ],
     role: [this.data.role],
     active: [this.data.account?.active ?? true],
+    petLimit: [
+      this.data.account?.petProfileLimit === null || this.data.account?.petProfileLimit === undefined
+        ? ''
+        : String(this.data.account.petProfileLimit),
+      [Validators.pattern(/^\d{0,4}$/), Validators.max(1000)],
+    ],
   });
 
   save(): void {
@@ -83,6 +91,7 @@ export class AccountFormDialog {
       password: raw.password,
       role: raw.role,
       active: raw.active,
+      petLimit: raw.petLimit.trim() === '' ? null : Number(raw.petLimit),
     });
   }
 

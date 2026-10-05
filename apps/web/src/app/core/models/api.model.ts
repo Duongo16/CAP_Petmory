@@ -348,6 +348,29 @@ export interface CartDesign {
   missing: boolean;
 }
 
+/** Mot quyen nhat ky tren man kiem duyet cong dong. */
+export interface DiaryModerationCard {
+  petId: string;
+  name: string;
+  kind: string;
+  tagline: string;
+  avatarUrl: string;
+  momentCount: number;
+  lastMomentAt: string | null;
+  ownerName: string;
+  diaryPublic: boolean;
+  diaryBlocked: boolean;
+  blockReason: string;
+  blockedAt: string | null;
+}
+
+export interface DiaryModerationPage {
+  rows: DiaryModerationCard[];
+  total: number;
+  page: number;
+  pageCount: number;
+}
+
 export interface Cart {
   items: CartLine[];
   countItem: number;

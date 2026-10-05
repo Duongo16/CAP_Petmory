@@ -50,6 +50,16 @@
     </div>
 
     @if (editing) {
+      <div class="field">
+        <label class="field-name" for="account-pet-limit">{{ 'ADMIN.ACCOUNT.PET_LIMIT' | translate }}</label>
+        <input id="account-pet-limit" type="text" inputmode="numeric" maxlength="4" formControlName="petLimit"
+          [placeholder]="'ADMIN.ACCOUNT.PET_LIMIT_DEFAULT' | translate" />
+        <p class="field-hint">{{ 'ADMIN.ACCOUNT.PET_LIMIT_HINT' | translate }}</p>
+        @if (form.controls.petLimit.invalid) {
+          <p class="field-error">{{ 'ADMIN.ACCOUNT.PET_LIMIT_BAD' | translate }}</p>
+        }
+      </div>
+
       <label class="tick">
         <input id="account-active" type="checkbox" formControlName="active" />
         <span>{{ 'ADMIN.ACCOUNT.ACTIVE_LABEL' | translate }}</span>

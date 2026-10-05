@@ -10,7 +10,7 @@ import {
   CustomerSearchDto,
   QualityTickDto,
 } from './dto/admin.dto';
-import { HideDiaryDto } from '../memories/dto/diary.dto';
+import { HideDiaryDto, ModerationQueryDto } from '../memories/dto/diary.dto';
 import { DiaryService } from '../memories/diary.service';
 import { AuditService } from '../../common/audit.service';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -105,7 +105,14 @@ export class AdminController {
    * Ly do la bat buoc, va duoc ghi vao nhat ky he thong kem ten nguoi lam,
    * vi day la mot quyet dinh cham den noi dung cua nguoi khac.
    */
-  @Roles(Role.MANAGER)
+  /** Man kiem duyet nhat ky cong dong: nhom Quan tri vien theo hop dong, kem nhom Quan ly. */
+  @Roles(Role.ADMIN, Role.MANAGER)
+  @Get('diaries')
+  moderationList(@Query() query: ModerationQueryDto) {
+    return this.diary.moderationList(query.page ?? 1, query.state ?? 'PUBLIC', query.keyword);
+  }
+
+  @Roles(Role.ADMIN, Role.MANAGER)
   @Patch('diaries/:petId/block')
   async blockDiary(
     @Param('petId') petId: string,
@@ -124,7 +131,7 @@ export class AdminController {
     return pet;
   }
 
-  @Roles(Role.MANAGER)
+  @Roles(Role.ADMIN, Role.MANAGER)
   @Patch('diaries/:petId/unblock')
   async unblockDiary(@Param('petId') petId: string, @CurrentUser() user: AuthUser) {
     const pet = await this.diary.unblockDiary(petId);

@@ -6,6 +6,7 @@ import {
   managerGuard,
   deskGuard,
   accountAdminGuard,
+  moderatorGuard,
   customerOnlyGuard,
   guestGuard,
   internalGuard,
@@ -322,6 +323,12 @@ export const routes: Routes = [
              * Quan ly tai khoan la ranh gioi cua ba nhom quyen: chi nhom Quan
              * tri vien vao duoc, va nhom do khong mo duoc man hinh nao khac.
              */
+            path: 'moderation',
+            canActivate: [moderatorGuard],
+            loadComponent: () =>
+              import('./features/admin/admin-moderation-page').then((m) => m.AdminModerationPage),
+          },
+          {
             path: 'accounts',
             canActivate: [accountAdminGuard],
             loadComponent: () =>

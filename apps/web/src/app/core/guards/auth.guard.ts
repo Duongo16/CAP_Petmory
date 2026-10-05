@@ -78,6 +78,16 @@ export const deskGuard: CanActivateFn = () => {
   return auth.isDesk() ? true : router.createUrlTree([auth.getDefaultRoute()]);
 };
 
+/** Kiem duyet cong dong: nhom Quan tri vien theo hop dong, kem nhom Quan ly. */
+export const moderatorGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  if (!auth.isSignedIn()) {
+    return router.createUrlTree(['/login']);
+  }
+  return auth.isAccountAdmin() || auth.isManager() ? true : router.createUrlTree([auth.getDefaultRoute()]);
+};
+
 export const accountAdminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);

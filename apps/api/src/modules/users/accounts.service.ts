@@ -6,6 +6,10 @@ import { UsersService } from './users.service';
 import { Role } from '../../common/constants/roles';
 import { MSG } from '../../common/constants/messages';
 import { AccountQueryDto } from './dto/account.dto';
+import { AuditService } from '../../common/audit.service';
+
+/** Loai tai nguyen ghi trong nhat ky thao tac. */
+const RESOURCE = 'User';
 
 /** Bao nhieu tai khoan tren mot trang. */
 const PAGE_SIZE = 20;
@@ -31,6 +35,7 @@ export class AccountsService {
   constructor(
     @InjectModel(User.name) private readonly model: Model<UserDocument>,
     private readonly users: UsersService,
+    private readonly audit: AuditService,
   ) {}
 
   /** Danh sach tai khoan, tim theo ten hoac dia chi thu. */
@@ -91,20 +96,25 @@ export class AccountsService {
   }
 
   /** Tao mot tai khoan moi, mang dung mot nhom quyen. */
-  create(input: {
-    email: string;
-    password: string;
-    fullName: string;
-    phone?: string;
-    role: string;
-  }): Promise<UserDocument> {
-    return this.users.createNext({
+  async create(
+    input: { email: string; password: string; fullName: string; phone?: string; role: string },
+    actor: string,
+  ): Promise<UserDocument> {
+    const made = await this.users.createNext({
       email: input.email,
       password: input.password,
       fullName: input.fullName,
       phone: input.phone,
       roles: [input.role as Role],
     });
+    await this.audit.write({
+      actor,
+      action: 'ACCOUNT_CREATED',
+      resourceType: RESOURCE,
+      resourceId: made._id.toString(),
+      after: { email: made.email, role: input.role },
+    });
+    return made;
   }
 
   /**
@@ -121,9 +131,18 @@ export class AccountsService {
     if (one.roles.includes(Role.ADMIN) && role !== Role.ADMIN) {
       await this.keepOneAdmin(one._id.toString());
     }
+    const before = [...one.roles];
     one.roles = [role as Role];
     await one.save();
     await this.users.bumpTokenEpoch(id);
+    await this.audit.write({
+      actor,
+      action: 'ACCOUNT_ROLE_CHANGED',
+      resourceType: RESOURCE,
+      resourceId: id,
+      before: { roles: before },
+      after: { roles: one.roles },
+    });
     return one;
   }
 
@@ -136,11 +155,20 @@ export class AccountsService {
     if (!active && one.roles.includes(Role.ADMIN)) {
       await this.keepOneAdmin(one._id.toString());
     }
+    const before = one.active;
     one.active = active;
     await one.save();
     if (!active) {
       await this.users.bumpTokenEpoch(id);
     }
+    await this.audit.write({
+      actor,
+      action: 'ACCOUNT_ACTIVE_CHANGED',
+      resourceType: RESOURCE,
+      resourceId: id,
+      before: { active: before },
+      after: { active },
+    });
     return one;
   }
 
@@ -150,18 +178,30 @@ export class AccountsService {
    * Cac ma dang nhap cu bi bo ngay, de nguoi dang cam ma cu khong tiep tuc
    * dung duoc sau khi mat khau da doi.
    */
-  async resetPassword(id: string, password: string): Promise<{ done: boolean }> {
+  async resetPassword(id: string, password: string, actor: string): Promise<{ done: boolean }> {
     await this.detail(id);
     await this.users.setPassword(id, password);
     await this.users.bumpTokenEpoch(id);
+    // Chi ghi la da dat lai, khong bao gio ghi mat khau.
+    await this.audit.write({ actor, action: 'ACCOUNT_PASSWORD_RESET', resourceType: RESOURCE, resourceId: id });
     return { done: true };
   }
 
   /** Dat rieng gioi han so ho so thu cung. De trong la quay ve muc chung. */
-  async setPetLimit(id: string, limit: number | undefined): Promise<UserDocument> {
+  async setPetLimit(id: string, limit: number | undefined, actor: string): Promise<UserDocument> {
     const one = await this.detail(id);
+    const before = one.petProfileLimit ?? null;
     one.petProfileLimit = limit ?? null;
-    return one.save();
+    const saved = await one.save();
+    await this.audit.write({
+      actor,
+      action: 'ACCOUNT_PET_LIMIT_CHANGED',
+      resourceType: RESOURCE,
+      resourceId: id,
+      before: { petProfileLimit: before },
+      after: { petProfileLimit: saved.petProfileLimit ?? null },
+    });
+    return saved;
   }
 
   /**

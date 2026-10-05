@@ -1,0 +1,117 @@
+<div class="pm-page">
+  <header class="page-header">
+    <h1 class="title pm-page-title">{{ 'ADMIN.MODERATION.TITLE' | translate }}</h1>
+    <p class="description">{{ 'ADMIN.MODERATION.SUB' | translate }}</p>
+  </header>
+
+  <nav class="mod-tabs" [attr.aria-label]="'ADMIN.MODERATION.TITLE' | translate">
+    @for (one of tabs(); track one.code) {
+      <button type="button" class="tw-chip filter" [class.on]="one.on" [attr.aria-pressed]="one.on"
+        [attr.data-tab]="one.code" (click)="pickTab(one.code)">
+        {{ one.key | translate }}
+      </button>
+    }
+  </nav>
+
+  <form class="search-row" (submit)="$event.preventDefault(); search(searchInput.value)">
+    <label class="sr-only" for="search-diary">{{ 'ADMIN.MODERATION.SEARCH' | translate }}</label>
+    <input id="search-diary" #searchInput type="search" autocomplete="off" [value]="keyword()"
+      [placeholder]="'ADMIN.MODERATION.SEARCH' | translate" />
+    <button class="pm-button-primary" type="submit">{{ 'ADMIN.FIND' | translate }}</button>
+    <span class="result-count">{{ 'ADMIN.RESULT_COUNT' | translate: { count: total() } }}</span>
+  </form>
+
+  @if (problem(); as message) {
+    <p class="mod-alert" role="alert">{{ message | translate: { min: reasonMin } }}</p>
+  }
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <div class="pm-center"><mat-spinner diameter="40" /></div>
+    }
+    @case ('ERROR') {
+      <div class="pm-center">
+        <p>{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button class="pm-button-secondary" type="button" (click)="reload()">{{ 'COMMON.RETRY' | translate }}</button>
+      </div>
+    }
+    @case ('READY') {
+      @if (rows().length === 0) {
+        <div class="pm-center pm-empty">
+          <p>{{ (tab() === 'BLOCKED' ? 'ADMIN.MODERATION.EMPTY_BLOCKED' : 'ADMIN.MODERATION.EMPTY_PUBLIC') | translate }}</p>
+        </div>
+      } @else {
+        <ul class="mod-list">
+          @for (one of rows(); track one.petId) {
+            <li class="mod-card" [attr.data-pet]="one.petId">
+              <span class="mod-photo" aria-hidden="true">
+                @if (one.avatarUrl) {
+                  <img [src]="one.avatarUrl" alt="" loading="lazy" />
+                } @else {
+                  <pm-icon name="paw" [size]="20" />
+                }
+              </span>
+              <div class="mod-body">
+                <p class="mod-name">{{ one.name }}</p>
+                <p class="mod-meta">
+                  {{ 'ADMIN.MODERATION.OWNER' | translate }} {{ one.ownerName }} ·
+                  {{ 'ADMIN.MODERATION.MOMENTS' | translate: { count: one.momentCount } }}
+                  @if (one.lastMomentAt) {
+                    · {{ one.lastMomentAt | date: 'dd/MM/yyyy' }}
+                  }
+                </p>
+                @if (one.diaryBlocked) {
+                  <p class="mod-reason">
+                    <strong>{{ 'ADMIN.MODERATION.REASON' | translate }}</strong> {{ one.blockReason }}
+                    @if (one.blockedAt) {
+                      ({{ one.blockedAt | date: 'dd/MM/yyyy HH:mm' }})
+                    }
+                  </p>
+                }
+
+                @if (hidingId() === one.petId) {
+                  <form class="mod-hide" (submit)="$event.preventDefault(); hide(one.petId, reasonBox.value)">
+                    <label class="sr-only" [for]="'reason-' + one.petId">{{ 'ADMIN.MODERATION.REASON' | translate }}</label>
+                    <textarea #reasonBox [id]="'reason-' + one.petId" rows="2" maxlength="500"
+                      [placeholder]="'ADMIN.MODERATION.REASON_HINT' | translate: { min: reasonMin }"></textarea>
+                    <div class="mod-actions">
+                      <button type="submit" class="pm-button-primary" [disabled]="busyId() === one.petId">
+                        {{ 'ADMIN.MODERATION.CONFIRM_HIDE' | translate }}
+                      </button>
+                      <button type="button" class="pm-button-secondary" (click)="cancelHide()">{{ 'COMMON.CANCEL' | translate }}</button>
+                    </div>
+                  </form>
+                }
+              </div>
+              <div class="mod-actions side">
+                @if (one.diaryBlocked) {
+                  <button type="button" class="pm-button-secondary unhide-button" [disabled]="busyId() === one.petId"
+                    (click)="unhide(one.petId)">
+                    {{ 'ADMIN.MODERATION.UNHIDE' | translate }}
+                  </button>
+                } @else {
+                  <a class="pm-button-secondary" [routerLink]="['/diaries', one.petId]" target="_blank">
+                    {{ 'ADMIN.MODERATION.VIEW' | translate }}
+                  </a>
+                  @if (hidingId() !== one.petId) {
+                    <button type="button" class="pm-button-primary hide-button" (click)="startHide(one.petId)">
+                      {{ 'ADMIN.MODERATION.HIDE' | translate }}
+                    </button>
+                  }
+                }
+              </div>
+            </li>
+          }
+        </ul>
+
+        @if (pageCount() > 1) {
+          <nav class="mod-pager">
+            <button type="button" class="pm-button-secondary" [disabled]="page() <= 1" (click)="goTo(page() - 1)">‹</button>
+            <span>{{ page() }} / {{ pageCount() }}</span>
+            <button type="button" class="pm-button-secondary" [disabled]="page() >= pageCount()" (click)="goTo(page() + 1)">›</button>
+          </nav>
+        }
+      }
+    }
+  }
+</div>

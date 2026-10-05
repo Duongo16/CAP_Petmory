@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { API_BASE } from './api-base';
 import {
   BusinessConfig,
+  DiaryModerationPage,
   AdminOrderDetail,
   Order,
   CustomerRow,
@@ -108,5 +109,23 @@ export class AdminService {
     return this.http.get<TransferNotification[]>(`${this.base}/payments/log`, {
       params: new HttpParams().set('limit', limit),
     });
+  }
+
+  /** Nhat ky cong khai hoac da bi an, cho man kiem duyet cong dong. */
+  moderationList(state: 'PUBLIC' | 'BLOCKED', keyword: string, page: number): Observable<DiaryModerationPage> {
+    let params = new HttpParams().set('state', state).set('page', page);
+    if (keyword.trim()) {
+      params = params.set('keyword', keyword.trim());
+    }
+    return this.http.get<DiaryModerationPage>(`${this.base}/admin/diaries`, { params });
+  }
+
+  /** An mot quyen nhat ky khoi cong dong, ly do bat buoc. */
+  blockDiary(petId: string, reason: string): Observable<unknown> {
+    return this.http.patch(`${this.base}/admin/diaries/${petId}/block`, { reason });
+  }
+
+  unblockDiary(petId: string): Observable<unknown> {
+    return this.http.patch(`${this.base}/admin/diaries/${petId}/unblock`, {});
   }
 }

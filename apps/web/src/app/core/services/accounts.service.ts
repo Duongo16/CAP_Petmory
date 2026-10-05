@@ -49,6 +49,12 @@ export class AccountsService {
     return this.http.patch<Account>(`${this.base}/admin/accounts/${id}/active`, { active });
   }
 
+  /** Dat rieng gioi han ho so thu cung. Rong la quay ve muc chung cua cua hang. */
+  setPetLimit(id: string, limit: number | null): Observable<Account> {
+    const body = limit === null ? {} : { petProfileLimit: limit };
+    return this.http.patch<Account>(`${this.base}/admin/accounts/${id}/pet-limit`, body);
+  }
+
   resetPassword(id: string, password: string): Observable<{ done: boolean }> {
     return this.http.patch<{ done: boolean }>(
       `${this.base}/admin/accounts/${id}/password`,

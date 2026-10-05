@@ -55,7 +55,8 @@
     "JOURNALS": "Diaries",
     "SHOP": "Shop",
     "ASSISTANT_KNOWLEDGE": "Assistant knowledge",
-    "DESIGNS": "My designs"
+    "DESIGNS": "My designs",
+    "MODERATION": "Community moderation"
   },
   "AUTH": {
     "QUICK": {
@@ -1595,7 +1596,7 @@
       "ERROR_READ": "That conversation could not be read.",
       "ERROR_ACT": "That did not go through. Try again."
     },
-    "GROUP_ACCOUNT": "Accounts",
+    "GROUP_ACCOUNT": "ACCOUNTS & COMMUNITY",
     "ACCOUNT": {
       "EYEBROW": "USER PERMISSIONS",
       "TITLE": "Account management",
@@ -1624,7 +1625,11 @@
       "PASSWORD_SHORT": "The password needs at least 8 characters.",
       "ACTIVE_LABEL": "Let this account sign in",
       "SAVED": "The changes to the account have been saved.",
-      "ROLE_SUPPORT": "Customer care"
+      "ROLE_SUPPORT": "Customer care",
+      "PET_LIMIT": "Pet profile limit",
+      "PET_LIMIT_DEFAULT": "Shop default",
+      "PET_LIMIT_HINT": "Leave empty to use the default in Settings. Enter a number to set one for this account only.",
+      "PET_LIMIT_BAD": "Enter a whole number from 0 to 1000"
     },
     "MODELS": {
       "EYEBROW": "CHOOSE THE PRODUCT SHAPE",
@@ -1646,7 +1651,26 @@
     },
     "GROUP_OPERATE": "Operations",
     "GROUP_CATALOG": "Catalogue & workshop",
-    "ERROR_ORDER_STALE": "This order was just changed elsewhere. The page has reloaded, check the new status and carry on."
+    "ERROR_ORDER_STALE": "This order was just changed elsewhere. The page has reloaded, check the new status and carry on.",
+    "MODERATION": {
+      "TITLE": "Community moderation",
+      "SUB": "Hide public journals that break the rules from the community page. The reason is written to the audit log; owners can still read their own journal.",
+      "TAB_PUBLIC": "Public",
+      "TAB_BLOCKED": "Hidden",
+      "SEARCH": "Search by pet name",
+      "OWNER": "Owner:",
+      "MOMENTS": "{{count}} moments",
+      "REASON": "Reason:",
+      "REASON_HINT": "Explain the violation, at least {{min}} characters",
+      "REASON_SHORT": "The reason needs at least {{min}} characters",
+      "CONFIRM_HIDE": "Hide journal",
+      "HIDE": "Hide",
+      "UNHIDE": "Show again",
+      "VIEW": "View",
+      "NO_RIGHT": "This account cannot moderate",
+      "EMPTY_PUBLIC": "No public journals yet.",
+      "EMPTY_BLOCKED": "No hidden journals."
+    }
   },
   "FOOTER": {
     "TAGLINE": "More than a product — a piece of memory.",
