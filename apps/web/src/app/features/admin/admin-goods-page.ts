@@ -10,24 +10,19 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Observable, concatMap, filter, forkJoin, of, switchMap } from 'rxjs';
+import { filter, forkJoin } from 'rxjs';
 import { GoodsService } from '../../core/services/goods.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Goods, GoodsCategory } from '../../core/models/api.model';
-import {
-  GoodsFormDialog,
-  GoodsFormInput,
-  GoodsFormResult,
-  GoodsFormVariant,
-} from './goods-form-dialog';
+import { GoodsFormDialog, GoodsFormInput, GoodsFormResult } from './goods-form-dialog';
+import { StockDialog, StockDialogResult } from './stock-dialog';
+import { GoodsCategoryPanel } from './goods-category-panel';
 
 type ScreenState = 'LOADING' | 'READY' | 'ERROR';
+type GoodsTab = 'GOODS' | 'GROUPS';
 
 /** Trang thai man hinh luc dang doc du lieu. */
 const LOADING = 'LOADING';
-
-/** Ly do ghi vao so kho khi ton duoc sua thang trong hop thoai. */
-const NOTE_FROM_FORM = 'Sua truc tiep o man quan ly hang';
 
 /** Kich thuoc hop thoai, giong cac hop thoai khac trong trang. */
 const SHEET = {
@@ -50,14 +45,13 @@ interface GoodsRow {
  * Mot bang liet ke, con them va sua deu mo ra hop thoai, dung nhu moi man quan
  * ly danh muc khac trong trang.
  *
- * So ton kho van duoc ghi lai day du. Khi nguoi dung doi so ton trong hop thoai,
- * trang nay gui phan chenh lech qua duong cong tru cua may chu, nen so kho van
- * la so chi them chu khong sua, va van khong the tru qua so hang dang co.
+ * So ton kho khong sua trong hop thoai mon hang. Moi lan nhap hay tru deu di qua
+ * hop thoai So kho, kem ly do bat buoc, va xem lai duoc lich su tung to hop.
  */
 @Component({
   selector: 'pm-admin-goods-page',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, GoodsCategoryPanel],
   templateUrl: './admin-goods-page.html',
   styleUrls: ['./admin-shared.scss', './admin-goods-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,6 +64,7 @@ export class AdminGoodsPage implements OnInit {
   readonly canEdit = inject(AuthService).isManager;
 
   readonly status = signal<ScreenState>(LOADING);
+  readonly tab = signal<GoodsTab>('GOODS');
   readonly rows = signal<Goods[]>([]);
   readonly groups = signal<GoodsCategory[]>([]);
   readonly saving = signal(false);
@@ -101,6 +96,25 @@ export class AdminGoodsPage implements OnInit {
           this.status.set('READY');
         },
         error: () => this.status.set('ERROR'),
+      });
+  }
+
+  pickTab(tab: GoodsTab): void {
+    this.clearNotes();
+    this.tab.set(tab);
+  }
+
+  /** Mo so kho cua mot mon: nhap, tru kem ly do va xem lich su. */
+  openStock(one: Goods): void {
+    this.clearNotes();
+    this.dialog
+      .open<StockDialog, Goods, StockDialogResult>(StockDialog, { ...SHEET, data: one })
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((changed) => {
+        if (changed) {
+          this.reload();
+        }
       });
   }
 
@@ -156,12 +170,8 @@ export class AdminGoodsPage implements OnInit {
   /**
    * Luu mon hang.
    *
-   * Phan thong tin mon hang va phan so ton di theo hai duong khac nhau: mon
-   * hang ghi de duoc, con so ton thi chi cong tru chu khong dat thang, de so
-   * kho van la so chi them.
-   *
-   * Them moi thi may chu da luu so ton ngay luc tao, nen khong cong them mot
-   * lan nua. Chi khi sua moi phai gui phan chenh lech.
+   * So ton chi gui cho to hop moi lam so ban dau. To hop da co thi may chu giu
+   * nguyen so ton, muon doi phai qua So kho.
    *
    * Ma mon hang cung chi gui khi tao moi: duong sua khong nhan truong ma, vi
    * ma la chia khoa cua mon hang va doi ma nghia la mot mon khac. Gui kem thi
@@ -176,10 +186,10 @@ export class AdminGoodsPage implements OnInit {
       deliveryDays: result.deliveryDays,
       enabled: result.enabled,
       images: result.images,
-      optionNames: ['Tổ hợp'],
+      optionNames: result.optionNames,
       variant: result.variant.map((each) => ({
         sku: each.sku,
-        optionValues: [each.label],
+        optionValues: each.optionValues,
         price: each.price,
         stock: each.stock,
         enabled: each.enabled,
@@ -187,9 +197,7 @@ export class AdminGoodsPage implements OnInit {
     };
 
     const write = before
-      ? this.service
-          .update(before.code, body)
-          .pipe(switchMap((saved) => this.applyStock(saved.code, before, result.variant)))
+      ? this.service.update(before.code, body)
       : this.service.create({ ...body, code: result.code });
 
     write.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -203,30 +211,6 @@ export class AdminGoodsPage implements OnInit {
         this.problem.set(firstMessage(trouble) ?? 'COMMON.GENERIC_ERROR');
       },
     });
-  }
-
-  /**
-   * Gui phan chenh lech cua tung to hop co so ton doi.
-   *
-   * Cac lan gui di lan luot chu khong song song, de so kho ghi dung thu tu va
-   * de mot to hop khong du hang thi cac to hop truoc do van da ghi xong.
-   */
-  private applyStock(
-    code: string,
-    before: Goods,
-    after: GoodsFormVariant[],
-  ): Observable<unknown> {
-    const had = new Map(before.variant.map((each) => [each.sku, each.stock]));
-    const jobs = after
-      .map((each) => ({ sku: each.sku, delta: each.stock - (had.get(each.sku) ?? 0) }))
-      .filter((each) => each.delta !== 0);
-
-    if (jobs.length === 0) {
-      return of(null);
-    }
-    return of(...jobs).pipe(
-      concatMap((each) => this.service.adjustStock(code, each.sku, each.delta, NOTE_FROM_FORM)),
-    );
   }
 
   private clearNotes(): void {

@@ -12,3 +12,9 @@ tr.off {
   color: var(--pm-text-muted);
   font-size: var(--pm-text-sm);
 }
+
+.goods-tabs {
+  display: flex;
+  gap: 6px;
+  margin-block-end: 12px;
+}

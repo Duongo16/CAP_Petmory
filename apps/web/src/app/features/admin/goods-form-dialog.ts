@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -12,10 +13,10 @@ export interface GoodsFormInput {
   groups: GoodsCategory[];
 }
 
-/** Mot to hop trong bieu mau. */
+/** Mot to hop trong bieu mau. Moi gia tri ung voi mot ten thuoc tinh. */
 export interface GoodsFormVariant {
   sku: string;
-  label: string;
+  optionValues: string[];
   price: string;
   stock: number;
   enabled: boolean;
@@ -30,6 +31,7 @@ export interface GoodsFormResult {
   deliveryDays: number;
   enabled: boolean;
   images: string[];
+  optionNames: string[];
   variant: GoodsFormVariant[];
 }
 
@@ -88,10 +90,24 @@ export class GoodsFormDialog {
       [Validators.required, Validators.min(1), Validators.max(60)],
     ],
     enabled: [this.data.goods?.enabled ?? true],
+    /* Toi da hai thuoc tinh bien the, ten do quan tri dat (vd Kich thuoc, Mau). */
+    optionName1: [this.data.goods?.optionNames[0] ?? '', [Validators.required, Validators.maxLength(60)]],
+    optionName2: [this.data.goods?.optionNames[1] ?? '', Validators.maxLength(60)],
     variant: this.fb.array<ReturnType<GoodsFormDialog['makeVariant']>>(this.startingVariants()),
   });
 
   readonly variants = computed(() => this.form.controls.variant);
+
+  readonly nameOne = toSignal(this.form.controls.optionName1.valueChanges, {
+    initialValue: this.form.controls.optionName1.value,
+  });
+  readonly nameTwo = toSignal(this.form.controls.optionName2.valueChanges, {
+    initialValue: this.form.controls.optionName2.value,
+  });
+  readonly hasTwo = computed(() => this.nameTwo().trim() !== '');
+
+  /** Thieu gia tri cho thuoc tinh thu hai khi da dat ten cho no. */
+  readonly missingTwo = signal(false);
 
   addImage(link: string): void {
     if (this.imageFull() || this.images().includes(link)) {
@@ -105,7 +121,7 @@ export class GoodsFormDialog {
   }
 
   addVariant(): void {
-    this.variantList().push(this.makeVariant('', '', '', 0, true));
+    this.variantList().push(this.makeVariant('', ['', ''], '', 0, true, false));
   }
 
   dropVariant(at: number): void {
@@ -115,11 +131,14 @@ export class GoodsFormDialog {
   }
 
   save(): void {
-    if (this.form.invalid) {
+    const raw = this.form.getRawValue();
+    const two = raw.optionName2.trim() !== '';
+    this.missingTwo.set(two && raw.variant.some((each) => each.value2.trim() === ''));
+    if (this.form.invalid || this.missingTwo()) {
       this.form.markAllAsTouched();
       return;
     }
-    const raw = this.form.getRawValue();
+    const names = two ? [raw.optionName1.trim(), raw.optionName2.trim()] : [raw.optionName1.trim()];
     this.ref.close({
       code: raw.code.trim().toUpperCase(),
       name: raw.name.trim(),
@@ -128,9 +147,10 @@ export class GoodsFormDialog {
       deliveryDays: raw.deliveryDays,
       enabled: raw.enabled,
       images: this.images(),
+      optionNames: names,
       variant: raw.variant.map((each) => ({
         sku: each.sku.trim().toUpperCase(),
-        label: each.label.trim(),
+        optionValues: two ? [each.value1.trim(), each.value2.trim()] : [each.value1.trim()],
         price: String(each.price).trim(),
         stock: each.stock,
         enabled: each.enabled,
@@ -150,33 +170,40 @@ export class GoodsFormDialog {
    */
   private startingVariants(): ReturnType<GoodsFormDialog['makeVariant']>[] {
     const have = (this.data.goods?.variant ?? []).map((each) =>
-      this.makeVariant(
-        each.sku,
-        each.optionValues.join(' · '),
-        wholeDong(each.price),
-        each.stock,
-        each.enabled,
-      ),
+      this.makeVariant(each.sku, each.optionValues, wholeDong(each.price), each.stock, each.enabled, true),
     );
-    return have.length > 0 ? have : [this.makeVariant('', '', '', 0, true)];
+    return have.length > 0 ? have : [this.makeVariant('', ['', ''], '', 0, true, false)];
   }
 
   private variantList(): FormArray {
     return this.form.controls.variant as unknown as FormArray;
   }
 
+  /**
+   * Mot dong to hop.
+   *
+   * To hop da luu thi khoa ma va khoa so ton: ma la khoa cua don hang, con
+   * ton kho chi doi qua hop thoai Kho kem ly do. To hop moi thi nhap duoc so
+   * ton ban dau.
+   */
   private makeVariant(
     sku: string,
-    label: string,
+    values: string[],
     price: string,
     stock: number,
     enabled: boolean,
+    saved: boolean,
   ) {
     return this.fb.nonNullable.group({
-      sku: [sku, [Validators.required, Validators.pattern(SKU_SHAPE)]],
-      label: [label, [Validators.required, Validators.maxLength(60)]],
+      saved: [saved],
+      sku: [{ value: sku, disabled: saved }, [Validators.required, Validators.pattern(SKU_SHAPE)]],
+      value1: [values[0] ?? '', [Validators.required, Validators.maxLength(60)]],
+      value2: [values[1] ?? '', Validators.maxLength(60)],
       price: [price, [Validators.required, Validators.pattern(MONEY_SHAPE)]],
-      stock: [stock, [Validators.required, Validators.min(0), Validators.max(1000000)]],
+      stock: [
+        { value: stock, disabled: saved },
+        [Validators.required, Validators.min(0), Validators.max(1000000)],
+      ],
       enabled: [enabled],
     });
   }

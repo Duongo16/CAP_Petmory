@@ -34,6 +34,15 @@ export interface GoodsInput {
   enabled?: boolean;
 }
 
+/** Mot nhom hang khi tao hoac sua tu trang quan tri. */
+export interface GoodsCategoryInput {
+  code?: string;
+  name?: string;
+  description?: string;
+  sortOrder?: number;
+  enabled?: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GoodsService {
   private readonly http = inject(HttpClient);
@@ -101,6 +110,18 @@ export class GoodsService {
       delta,
       note,
     });
+  }
+
+  createCategory(input: GoodsCategoryInput): Observable<GoodsCategory> {
+    return this.http.post<GoodsCategory>(`${this.base}/admin/goods/categories`, input);
+  }
+
+  updateCategory(code: string, input: GoodsCategoryInput): Observable<GoodsCategory> {
+    return this.http.patch<GoodsCategory>(`${this.base}/admin/goods/categories/${code}`, input);
+  }
+
+  hideCategory(code: string): Observable<GoodsCategory> {
+    return this.http.delete<GoodsCategory>(`${this.base}/admin/goods/categories/${code}`);
   }
 
   stockMoves(code: string, sku: string): Observable<StockMove[]> {

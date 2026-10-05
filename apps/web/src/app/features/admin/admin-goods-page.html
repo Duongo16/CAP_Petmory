@@ -2,7 +2,7 @@
   <div class="pm-page-head-text">
     <h1 class="title pm-page-title">{{ 'ADMIN.GOODS.TITLE' | translate }}</h1>
   </div>
-  @if (canEdit()) {
+  @if (canEdit() && tab() === 'GOODS') {
     <div class="pm-page-head-actions">
       <button
         type="button"
@@ -40,6 +40,20 @@
       <p class="pm-status" data-tone="good" role="status">{{ said | translate }}</p>
     }
 
+    <nav class="goods-tabs" [attr.aria-label]="'ADMIN.GOODS.TITLE' | translate">
+      <button type="button" class="tw-chip" data-tab="GOODS" [class.on]="tab() === 'GOODS'"
+        [attr.aria-pressed]="tab() === 'GOODS'" (click)="pickTab('GOODS')">
+        {{ 'ADMIN.GOODS.TAB_GOODS' | translate }}
+      </button>
+      <button type="button" class="tw-chip" data-tab="GROUPS" [class.on]="tab() === 'GROUPS'"
+        [attr.aria-pressed]="tab() === 'GROUPS'" (click)="pickTab('GROUPS')">
+        {{ 'ADMIN.GOODS.TAB_GROUPS' | translate }}
+      </button>
+    </nav>
+
+    @if (tab() === 'GROUPS') {
+      <pm-goods-category-panel [groups]="groups()" [canEdit]="canEdit()" (changed)="reload()" />
+    } @else {
     <section class="pm-card tw-card-pad">
       @if (view().length === 0) {
         <p class="pm-empty">{{ 'ADMIN.GOODS.NONE_YET' | translate }}</p>
@@ -77,6 +91,9 @@
                       <button type="button" class="plain" [disabled]="saving()" (click)="edit(one.raw)">
                         {{ 'COMMON.EDIT' | translate }}
                       </button>
+                      <button type="button" class="plain stock-open" [disabled]="saving()" (click)="openStock(one.raw)">
+                        {{ 'ADMIN.GOODS.STOCK_BOOK' | translate }}
+                      </button>
                       <button type="button" class="plain danger" [disabled]="saving()" (click)="drop(one.raw)">
                         {{ 'COMMON.REMOVE' | translate }}
                       </button>
@@ -89,5 +106,6 @@
         </div>
       }
     </section>
+    }
   }
 }

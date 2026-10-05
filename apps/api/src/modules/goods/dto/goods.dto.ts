@@ -29,8 +29,11 @@ const WHOLE_DONG_MESSAGE = 'Gia phai la so nguyen dong, khong co phan le';
 const CODE_SHAPE = /^[A-Z0-9-]{2,40}$/;
 const CODE_MESSAGE = 'Ma chi gom chu in hoa, chu so va dau gach ngang';
 
+/** Ma nhom hang ngan hon, khop do dai toi da cua truong ma trong co so du lieu. */
+const CATEGORY_CODE_SHAPE = /^[A-Z0-9-]{2,30}$/;
+
 export class GoodsCategoryDto {
-  @Matches(CODE_SHAPE, { message: CODE_MESSAGE })
+  @Matches(CATEGORY_CODE_SHAPE, { message: CODE_MESSAGE })
   code!: string;
 
   @IsString() @MinLength(2) @MaxLength(120)

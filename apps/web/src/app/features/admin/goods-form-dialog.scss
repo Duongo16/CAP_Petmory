@@ -17,7 +17,7 @@
 .variant-head,
 .variant-row {
   display: grid;
-  grid-template-columns: 1.5fr 1.2fr 1fr 0.8fr auto auto;
+  grid-template-columns: 1.2fr 1.2fr 1.1fr 1fr 0.7fr auto auto;
   gap: var(--pm-space-2);
   align-items: center;
 }
@@ -231,4 +231,14 @@
   .shot-drop:focus-visible {
     opacity: 1;
   }
+}
+
+/* O thuoc tinh thu hai khi chua dat ten thi mo di, khong go duoc. */
+.variant-row input.is-off {
+  opacity: 0.45;
+}
+
+.variant-row input:disabled {
+  background: var(--pm-bg-muted);
+  color: var(--pm-text-muted);
 }

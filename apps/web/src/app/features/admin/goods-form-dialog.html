@@ -85,8 +85,22 @@
 
     <!-- Bien the -->
     <h3 class="sub-head">{{ 'ADMIN.GOODS.VARIANT' | translate }}</h3>
+    <div class="pair">
+      <div class="field">
+        <label class="field-name" for="goods-option-1">{{ 'ADMIN.GOODS.OPTION_1' | translate }}</label>
+        <input id="goods-option-1" type="text" maxlength="60" formControlName="optionName1"
+          [placeholder]="'ADMIN.GOODS.OPTION_1_HINT' | translate" />
+      </div>
+      <div class="field">
+        <label class="field-name" for="goods-option-2">{{ 'ADMIN.GOODS.OPTION_2' | translate }}</label>
+        <input id="goods-option-2" type="text" maxlength="60" formControlName="optionName2"
+          [placeholder]="'ADMIN.GOODS.OPTION_2_HINT' | translate" />
+      </div>
+    </div>
+
     <div class="variant-head">
-      <span>{{ 'ADMIN.GOODS.VARIANT_NAME' | translate }}</span>
+      <span>{{ nameOne() || ('ADMIN.GOODS.OPTION_1' | translate) }}</span>
+      <span>{{ hasTwo() ? nameTwo() : '—' }}</span>
       <span>{{ 'ADMIN.GOODS.SKU' | translate }}</span>
       <span>{{ 'ADMIN.GOODS.PRICE' | translate }}</span>
       <span>{{ 'ADMIN.GOODS.STOCK' | translate }}</span>
@@ -95,15 +109,20 @@
     </div>
 
     <div formArrayName="variant">
-      @for (row of variants().controls; track $index) {
+      @for (row of variants().controls; track row) {
         <div class="variant-row" [formGroupName]="$index">
           <label class="cell">
-            <span class="cell-name">{{ 'ADMIN.GOODS.VARIANT_NAME' | translate }}</span>
-            <input type="text" formControlName="label" />
+            <span class="cell-name">{{ nameOne() || ('ADMIN.GOODS.OPTION_1' | translate) }}</span>
+            <input class="value-1" type="text" maxlength="60" formControlName="value1" />
+          </label>
+          <label class="cell">
+            <span class="cell-name">{{ hasTwo() ? nameTwo() : ('ADMIN.GOODS.OPTION_2' | translate) }}</span>
+            <input class="value-2" type="text" maxlength="60" formControlName="value2" [readonly]="!hasTwo()"
+              [class.is-off]="!hasTwo()" />
           </label>
           <label class="cell">
             <span class="cell-name">{{ 'ADMIN.GOODS.SKU' | translate }}</span>
-            <input type="text" formControlName="sku" />
+            <input class="variant-sku" type="text" formControlName="sku" />
           </label>
           <label class="cell">
             <span class="cell-name">{{ 'ADMIN.GOODS.PRICE' | translate }}</span>
@@ -111,7 +130,7 @@
           </label>
           <label class="cell">
             <span class="cell-name">{{ 'ADMIN.GOODS.STOCK' | translate }}</span>
-            <input type="number" min="0" formControlName="stock" />
+            <input class="variant-stock" type="number" min="0" formControlName="stock" />
           </label>
           <label class="cell tick-cell">
             <span class="cell-name">{{ 'ADMIN.GOODS.ON_SHOP' | translate }}</span>
@@ -130,11 +149,15 @@
       }
     </div>
 
+    @if (missingTwo()) {
+      <p class="field-error" role="alert">{{ 'ADMIN.GOODS.OPTION_2_MISSING' | translate: { name: nameTwo() } }}</p>
+    }
+
     <button type="button" class="plain add-variant" (click)="addVariant()">
       {{ 'ADMIN.GOODS.ADD_VARIANT' | translate }}
     </button>
 
-    <p class="field-note">{{ 'ADMIN.GOODS.STOCK_HINT' | translate }}</p>
+    <p class="field-note">{{ (editing ? 'ADMIN.GOODS.STOCK_LOCKED' : 'ADMIN.GOODS.STOCK_OPENING') | translate }}</p>
   </div>
 
   <footer class="sheet-foot">

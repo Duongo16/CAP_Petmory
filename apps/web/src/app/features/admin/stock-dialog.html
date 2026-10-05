@@ -1,0 +1,93 @@
+<div class="stock-sheet">
+  <header class="stock-head">
+    <div>
+      <p class="eyebrow">{{ goods().code }}</p>
+      <h2 class="stock-title">{{ goods().name }}</h2>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="17" />
+    </button>
+  </header>
+
+  <div class="stock-body">
+    <nav class="sku-list" [attr.aria-label]="'ADMIN.GOODS.VARIANT' | translate">
+      @for (one of rows(); track one.sku) {
+        <button type="button" class="sku" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-sku]="one.sku"
+          (click)="pick(one.sku)">
+          <span class="sku-name">{{ one.label || one.sku }}</span>
+          <span class="sku-code">{{ one.sku }}</span>
+          <strong class="sku-stock">{{ one.stock }}</strong>
+        </button>
+      }
+    </nav>
+
+    <section class="stock-main">
+      <form class="adjust" [formGroup]="form" (submit)="$event.preventDefault(); apply()">
+        <h3>{{ 'ADMIN.GOODS.ADJUST_TITLE' | translate }}</h3>
+        <div class="adjust-fields">
+          <label class="adjust-field">
+            <span>{{ 'ADMIN.GOODS.DELTA' | translate }}</span>
+            <input id="stock-delta" type="number" step="1" formControlName="delta" />
+            <small>{{ 'ADMIN.GOODS.DELTA_HINT' | translate }}</small>
+          </label>
+          <label class="adjust-field wide">
+            <span>{{ 'ADMIN.GOODS.REASON' | translate }}</span>
+            <input id="stock-note" type="text" maxlength="300" formControlName="note"
+              [placeholder]="'ADMIN.GOODS.REASON_HINT' | translate" />
+          </label>
+        </div>
+        @if (problem(); as message) {
+          <p class="stock-alert" role="alert">{{ message | translate: { min: noteMin } }}</p>
+        }
+        @if (notice(); as message) {
+          <p class="stock-notice" role="status">{{ message | translate }}</p>
+        }
+        <button id="stock-apply" type="submit" class="pm-button-primary" [disabled]="busy()">
+          {{ 'ADMIN.GOODS.APPLY' | translate }}
+        </button>
+      </form>
+
+      <h3 class="history-title">{{ 'ADMIN.GOODS.HISTORY_OF' | translate: { sku: sku() } }}</h3>
+      @if (loadingMoves()) {
+        <p class="muted">{{ 'COMMON.LOADING' | translate }}</p>
+      } @else if (moves().length === 0) {
+        <p class="muted">{{ 'ADMIN.GOODS.HISTORY_EMPTY' | translate }}</p>
+      } @else {
+        <div class="history-wrap">
+          <table class="history" id="stock-history">
+            <thead>
+              <tr>
+                <th>{{ 'ADMIN.GOODS.WHEN' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.DELTA' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.BEFORE_AFTER' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.REASON' | translate }}</th>
+                <th>{{ 'ADMIN.GOODS.BY' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (move of moves(); track move._id) {
+                <tr>
+                  <td class="nowrap">{{ move.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="delta" [class.up]="move.delta > 0" [class.down]="move.delta < 0">
+                    {{ move.delta > 0 ? '+' : '' }}{{ move.delta }}
+                  </td>
+                  <td class="nowrap">{{ move.before }} → {{ move.after }}</td>
+                  <td>
+                    <span class="reason-kind">{{ reasonKey[move.reason] | translate }}</span>
+                    @if (move.orderCode) {
+                      <span class="muted"> · {{ move.orderCode }}</span>
+                    }
+                    @if (move.note) {
+                      <span class="move-note">{{ move.note }}</span>
+                    }
+                  </td>
+                  <td>{{ move.actor?.fullName ?? '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </div>
+</div>

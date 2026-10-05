@@ -1,0 +1,91 @@
+<section class="pm-card tw-card-pad group-panel">
+  <div class="group-head">
+    <h2 class="group-title">{{ 'ADMIN.GOODS.GROUPS' | translate }}</h2>
+    @if (canEdit() && editing() === null) {
+      <button id="group-new" type="button" class="pm-button-secondary" (click)="startNew()">
+        {{ 'ADMIN.GOODS.GROUP_NEW' | translate }}
+      </button>
+    }
+  </div>
+
+  @if (problem(); as message) {
+    <p class="pm-status" data-tone="bad" role="alert">{{ message | translate }}</p>
+  }
+  @if (notice(); as message) {
+    <p class="pm-status" data-tone="good" role="status">{{ message | translate }}</p>
+  }
+
+  @if (editing() !== null) {
+    <form class="group-form" [formGroup]="form" (submit)="$event.preventDefault(); save()">
+      <label class="group-field">
+        <span>{{ 'ADMIN.GOODS.CODE' | translate }}</span>
+        <input id="group-code" type="text" maxlength="30" formControlName="code" />
+      </label>
+      <label class="group-field">
+        <span>{{ 'ADMIN.GOODS.NAME' | translate }}</span>
+        <input id="group-name" type="text" maxlength="120" formControlName="name" />
+      </label>
+      <label class="group-field small">
+        <span>{{ 'ADMIN.GOODS.GROUP_ORDER' | translate }}</span>
+        <input id="group-order" type="number" min="0" max="9999" formControlName="sortOrder" />
+      </label>
+      <label class="group-field wide">
+        <span>{{ 'ADMIN.GOODS.DESCRIPTION' | translate }}</span>
+        <input id="group-description" type="text" maxlength="500" formControlName="description" />
+      </label>
+      <label class="group-tick">
+        <input type="checkbox" formControlName="enabled" />
+        <span>{{ 'ADMIN.GOODS.SHOW_ON_SHOP' | translate }}</span>
+      </label>
+      <div class="group-actions">
+        <button id="group-save" type="submit" class="pm-button-primary" [disabled]="busy()">{{ 'COMMON.SAVE' | translate }}</button>
+        <button type="button" class="pm-button-secondary" (click)="cancel()">{{ 'COMMON.CANCEL' | translate }}</button>
+      </div>
+    </form>
+  }
+
+  @if (groups().length === 0) {
+    <p class="pm-empty">{{ 'ADMIN.GOODS.GROUP_NONE' | translate }}</p>
+  } @else {
+    <div class="table-wrap">
+      <table class="table" id="group-table">
+        <thead>
+          <tr>
+            <th>{{ 'ADMIN.GOODS.CODE' | translate }}</th>
+            <th>{{ 'ADMIN.GOODS.NAME' | translate }}</th>
+            <th>{{ 'ADMIN.GOODS.GROUP_ORDER' | translate }}</th>
+            <th>{{ 'ADMIN.GOODS.STATE' | translate }}</th>
+            @if (canEdit()) {
+              <th></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (one of groups(); track one._id) {
+            <tr [class.off]="!one.enabled" [attr.data-group]="one.code">
+              <td class="mono">{{ one.code }}</td>
+              <td>
+                {{ one.name }}
+                @if (one.description) {
+                  <span class="thin block">{{ one.description }}</span>
+                }
+              </td>
+              <td>{{ one.sortOrder }}</td>
+              <td class="thin">{{ (one.enabled ? 'ADMIN.GOODS.ON_SHOP' : 'ADMIN.GOODS.OFF_SHOP') | translate }}</td>
+              @if (canEdit()) {
+                <td class="row-tools">
+                  <button type="button" class="plain group-edit" [disabled]="busy()" (click)="startEdit(one)">
+                    {{ 'COMMON.EDIT' | translate }}
+                  </button>
+                  <button type="button" class="plain danger group-hide" [disabled]="busy()" (click)="hide(one)">
+                    {{ 'COMMON.REMOVE' | translate }}
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
