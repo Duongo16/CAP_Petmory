@@ -303,3 +303,48 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+.ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    inline-size: 100%;
+    margin-block-end: 6px;
+    font-weight: 700;
+    color: var(--pm-ink);
+  }
+}
+
+.ai-tag {
+  padding: 0 6px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.ops-hint {
+  inline-size: 100%;
+  margin: 4px 0 0;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}
+
+.save-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 12px;
+}
+
+.note-ok {
+  background: var(--pm-accent-soft);
+  color: var(--pm-ink);
+}

@@ -8,7 +8,14 @@ export interface RestoredPicture {
   picture: Blob;
   /** Tu 0 toi 100; null khi may chu khong gui kem. */
   resemblance: number | null;
+  /** LIVE khi co thao tac AI chay that, LOCAL khi chi dung bo loc tai may. */
+  mode: 'LIVE' | 'LOCAL';
+  /** Thao tac AI da chon nhung khong lam duoc. */
+  skipped: string[];
 }
+
+/** Cac thao tac phuc hoi khach chon duoc; hai thao tac cuoi dung mo hinh sua anh. */
+export type RestoreOperation = 'UPSCALE' | 'SHARPEN' | 'DENOISE' | 'EXPOSURE' | 'CONTRAST' | 'FACE_DETAIL' | 'REMOVE_BACKGROUND';
 
 /**
  * Phuc hoi mot tam anh rieng le. Khong dinh toi ho so hay album thu cung nao:
@@ -19,17 +26,23 @@ export class PhotoRestoreService {
   private readonly http = inject(HttpClient);
   private readonly base = inject(API_BASE);
 
-  restore(file: File): Observable<RestoredPicture> {
+  restore(file: File, operations: RestoreOperation[] = []): Observable<RestoredPicture> {
     const form = new FormData();
     form.append('file', file, file.name);
+    for (const one of operations) {
+      form.append('operation', one);
+    }
     return this.http
       .post(`${this.base}/photo-restore`, form, { observe: 'response', responseType: 'blob' })
       .pipe(
         map((answer) => {
           const score = Number.parseFloat(answer.headers.get('X-Resemblance') ?? '');
+          const skipped = (answer.headers.get('X-Restore-Skipped') ?? '').split(',').filter(Boolean);
           return {
             picture: answer.body ?? new Blob(),
             resemblance: Number.isFinite(score) ? Math.round(score) : null,
+            mode: answer.headers.get('X-Restore-Mode') === 'LIVE' ? 'LIVE' : 'LOCAL',
+            skipped,
           };
         }),
       );

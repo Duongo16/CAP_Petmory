@@ -42,6 +42,8 @@ export interface AppConfig {
     geminiKey: string;
     /** Rong thi dung mo hinh mac dinh cua nha cung cap. */
     model: string;
+    /** Mo hinh sua anh cua Gemini, dung cho phuc hoi anh. Rong thi dung mac dinh. */
+    imageModel: string;
     timeoutMs: number;
   };
   storage: {
@@ -103,6 +105,7 @@ export default (): AppConfig => ({
     apiKey: process.env.ANTHROPIC_API_KEY ?? '',
     geminiKey: process.env.GEMINI_API_KEY ?? '',
     model: (process.env.AI_MODEL ?? '').trim(),
+    imageModel: (process.env.AI_IMAGE_MODEL ?? '').trim(),
     timeoutMs: Number(process.env.AI_TIMEOUT_MS ?? 45000),
   },
   storage: {

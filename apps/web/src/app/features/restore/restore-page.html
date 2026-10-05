@@ -35,8 +35,34 @@
           }
         </dl>
 
+        @if (mode() === 'LIVE') {
+          <p class="note note-ok" id="restore-mode">{{ 'RESTORE.MODE_LIVE' | translate }}</p>
+        } @else if (mode() === 'LOCAL') {
+          <p class="note" id="restore-mode">{{ 'RESTORE.MODE_LOCAL' | translate }}</p>
+        }
+        @if (skipped().length > 0) {
+          <p class="note note-bad" id="restore-skipped" role="status">{{ 'RESTORE.SKIPPED' | translate }}</p>
+        }
+
+        @if (pets().length > 0) {
+          <div class="save-row">
+            <label class="sr-only" for="restore-pet">{{ 'RESTORE.SAVE_PET' | translate }}</label>
+            <select id="restore-pet" class="tw-select" [value]="petChosen()" (change)="choosePet($event)">
+              @for (pet of pets(); track pet._id) {
+                <option [value]="pet._id">{{ pet.name }}</option>
+              }
+            </select>
+            <button type="button" class="tw-btn-primary" id="restore-save" [disabled]="saveState() === 'SAVING' || saveState() === 'SAVED'" (click)="saveToPet()">
+              {{ (saveState() === 'SAVED' ? 'RESTORE.SAVED' : 'RESTORE.SAVE_TO_PET') | translate }}
+            </button>
+            @if (saveState() === 'FAILED') {
+              <span class="note note-bad">{{ 'COMMON.GENERIC_ERROR' | translate }}</span>
+            }
+          </div>
+        }
+
         <div class="actions">
-          <a class="tw-btn-primary" id="restore-download" [href]="after" [attr.download]="downloadName()">
+          <a class="tw-btn-secondary" id="restore-download" [href]="after" [attr.download]="downloadName()">
             <pm-icon name="download" [size]="16" />
             {{ 'RESTORE.DOWNLOAD' | translate }}
           </a>
@@ -58,6 +84,19 @@
             </button>
           }
         </figure>
+        <fieldset class="ops" [disabled]="working()">
+          <legend>{{ 'RESTORE.OPERATIONS' | translate }}</legend>
+          @for (one of operationCards(); track one.code) {
+            <button type="button" class="tw-chip op" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-op]="one.code"
+              (click)="toggleOperation(one.code)">
+              {{ one.key | translate }}
+              @if (one.ai) {
+                <span class="ai-tag">AI</span>
+              }
+            </button>
+          }
+          <p class="ops-hint">{{ 'RESTORE.AI_HINT' | translate }}</p>
+        </fieldset>
         <div class="actions">
           <button type="button" class="tw-btn-primary" id="restore-run" [disabled]="working()" (click)="run()">
             <pm-icon name="sparkle" [size]="16" />

@@ -2018,7 +2018,25 @@
     "RUN": "Phục hồi ảnh này",
     "CHANGE": "Chọn ảnh khác",
     "ANOTHER": "Phục hồi ảnh khác",
-    "QUOTA": "Bạn đã dùng hết lượt phục hồi ảnh của kỳ này"
+    "QUOTA": "Bạn đã dùng hết lượt phục hồi ảnh của kỳ này",
+    "OPERATIONS": "Chọn cách phục hồi",
+    "AI_HINT": "Hai thao tác có nhãn AI dùng mô hình sửa ảnh, tính vào lượt phục hồi.",
+    "PICK_ONE": "Hãy chọn ít nhất một cách phục hồi.",
+    "MODE_LIVE": "Đã dùng AI để phục hồi ảnh này.",
+    "MODE_LOCAL": "Ảnh này được phục hồi bằng bộ lọc tại máy chủ, không dùng AI.",
+    "SKIPPED": "Chưa làm được thao tác AI đã chọn (dịch vụ AI chưa sẵn sàng). Ảnh dưới đây chỉ qua bộ lọc tại máy chủ.",
+    "SAVE_PET": "Lưu vào hồ sơ bé",
+    "SAVE_TO_PET": "Lưu vào album của bé",
+    "SAVED": "Đã lưu vào album",
+    "OP": {
+      "UPSCALE": "Tăng độ phân giải",
+      "SHARPEN": "Làm nét",
+      "DENOISE": "Giảm nhiễu",
+      "EXPOSURE": "Cân sáng",
+      "CONTRAST": "Tăng tương phản",
+      "FACE_DETAIL": "Tăng chi tiết khuôn mặt",
+      "REMOVE_BACKGROUND": "Tách nền"
+    }
   },
   "SUGGEST": {
     "TITLE": "Gợi ý thiết kế",

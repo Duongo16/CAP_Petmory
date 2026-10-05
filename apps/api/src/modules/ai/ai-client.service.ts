@@ -134,6 +134,33 @@ class GeminiCaller implements ModelCaller {
     }
     return (reply.text ?? '').trim();
   }
+
+  /** Gui mot anh kem loi dan sua, lay ve anh da sua. Khong co anh tra ve thi nem loi. */
+  async editImage(data: Buffer, mimeType: string, instruction: string, model: string): Promise<Buffer> {
+    const reply = await this.client.models.generateContent({
+      model,
+      contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: data.toString('base64') } }, { text: instruction }] }],
+      config: { responseModalities: ['IMAGE', 'TEXT'] },
+    });
+    if (reply.promptFeedback?.blockReason || reply.candidates?.[0]?.finishReason === FinishReason.SAFETY) {
+      throw new BlockedAnswer();
+    }
+    const picture = (reply.candidates?.[0]?.content?.parts ?? []).find((part) => part.inlineData?.data);
+    if (!picture?.inlineData?.data) {
+      throw new Error('Dich vu khong tra ve anh');
+    }
+    return Buffer.from(picture.inlineData.data, 'base64');
+  }
+}
+
+/** Mo hinh sua anh mac dinh cua Gemini. */
+const IMAGE_MODEL_DEFAULT = 'gemini-2.5-flash-image';
+
+/** Ket qua sua anh: anh moi (rong khi khong goi duoc), che do va ly do. */
+export interface AiImageAnswer {
+  data: Buffer | null;
+  mode: AiMode;
+  problem: string;
 }
 
 /**
@@ -153,6 +180,13 @@ export class AiClientService {
   private readonly logger = new Logger(AiClientService.name);
   private readonly caller: ModelCaller | null;
   private readonly model: string;
+  /** Goi sua anh luon qua Gemini, vi chi Gemini tra ve anh; rong khi chua co khoa Gemini. */
+  private readonly imageCaller: GeminiCaller | null;
+  private readonly imageModel: string;
+
+  /** So lan sua anh hong lien tiep, va moc duoc goi sua anh lai. */
+  private imageFailInRow = 0;
+  private imageOpenUntil = 0;
 
   /** So lan goi hong lien tiep tinh den luc nay. */
   private failInRow = 0;
@@ -172,6 +206,8 @@ export class AiClientService {
     const key = keys[provider];
 
     this.model = config.get<string>('ai.model') || MODEL_DEFAULT[provider];
+    this.imageModel = config.get<string>('ai.imageModel') || IMAGE_MODEL_DEFAULT;
+    this.imageCaller = keys[PROVIDER_GEMINI] ? new GeminiCaller(keys[PROVIDER_GEMINI], timeout) : null;
     if (!key) {
       this.caller = null;
     } else if (provider === PROVIDER_GEMINI) {
@@ -185,6 +221,36 @@ export class AiClientService {
         ? `Dich vu tri tue nhan tao: goi that qua ${provider}, mo hinh ${this.model}`
         : `Dich vu tri tue nhan tao: chua co khoa ${provider}, chay bang bo tra loi mau`,
     );
+  }
+
+  /**
+   * Sua mot anh bang mo hinh sua anh (phuc hoi anh, muc 4).
+   *
+   * Khong bao gio nem loi: chua co khoa, cau dao dang mo hay goi hong thi tra
+   * ve anh rong kem ly do, de ben goi giu ket qua cua bo loc tai may.
+   */
+  async editImage(data: Buffer, mimeType: string, instruction: string): Promise<AiImageAnswer> {
+    if (!this.imageCaller) {
+      return { data: null, mode: AiMode.LOCAL, problem: NO_KEY };
+    }
+    // Cau dao rieng cho sua anh: mo hinh anh hong khong duoc chan luon tro ly va cau chuyen.
+    if (Date.now() < this.imageOpenUntil) {
+      return { data: null, mode: AiMode.LOCAL, problem: BREAK_OPEN };
+    }
+    try {
+      const edited = await this.imageCaller.editImage(data, mimeType, instruction, this.imageModel);
+      this.imageFailInRow = 0;
+      return { data: edited, mode: AiMode.LIVE, problem: '' };
+    } catch (trouble) {
+      const why = shortReason(trouble);
+      this.imageFailInRow += 1;
+      if (this.imageFailInRow >= BREAK_AFTER) {
+        this.imageOpenUntil = Date.now() + BREAK_MS;
+        this.imageFailInRow = 0;
+      }
+      this.logger.warn(`Goi sua anh hong: ${why}`);
+      return { data: null, mode: AiMode.LOCAL, problem: why };
+    }
   }
 
   /** He thong co dang goi dich vu that hay khong. */

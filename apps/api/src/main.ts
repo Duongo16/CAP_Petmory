@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import { HEADER_RESEMBLANCE } from './modules/photos/photo-restore.controller';
+import { HEADER_RESEMBLANCE, HEADER_MODE, HEADER_SKIPPED } from './modules/photos/photo-restore.controller';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -14,7 +14,7 @@ async function bootstrap(): Promise<void> {
   app.enableCors({
     origin: config.getOrThrow<string>('webOrigin'),
     credentials: true,
-    exposedHeaders: [HEADER_RESEMBLANCE],
+    exposedHeaders: [HEADER_RESEMBLANCE, HEADER_MODE, HEADER_SKIPPED],
   });
 
   /**

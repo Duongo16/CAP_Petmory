@@ -2018,7 +2018,25 @@
     "RUN": "Restore this picture",
     "CHANGE": "Choose another picture",
     "ANOTHER": "Restore another picture",
-    "QUOTA": "You have used all your restorations for this period"
+    "QUOTA": "You have used all your restorations for this period",
+    "OPERATIONS": "Choose how to restore",
+    "AI_HINT": "The two options marked AI use an image model and count towards your restorations.",
+    "PICK_ONE": "Choose at least one option.",
+    "MODE_LIVE": "This photo was restored with AI.",
+    "MODE_LOCAL": "This photo was restored with server filters, without AI.",
+    "SKIPPED": "The AI options you chose could not run (the AI service is not available). The photo below only went through the server filters.",
+    "SAVE_PET": "Save to a pet profile",
+    "SAVE_TO_PET": "Save to the pet album",
+    "SAVED": "Saved to the album",
+    "OP": {
+      "UPSCALE": "Upscale",
+      "SHARPEN": "Sharpen",
+      "DENOISE": "Reduce noise",
+      "EXPOSURE": "Balance light",
+      "CONTRAST": "Boost contrast",
+      "FACE_DETAIL": "Face detail",
+      "REMOVE_BACKGROUND": "Remove background"
+    }
   },
   "SUGGEST": {
     "TITLE": "Design suggestions",
