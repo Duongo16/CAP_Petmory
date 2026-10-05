@@ -1198,7 +1198,32 @@
     "EMPTY": "Chưa có ảnh nào",
     "EMPTY_HINT": "Bấm Thêm ảnh để gửi những tấm bạn thích nhất.",
     "LINK_FAILED": "Không lấy được ảnh từ liên kết này. Thử liên kết khác xem sao.",
-    "VIEW": "Xem ảnh lớn"
+    "VIEW": "Xem ảnh lớn",
+    "FRAME": {
+      "TITLE": "Khung ảnh theo góc",
+      "SUB": "Bốn góc bắt buộc giúp xưởng làm đúng dáng bé; hai góc còn lại không bắt buộc. Kéo thả ảnh vào từng ô hoặc bấm để chọn.",
+      "REQUIRED_COUNT": "{{done}}/{{total}} góc bắt buộc",
+      "OPTIONAL": "Tùy chọn",
+      "DROP": "Kéo thả hoặc bấm để chọn ảnh",
+      "REPLACE": "Thay ảnh",
+      "MISSING": "Còn thiếu góc bắt buộc. Xưởng có thể phải hỏi lại bạn trước khi làm.",
+      "ANGLE": {
+        "FRONT": "Chính diện",
+        "LEFT_SIDE": "Bên trái",
+        "RIGHT_SIDE": "Bên phải",
+        "BACK": "Phía sau",
+        "FACE_CLOSEUP": "Cận mặt",
+        "FAVOURITE_POSE": "Dáng yêu thích"
+      }
+    },
+    "QUALITY": {
+      "GOOD": "Ảnh tốt",
+      "ACCEPTABLE": "Dùng được",
+      "SHOULD_RESTORE": "Nên phục hồi",
+      "UNUSABLE": "Không đạt, nên thay"
+    },
+    "OTHERS": "Ảnh khác",
+    "DROP_HINT": "Kéo thả ảnh vào đây, hoặc dùng nút Thêm ảnh ở trên."
   },
   "ASSISTANT": {
     "TITLE": "Hỏi nhanh",

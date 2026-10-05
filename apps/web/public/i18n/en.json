@@ -1198,7 +1198,32 @@
     "EMPTY": "No photographs yet",
     "EMPTY_HINT": "Press Add photographs to send the ones you love most.",
     "LINK_FAILED": "That link did not give us a picture. Try another one.",
-    "VIEW": "View larger"
+    "VIEW": "View larger",
+    "FRAME": {
+      "TITLE": "Photos by angle",
+      "SUB": "The four required angles help the workshop get the shape right; the other two are optional. Drop a photo onto each box or click to choose.",
+      "REQUIRED_COUNT": "{{done}}/{{total}} required angles",
+      "OPTIONAL": "Optional",
+      "DROP": "Drop or click to choose a photo",
+      "REPLACE": "Replace",
+      "MISSING": "Some required angles are missing. The workshop may need to ask you before starting.",
+      "ANGLE": {
+        "FRONT": "Front",
+        "LEFT_SIDE": "Left side",
+        "RIGHT_SIDE": "Right side",
+        "BACK": "Back",
+        "FACE_CLOSEUP": "Face close-up",
+        "FAVOURITE_POSE": "Favourite pose"
+      }
+    },
+    "QUALITY": {
+      "GOOD": "Good photo",
+      "ACCEPTABLE": "Usable",
+      "SHOULD_RESTORE": "Should be restored",
+      "UNUSABLE": "Not usable, replace it"
+    },
+    "OTHERS": "Other photos",
+    "DROP_HINT": "Drop photos here, or use the Add photos button above."
   },
   "ASSISTANT": {
     "TITLE": "Quick questions",

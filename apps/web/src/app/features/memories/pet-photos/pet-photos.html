@@ -42,29 +42,80 @@
         <button type="button" class="tw-btn-secondary" (click)="facade.reload()">{{ 'COMMON.RETRY' | translate }}</button>
       </div>
     }
-    @case ('EMPTY') {
-      <div class="centre tw-empty">
-        <span class="empty-mark" aria-hidden="true"><pm-icon name="image" [size]="32" /></span>
-        <p>{{ 'PHOTO.EMPTY' | translate }}</p>
-        <p class="empty-hint">{{ 'PHOTO.EMPTY_HINT' | translate }}</p>
-      </div>
-    }
-    @case ('HAS_DATA') {
-      <ul class="grid">
-        @for (card of facade.cards(); track card.photo._id) {
-          <li class="shot">
-            <button type="button" class="shot-open" (click)="open(card)" [attr.aria-label]="'PHOTO.VIEW' | translate">
-              @if (card.source) {
-                <img [src]="card.source" alt="" loading="lazy" />
+    @default {
+      <section class="frame" [attr.aria-label]="'PHOTO.FRAME.TITLE' | translate">
+        <div class="frame-head">
+          <h3>{{ 'PHOTO.FRAME.TITLE' | translate }}</h3>
+          <span class="frame-count" [class.ok]="facade.requiredDone() === facade.requiredTotal">
+            {{ 'PHOTO.FRAME.REQUIRED_COUNT' | translate: { done: facade.requiredDone(), total: facade.requiredTotal } }}
+          </span>
+        </div>
+        <p class="frame-sub">{{ 'PHOTO.FRAME.SUB' | translate }}</p>
+        <ul class="slots">
+          @for (slot of facade.slots(); track slot.angle) {
+            <li class="slot" [class.filled]="slot.card" [class.over]="dragOver() === slot.angle" [attr.data-angle]="slot.angle"
+              (dragover)="hover($event, slot.angle)" (dragleave)="leave(slot.angle)" (drop)="dropOnSlot($event, slot)">
+              <span class="slot-name">
+                {{ slot.key | translate }}
+                @if (!slot.required) {
+                  <span class="slot-optional">{{ 'PHOTO.FRAME.OPTIONAL' | translate }}</span>
+                }
+              </span>
+              @if (slot.card; as card) {
+                <button type="button" class="slot-photo" (click)="open(card)" [attr.aria-label]="'PHOTO.VIEW' | translate">
+                  @if (card.source) {
+                    <img [src]="card.source" alt="" />
+                  }
+                </button>
+                <span class="quality" [class.warn]="card.warn">{{ card.qualityKey | translate }}</span>
+                <div class="slot-tools">
+                  <label class="tw-btn-secondary tw-btn-sm slot-replace" [attr.for]="'slot-' + slot.angle">{{ 'PHOTO.FRAME.REPLACE' | translate }}</label>
+                  <button type="button" class="tw-btn-ghost tw-btn-sm slot-remove" (click)="removeFromSlot(slot)">{{ 'COMMON.REMOVE' | translate }}</button>
+                </div>
+              } @else {
+                <label class="slot-empty" [attr.for]="'slot-' + slot.angle">
+                  <pm-icon name="camera" [size]="20" />
+                  <span>{{ 'PHOTO.FRAME.DROP' | translate }}</span>
+                </label>
               }
-            </button>
-            <span class="shot-date">{{ card.photo.createdAt | date: 'dd/MM/yyyy' }}</span>
-            <button type="button" class="shot-drop" (click)="remove(card)" [attr.aria-label]="'COMMON.REMOVE' | translate">
-              <pm-icon name="trash" [size]="14" />
-            </button>
-          </li>
+              <input class="sr-only slot-input" type="file" accept="image/png,image/jpeg" [id]="'slot-' + slot.angle"
+                [disabled]="facade.uploading()" (change)="pickForSlot($event, slot)" />
+            </li>
+          }
+        </ul>
+        @if (facade.requiredDone() < facade.requiredTotal) {
+          <p class="frame-warn">{{ 'PHOTO.FRAME.MISSING' | translate }}</p>
         }
-      </ul>
+      </section>
+
+      <section class="others" [class.over]="dragOver() === 'ALBUM'"
+        (dragover)="hover($event, 'ALBUM')" (dragleave)="leave('ALBUM')" (drop)="dropOnAlbum($event)">
+        <h3>{{ 'PHOTO.OTHERS' | translate }}</h3>
+        @if (facade.others().length === 0) {
+          <div class="centre tw-empty">
+            <span class="empty-mark" aria-hidden="true"><pm-icon name="image" [size]="32" /></span>
+            <p>{{ 'PHOTO.EMPTY' | translate }}</p>
+            <p class="empty-hint">{{ 'PHOTO.DROP_HINT' | translate }}</p>
+          </div>
+        } @else {
+          <ul class="grid">
+            @for (card of facade.others(); track card.photo._id) {
+              <li class="shot">
+                <button type="button" class="shot-open" (click)="open(card)" [attr.aria-label]="'PHOTO.VIEW' | translate">
+                  @if (card.source) {
+                    <img [src]="card.source" alt="" loading="lazy" />
+                  }
+                </button>
+                <span class="shot-date">{{ card.photo.createdAt | date: 'dd/MM/yyyy' }}</span>
+                <span class="quality shot-quality" [class.warn]="card.warn">{{ card.qualityKey | translate }}</span>
+                <button type="button" class="shot-drop" (click)="remove(card)" [attr.aria-label]="'COMMON.REMOVE' | translate">
+                  <pm-icon name="trash" [size]="14" />
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
     }
   }
 </section>

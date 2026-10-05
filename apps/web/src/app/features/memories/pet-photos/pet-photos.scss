@@ -161,3 +161,176 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+// --- Khung nap theo goc ---
+
+.frame,
+.others {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px dashed transparent;
+  border-radius: 18px;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--pm-ink);
+  }
+
+  &.over {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+  }
+}
+
+.frame {
+  margin-block-end: 8px;
+  border-color: var(--pm-border);
+}
+
+.frame-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.frame-count {
+  padding: 2px 10px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+
+  &.ok {
+    background: var(--pm-accent-soft);
+    color: var(--pm-ink);
+  }
+}
+
+.frame-sub,
+.frame-warn {
+  margin: 0;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}
+
+.frame-warn {
+  color: var(--pm-on-amber);
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 8px;
+  border: 2px dashed var(--pm-border);
+  border-radius: 14px;
+  background: var(--pm-bg-card);
+
+  &.filled {
+    border-style: solid;
+  }
+
+  &.over {
+    border-color: var(--pm-accent);
+    background: var(--pm-accent-soft);
+  }
+}
+
+.slot-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  color: var(--pm-ink);
+}
+
+.slot-optional {
+  padding: 0 6px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-muted);
+  color: var(--pm-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.slot-photo,
+.slot-empty {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--pm-bg-muted);
+}
+
+.slot-photo {
+  padding: 0;
+  border: 0;
+  cursor: zoom-in;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pm-accent);
+  }
+}
+
+.slot-empty {
+  align-content: center;
+  gap: 6px;
+  padding: 8px;
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-xs);
+  text-align: center;
+  cursor: pointer;
+}
+
+.slot-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.quality {
+  justify-self: start;
+  padding: 1px 8px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent-soft);
+  color: var(--pm-ink);
+  font-size: 11px;
+  font-weight: 700;
+
+  &.warn {
+    background: var(--pm-danger-soft);
+    color: var(--pm-on-danger-soft);
+  }
+}
+
+.shot-quality {
+  margin: 0 12px 10px;
+}
