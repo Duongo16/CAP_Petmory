@@ -25,6 +25,7 @@ const SUITES = [
   { name: 'studio-full', file: 'test-studio-full-ui.js' },
   { name: 'shopping', file: 'test-shopping-ui.js' },
   { name: 'checkout', file: 'test-checkout-ui.js' },
+  { name: 'packaging', file: 'test-packaging-ui.js' },
   { name: 'goods', file: 'test-goods-ui.js' },
   { name: 'goods-flow', file: 'test-goods-flow-ui.js' },
   { name: 'community', file: 'test-community-ui.js' },

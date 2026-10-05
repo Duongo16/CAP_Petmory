@@ -1,4 +1,4 @@
-import { IsInt, IsMongoId, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsInt, IsMongoId, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class AddToCartDto {
   @IsString()
@@ -23,6 +23,14 @@ export class AddToCartDto {
   @IsString()
   @MaxLength(40)
   displayBaseCode?: string;
+
+  /** Hop va khung chon them, moi loai mot mau. De trong la khong lay. */
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(2)
+  @IsString({ each: true })
+  @MaxLength(30, { each: true })
+  packagingCodes?: string[];
 
   @IsInt()
   @Min(1)

@@ -18,6 +18,8 @@ import {
   Pet,
   DisplayBase,
   Accessory,
+  PackagingKind,
+  PackagingOption,
 } from '../../core/models/api.model';
 import {
   BASE_NONE,
@@ -138,6 +140,20 @@ export class StudioFacade {
     return size ? size.maxAccessories : 4;
   });
 
+  /** Hop va khung dang ban, kem gia, doc tu may chu. */
+  readonly packagingCatalog = signal<PackagingOption[]>([]);
+
+  /**
+   * Hop va khung khach chon, moi loai mot mau.
+   *
+   * Mac dinh khong chon gi, de khong tu cong tien vao don. Lua chon nay di theo
+   * dong gio hang chu khong luu vao ban thiet ke, nen doi xong khong can luu lai.
+   */
+  readonly packagingPicked = signal<Partial<Record<PackagingKind, string>>>({});
+
+  /** Ma hop va khung dang chon, de gui di bao gia va them vao gio. */
+  readonly packagingCodes = computed(() => Object.values(this.packagingPicked()).filter((one): one is string => Boolean(one)));
+
   /** Mac dinh khong de, de khong tu cong tien vao don cua khach. */
   readonly stand = signal<StandChoice>({ baseCode: BASE_NONE, tone: 'OAK', decorations: [] });
 
@@ -200,12 +216,32 @@ export class StudioFacade {
       next: (ds) => this.bases.set(ds),
       error: () => this.bases.set([]),
     });
+    this.catalog.packaging$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (list) => this.packagingCatalog.set(list.filter((one) => one.enabled)),
+      error: () => this.packagingCatalog.set([]),
+    });
     this.catalog.product$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (ds) => this.types.set(ds.filter((l) => l.enabled)),
         error: () => this.types.set([]),
       });
+  }
+
+  /** Chon mot mau hop hoac khung; chon lai mau dang chon, hoac de trong, la bo. */
+  selectPackaging(kind: PackagingKind, code: string): void {
+    this.packagingPicked.update((now) => {
+      const next = { ...now };
+      if (!code || now[kind] === code) {
+        delete next[kind];
+      } else {
+        next[kind] = code;
+      }
+      return next;
+    });
+    // Doi hop hay khung la mot mon khac trong gio, nen cho them vao gio lai.
+    this.addedToCart.set(false);
+    this.fetchQuote();
   }
 
   selectBase(code: string): void {
@@ -302,7 +338,7 @@ export class StudioFacade {
     }
     const base = this.stand().baseCode;
     this.designs
-      .quote(kind, size, base === BASE_NONE ? '' : base, this.accessoryPicked())
+      .quote(kind, size, base === BASE_NONE ? '' : base, this.accessoryPicked(), this.packagingCodes())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (bg) => this.quote.set(bg),
@@ -395,6 +431,7 @@ export class StudioFacade {
         designId: code,
         petName: petName || undefined,
         displayBaseCode: this.stand().baseCode || undefined,
+        packagingCodes: this.packagingCodes(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

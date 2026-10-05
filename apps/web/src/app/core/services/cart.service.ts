@@ -12,6 +12,8 @@ export interface AddToCart {
   designId?: string;
   /** Optional stand. Left out, the figure is sold without one. */
   displayBaseCode?: string;
+  /** Hop va khung chon them, moi loai mot mau. */
+  packagingCodes?: string[];
 }
 
 const EMPTY_CART: Cart = {

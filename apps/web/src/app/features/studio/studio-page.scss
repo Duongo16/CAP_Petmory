@@ -913,6 +913,7 @@ ul {
 
 .drawer-foot {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--pm-space-2);
   padding: var(--pm-space-3) var(--pm-space-4);
   border-block-start: 2px dashed var(--pm-paper-mark);

@@ -99,23 +99,26 @@ export class DesignsService {
    * The quote is read from the catalog on the server.
    * A price sent by the browser is never trusted.
    */
-  async quote(productTypeCode: string, sizeCode: string, baseCode?: string, accessoryCodes?: string[]) {
+  async quote(productTypeCode: string, sizeCode: string, baseCode?: string, accessoryCodes?: string[], packagingCodes?: string[]) {
     const kind = await this.catalog.detailProductType(productTypeCode);
     const size = kind.sizes.find((s) => s.code === sizeCode.toUpperCase() && s.enabled);
     if (!size) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
-    // Tong la gia kich co cong de cong phu kien, deu doc tu danh muc tren may chu.
+    // Tong la gia kich co cong de, phu kien, hop va khung, deu doc tu danh muc tren may chu.
     const base = await this.catalog.findDisplayBase(baseCode);
     const accessories = await this.catalog.findAccessories(accessoryCodes);
+    const packaging = await this.catalog.findPackaging(packagingCodes);
     const whole = (value: unknown) => BigInt(String(value ?? '0').split('.')[0]);
     const standPrice = whole(base?.priceDelta);
     const accessoryPrice = accessories.reduce((sum, one) => sum + whole(one.priceDelta), 0n);
-    const total = whole(size.price) + standPrice + accessoryPrice;
+    const packagingPrice = packaging.reduce((sum, one) => sum + whole(one.priceDelta), 0n);
+    const total = whole(size.price) + standPrice + accessoryPrice + packagingPrice;
     return {
       sizePrice: size.price.toString(),
       standPrice: standPrice.toString(),
       accessoryPrice: accessoryPrice.toString(),
+      packagingPrice: packagingPrice.toString(),
       totalPrice: total.toString(),
       maxAccessories: size.maxAccessories,
       productTypeCode: kind.code,

@@ -7,6 +7,7 @@ import {
   ColorCode,
   ColorGroup,
   DisplayBase,
+  PackagingOption,
   PendingReview,
   ProductReview,
   ProductType,
@@ -34,6 +35,11 @@ export class CatalogService {
   /** Phu kien dung chung, doc mot lan roi dung lai. */
   readonly accessory$ = this.http
     .get<Accessory[]>(`${this.base}/catalog/accessories`)
+    .pipe(shareReplay({ bufferSize: 1, refCount: false }));
+
+  /** Hop va khung dang ban, kem gia do Quan ly dat. */
+  readonly packaging$ = this.http
+    .get<PackagingOption[]>(`${this.base}/catalog/packaging`)
     .pipe(shareReplay({ bufferSize: 1, refCount: false }));
 
   productDetail(code: string): Observable<ProductType> {

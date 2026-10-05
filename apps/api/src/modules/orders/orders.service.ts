@@ -199,6 +199,12 @@ export class OrdersService {
           displayName: one.displayName,
           priceDelta: Types.Decimal128.fromString(one.priceDelta.toString()),
         })),
+        packaging: (m.packaging ?? []).map((one) => ({
+          code: one.code,
+          kind: one.kind,
+          displayName: one.displayName,
+          priceDelta: Types.Decimal128.fromString(one.priceDelta.toString()),
+        })),
         designId,
         design: await this.copyDesign(designId, customer),
         quantity: m.quantity,

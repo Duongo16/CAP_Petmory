@@ -119,7 +119,9 @@ async function run() {
     const studio = new URL(page.url());
     res.push(check('Starting the design carries the product and size to the studio',
       studio.searchParams.get('product') === PRODUCT && studio.searchParams.get('size') === sizeCode, page.url()));
-    res.push(check('Leaving the shop closes the popup', (await page.locator(POPUP).count()) === 0));
+    // Cua so dong kem hieu ung, nen cho no go han khoi trang thay vi dem ngay.
+    res.push(check('Leaving the shop closes the popup',
+      await page.waitForSelector(POPUP, { state: 'detached', timeout: 5000 }).then(() => true, () => false)));
 
                 // --- Add to cart ---
     /*

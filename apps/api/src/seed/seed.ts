@@ -7,10 +7,11 @@ import { AppModule } from '../app.module';
 import { ColorCode, ColorCodeDocument } from '../modules/catalog/schemas/color-code.schema';
 import { ProductType, ProductTypeDocument } from '../modules/catalog/schemas/product-type.schema';
 import { DisplayBase, DisplayBaseDocument } from '../modules/catalog/schemas/display-base.schema';
+import { PackagingOption, PackagingOptionDocument } from '../modules/catalog/schemas/packaging-option.schema';
 import { User, UserDocument } from '../modules/users/schemas/user.schema';
 import { BusinessConfig, BusinessConfigDocument } from '../modules/business-config/schemas/business-config.schema';
 import { Role } from '../common/constants/roles';
-import { DISPLAY_BASE_LIST, LIST_COLOR, PRODUCT_LIST } from './seed-data';
+import { DISPLAY_BASE_LIST, LIST_COLOR, PACKAGING_LIST, PRODUCT_LIST } from './seed-data';
 
 const log = new Logger('Seed');
 
@@ -28,11 +29,6 @@ const ACCOUNT_INTERNAL: { email: string; fullName: string; roles: Role[] }[] = [
     email: 'quanly@petmory.local',
     fullName: 'Quan ly PETMORY',
     roles: [Role.MANAGER],
-  },
-  {
-    email: 'quantri@petmory.local',
-    fullName: 'Quan tri tai khoan',
-    roles: [Role.ADMIN],
   },
   {
     email: 'cskh@petmory.local',
@@ -62,16 +58,31 @@ async function loadDisplayBase(model: Model<DisplayBaseDocument>): Promise<void>
         $set: {
           displayName: base.displayName,
           description: base.description,
-          priceDelta: Types.Decimal128.fromString(base.priceDelta),
           currency: 'VND',
           sortOrder: base.sortOrder,
-          enabled: true,
         },
+        // Gia va trang thai bat tat chi dat lan dau, gieo lai khong ghi de gia Quan ly da sua.
+        $setOnInsert: { priceDelta: Types.Decimal128.fromString(base.priceDelta), enabled: true },
       },
       { upsert: true },
     );
   }
   log.log(`Loaded ${DISPLAY_BASE_LIST.length} display bases`);
+}
+
+async function loadPackaging(model: Model<PackagingOptionDocument>): Promise<void> {
+  for (const pack of PACKAGING_LIST) {
+    await model.updateOne(
+      { code: pack.code },
+      {
+        $set: { kind: pack.kind, displayName: pack.displayName, description: pack.description, currency: 'VND', sortOrder: pack.sortOrder },
+        // Gia va trang thai bat tat chi dat lan dau, gieo lai khong ghi de gia Quan ly da sua.
+        $setOnInsert: { priceDelta: Types.Decimal128.fromString(pack.priceDelta), enabled: true },
+      },
+      { upsert: true },
+    );
+  }
+  log.log(`Loaded ${PACKAGING_LIST.length} boxes and frames`);
 }
 
 /**
@@ -151,6 +162,7 @@ async function run(): Promise<void> {
   try {
     await loadColor(app.get<Model<ColorCodeDocument>>(getModelToken(ColorCode.name)));
     await loadDisplayBase(app.get<Model<DisplayBaseDocument>>(getModelToken(DisplayBase.name)));
+    await loadPackaging(app.get<Model<PackagingOptionDocument>>(getModelToken(PackagingOption.name)));
     await loadProduct(app.get<Model<ProductTypeDocument>>(getModelToken(ProductType.name)));
     await loadAccountInternal(app.get<Model<UserDocument>>(getModelToken(User.name)));
     await loadConfig(app.get<Model<BusinessConfigDocument>>(getModelToken(BusinessConfig.name)));

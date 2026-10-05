@@ -195,6 +195,9 @@
                       @for (acc of card.raw.accessories ?? []; track acc.code) {
                         <span class="line-chip acc-chip">{{ 'CART.SPEC_ACCESSORY' | translate }} {{ acc.displayName }}</span>
                       }
+                      @for (pack of card.raw.packaging ?? []; track pack.code) {
+                        <span class="line-chip pack-chip">{{ 'CART.SPEC_PACK' | translate }} {{ pack.displayName }}</span>
+                      }
                       <a
                         class="line-link"
                         [routerLink]="card.productLink"

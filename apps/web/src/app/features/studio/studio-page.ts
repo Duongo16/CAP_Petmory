@@ -22,7 +22,7 @@ import { StudioFacade } from './studio-facade';
 import { ANCHOR_NODE, AccessoryMount, StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
 import { PaintMode } from '../../shared/viewer-3d/painter';
 import { CatalogService } from '../../core/services/catalog.service';
-import { AccessoryAnchor, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
+import { AccessoryAnchor, PackagingKind, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
 import { BaseModel, ModelLibrary, DeclaredZone, ZoneName, currentModelCode } from './model-manifest';
 import {
   STAND_DECORATIONS,
@@ -39,6 +39,12 @@ function dateForStand(value: string): string {
 }
 
 /** Gia them bang khong thi hien chu da gom thay vi so khong dong. */
+/** Hai nhom dong goi khach chon them, khai key ban dich tung nhom. */
+const PACK_GROUPS: { kind: PackagingKind; key: string }[] = [
+  { kind: 'BOX', key: 'STUDIO.PACK.BOX' },
+  { kind: 'FRAME', key: 'STUDIO.PACK.FRAME' },
+];
+
 function isZero(value: string): boolean {
   return /^0+(\.0+)?$/.test(value.trim());
 }
@@ -314,6 +320,29 @@ export class StudioPage implements OnInit {
   });
 
   /** Gia them cua de dang chon, hien rieng o buoc goi qua. */
+  /** Hai nhom hop va khung, moi nhom kem lua chon khong lay. Nhom chua co mau nao thi an. */
+  readonly packGroups = computed(() => {
+    const picked = this.facade.packagingPicked();
+    return PACK_GROUPS.map((group) => ({
+      ...group,
+      none: !picked[group.kind],
+      options: this.facade
+        .packagingCatalog()
+        .filter((one) => one.kind === group.kind)
+        .map((raw) => ({ raw, on: picked[group.kind] === raw.code, free: isZero(raw.priceDelta.$numberDecimal) })),
+    })).filter((group) => group.options.length > 0);
+  });
+
+  /** Ten hop va khung dang chon, de ghi vao bang gia. */
+  readonly packagingNames = computed(() => {
+    const picked = new Set(this.facade.packagingCodes());
+    return this.facade
+      .packagingCatalog()
+      .filter((one) => picked.has(one.code))
+      .map((one) => one.displayName)
+      .join(', ');
+  });
+
   readonly baseLine = computed(() => {
     const base = this.facade.baseChosen();
     if (!base || !this.hasStand()) {

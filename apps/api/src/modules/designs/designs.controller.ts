@@ -35,13 +35,19 @@ export class DesignsController {
     @Query('sizeCode') size: string,
     @Query('baseCode') baseCode?: string,
     @Query('accessories') accessories?: string,
+    @Query('packaging') packaging?: string,
   ) {
     // Danh sach phu kien gui dang chuoi ngan cach bang dau phay; mot mau co toi da bon diem neo.
     const codes = (accessories ?? '').split(',').map((one) => one.trim()).filter(Boolean);
     if (codes.length > ACCESSORY_PICK_MAX) {
       throw new BadRequestException('Qua nhieu phu kien');
     }
-    return this.service.quote(kind ?? '', size ?? '', baseCode, codes);
+    // Hop va khung cung gui dang chuoi ngan cach bang dau phay, moi loai mot mau.
+    const packs = (packaging ?? '').split(',').map((one) => one.trim()).filter(Boolean);
+    if (packs.length > 2) {
+      throw new BadRequestException('Qua nhieu hop hoac khung');
+    }
+    return this.service.quote(kind ?? '', size ?? '', baseCode, codes, packs);
   }
 
   @Get(':id')

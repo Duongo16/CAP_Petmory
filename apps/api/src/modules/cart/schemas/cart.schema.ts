@@ -30,6 +30,24 @@ export class AccessoryLine {
 
 export const AccessoryLineSchema = SchemaFactory.createForClass(AccessoryLine);
 
+/** Hop hoac khung di kem dong hang, chot loai, ten va gia luc chon. */
+@Schema({ _id: false })
+export class PackagingLine {
+  @Prop({ required: true, uppercase: true, trim: true })
+  code!: string;
+
+  @Prop({ required: true, uppercase: true, trim: true })
+  kind!: string;
+
+  @Prop({ required: true, trim: true })
+  displayName!: string;
+
+  @Prop({ type: MongooseSchema.Types.Decimal128, required: true })
+  priceDelta!: Types.Decimal128;
+}
+
+export const PackagingLineSchema = SchemaFactory.createForClass(PackagingLine);
+
 @Schema({ _id: true })
 export class CartItem {
   _id!: Types.ObjectId;
@@ -71,6 +89,10 @@ export class CartItem {
   /** Phu kien gan len mau, chot ten va gia luc them vao gio. */
   @Prop({ type: [AccessoryLineSchema], default: [] })
   accessories!: AccessoryLine[];
+
+  /** Hop va khung khach chon them, moi loai mot mau. */
+  @Prop({ type: [PackagingLineSchema], default: [] })
+  packaging!: PackagingLine[];
 
   /** The attached design, so the workshop knows which model to make. May be empty. */
   @Prop({ type: Types.ObjectId, ref: 'Design', default: null })

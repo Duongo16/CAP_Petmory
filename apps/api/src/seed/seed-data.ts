@@ -148,3 +148,17 @@ export const DISPLAY_BASE_LIST: SeedDisplayBase[] = [
   { code: 'BASE-ROUND', displayName: 'Gỗ tròn', description: 'Đế gỗ tròn đánh bóng, hợp đặt bàn làm việc.', priceDelta: '120000', sortOrder: 1 },
   { code: 'BASE-SQUARE', displayName: 'Gỗ vuông', description: 'Đế gỗ vuông khắc được tên và ngày tháng.', priceDelta: '150000', sortOrder: 2 },
 ];
+
+/** Hop dung hoac khung trung bay khach chon them khi dat hang. */
+export interface SeedPackaging extends SeedDisplayBase {
+  kind: 'BOX' | 'FRAME';
+}
+
+/** Hop va khung mau. Quan ly sua gia o trang danh muc, gieo lai khong ghi de gia da sua. */
+export const PACKAGING_LIST: SeedPackaging[] = [
+  { kind: 'BOX', code: 'BOX-KRAFT', displayName: 'Hộp giấy kraft', description: 'Hộp giấy kraft có lót xốp, đi kèm mọi đơn.', priceDelta: '0', sortOrder: 1 },
+  { kind: 'BOX', code: 'BOX-GIFT', displayName: 'Hộp quà nam châm', description: 'Hộp cứng nắp nam châm, kèm thiệp viết tay.', priceDelta: '59000', sortOrder: 2 },
+  { kind: 'BOX', code: 'BOX-WOOD', displayName: 'Hộp gỗ khắc tên', description: 'Hộp gỗ thông, khắc tên bé trên nắp.', priceDelta: '149000', sortOrder: 3 },
+  { kind: 'FRAME', code: 'FRAME-ACRYLIC', displayName: 'Lồng mica trong', description: 'Lồng mica trong suốt chống bụi, đặt trùm lên tượng.', priceDelta: '129000', sortOrder: 1 },
+  { kind: 'FRAME', code: 'FRAME-SHADOW', displayName: 'Khung hộp treo tường', description: 'Khung gỗ sâu lòng, treo tường, mặt kính.', priceDelta: '189000', sortOrder: 2 },
+];

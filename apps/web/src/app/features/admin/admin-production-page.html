@@ -128,6 +128,17 @@
               </ul>
             }
 
+            <h3>{{ 'ADMIN.PROFILE.PACKAGING' | translate }}</h3>
+            @if ((item.packaging ?? []).length === 0) {
+              <p class="note">{{ 'ADMIN.PROFILE.PACKAGING_NONE' | translate }}</p>
+            } @else {
+              <ul class="accessory-list packaging-list">
+                @for (one of item.packaging ?? []; track one.code) {
+                  <li><strong>{{ one.displayName }}</strong> <span class="sub">{{ one.code }}</span></li>
+                }
+              </ul>
+            }
+
             <h3>{{ 'ADMIN.PROFILE.FEATURES' | translate }}</h3>
             <dl class="info-pair feature-pair">
               @if (item.pet; as pet) {

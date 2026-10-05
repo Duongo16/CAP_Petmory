@@ -381,6 +381,26 @@
                   }
                 </div>
               }
+              @for (group of packGroups(); track group.kind) {
+                <h3 class="group-title">{{ group.key | translate }}</h3>
+                <div class="chips" role="group" [attr.aria-label]="group.key | translate" [attr.data-pack]="group.kind">
+                  <button type="button" class="chip" [class.on]="group.none" [attr.aria-pressed]="group.none"
+                    (click)="facade.selectPackaging(group.kind, '')">
+                    {{ 'STUDIO.PACK.NONE' | translate }}
+                  </button>
+                  @for (card of group.options; track card.raw.code) {
+                    <button type="button" class="chip" [class.on]="card.on" [attr.aria-pressed]="card.on"
+                      [attr.data-code]="card.raw.code" (click)="facade.selectPackaging(group.kind, card.raw.code)">
+                      {{ card.raw.displayName }}
+                      @if (card.free) {
+                        · {{ 'STUDIO.STAND.FREE' | translate }}
+                      } @else {
+                        · +{{ card.raw.priceDelta | amount: card.raw.currency }}
+                      }
+                    </button>
+                  }
+                </div>
+              }
               @if (facade.quote(); as bg) {
                 <p class="quote">
                   <span class="quote-price">{{ bg.totalPrice | amount: bg.currency }}</span>
@@ -393,6 +413,12 @@
                   <p class="base-line acc-line">
                     <span>{{ 'STUDIO.ACC.LINE' | translate }} {{ accessoryNames() }}</span>
                     <span>+{{ bg.accessoryPrice | amount: bg.currency }}</span>
+                  </p>
+                }
+                @if (packagingNames()) {
+                  <p class="base-line pack-line">
+                    <span>{{ 'STUDIO.PACK.LINE' | translate }} {{ packagingNames() }}</span>
+                    <span>+{{ (bg.packagingPrice ?? '0') | amount: bg.currency }}</span>
                   </p>
                 }
               }

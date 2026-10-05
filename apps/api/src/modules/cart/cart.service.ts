@@ -91,7 +91,9 @@ export class CartService {
     if (accessories.length > size.maxAccessories) {
       throw new BadRequestException(`Kich co nay gan toi da ${size.maxAccessories} phu kien`);
     }
-    const unitPrice = accessories.reduce(
+    // Hop va khung cung doc gia tu danh muc, moi loai mot mau.
+    const packaging = await this.catalog.findPackaging(dto.packagingCodes);
+    const unitPrice = [...accessories, ...packaging].reduce(
       (sum, one) => addMoney(sum, one.priceDelta),
       addMoney(size.price, base?.priceDelta),
     );
@@ -101,6 +103,13 @@ export class CartService {
       priceDelta: one.priceDelta,
     }));
     const accessoryKey = accessoryLines.map((one) => one.code).join(',');
+    const packagingLines = packaging.map((one) => ({
+      code: one.code,
+      kind: one.kind,
+      displayName: one.displayName,
+      priceDelta: one.priceDelta,
+    }));
+    const packagingKey = packagingLines.map((one) => one.code).sort().join(',');
 
     const cart = await this.getOrCreate(owner);
     // Two lines merge only when the design and the stand match as well, because
@@ -114,6 +123,7 @@ export class CartService {
         m.petName === (dto.petName ?? '') &&
         m.displayBaseCode === baseCode &&
         (m.accessories ?? []).map((one) => one.code).join(',') === accessoryKey &&
+        (m.packaging ?? []).map((one) => one.code).sort().join(',') === packagingKey &&
         (m.designId?.toString() ?? '') === (designId?.toString() ?? ''),
     );
 
@@ -133,6 +143,7 @@ export class CartService {
         displayBaseCode: baseCode,
         displayBaseName: base?.displayName ?? '',
         accessories: accessoryLines,
+        packaging: packagingLines,
         designId,
         quantity: dto.quantity,
         unitPrice,
@@ -217,6 +228,7 @@ export class CartService {
         displayBaseCode: '',
         displayBaseName: '',
         accessories: [],
+        packaging: [],
         designId: null,
         quantity: dto.quantity,
         unitPrice: found.variant.price,
@@ -374,6 +386,12 @@ export class CartService {
         displayBaseName: m.displayBaseName,
         accessories: (m.accessories ?? []).map((one) => ({
           code: one.code,
+          displayName: one.displayName,
+          priceDelta: one.priceDelta.toString(),
+        })),
+        packaging: (m.packaging ?? []).map((one) => ({
+          code: one.code,
+          kind: one.kind,
           displayName: one.displayName,
           priceDelta: one.priceDelta.toString(),
         })),

@@ -56,14 +56,17 @@ export class DesignsService {
   }
 
   /** The price is always asked of the server, never computed in the browser. */
-  /** Bao gia tu may chu, gom ca de va phu kien neu da chon. */
-  quote(productTypeCode: string, sizeCode: string, baseCode = '', accessories: string[] = []): Observable<Quote> {
+  /** Bao gia tu may chu, gom ca de, phu kien, hop va khung neu da chon. */
+  quote(productTypeCode: string, sizeCode: string, baseCode = '', accessories: string[] = [], packaging: string[] = []): Observable<Quote> {
     let params = new HttpParams().set('productTypeCode', productTypeCode).set('sizeCode', sizeCode);
     if (baseCode) {
       params = params.set('baseCode', baseCode);
     }
     if (accessories.length > 0) {
       params = params.set('accessories', accessories.join(','));
+    }
+    if (packaging.length > 0) {
+      params = params.set('packaging', packaging.join(','));
     }
     return this.http.get<Quote>(`${this.base}/designs/quote`, { params });
   }

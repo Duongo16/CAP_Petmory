@@ -39,6 +39,8 @@ export interface ProductionItem {
   stand: { baseName: string; tone: string; decorations: string[] } | null;
   /** Phu kien gan len mau. */
   accessories: { code: string; displayName: string }[];
+  /** Hop va khung khach chon, xuong dong goi kem. */
+  packaging: { code: string; kind: string; displayName: string }[];
   featureNote?: string;
   /** Vi tri dong trong don. */
   rowIndex?: number;
@@ -300,6 +302,7 @@ export class ProductionFileService {
         : null,
       // Phu kien chot cung dong luc dat, dung nhu khach da tra tien (muc 11).
       accessories: (line.accessories ?? []).map((one) => ({ code: one.code, displayName: one.displayName })),
+      packaging: (line.packaging ?? []).map((one) => ({ code: one.code, kind: one.kind, displayName: one.displayName })),
       anglesPreview: preview.map((a) => a.angle),
     };
   }

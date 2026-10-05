@@ -6,6 +6,7 @@ import { CreateColorCodeDto, UpdateColorCodeDto } from './dto/color-code.dto';
 import { ProductType, ProductTypeDocument } from './schemas/product-type.schema';
 import { DisplayBase, DisplayBaseDocument } from './schemas/display-base.schema';
 import { Accessory, AccessoryDocument } from './schemas/accessory.schema';
+import { PackagingOption, PackagingOptionDocument } from './schemas/packaging-option.schema';
 import { CreateAccessoryDto, UpdateAccessoryDto } from './dto/accessory.dto';
 import {
   ProductReview,
@@ -35,6 +36,7 @@ export class CatalogService {
     @InjectModel(DisplayBase.name) private readonly displayBaseModel: Model<DisplayBaseDocument>,
     @InjectModel(ProductReview.name) private readonly reviewModel: Model<ProductReviewDocument>,
     @InjectModel(Accessory.name) private readonly accessoryModel: Model<AccessoryDocument>,
+    @InjectModel(PackagingOption.name) private readonly packagingModel: Model<PackagingOptionDocument>,
   ) {}
 
   /** Phu kien dung chung. Khach chi thay phu kien dang ban. */
@@ -67,6 +69,34 @@ export class CatalogService {
     const anchors = list.map((one) => one.anchor);
     if (new Set(anchors).size !== anchors.length) {
       throw new BadRequestException('Moi diem neo chi gan duoc mot phu kien');
+    }
+    return list;
+  }
+
+  /**
+   * Doc hop va khung khach chon tu danh muc, kem gia tren may chu.
+   *
+   * Moi loai chi chon duoc mot mau, va mau phai dang bat. Gia lay tu danh muc,
+   * khong tin so tien trinh duyet gui len.
+   */
+  async findPackaging(codes: string[] | undefined): Promise<PackagingOptionDocument[]> {
+    const wanted = (codes ?? []).map((one) => one.trim().toUpperCase()).filter(Boolean);
+    if (wanted.length === 0) {
+      return [];
+    }
+    if (new Set(wanted).size !== wanted.length) {
+      throw new BadRequestException('Hop hoac khung bi lap lai');
+    }
+    const found = await this.packagingModel.find({ code: { $in: wanted }, enabled: true }).exec();
+    const byCode = new Map(found.map((one) => [one.code, one]));
+    const missing = wanted.filter((code) => !byCode.has(code));
+    if (missing.length > 0) {
+      throw new BadRequestException(`Hop hoac khung khong con ban: ${missing.join(', ')}`);
+    }
+    const list = wanted.map((code) => byCode.get(code) as PackagingOptionDocument);
+    const kinds = list.map((one) => one.kind);
+    if (new Set(kinds).size !== kinds.length) {
+      throw new BadRequestException('Moi loai chi chon duoc mot mau hop hoac khung');
     }
     return list;
   }
