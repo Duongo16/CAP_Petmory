@@ -286,6 +286,7 @@ export interface ProductType {
   sizes: ProductSize[];
   enabled: boolean;
   rating: RatingSummary;
+  sortOrder?: number;
 }
 
 /** A stand the finished figure is mounted on. */
@@ -296,6 +297,25 @@ export interface DisplayBase {
   description: string;
   priceDelta: { $numberDecimal: string };
   currency: string;
+  enabled?: boolean;
+  sortOrder?: number;
+}
+
+/** Hop dung tuong khi giao hoac khung trung bay. */
+export type PackagingKind = 'BOX' | 'FRAME';
+
+/** Mot mau hop hoac khung trong danh muc vat lieu. */
+export interface PackagingOption {
+  _id: string;
+  kind: PackagingKind;
+  code: string;
+  displayName: string;
+  description: string;
+  priceDelta: Money;
+  currency: string;
+  imageUrl: string;
+  enabled: boolean;
+  sortOrder: number;
 }
 
 export interface ProductReview {

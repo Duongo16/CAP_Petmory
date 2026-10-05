@@ -1,0 +1,45 @@
+<form class="cat-form" [attr.id]="formId()" (submit)="$event.preventDefault(); submit()">
+  <div class="cat-grid">
+    @for (field of fields(); track field.key) {
+      @switch (field.type) {
+        @case ('toggle') {
+          <label class="cat-tick" [formGroup]="flags">
+            <input type="checkbox" [formControlName]="field.key" [attr.data-field]="field.key" />
+            <span>{{ field.labelKey | translate }}</span>
+          </label>
+        }
+        @case ('textarea') {
+          <label class="cat-field wide" [formGroup]="text">
+            <span>{{ field.labelKey | translate }}</span>
+            <textarea rows="2" [formControlName]="field.key" [attr.maxlength]="field.maxLength ?? null"
+              [attr.data-field]="field.key"></textarea>
+          </label>
+        }
+        @case ('select') {
+          <label class="cat-field" [formGroup]="text">
+            <span>{{ field.labelKey | translate }}</span>
+            <select [formControlName]="field.key" [attr.data-field]="field.key">
+              @for (option of field.options ?? []; track option.value) {
+                <option [value]="option.value">{{ option.labelKey | translate }}</option>
+              }
+            </select>
+          </label>
+        }
+        @default {
+          <label class="cat-field" [formGroup]="text">
+            <span>{{ field.labelKey | translate }}</span>
+            <input type="text" [formControlName]="field.key" [attr.maxlength]="field.maxLength ?? null"
+              [attr.inputmode]="field.type === 'money' || field.type === 'int' ? 'numeric' : null" [attr.data-field]="field.key" />
+          </label>
+        }
+      }
+    }
+  </div>
+  @if (invalid()) {
+    <p class="cat-error" role="alert">{{ 'ADMIN.CATALOG.INVALID' | translate }}</p>
+  }
+  <div class="cat-actions">
+    <button type="submit" class="pm-button-primary cat-save" [disabled]="busy()">{{ 'COMMON.SAVE' | translate }}</button>
+    <button type="button" class="pm-button-secondary" (click)="cancelled.emit()">{{ 'COMMON.CANCEL' | translate }}</button>
+  </div>
+</form>

@@ -1,0 +1,71 @@
+<section class="pm-card tw-card-pad cat-panel">
+  <div class="cat-head">
+    <span class="cat-count">{{ 'ADMIN.RESULT_COUNT' | translate: { count: rows().length } }}</span>
+    @if (editing() === null) {
+      <button type="button" class="pm-button-secondary cat-new" (click)="startNew()">{{ 'ADMIN.CATALOG.NEW' | translate }}</button>
+    }
+  </div>
+
+  @if (problem(); as message) {
+    <p class="pm-status" data-tone="bad" role="alert">{{ message | translate }}</p>
+  }
+  @if (notice(); as message) {
+    <p class="pm-status" data-tone="good" role="status">{{ message | translate }}</p>
+  }
+
+  @if (editing() !== null) {
+    <pm-catalog-form [fields]="fields()" [initial]="chosen()" [busy]="busy()" (saved)="save($event)" (cancelled)="cancel()" />
+  }
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+    }
+    @case ('READY') {
+      @if (view().length === 0) {
+        <p class="pm-empty">{{ 'ADMIN.CATALOG.EMPTY' | translate }}</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="table cat-table">
+            <thead>
+              <tr>
+                <th>{{ 'ADMIN.CATALOG.CODE' | translate }}</th>
+                <th>{{ 'ADMIN.CATALOG.NAME' | translate }}</th>
+                @if (extra(); as more) {
+                  <th>{{ more.labelKey | translate }}</th>
+                }
+                <th>{{ 'ADMIN.CATALOG.PRICE_DELTA' | translate }}</th>
+                <th>{{ 'ADMIN.CATALOG.STATE' | translate }}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (one of view(); track one.raw.code) {
+                <tr [class.off]="!one.on" [attr.data-code]="one.raw.code">
+                  <td class="mono">{{ one.raw.code }}</td>
+                  <td>{{ one.raw.displayName }}</td>
+                  @if (extra()) {
+                    <td class="thin">{{ one.extraKey | translate }}</td>
+                  }
+                  <td>{{ one.price | amount }}</td>
+                  <td class="thin">{{ (one.on ? 'ADMIN.CATALOG.ON' : 'ADMIN.CATALOG.OFF') | translate }}</td>
+                  <td class="row-tools">
+                    <button type="button" class="plain cat-edit" [disabled]="busy()" (click)="startEdit(one.raw.code)">
+                      {{ 'COMMON.EDIT' | translate }}
+                    </button>
+                    <button type="button" class="plain cat-toggle" [disabled]="busy()" (click)="toggle(one.raw.code, !one.on)">
+                      {{ (one.on ? 'ADMIN.CATALOG.TURN_OFF' : 'ADMIN.CATALOG.TURN_ON') | translate }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  }
+</section>

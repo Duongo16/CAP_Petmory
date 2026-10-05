@@ -56,7 +56,8 @@
     "SHOP": "Cửa hàng",
     "ASSISTANT_KNOWLEDGE": "Kho tri thức trợ lý",
     "DESIGNS": "Thiết kế của tôi",
-    "MODERATION": "Kiểm duyệt cộng đồng"
+    "MODERATION": "Kiểm duyệt cộng đồng",
+    "CATALOG": "Danh mục"
   },
   "AUTH": {
     "QUICK": {
@@ -1726,6 +1727,46 @@
       "INVALID": "Còn bài thiếu tên hoặc đường dẫn chưa đúng.",
       "DUPLICATE": "Có hai bài trùng mã, hãy bỏ bớt một bài.",
       "TOO_MANY": "Kho chỉ chứa tối đa {{max}} bài."
+    },
+    "CATALOG": {
+      "TITLE": "Danh mục sản phẩm và vật liệu",
+      "SUB": "Loại sản phẩm và kích cỡ, đế, phụ kiện, hộp và khung. Đổi giá chỉ áp dụng cho đơn mới; đơn đã chốt giữ nguyên giá.",
+      "TAB_PRODUCTS": "Sản phẩm & kích cỡ",
+      "TAB_BASES": "Đế",
+      "TAB_ACCESSORIES": "Phụ kiện",
+      "TAB_PACKAGING": "Hộp & khung",
+      "CODE": "Mã",
+      "NAME": "Tên",
+      "PRICE": "Giá",
+      "PRICE_DELTA": "Giá cộng thêm",
+      "ORDER": "Thứ tự",
+      "DESCRIPTION": "Mô tả",
+      "IMAGE": "Ảnh (đường dẫn)",
+      "ENABLED": "Đang bán",
+      "STATE": "Trạng thái",
+      "ON": "Đang bán",
+      "OFF": "Đang tắt",
+      "TURN_ON": "Bật",
+      "TURN_OFF": "Tắt",
+      "NEW": "Thêm mục",
+      "NEW_TYPE": "Thêm loại sản phẩm",
+      "NEW_SIZE": "+ Thêm kích cỡ",
+      "MATERIAL": "Chất liệu",
+      "DIMENSIONS": "Kích thước",
+      "PRODUCTION_DAYS": "Số ngày làm",
+      "MIN_PHOTOS": "Số ảnh tối thiểu",
+      "MAX_ACCESSORIES": "Số phụ kiện tối đa",
+      "EXPLAINER": "Mô tả kích cỡ",
+      "SIZE_META": "{{days}} ngày · tối thiểu {{photos}} ảnh · tối đa {{acc}} phụ kiện",
+      "ANCHOR": "Điểm gắn",
+      "MODEL_FILE": "Tệp mô hình",
+      "KIND": "Loại",
+      "KIND_BOX": "Hộp",
+      "KIND_FRAME": "Khung",
+      "SAVED": "Đã lưu.",
+      "DUPLICATE": "Mã này đã có rồi.",
+      "INVALID": "Còn ô thiếu hoặc chưa đúng định dạng (mã chỉ gồm chữ, số, gạch ngang; giá là số nguyên đồng).",
+      "EMPTY": "Chưa có mục nào."
     }
   },
   "FOOTER": {

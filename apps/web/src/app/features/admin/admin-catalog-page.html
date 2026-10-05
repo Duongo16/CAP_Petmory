@@ -1,0 +1,20 @@
+<div class="pm-page-head">
+  <div class="pm-page-head-text">
+    <h1 class="title pm-page-title">{{ 'ADMIN.CATALOG.TITLE' | translate }}</h1>
+    <p class="description">{{ 'ADMIN.CATALOG.SUB' | translate }}</p>
+  </div>
+</div>
+
+<nav class="catalog-tabs" [attr.aria-label]="'ADMIN.CATALOG.TITLE' | translate">
+  @for (one of tabs(); track one.code) {
+    <button type="button" class="tw-chip" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-tab]="one.code" (click)="pick(one.code)">
+      {{ one.key | translate }}
+    </button>
+  }
+</nav>
+
+@if (itemKind(); as kind) {
+  <pm-catalog-items-panel [kind]="kind" />
+} @else {
+  <pm-catalog-products-panel />
+}

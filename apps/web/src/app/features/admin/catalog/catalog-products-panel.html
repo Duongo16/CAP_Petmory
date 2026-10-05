@@ -1,0 +1,80 @@
+<section class="pm-card tw-card-pad cat-panel">
+  <div class="cat-head">
+    <span class="cat-count">{{ 'ADMIN.RESULT_COUNT' | translate: { count: types().length } }}</span>
+    @if (editing() === null) {
+      <button type="button" class="pm-button-secondary type-new" (click)="newType()">{{ 'ADMIN.CATALOG.NEW_TYPE' | translate }}</button>
+    }
+  </div>
+
+  @if (problem(); as message) {
+    <p class="pm-status" data-tone="bad" role="alert">{{ message | translate }}</p>
+  }
+  @if (notice(); as message) {
+    <p class="pm-status" data-tone="good" role="status">{{ message | translate }}</p>
+  }
+
+  @if (typeFormOpen() && editingTypeCode() === '') {
+    <pm-catalog-form formId="type-form" [fields]="typeFields" [initial]="null" [busy]="busy()" (saved)="save($event)" (cancelled)="cancel()" />
+  }
+
+  @switch (status()) {
+    @case ('LOADING') {
+      <p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+    @case ('ERROR') {
+      <p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+    }
+    @case ('READY') {
+      @if (types().length === 0) {
+        <p class="pm-empty">{{ 'ADMIN.CATALOG.EMPTY' | translate }}</p>
+      }
+      <ul class="type-list">
+        @for (type of types(); track type.code) {
+          <li class="type-card" [class.off]="!type.enabled" [attr.data-type]="type.code">
+            <div class="type-head">
+              <div>
+                <strong>{{ type.name }}</strong>
+                <span class="thin"> · {{ type.code }}</span>
+                @if (!type.enabled) {
+                  <span class="thin"> · {{ 'ADMIN.CATALOG.OFF' | translate }}</span>
+                }
+              </div>
+              <div class="size-tools">
+                <button type="button" class="plain type-edit" [disabled]="busy()" (click)="editType(type.code)">{{ 'COMMON.EDIT' | translate }}</button>
+                <button type="button" class="plain type-toggle" [disabled]="busy()" (click)="toggleType(type.code, !type.enabled)">
+                  {{ (type.enabled ? 'ADMIN.CATALOG.TURN_OFF' : 'ADMIN.CATALOG.TURN_ON') | translate }}
+                </button>
+              </div>
+            </div>
+
+            @if (typeFormOpen() && editingTypeCode() === type.code) {
+              <pm-catalog-form formId="type-form" [fields]="typeFields" [initial]="chosen()" [busy]="busy()" (saved)="save($event)" (cancelled)="cancel()" />
+            }
+
+            <div class="sizes">
+              @for (size of type.sizes; track size.code) {
+                <div class="size-row" [class.off]="!size.enabled" [attr.data-size]="size.code">
+                  <strong>{{ size.displayName }}</strong>
+                  <span class="size-meta">{{ size.dimensions }}</span>
+                  <span>{{ size.price | amount }}</span>
+                  <span class="size-meta">{{ 'ADMIN.CATALOG.SIZE_META' | translate: { days: size.productionDays, photos: size.minPhotos, acc: size.maxAccessories } }}</span>
+                  <span class="size-tools">
+                    <button type="button" class="plain size-edit" [disabled]="busy()" (click)="editSize(type.code, size.code)">{{ 'COMMON.EDIT' | translate }}</button>
+                    <button type="button" class="plain size-toggle" [disabled]="busy()" (click)="toggleSize(type.code, size.code, !size.enabled)">
+                      {{ (size.enabled ? 'ADMIN.CATALOG.TURN_OFF' : 'ADMIN.CATALOG.TURN_ON') | translate }}
+                    </button>
+                  </span>
+                </div>
+              }
+              @if (sizeFormFor() === type.code) {
+                <pm-catalog-form formId="size-form" [fields]="sizeFields" [initial]="chosen()" [busy]="busy()" (saved)="save($event)" (cancelled)="cancel()" />
+              } @else if (editing() === null) {
+                <button type="button" class="plain size-new" (click)="newSize(type.code)">{{ 'ADMIN.CATALOG.NEW_SIZE' | translate }}</button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>

@@ -27,6 +27,7 @@ const MANAGER_STOPS: Stop[] = [
 
 /** Phan xuong va tham so, cung thuoc nhom Quan ly. */
 const WORKSHOP_STOPS: Stop[] = [
+  { path: '/admin/catalog', key: 'NAV.CATALOG', icon: 'gift' },
   { path: '/admin/reports', key: 'NAV.REPORT', icon: 'tag' },
   { path: '/admin/settings', key: 'NAV.SETTINGS', icon: 'bulb' },
 ];

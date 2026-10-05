@@ -289,6 +289,12 @@ export const routes: Routes = [
               import('./features/admin/admin-goods-page').then((m) => m.AdminGoodsPage),
           },
           {
+            path: 'catalog',
+            canActivate: [managerGuard],
+            loadComponent: () =>
+              import('./features/admin/admin-catalog-page').then((m) => m.AdminCatalogPage),
+          },
+          {
             path: 'materials',
             redirectTo: () =>
               inject(Router).createUrlTree(['/admin/settings'], {

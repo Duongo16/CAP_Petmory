@@ -56,7 +56,8 @@
     "SHOP": "Shop",
     "ASSISTANT_KNOWLEDGE": "Assistant knowledge",
     "DESIGNS": "My designs",
-    "MODERATION": "Community moderation"
+    "MODERATION": "Community moderation",
+    "CATALOG": "Catalogue"
   },
   "AUTH": {
     "QUICK": {
@@ -1726,6 +1727,46 @@
       "INVALID": "Some tracks are missing a name or have an invalid link.",
       "DUPLICATE": "Two tracks share the same code, remove one of them.",
       "TOO_MANY": "The library holds at most {{max}} tracks."
+    },
+    "CATALOG": {
+      "TITLE": "Products and materials catalogue",
+      "SUB": "Product types and sizes, stands, accessories, boxes and frames. Price changes apply to new orders only; placed orders keep their price.",
+      "TAB_PRODUCTS": "Products & sizes",
+      "TAB_BASES": "Stands",
+      "TAB_ACCESSORIES": "Accessories",
+      "TAB_PACKAGING": "Boxes & frames",
+      "CODE": "Code",
+      "NAME": "Name",
+      "PRICE": "Price",
+      "PRICE_DELTA": "Extra price",
+      "ORDER": "Order",
+      "DESCRIPTION": "Description",
+      "IMAGE": "Image (link)",
+      "ENABLED": "On sale",
+      "STATE": "State",
+      "ON": "On sale",
+      "OFF": "Off",
+      "TURN_ON": "Turn on",
+      "TURN_OFF": "Turn off",
+      "NEW": "Add item",
+      "NEW_TYPE": "Add product type",
+      "NEW_SIZE": "+ Add size",
+      "MATERIAL": "Material",
+      "DIMENSIONS": "Dimensions",
+      "PRODUCTION_DAYS": "Production days",
+      "MIN_PHOTOS": "Minimum photos",
+      "MAX_ACCESSORIES": "Maximum accessories",
+      "EXPLAINER": "Size description",
+      "SIZE_META": "{{days}} days · at least {{photos}} photos · up to {{acc}} accessories",
+      "ANCHOR": "Anchor",
+      "MODEL_FILE": "Model file",
+      "KIND": "Kind",
+      "KIND_BOX": "Box",
+      "KIND_FRAME": "Frame",
+      "SAVED": "Saved.",
+      "DUPLICATE": "This code already exists.",
+      "INVALID": "Some fields are missing or invalid (codes use letters, digits and dashes; prices are whole dong).",
+      "EMPTY": "Nothing here yet."
     }
   },
   "FOOTER": {

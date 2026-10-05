@@ -401,7 +401,8 @@
     text-decoration: none;
     cursor: pointer;
     transition: background-color 140ms, border-color 140ms, color 140ms;
-    &:hover:not(:disabled) { border-color: var(--color-accent); color: var(--color-ink); }
+    /* Chip dang chon giu chu sang khi re chuot, neu khong chu trung mau nen. */
+    &:hover:not(:disabled):not([aria-pressed='true'], .is-selected, .active) { border-color: var(--color-accent); color: var(--color-ink); }
     &[aria-pressed='true'], &.is-selected, &.active {
       border-color: var(--color-night);
       background-color: var(--color-night);
