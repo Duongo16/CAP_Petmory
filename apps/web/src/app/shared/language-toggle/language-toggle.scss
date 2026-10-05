@@ -1,0 +1,22 @@
+:host {
+  display: inline-flex;
+}
+
+.lang-button {
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--pm-text-body);
+
+  &:hover {
+    color: var(--pm-accent);
+  }
+}
+
+// Man hinh hep: nut hep lai de thanh tren cung khong tran ngang.
+@media (max-width: 420px) {
+  .lang-button {
+    inline-size: 32px;
+    min-inline-size: 32px;
+  }
+}

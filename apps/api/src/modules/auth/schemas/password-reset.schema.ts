@@ -19,7 +19,9 @@ export class PasswordReset {
   @Prop({ required: true })
   codeHash!: string;
 
-  @Prop({ type: Date, required: true, index: true })
+  // Chi muc tu xoa khai bao rieng ben duoi. Them index o day se tao chi muc
+  // thuong trung khoa, va tuy chon tu xoa khong con duoc ap dung.
+  @Prop({ type: Date, required: true })
   expiresAt!: Date;
 
   /** Set the moment the code is spent, so it can never be spent twice. */

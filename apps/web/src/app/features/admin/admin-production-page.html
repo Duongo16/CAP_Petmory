@@ -107,7 +107,7 @@
             @if (item.zoneColours.length === 0) {
               <p class="note">{{ 'ADMIN.PROFILE.ZONE_NONE' | translate }}</p>
             } @else {
-              <ul class="wool-list">
+              <ul class="wool-list zone-list">
                 @for (one of item.zoneColours; track one.zone) {
                   <li>
                     <span class="swatch-sm" [style.background-color]="one.wool.swatch" aria-hidden="true"></span>
@@ -122,7 +122,7 @@
             @if (item.woolRolls.length === 0) {
               <p class="note">{{ 'ADMIN.NONE_YET' | translate }}</p>
             } @else {
-              <ul class="wool-list">
+              <ul class="wool-list roll-list">
                 @for (wool of item.woolRolls; track wool.code) {
                   <li>
                     <span class="swatch-sm" [style.background-color]="wool.swatch" aria-hidden="true"></span>

@@ -16,6 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { PetDraftService } from '../../core/services/pet-draft.service';
 import { DemoAccount } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
+import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
 import { DiaryScene } from '../../shared/diary-scene/diary-scene';
 import { Brand } from '../../shared/brand/brand';
@@ -23,7 +24,7 @@ import { Brand } from '../../shared/brand/brand';
 @Component({
   selector: 'pm-login',
   standalone: true,
-  imports: [Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [LanguageToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './login.html',
   styleUrls: ['./auth-shared.scss', './login.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,8 +47,6 @@ export class LoginPage implements OnInit {
   readonly pendingSend = signal(false);
   readonly error = signal<string | null>(null);
 
-  /** Turns true when a social button is pressed, which is not wired up yet. */
-  readonly socialNotice = signal(false);
 
   /** Whether the password is shown as plain text. */
   readonly peeking = signal(false);
@@ -78,9 +77,6 @@ export class LoginPage implements OnInit {
     this.peeking.set(!this.peeking());
   }
 
-  showSocialNotice(): void {
-    this.socialNotice.set(true);
-  }
 
   send(): void {
     if (this.form.invalid || this.pendingSend()) {

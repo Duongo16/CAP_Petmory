@@ -7,6 +7,16 @@ export interface AppConfig {
   mongodbUri: string;
   webOrigin: string;
   sepayWebhookKey: string;
+  mail: {
+    /** May chu SMTP. Rong thi khong gui thu; o moi truong phat trien noi dung thu duoc ghi ra nhat ky. */
+    host: string;
+    port: number;
+    secure: boolean;
+    user: string;
+    pass: string;
+    from: string;
+    timeoutMs: number;
+  };
   sepay: {
     /** Token goi API giao dich cua SePay, dung cho doi soat. Rong thi tat doi soat. */
     apiToken: string;
@@ -58,6 +68,15 @@ export default (): AppConfig => ({
   port: Number(process.env.API_PORT ?? 3000),
   mongodbUri: required('MONGODB_URI'),
   webOrigin: process.env.WEB_ORIGIN ?? 'http://localhost:4200',
+  mail: {
+    host: (process.env.SMTP_HOST ?? '').trim(),
+    port: Number(process.env.SMTP_PORT ?? 587),
+    secure: (process.env.SMTP_SECURE ?? '').trim().toLowerCase() === 'true',
+    user: (process.env.SMTP_USER ?? '').trim(),
+    pass: process.env.SMTP_PASS ?? '',
+    from: (process.env.SMTP_FROM ?? 'Petmory <no-reply@petmory.local>').trim(),
+    timeoutMs: Number(process.env.SMTP_TIMEOUT_MS ?? 10000),
+  },
   // Khong co gia tri mac dinh: thieu khoa thi webhook tu choi moi yeu cau.
   sepayWebhookKey: (process.env.SEPAY_WEBHOOK_KEY ?? '').trim(),
   sepay: {

@@ -23,10 +23,12 @@ interface Step {
 import { DiaryScene } from '../../shared/diary-scene/diary-scene';
 import { Brand } from '../../shared/brand/brand';
 
+import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
+
 @Component({
   selector: 'pm-guest-home-page',
   standalone: true,
-  imports: [Brand, DiaryScene, RouterLink, TranslatePipe, Icon, PetArt, PetStarter],
+  imports: [Brand, DiaryScene, RouterLink, TranslatePipe, Icon, PetArt, PetStarter, LanguageToggle],
   templateUrl: './guest-home-page.html',
   styleUrl: './guest-home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

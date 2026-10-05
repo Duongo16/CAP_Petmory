@@ -14,11 +14,8 @@ export class NotificationService {
       .get(key)
       .pipe(take(1))
       .subscribe((text) => {
-        const message =
-          text && text !== key
-            ? text
-            : 'Tài khoản không thích hợp để tham gia tính năng này. Đã chuyển về trang quản lý.';
-        const close = this.translate.instant('COMMON.CLOSE') || 'Đóng';
+        const message = text;
+        const close = this.translate.instant('COMMON.CLOSE');
         this.snackBar.open(message, close, {
           duration: 4500,
           horizontalPosition: 'center',

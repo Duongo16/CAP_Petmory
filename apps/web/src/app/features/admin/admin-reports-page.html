@@ -162,7 +162,7 @@
               <span class="kpi-value">{{ onTimeRate() }}%</span>
               <span class="kpi-sub">
                 @if ((progress()?.lateCount ?? 0) > 0) {
-                  <span class="text-danger font-bold">{{ progress()?.lateCount }} đơn trễ hạn</span>
+                  <span class="text-danger font-bold">{{ 'ADMIN.REPORT.LATE_ORDERS' | translate: { count: progress()?.lateCount ?? 0 } }}</span>
                 } @else {
                   <span class="text-success font-semibold">{{ 'ADMIN.REPORT.HEALTH_NORMAL' | translate }}</span>
                 }
@@ -213,7 +213,7 @@
                     <span class="color-dot" [style.background-color]="item.color"></span>
                     <div class="legend-info">
                       <span class="legend-name">{{ item.key | translate }}</span>
-                      <span class="legend-val">{{ item.raw.amount | amount }} ({{ item.raw.count }} món)</span>
+                      <span class="legend-val">{{ item.raw.amount | amount }} ({{ 'ADMIN.REPORT.UNIT_ITEMS' | translate: { count: item.raw.count } }})</span>
                     </div>
                     <span class="legend-percent">{{ item.percent }}%</span>
                   </div>
@@ -228,7 +228,7 @@
                   <pm-icon name="star" [size]="18" />
                   {{ 'ADMIN.REPORT.TOP_PRODUCTS' | translate }}
                 </h3>
-                <span class="chart-badge">{{ (revenue()?.byProduct?.length ?? 0) }} sản phẩm</span>
+                <span class="chart-badge">{{ 'ADMIN.REPORT.UNIT_PRODUCTS' | translate: { count: revenue()?.byProduct?.length ?? 0 } }}</span>
               </div>
               <div class="chart-canvas-wrap">
                 <canvas #productsCanvas id="chart-top-products"></canvas>

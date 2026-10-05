@@ -71,6 +71,16 @@ export class AuthService {
     return this.http.get<DemoAccount[]>(`${this.base}/auth/demo-accounts`);
   }
 
+  /** Xin thu dat lai mat khau. May chu tra loi giong nhau du email co tai khoan hay khong. */
+  forgotPassword(email: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.base}/auth/forgot-password`, { email });
+  }
+
+  /** Dat mat khau moi bang ma trong thu. Moi phien dang mo se bi dang xuat. */
+  resetPassword(token: string, password: string): Observable<{ ok: boolean }> {
+    return this.http.post<{ ok: boolean }>(`${this.base}/auth/reset-password`, { token, password });
+  }
+
   login(email: string, password: string): Observable<LoginResult> {
     return this.http
       .post<LoginResult>(`${this.base}/auth/login`, { email, password })

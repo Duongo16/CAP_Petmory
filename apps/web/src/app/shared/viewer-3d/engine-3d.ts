@@ -274,6 +274,11 @@ export class Engine3d {
     return this.painter?.undo() ?? false;
   }
 
+  /** So mat cua tung mau theo vat lieu, de biet moi vung dang mang mau gi. */
+  colorCountByMaterial(): Record<string, Record<string, number>> {
+    return this.painter?.colorCountByMaterial() ?? {};
+  }
+
   /** Exports the current colour of every face so a draft can be saved. */
   exportStatusPaint(): PaintState[] {
     return this.painter?.exportStatus() ?? [];

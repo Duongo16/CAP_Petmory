@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { samePassword } from './password-match';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -7,6 +8,7 @@ import { switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { PetDraftService } from '../../core/services/pet-draft.service';
 import { Icon } from '../../shared/icon/icon';
+import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
 
 /** A benefit shown in the left panel. Both keys are written out in full. */
@@ -26,16 +28,6 @@ const STRENGTH_LABEL: Record<number, string> = {
 };
 
 const STRENGTH_STEPS = [1, 2, 3, 4];
-
-/** Checks that the two password boxes hold the same thing. */
-function samePassword(group: AbstractControl): ValidationErrors | null {
-  const password = group.get('password')?.value as string;
-  const confirm = group.get('confirm')?.value as string;
-  if (!confirm || password === confirm) {
-    return null;
-  }
-  return { mismatch: true };
-}
 
 /** A rough score from zero to four, used only to colour the meter. */
 function scorePassword(value: string): number {
@@ -63,7 +55,7 @@ import { Brand } from '../../shared/brand/brand';
 @Component({
   selector: 'pm-register',
   standalone: true,
-  imports: [Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [LanguageToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './register.html',
   styleUrls: ['./auth-shared.scss', './register.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -81,7 +73,6 @@ export class RegisterPage {
 
   readonly pendingSend = signal(false);
   readonly error = signal<string | null>(null);
-  readonly socialNotice = signal(false);
   readonly peeking = signal(false);
   readonly peekingConfirm = signal(false);
 
@@ -122,9 +113,6 @@ export class RegisterPage {
     this.peekingConfirm.set(!this.peekingConfirm());
   }
 
-  showSocialNotice(): void {
-    this.socialNotice.set(true);
-  }
 
   send(): void {
     if (this.form.invalid || this.pendingSend()) {

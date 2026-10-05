@@ -29,7 +29,10 @@
   <div class="ap-form-panel">
     <div class="ap-form-inner">
 
-      <a class="ap-back" routerLink="/landing"><pm-icon name="back" [size]="16" />{{ 'AUTH.BACK_HOME' | translate }}</a>
+      <div class="ap-top-row">
+        <a class="ap-back" routerLink="/landing"><pm-icon name="back" [size]="16" />{{ 'AUTH.BACK_HOME' | translate }}</a>
+        <pm-language-toggle />
+      </div>
 
       <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" /></a>
 
@@ -47,22 +50,6 @@
           </span>
         </div>
       }
-
-      <!-- Social buttons -->
-      <div class="ap-social-row">
-        <button type="button" class="ap-social-btn" (click)="showSocialNotice()">
-          <pm-icon name="user" [size]="16" /> {{ 'AUTH.UP_GOOGLE' | translate }}
-        </button>
-        <button type="button" class="ap-social-btn" (click)="showSocialNotice()">
-          <pm-icon name="comment" [size]="16" /> {{ 'AUTH.UP_ZALO' | translate }}
-        </button>
-      </div>
-
-      @if (socialNotice()) {
-        <p class="ap-notice ap-notice-warn" role="status">{{ 'AUTH.SOCIAL_OFF' | translate }}</p>
-      }
-
-      <p class="ap-divider">{{ 'AUTH.OR_EMAIL_UP' | translate }}</p>
 
       <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="send()">
 

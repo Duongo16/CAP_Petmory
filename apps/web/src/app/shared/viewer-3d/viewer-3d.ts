@@ -180,6 +180,11 @@ export class Viewer3d {
   }
 
   /** Reads the current colour of every face, used when saving a draft. */
+  /** So mat cua tung mau theo vat lieu goc, de tinh mau tung vung cho ho so san xuat. */
+  readColorCountByMaterial(): Record<string, Record<string, number>> {
+    return this.engine?.colorCountByMaterial() ?? {};
+  }
+
   readStatusPaint(): PaintState[] {
     return this.engine?.exportStatusPaint() ?? [];
   }

@@ -228,7 +228,7 @@
                       </strong>
                       @if (card.raw.quantity > 1) {
                         <span class="line-unit-price">
-                          {{ card.raw.unitPrice | amount: card.raw.currency }} / món
+                          {{ 'CART.PER_ITEM' | translate: { price: (card.raw.unitPrice | amount: card.raw.currency) } }}
                         </span>
                       }
                     </div>

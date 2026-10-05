@@ -151,6 +151,26 @@ export class Painter {
   }
 
   /**
+   * Dem mau cua cac mat theo tung mang vat lieu goc.
+   *
+   * Mau da to nam o tung dinh, khong o vat lieu, nen muon biet mot vung dang
+   * mang mau gi thi phai dem mat. Tra ve so mat cua tung mau, theo ten vat lieu.
+   */
+  colorCountByMaterial(): Record<string, Record<string, number>> {
+    const out: Record<string, Record<string, number>> = {};
+    for (const item of this.meshes) {
+      for (let face = 0; face < item.faceCenters.length; face += 1) {
+        const i = face * 3;
+        const hex = toColorString(item.colorAttribute.getX(i), item.colorAttribute.getY(i), item.colorAttribute.getZ(i));
+        const material = item.faceMaterial[face] || 'unnamed';
+        const counts = (out[material] ??= {});
+        counts[hex] = (counts[hex] ?? 0) + 1;
+      }
+    }
+    return out;
+  }
+
+  /**
    * Reloads saved colours. A mesh whose name or face count does not match is skipped,
    * so an old draft cannot break the model if the model library changes later.
    * Returns how many meshes were loaded.

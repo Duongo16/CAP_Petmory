@@ -64,7 +64,7 @@ export class PhotoRestoreService {
 
     const data = await restorePhoto(file.buffer, OPERATIONS);
     const resemblance = await measureResemblance(file.buffer, data);
-    await this.usage.record(AiKind.RESTORE_PHOTO, owner, AiMode.LIVE);
+    await this.usage.record(AiKind.RESTORE_PHOTO, owner, AiMode.LOCAL);
     return { data, resemblance };
   }
 

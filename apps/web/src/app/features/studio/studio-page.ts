@@ -458,18 +458,31 @@ export class StudioPage implements OnInit {
     return list.map((one) => ({ raw: one, on: one.code === held, used: used.has(one.code) }));
   }
 
-  /** Mau cua tung vung co ten tren mo hinh dang dung, cho ho so san xuat. */
+  /**
+   * Mau cua tung vung co ten tren mo hinh dang dung, cho ho so san xuat.
+   *
+   * Dem mau tren cac mat da to cua tung vat lieu va lay mau len xuat hien nhieu
+   * nhat. Mau goc cua tep khong trung ma len nao nen tu bi bo qua: vung nao
+   * khach chua chon mau thi khong ghi.
+   */
   private zonePaintOf(model: BaseModel): { zone: string; colorCode: string }[] {
     const map = this.zoneByFile[model.file] ?? {};
-    const codeOf = new Map(this.palette().map((one) => [one.swatch.toLowerCase(), one.code]));
-    const out = new Map<string, string>();
-    for (const one of this.zoneDisplay()) {
-      const zone = map[one.name];
-      const code = codeOf.get(`#${one.colorSelected}`.toLowerCase()) ?? codeOf.get(one.colorSelected.toLowerCase());
-      if (zone && code && !out.has(zone)) {
-        out.set(zone, code);
+    const codeOf = new Map(this.palette().map((one) => [one.swatch.replace('#', '').toLowerCase(), one.code]));
+    const counts = this.viewer()?.readColorCountByMaterial() ?? {};
+    const best = new Map<string, { code: string; faces: number }>();
+    for (const [material, byColor] of Object.entries(counts)) {
+      const zone = map[material];
+      if (!zone) {
+        continue;
+      }
+      for (const [hex, faces] of Object.entries(byColor)) {
+        const code = codeOf.get(hex.toLowerCase());
+        const now = best.get(zone);
+        if (code && (!now || faces > now.faces)) {
+          best.set(zone, { code, faces });
+        }
       }
     }
-    return [...out].map(([zone, colorCode]) => ({ zone, colorCode }));
+    return [...best].map(([zone, one]) => ({ zone, colorCode: one.code }));
   }
 }

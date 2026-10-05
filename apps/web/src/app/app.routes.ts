@@ -39,6 +39,16 @@ export const routes: Routes = [
     canActivate: [guestGuard],
     loadComponent: () => import('./features/auth/register').then((m) => m.RegisterPage),
   },
+  {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/forgot-password').then((m) => m.ForgotPasswordPage),
+  },
+  {
+    // Khong chan nguoi da dang nhap: ho van co the bam duong dan trong thu.
+    path: 'reset-password',
+    loadComponent: () => import('./features/auth/reset-password').then((m) => m.ResetPasswordPage),
+  },
   /*
    * Ba duong duoi day nam ngoai lop kiem dang nhap, vi mot quyen nhat ky da
    * de cong khai thi phai doc duoc that su, ke ca khi nguoi doc chua tung co

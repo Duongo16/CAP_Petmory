@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { LanguageService } from './core/services/language.service';
 import { ThemeService } from './core/services/theme.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { ThemeService } from './core/services/theme.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App implements OnInit {
-  private readonly translate = inject(TranslateService);
+  private readonly language = inject(LanguageService);
 
   /*
    * Doc ra de dich vu giao dien duoc dung len ngay tu goc. Truoc day no chi
@@ -21,7 +21,7 @@ export class App implements OnInit {
   private readonly theme = inject(ThemeService);
 
   ngOnInit(): void {
-    this.translate.setDefaultLang('vi');
-    void this.translate.use('vi');
+    // Dung ngon ngu nguoi doc da chon lan truoc, mac dinh la tieng Viet.
+    this.language.start();
   }
 }

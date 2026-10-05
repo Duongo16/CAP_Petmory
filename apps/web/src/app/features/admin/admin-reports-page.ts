@@ -251,7 +251,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
         labels,
         datasets: [
           {
-            label: this.words.instant('ADMIN.REPORT.DAILY_REVENUE') || 'Doanh thu (VND)',
+            label: this.words.instant('ADMIN.REPORT.DAILY_REVENUE'),
             data: revenueData,
             borderColor: '#a8500c',
             backgroundColor: 'rgba(168, 80, 12, 0.12)',
@@ -263,7 +263,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
             yAxisID: 'y',
           },
           {
-            label: this.words.instant('ADMIN.REPORT.DAILY_ORDERS') || 'Số đơn hàng',
+            label: this.words.instant('ADMIN.REPORT.DAILY_ORDERS'),
             data: ordersData,
             borderColor: '#5b6640',
             backgroundColor: '#5b6640',
@@ -286,7 +286,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
                 if (ctx.dataset.yAxisID === 'y') {
                   return `${ctx.dataset.label}: ${formatVND(ctx.parsed.y)}`;
                 }
-                return `${ctx.dataset.label}: ${ctx.parsed.y} đơn`;
+                return `${ctx.dataset.label}: ${this.words.instant('ADMIN.REPORT.UNIT_ORDERS', { count: ctx.parsed.y })}`;
               },
             },
           },
@@ -381,7 +381,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
         labels,
         datasets: [
           {
-            label: this.words.instant('ADMIN.REPORT.REVENUE') || 'Doanh thu (VND)',
+            label: this.words.instant('ADMIN.REPORT.REVENUE'),
             data,
             backgroundColor: '#a8500c',
             borderRadius: 6,
@@ -442,7 +442,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
         labels,
         datasets: [
           {
-            label: this.words.instant('ADMIN.REPORT.ORDER_COUNT') || 'Số đơn',
+            label: this.words.instant('ADMIN.REPORT.ORDER_COUNT'),
             data,
             backgroundColor: colors,
             borderRadius: 8,
@@ -456,7 +456,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (ctx: any) => ` ${ctx.parsed.y} đơn hàng`,
+              label: (ctx: any) => ` ${this.words.instant('ADMIN.REPORT.UNIT_ORDERS', { count: ctx.parsed.y })}`,
             },
           },
         },
@@ -489,14 +489,14 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
         labels,
         datasets: [
           {
-            label: this.words.instant('ADMIN.REPORT.AI_COST') || 'Chi phí (VND)',
+            label: this.words.instant('ADMIN.REPORT.AI_COST'),
             data: costs,
             backgroundColor: '#a8500c',
             borderRadius: 6,
             yAxisID: 'y',
           },
           {
-            label: this.words.instant('ADMIN.REPORT.USES') || 'Số lượt dùng',
+            label: this.words.instant('ADMIN.REPORT.USES'),
             data: counts,
             backgroundColor: '#5b6640',
             borderRadius: 6,
@@ -515,7 +515,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
                 if (ctx.dataset.yAxisID === 'y') {
                   return `${ctx.dataset.label}: ${formatVND(Number(ctx.raw))}`;
                 }
-                return `${ctx.dataset.label}: ${ctx.raw} lượt`;
+                return `${ctx.dataset.label}: ${this.words.instant('ADMIN.REPORT.UNIT_USES', { count: ctx.raw })}`;
               },
             },
           },

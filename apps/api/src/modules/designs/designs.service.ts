@@ -228,6 +228,8 @@ export class DesignsService {
       modelCode: dto.modelCode,
       paint: dto.paint ?? [],
       colorCodesUsed: dto.colorCodesUsed ?? [],
+      // Mau tung vung co ten: ho so san xuat doc day de ghi ma mau theo vung cho xuong.
+      zonePaint: (dto.zonePaint ?? []).map((one) => ({ zone: one.zone, colorCode: one.colorCode })),
       productTypeCode: dto.productTypeCode ?? '',
       sizeCode: dto.sizeCode ?? '',
       engraving: {

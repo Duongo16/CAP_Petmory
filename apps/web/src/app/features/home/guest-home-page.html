@@ -10,6 +10,7 @@
         <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
       </nav>
       <div class="lp-bar-actions">
+        <pm-language-toggle />
         <a class="lp-link-btn" routerLink="/login">{{ 'AUTH.SIGN_IN' | translate }}</a>
         <button type="button" class="lp-btn lp-btn-sm" (click)="openOnboarding()">{{ 'LANDING.START_FREE' | translate }}</button>
       </div>

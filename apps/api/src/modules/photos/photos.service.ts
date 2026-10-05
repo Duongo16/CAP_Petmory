@@ -247,7 +247,7 @@ export class PhotosService {
     await this.usage.record(
       AiKind.RESTORE_PHOTO,
       owner,
-      AiMode.LIVE,
+      AiMode.LOCAL,
       made._id.toString(),
     );
     return made;

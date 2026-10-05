@@ -1,0 +1,9 @@
+<button
+  type="button"
+  class="lang-button pm-icon-button"
+  (click)="press()"
+  [attr.aria-label]="'LANG.SWITCH_TO' | translate: { name: nextName() | translate }"
+  [attr.title]="'LANG.SWITCH_TO' | translate: { name: nextName() | translate }"
+>
+  {{ short() }}
+</button>

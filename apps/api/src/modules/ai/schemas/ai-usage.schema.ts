@@ -18,8 +18,12 @@ export enum AiKind {
 
 /** Mot luot dung chay that hay chay bang bo tra loi mau. */
 export enum AiMode {
+  /** Goi dich vu tri tue nhan tao that. */
   LIVE = 'LIVE',
+  /** Khong co khoa hoac dich vu loi, tra ket qua mau. */
   SAMPLE = 'SAMPLE',
+  /** Xu ly anh ngay tren may chu bang bo loc, khong goi dich vu tri tue nhan tao nao. */
+  LOCAL = 'LOCAL',
 }
 
 /**

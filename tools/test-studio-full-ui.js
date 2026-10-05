@@ -172,6 +172,8 @@ async function run() {
       `${design?.paint?.length} mesh`));
     res.push(check('The server stores the colour codes used', (design?.colorCodesUsed?.length ?? 0) === 1,
       (design?.colorCodesUsed ?? []).join(',')));
+    res.push(check('The server stores the colour chosen for each named zone',
+      (design?.zonePaint ?? []).some((one) => one.colorCode === 'WOOL-W01'), JSON.stringify(design?.zonePaint)));
     res.push(check('The server stores the engraving', design?.engraving?.name === 'Mun'));
     res.push(check('The server stores the engraving font', design?.engraving?.message === 'Nho be nhieu lam'));
     res.push(check('The server stores the stand', design?.stand?.baseCode === 'BASE-ROUND'
@@ -257,10 +259,13 @@ async function run() {
     await page.goto(`${WEB}/admin/orders/${orderCode}/production-file`, {
       waitUntil: 'networkidle',
     });
-    await page.waitForSelector('.wool-list li', { timeout: 30000 });
+    await page.waitForSelector('.roll-list li', { timeout: 30000 });
     res.push(check('The production file names the wool rolls needed',
-      (await page.locator('.wool-list li').count()) === 1,
-      (await page.locator('.wool-list li').first().innerText()).trim()));
+      (await page.locator('.roll-list li').count()) === 1,
+      (await page.locator('.roll-list li').first().innerText()).trim()));
+    const zoneText = (await page.locator('.zone-list').innerText().catch(() => '')).replace(SPLIT_LINES, ' ');
+    res.push(check('The production file gives the wool code for each painted zone',
+      zoneText.includes('WOOL-W01'), zoneText.slice(0, 80)));
     /*
      * Tim dung the chua danh sach len thay vi dem theo thu tu the tren trang.
      * Dem theo thu tu la cach bai kiem thu nay tung lam, va no hong ngay khi

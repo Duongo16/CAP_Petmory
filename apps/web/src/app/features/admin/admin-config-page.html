@@ -6,7 +6,7 @@
   </header>
 
   <!-- Segmented Navigation Tabs -->
-  <nav class="config-tabs-nav" aria-label="Cấu hình tham số">
+  <nav class="config-tabs-nav" [attr.aria-label]="'ADMIN.CONFIG.TABS_LABEL' | translate">
     @for (t of tabs; track t.id) {
       <button
         type="button"
@@ -148,13 +148,13 @@
                 <div class="bank-preview-box">
                   <div class="preview-label">
                     <pm-icon name="tag" [size]="14" />
-                    <span>Thẻ thụ hưởng thanh toán</span>
+                    <span>{{ 'ADMIN.CONFIG.BANK_CARD' | translate }}</span>
                   </div>
                   <div class="bank-mock-card">
                     <div class="mock-top">
                       <div class="flex items-center gap-2">
                         <img src="img/logo-mark.png" alt="Petmory" class="mock-logo" />
-                        <span class="mock-bank">{{ form.get('bankName')?.value || 'NGÂN HÀNG' }}</span>
+                        <span class="mock-bank">{{ form.get('bankName')?.value || ('ADMIN.CONFIG.BANK_PLACEHOLDER' | translate) }}</span>
                       </div>
                       <span class="mock-code">BIN: {{ form.get('bankCode')?.value || '------' }}</span>
                     </div>
@@ -201,7 +201,7 @@
                         <div class="feature-icon"><pm-icon name="image" [size]="18" /></div>
                         <div>
                           <span>{{ 'ADMIN.CONFIG.PRICE_RESTORE_PHOTO' | translate }}</span>
-                          <div class="sub">Phục hồi và làm rõ ảnh thú cưng</div>
+                          <div class="sub">{{ 'ADMIN.CONFIG.AI_RESTORE_SUB' | translate }}</div>
                         </div>
                       </div>
                     </td>
@@ -232,7 +232,7 @@
                         <div class="feature-icon"><pm-icon name="sparkle" [size]="18" /></div>
                         <div>
                           <span>{{ 'ADMIN.CONFIG.PRICE_DESIGN_SUGGESTION' | translate }}</span>
-                          <div class="sub">Gợi ý tạo mẫu phối màu len</div>
+                          <div class="sub">{{ 'ADMIN.CONFIG.AI_SUGGEST_SUB' | translate }}</div>
                         </div>
                       </div>
                     </td>
@@ -263,7 +263,7 @@
                         <div class="feature-icon"><pm-icon name="book" [size]="18" /></div>
                         <div>
                           <span>{{ 'ADMIN.CONFIG.PRICE_STORY_WRITING' | translate }}</span>
-                          <div class="sub">Viết câu chuyện kỷ niệm thú cưng</div>
+                          <div class="sub">{{ 'ADMIN.CONFIG.AI_STORY_SUB' | translate }}</div>
                         </div>
                       </div>
                     </td>
@@ -294,7 +294,7 @@
                         <div class="feature-icon"><pm-icon name="comment" [size]="18" /></div>
                         <div>
                           <span>{{ 'ADMIN.CONFIG.PRICE_CHAT_REPLY' | translate }}</span>
-                          <div class="sub">Hội thoại tư vấn chăm sóc khách hàng</div>
+                          <div class="sub">{{ 'ADMIN.CONFIG.AI_CHAT_SUB' | translate }}</div>
                         </div>
                       </div>
                     </td>
@@ -333,7 +333,7 @@
                   <h2>{{ 'ADMIN.CONFIG.QC_GROUP' | translate }}</h2>
                   <p class="group-sub">{{ 'ADMIN.CONFIG.QC_NOTE' | translate }}</p>
                 </div>
-                <span class="group-count">{{ qcPreviewLines().length }} TIÊU CHÍ</span>
+                <span class="group-count">{{ 'ADMIN.CONFIG.QC_COUNT' | translate: { count: qcPreviewLines().length } }}</span>
               </div>
               <label class="wide">
                 <span>{{ 'ADMIN.CONFIG.QC_LIST' | translate }}</span>
@@ -341,7 +341,7 @@
                   formControlName="qcChecklist"
                   rows="9"
                   maxlength="4000"
-                  placeholder="Ví dụ: Kiểm tra mắt mũi đính chắc chắn&#10;Kiểm tra mã màu chuẩn mẫu khách duyệt&#10;Đóng gói kèm thư cảm ơn"
+                  [placeholder]="'ADMIN.CONFIG.QC_PLACEHOLDER' | translate"
                 ></textarea>
                 <small>{{ 'ADMIN.CONFIG.QC_HINT' | translate }}</small>
               </label>
@@ -354,7 +354,7 @@
                   <h3>{{ 'ADMIN.CONFIG.QC_PREVIEW_TITLE' | translate }}</h3>
                   <p class="group-sub">{{ 'ADMIN.CONFIG.QC_PREVIEW_SUB' | translate }}</p>
                 </div>
-                <span class="status-chip" data-group="good">Đạt chuẩn xuất xưởng</span>
+                <span class="status-chip" data-group="good">{{ 'ADMIN.CONFIG.QC_PASS' | translate }}</span>
               </div>
 
               <ul class="qc-items-list">
@@ -366,7 +366,7 @@
                     <span>{{ item }}</span>
                   </li>
                 } @empty {
-                  <li class="muted">Chưa có tiêu chí nào. Hãy nhập ít nhất một dòng bên trái.</li>
+                  <li class="muted">{{ 'ADMIN.CONFIG.QC_EMPTY' | translate }}</li>
                 }
               </ul>
             </div>
@@ -389,7 +389,7 @@
             </div>
             @if (lastEditedBy(); as editor) {
               <div class="audit-meta">
-                <span>Cập nhật gần nhất bởi: <strong>{{ editor }}</strong></span>
+                <span>{{ 'ADMIN.CONFIG.LAST_EDITOR' | translate }} <strong>{{ editor }}</strong></span>
               </div>
             }
           </div>
@@ -431,7 +431,7 @@
             </div>
 
             <div class="materials-counter-badge">
-              <span>Đang bật: <strong>{{ countEnabled() }}</strong> / {{ countTotal() }}</span>
+              <span>{{ 'ADMIN.CONFIG.ENABLED_COUNT' | translate }} <strong>{{ countEnabled() }}</strong> / {{ countTotal() }}</span>
             </div>
 
             @if (isManager()) {
@@ -521,7 +521,7 @@
                   } @empty {
                     <tr>
                       <td colspan="7" class="pm-empty" style="text-align: center; padding: 32px;">
-                        Không tìm thấy vật liệu phù hợp với điều kiện lọc.
+                        {{ 'ADMIN.CONFIG.MATERIAL_NONE' | translate }}
                       </td>
                     </tr>
                   }

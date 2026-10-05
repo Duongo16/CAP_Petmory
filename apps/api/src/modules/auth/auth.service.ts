@@ -9,6 +9,7 @@ import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { MSG } from '../../common/constants/messages';
 import { Role } from '../../common/constants/roles';
 import { PasswordReset, PasswordResetDocument } from './schemas/password-reset.schema';
+import { MailService } from '../../common/mail.service';
 
 /** How long a link to set a new password stays good for. */
 const RESET_VALID_MINUTES = 60;
@@ -17,6 +18,16 @@ const RESET_VALID_MINUTES = 60;
 const RESET_MAX_TRIES = 5;
 
 const MINUTE_MS = 60_000;
+
+/** Thoat ky tu dac biet truoc khi dua chu vao thu dang HTML. */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 export interface LoginResult {
   accessToken: string;
@@ -34,6 +45,7 @@ export class AuthService {
     private readonly config: ConfigService,
     @InjectModel(PasswordReset.name)
     private readonly resets: Model<PasswordResetDocument>,
+    private readonly mail: MailService,
   ) {}
 
   /**
@@ -66,12 +78,34 @@ export class AuthService {
     });
 
     /*
-     * O muc chay thu, duong dan duoc ghi ra nhat ky may chu thay vi gui thu
-     * that: khoan 3.5 Phu luc 01 de viec noi toi dich vu ben ngoai ra ngoai
-     * pham vi. Ma dat lai chi xuat hien o day, khong bao gio tra ve cho
-     * nguoi goi, vi ai goi cung nhan duoc cung mot cau tra loi.
+     * Gui thu ma khong cho ket qua. Cho gui xong moi tra loi thi thoi gian tra
+     * loi giua dia chi co tai khoan va khong co se chenh nhau, va do lai la mot
+     * cach do xem ai da dang ky. Ma dat lai chi nam trong thu, khong bao gio tra
+     * ve cho nguoi goi.
      */
-    this.log.log(`Duong dan dat lai mat khau cho ${user.email}: /reset-password?token=${code}`);
+    void this.mail.send(this.resetMail(user.email, user.fullName, code));
+  }
+
+  /** La thu dat lai mat khau, co duong dan day du toi trang dat lai tren web. */
+  private resetMail(email: string, fullName: string, code: string) {
+    const origin = (this.config.get<string>('webOrigin') ?? '').replace(/\/+$/, '');
+    const link = `${origin}/reset-password?token=${code}`;
+    const name = fullName || email;
+    const text = [
+      `Chào ${name},`,
+      '',
+      'Bạn (hoặc ai đó) vừa yêu cầu đặt lại mật khẩu tài khoản Petmory.',
+      `Mở đường dẫn sau trong vòng ${RESET_VALID_MINUTES} phút để đặt mật khẩu mới:`,
+      link,
+      '',
+      'Nếu bạn không yêu cầu, hãy bỏ qua thư này. Mật khẩu hiện tại vẫn giữ nguyên.',
+    ].join('\n');
+    const html =
+      `<p>Chào ${escapeHtml(name)},</p>` +
+      '<p>Bạn (hoặc ai đó) vừa yêu cầu đặt lại mật khẩu tài khoản Petmory.</p>' +
+      `<p><a href="${escapeHtml(link)}">Đặt mật khẩu mới</a> — đường dẫn dùng được trong ${RESET_VALID_MINUTES} phút.</p>` +
+      '<p>Nếu bạn không yêu cầu, hãy bỏ qua thư này. Mật khẩu hiện tại vẫn giữ nguyên.</p>';
+    return { to: email, subject: 'Đặt lại mật khẩu Petmory', text, html };
   }
 
   /**

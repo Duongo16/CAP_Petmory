@@ -9,6 +9,7 @@ import { ChatWidget } from '../shared/chat-widget/chat-widget';
 import { SocialLinks } from '../shared/social-links/social-links';
 import { Icon } from '../shared/icon/icon';
 import { ThemeToggle } from '../shared/theme-toggle/theme-toggle';
+import { LanguageToggle } from '../shared/language-toggle/language-toggle';
 import { BottomNav } from './bottom-nav/bottom-nav';
 
 interface MenuItem {
@@ -40,6 +41,7 @@ function isImmersive(root: ActivatedRouteSnapshot): boolean {
     SocialLinks,
     Icon,
     ThemeToggle,
+    LanguageToggle,
     BottomNav,
   ],
   templateUrl: './shell.html',
