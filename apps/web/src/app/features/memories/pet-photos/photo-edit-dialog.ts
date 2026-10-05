@@ -255,8 +255,13 @@ export class PhotoEditDialog implements OnInit {
   async useThis(): Promise<void> {
     const file = this.data.files[this.at()];
     const bitmap = this.bitmap;
-    if (!file || !bitmap) {
+    if (!file) {
       this.nextOne();
+      return;
+    }
+    // Hop khong doc duoc anh thi van gui tep goc, de buoc gui doi dang hoac bao ro ly do.
+    if (!bitmap) {
+      this.keepAsIs();
       return;
     }
     const untouched =

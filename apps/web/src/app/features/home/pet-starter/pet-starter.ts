@@ -19,6 +19,7 @@ import { PetDraft, PetDraftService } from '../../../core/services/pet-draft.serv
 import { LABEL_GENDER, LABEL_KIND } from '../../../shared/pet-labels';
 import { Icon } from '../../../shared/icon/icon';
 import { PetArt, PetArtKind } from '../../../shared/pet-art/pet-art';
+import { looksLikeImage, PICK_MAX_BYTES } from '../../../core/utils/upload-image';
 
 type Step = 1 | 2 | 3 | 4;
 type PhotoProblem = 'TYPE' | 'SIZE' | null;
@@ -35,8 +36,6 @@ interface StarterForm {
 const KIND_ORDER: PetKind[] = ['DOG', 'CAT', 'RABBIT', 'HAMSTER', 'BIRD', 'OTHER'];
 const GENDER_ORDER: Gender[] = ['MALE', 'FEMALE', 'UNKNOWN'];
 const STEP_COUNT = 4;
-const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
-const PHOTO_MAX_BYTES = 10 * 1024 * 1024;
 
 /**
  * The guided start for a visitor without an account: a few questions about
@@ -133,11 +132,11 @@ export class PetStarter implements OnInit {
     if (!file) {
       return;
     }
-    if (!PHOTO_TYPES.has(file.type)) {
+    if (!looksLikeImage(file)) {
       this.photoProblem.set('TYPE');
       return;
     }
-    if (file.size > PHOTO_MAX_BYTES) {
+    if (file.size > PICK_MAX_BYTES) {
       this.photoProblem.set('SIZE');
       return;
     }

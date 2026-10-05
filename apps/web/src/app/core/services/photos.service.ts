@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, from, switchMap } from 'rxjs';
 import { API_BASE } from './api-base';
+import { fitForUpload } from '../utils/upload-image';
 import {
   PetPhoto,
   PhotoAngle,
@@ -48,10 +49,15 @@ export class PhotosService {
   }
 
   load(petId: string, angle: PhotoAngle, file: File): Observable<PetPhoto> {
-    const form = new FormData();
-    form.append('angle', angle);
-    form.append('file', file, file.name);
-    return this.http.post<PetPhoto>(`${this.base}/pet-photos/${petId}`, form);
+    // Anh qua nang hay sai dang duoc thu nho va doi sang JPG truoc khi gui.
+    return from(fitForUpload(file)).pipe(
+      switchMap((ready) => {
+        const form = new FormData();
+        form.append('angle', angle);
+        form.append('file', ready, ready.name);
+        return this.http.post<PetPhoto>(`${this.base}/pet-photos/${petId}`, form);
+      }),
+    );
   }
 
   /**
@@ -61,9 +67,13 @@ export class PhotosService {
    * so a picture now simply belongs to the pet.
    */
   loadGeneral(petId: string, file: File): Observable<PetPhoto> {
-    const form = new FormData();
-    form.append('file', file, file.name);
-    return this.http.post<PetPhoto>(`${this.base}/pet-photos/${petId}`, form);
+    return from(fitForUpload(file)).pipe(
+      switchMap((ready) => {
+        const form = new FormData();
+        form.append('file', ready, ready.name);
+        return this.http.post<PetPhoto>(`${this.base}/pet-photos/${petId}`, form);
+      }),
+    );
   }
 
   /** Nho may chu tai buc anh o duong dan tren mang ve, thay cho tep tren may. */

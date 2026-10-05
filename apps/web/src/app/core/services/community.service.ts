@@ -1,7 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, from, switchMap } from 'rxjs';
 import { API_BASE } from './api-base';
+import { fitForUpload } from '../utils/upload-image';
 import {
   CommunityPost,
   CommunityProfile,
@@ -59,9 +60,13 @@ export class CommunityService {
   }
 
   addPhoto(id: string, file: Blob, fileName: string): Observable<unknown> {
-    const form = new FormData();
-    form.append('file', file, fileName);
-    return this.http.post(`${this.base}/community/posts/${id}/photos`, form);
+    return from(fitForUpload(new File([file], fileName, { type: file.type }))).pipe(
+      switchMap((ready) => {
+        const form = new FormData();
+        form.append('file', ready, ready.name);
+        return this.http.post(`${this.base}/community/posts/${id}/photos`, form);
+      }),
+    );
   }
 
   /** Nho may chu tai buc anh o duong dan tren mang ve, thay cho tep tren may. */
@@ -109,9 +114,14 @@ export class CommunityService {
 
   /** Sends a profile picture from the device; the answer names the stored file. */
   uploadAvatar(file: File): Observable<{ fileName: string }> {
-    const form = new FormData();
-    form.append('file', file, file.name);
-    return this.http.post<{ fileName: string }>(`${this.base}/community/users/me/avatar`, form);
+    // Anh dai dien chi can nho, va may chu gioi han nam MB.
+    return from(fitForUpload(file, { maxBytes: 4 * 1024 * 1024, maxEdge: 1024 })).pipe(
+      switchMap((ready) => {
+        const form = new FormData();
+        form.append('file', ready, ready.name);
+        return this.http.post<{ fileName: string }>(`${this.base}/community/users/me/avatar`, form);
+      }),
+    );
   }
 
   /** Where an uploaded profile picture is served from. */

@@ -6,6 +6,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { CommunityService } from '../../core/services/community.service';
 import { CommunityProfile } from '../../core/models/community.model';
 import { Icon } from '../../shared/icon/icon';
+import { looksLikeImage, PICK_MAX_BYTES } from '../../core/utils/upload-image';
 
 /** What the profile hands back once it has been saved. */
 export interface ProfileEditResult {
@@ -22,8 +23,6 @@ interface EditForm {
   avatarUrl: FormControl<string>;
 }
 
-const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
-const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
 
 /**
  * Editing one's own profile in a popup. The picture can come from the device,
@@ -81,11 +80,11 @@ export class ProfileEditDialog {
     if (!file || this.uploading()) {
       return;
     }
-    if (!PHOTO_TYPES.has(file.type)) {
+    if (!looksLikeImage(file)) {
       this.problem.set('COMMUNITY.PROFILE.AVATAR_TYPE_ERROR');
       return;
     }
-    if (file.size > PHOTO_MAX_BYTES) {
+    if (file.size > PICK_MAX_BYTES) {
       this.problem.set('COMMUNITY.PROFILE.AVATAR_SIZE_ERROR');
       return;
     }

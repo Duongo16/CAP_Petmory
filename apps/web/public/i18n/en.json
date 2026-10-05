@@ -1259,7 +1259,9 @@
       "UNUSABLE": "Not usable, replace it"
     },
     "OTHERS": "Other photos",
-    "DROP_HINT": "Drop photos here, or use the Add photos button above."
+    "DROP_HINT": "Drop photos here, or use the Add photos button above.",
+    "UNREADABLE": "This browser cannot read this image format (usually HEIC). Please choose a JPG or PNG photo.",
+    "TOO_BIG": "This photo is larger than the system allows. Please choose a smaller one."
   },
   "ASSISTANT": {
     "TITLE": "Quick questions",

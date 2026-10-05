@@ -1,5 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ImageUnreadable, looksLikeImage } from '../../../core/utils/upload-image';
 import { Observable, forkJoin, of, switchMap } from 'rxjs';
 import { PetPhoto, PhotoAngle, PhotoRules, QualityLabel } from '../../../core/models/api.model';
 import { PhotosService } from '../../../core/services/photos.service';
@@ -15,8 +17,29 @@ export interface PhotoCard {
   warn: boolean;
 }
 
-const ACCEPTED = ['image/png', 'image/jpeg'];
 const PHOTO_MAX = 20;
+
+/**
+ * Key loi khi gui anh, noi ro ly do thay cho loi chung.
+ *
+ * Trinh duyet khong doc duoc anh thi bao dang anh chua ho tro. May chu tu choi
+ * vi qua nang hay sai dang thi bao dung ly do do.
+ */
+function uploadErrorKey(trouble: unknown, fallback: string): string {
+  if (trouble instanceof ImageUnreadable) {
+    return 'PHOTO.UNREADABLE';
+  }
+  if (trouble instanceof HttpErrorResponse) {
+    const said = String(trouble.error?.message ?? '');
+    if (trouble.status === 413 || /MB/.test(said)) {
+      return 'PHOTO.TOO_BIG';
+    }
+    if (/JPG|PNG/.test(said)) {
+      return 'PET.PHOTO_WRONG_TYPE';
+    }
+  }
+  return fallback;
+}
 
 /** Khung nap theo goc (muc 3): bon goc bat buoc va hai goc tuy chon. */
 const SLOTS: { angle: PhotoAngle; required: boolean; key: string }[] = [
@@ -127,7 +150,7 @@ export class PetPhotosFacade {
 
   /** Gui moi tam da chon, roi tai lai mot lan khi tat ca da len. */
   add(files: File[], done: () => void): void {
-    if (files.some((f) => !ACCEPTED.includes(f.type))) {
+    if (files.some((f) => !looksLikeImage(f))) {
       this.error.set('PET.PHOTO_WRONG_TYPE');
       return;
     }
@@ -143,7 +166,7 @@ export class PetPhotosFacade {
    * truoc, roi moi bo tam cu, de khong luc nao goc bi trong.
    */
   addToAngle(angle: PhotoAngle, file: File, replacing: PetPhoto | null, done: () => void): void {
-    if (!ACCEPTED.includes(file.type)) {
+    if (!looksLikeImage(file)) {
       this.error.set('PET.PHOTO_WRONG_TYPE');
       return;
     }
@@ -195,9 +218,9 @@ export class PetPhotosFacade {
         this.reload();
         done();
       },
-      error: () => {
+      error: (trouble: unknown) => {
         this.uploading.set(false);
-        this.error.set(failKey);
+        this.error.set(uploadErrorKey(trouble, failKey));
       },
     });
   }

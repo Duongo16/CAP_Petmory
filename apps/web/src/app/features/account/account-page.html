@@ -26,7 +26,7 @@
               }
             </span>
             <label class="tw-btn-secondary tw-btn-sm" for="account-avatar">{{ 'ACCOUNT.CHANGE_AVATAR' | translate }}</label>
-            <input id="account-avatar" class="sr-only" type="file" accept="image/png,image/jpeg" (change)="pickAvatar($event)" />
+            <input id="account-avatar" class="sr-only" type="file" accept="image/*" (change)="pickAvatar($event)" />
           </div>
           <form class="account-form" [formGroup]="profile" (submit)="$event.preventDefault(); saveProfile()">
             <label class="tw-field">

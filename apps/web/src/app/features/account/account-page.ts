@@ -6,11 +6,11 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { CommunityService } from '../../core/services/community.service';
 import { samePassword } from '../auth/password-match';
+import { looksLikeImage } from '../../core/utils/upload-image';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
 const PHONE = /^(0\d{9})?$/;
-const IMAGE_TYPES = ['image/png', 'image/jpeg'];
 
 /**
  * Tai khoan cua toi (muc 2): sua ho ten, so dien thoai, anh dai dien va doi mat
@@ -80,7 +80,7 @@ export class AccountPage implements OnInit {
     if (!file || !me) {
       return;
     }
-    if (!IMAGE_TYPES.includes(file.type)) {
+    if (!looksLikeImage(file)) {
       this.profileNote.set({ key: 'PET.PHOTO_WRONG_TYPE', bad: true });
       return;
     }

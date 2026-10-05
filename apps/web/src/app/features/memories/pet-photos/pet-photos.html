@@ -8,7 +8,7 @@
       id="album-file"
       class="sr-only"
       type="file"
-      accept="image/png,image/jpeg"
+      accept="image/*"
       multiple
       [disabled]="facade.uploading() || facade.full()"
       (change)="pick($event)"
@@ -78,7 +78,7 @@
                   <span>{{ 'PHOTO.FRAME.DROP' | translate }}</span>
                 </label>
               }
-              <input class="sr-only slot-input" type="file" accept="image/png,image/jpeg" [id]="'slot-' + slot.angle"
+              <input class="sr-only slot-input" type="file" accept="image/*" [id]="'slot-' + slot.angle"
                 [disabled]="facade.uploading()" (change)="pickForSlot($event, slot)" />
             </li>
           }

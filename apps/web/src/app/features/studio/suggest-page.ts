@@ -32,6 +32,7 @@ import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
 import { PhotosService } from '../../core/services/photos.service';
 import { renderOptionShots } from './option-renderer';
 import { Icon } from '../../shared/icon/icon';
+import { looksLikeImage } from '../../core/utils/upload-image';
 
 type ScreenState = 'LOADING' | 'READY' | 'ERROR';
 
@@ -265,7 +266,7 @@ export class SuggestPage implements OnInit {
     if (files.length === 0 || !this.petChosen()) {
       return;
     }
-    if (files.some((file) => !['image/png', 'image/jpeg'].includes(file.type))) {
+    if (files.some((file) => !looksLikeImage(file))) {
       this.uploadState.set('WRONG');
       return;
     }

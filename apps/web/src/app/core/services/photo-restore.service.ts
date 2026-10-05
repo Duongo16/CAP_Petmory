@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, from, map, switchMap } from 'rxjs';
 import { API_BASE } from './api-base';
+import { fitForUpload } from '../utils/upload-image';
 
 /** Ban da phuc hoi cua mot tam anh, kem do giong voi anh goc. */
 export interface RestoredPicture {
@@ -37,24 +38,25 @@ export class PhotoRestoreService {
   }
 
   restore(file: File, operations: RestoreOperation[] = []): Observable<RestoredPicture> {
-    const form = new FormData();
-    form.append('file', file, file.name);
-    for (const one of operations) {
-      form.append('operation', one);
-    }
-    return this.http
-      .post(`${this.base}/photo-restore`, form, { observe: 'response', responseType: 'blob' })
-      .pipe(
-        map((answer) => {
-          const score = Number.parseFloat(answer.headers.get('X-Resemblance') ?? '');
-          const skipped = (answer.headers.get('X-Restore-Skipped') ?? '').split(',').filter(Boolean);
-          return {
-            picture: answer.body ?? new Blob(),
-            resemblance: Number.isFinite(score) ? Math.round(score) : null,
-            mode: answer.headers.get('X-Restore-Mode') === 'LIVE' ? 'LIVE' : 'LOCAL',
-            skipped,
-          };
-        }),
-      );
+    return from(fitForUpload(file)).pipe(
+      switchMap((ready) => {
+        const form = new FormData();
+        form.append('file', ready, ready.name);
+        for (const one of operations) {
+          form.append('operation', one);
+        }
+        return this.http.post(`${this.base}/photo-restore`, form, { observe: 'response', responseType: 'blob' });
+      }),
+      map((answer) => {
+        const score = Number.parseFloat(answer.headers.get('X-Resemblance') ?? '');
+        const skipped = (answer.headers.get('X-Restore-Skipped') ?? '').split(',').filter(Boolean);
+        return {
+          picture: answer.body ?? new Blob(),
+          resemblance: Number.isFinite(score) ? Math.round(score) : null,
+          mode: answer.headers.get('X-Restore-Mode') === 'LIVE' ? 'LIVE' : 'LOCAL',
+          skipped,
+        };
+      }),
+    );
   }
 }

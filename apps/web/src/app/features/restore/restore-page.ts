@@ -7,11 +7,10 @@ import { PetsService } from '../../core/services/pets.service';
 import { PhotosService } from '../../core/services/photos.service';
 import { Pet } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
+import { looksLikeImage, PICK_MAX_BYTES } from '../../core/utils/upload-image';
 
 /** Tep lon nhat duoc gui, khop voi gioi han phia may chu. */
-const SIZE_MAX_MB = 25;
 
-const ACCEPTED = ['image/png', 'image/jpeg'];
 
 /** Cac thao tac khach chon duoc; hai thao tac cuoi dung mo hinh sua anh (muc 4). */
 const OPERATION_LIST: { code: RestoreOperation; key: string; ai: boolean }[] = [
@@ -223,11 +222,11 @@ export class RestorePage {
   }
 
   private take(file: File): void {
-    if (!ACCEPTED.includes(file.type)) {
+    if (!looksLikeImage(file)) {
       this.error.set('RESTORE.WRONG_TYPE');
       return;
     }
-    if (file.size > SIZE_MAX_MB * 1024 * 1024) {
+    if (file.size > PICK_MAX_BYTES) {
       this.error.set('RESTORE.TOO_BIG');
       return;
     }

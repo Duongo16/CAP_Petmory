@@ -6,6 +6,7 @@ import { Carer, Gender, Pet, PetKind, PetStatus } from '../../core/models/api.mo
 import { Icon } from '../../shared/icon/icon';
 import { ImageLink } from '../../shared/image-link/image-link';
 import { PhotoPreviews } from '../../shared/photo-previews/photo-previews';
+import { looksLikeImage } from '../../core/utils/upload-image';
 
 /** What the dialog is opened with. A missing pet means it is adding a new one. */
 export interface PetFormInput {
@@ -64,7 +65,6 @@ const STATUS_CHOICES: Choice<PetStatus>[] = [
 const LINE_BREAK = String.fromCharCode(10);
 
 const PHOTO_MAX = 8;
-const ACCEPTED = ['image/png', 'image/jpeg'];
 
 /**
  * Checks the dates against each other and against the status.
@@ -210,7 +210,7 @@ export class PetFormDialog {
     const chosen = Array.from(input.files ?? []);
     this.photoError.set(null);
 
-    const wrong = chosen.filter((f) => !ACCEPTED.includes(f.type));
+    const wrong = chosen.filter((f) => !looksLikeImage(f));
     if (wrong.length > 0) {
       this.photoError.set('PET.PHOTO_WRONG_TYPE');
       return;

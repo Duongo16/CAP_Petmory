@@ -1259,7 +1259,9 @@
       "UNUSABLE": "Không đạt, nên thay"
     },
     "OTHERS": "Ảnh khác",
-    "DROP_HINT": "Kéo thả ảnh vào đây, hoặc dùng nút Thêm ảnh ở trên."
+    "DROP_HINT": "Kéo thả ảnh vào đây, hoặc dùng nút Thêm ảnh ở trên.",
+    "UNREADABLE": "Trình duyệt chưa đọc được định dạng ảnh này (thường là ảnh HEIC của iPhone). Hãy chọn ảnh JPG hoặc PNG, hoặc trên iPhone đặt Camera ở chế độ Tương thích nhất.",
+    "TOO_BIG": "Ảnh quá nặng so với giới hạn của hệ thống. Hãy chọn ảnh nhỏ hơn."
   },
   "ASSISTANT": {
     "TITLE": "Hỏi nhanh",

@@ -59,7 +59,7 @@
         <pm-icon name="camera" [size]="16" />
         {{ (uploadState() === 'SENDING' ? 'SUGGEST.UPLOADING' : 'SUGGEST.UPLOAD') | translate }}
       </label>
-      <input id="suggest-upload" class="sr-only" type="file" accept="image/png,image/jpeg" multiple
+      <input id="suggest-upload" class="sr-only" type="file" accept="image/*" multiple
         [disabled]="!petChosen() || uploadState() === 'SENDING'" (change)="upload($event)" />
       @switch (uploadState()) {
         @case ('DONE') {

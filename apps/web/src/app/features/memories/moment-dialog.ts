@@ -9,6 +9,7 @@ import { TOPIC_ORDER, topicKey } from '../../shared/memory-topics';
 import { DIARY_LAYOUTS, DiaryLayout, LayoutCode, buildPage, layoutOf } from '../../shared/diary-layouts';
 import { Icon } from '../../shared/icon/icon';
 import { PageFace, PageFaceView } from './book/page-face';
+import { looksLikeImage } from '../../core/utils/upload-image';
 
 /** Album cua be, truyen vao de nguoi dung chon anh gan vao khoanh khac. */
 export interface MomentRequest {
@@ -32,7 +33,6 @@ export interface MomentResult {
 
 type Step = 1 | 2 | 3;
 
-const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 /** Splits what was typed into separate words, dropping the blanks. */
 function asTags(typed: string): string[] {
@@ -214,7 +214,7 @@ export class MomentDialog {
     if (!file || this.uploading()) {
       return;
     }
-    if (!PHOTO_TYPES.has(file.type)) {
+    if (!looksLikeImage(file)) {
       this.uploadProblem.set('MEMORY.UPLOAD_TYPE_ERROR');
       return;
     }
