@@ -97,7 +97,7 @@ async function sendPhoto(token, petId, tint) {
   await settle(page);
   await page.fill('#login-email', EMAIL);
   await page.fill('#login-password', PASSWORD);
-  await page.click('.submit');
+  await page.click('button[type="submit"]');
   await page.waitForURL('**/home', { timeout: 30000 });
 
   // --- Quyen so mo ra o trang bia ---
