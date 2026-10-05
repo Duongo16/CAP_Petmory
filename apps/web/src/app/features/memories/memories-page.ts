@@ -19,11 +19,12 @@ import { PetFaceService } from '../../core/services/pet-face.service';
 import { MomentDialog, MomentRequest, MomentResult } from './moment-dialog';
 import { ShareDialog, ShareRequest } from './share-dialog';
 import { ExportDialog, ExportRequest } from './export-dialog';
+import { StoryReadDialog, StoryReadRequest } from './story-read-dialog';
 import { DiaryBookView } from './book/diary-book';
 import { PageFace } from './book/page-face';
 import { PageEditor, PageEditRequest, PageEditResult } from './book/page-editor';
 import { PaperKind } from '../../shared/diary-art';
-import { Memory, MemoryTopic } from '../../core/models/api.model';
+import { Memory, MemoryTopic, PetStory } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
 import { PetPhotos } from './pet-photos/pet-photos';
 
@@ -226,6 +227,17 @@ export class MemoriesPage implements OnInit {
     this.dialog.open<ShareDialog, ShareRequest>(ShareDialog, {
       data: { facade: this.facade, origin: this.page.location.origin },
       width: 'min(560px, 94vw)',
+      maxHeight: '92vh',
+      panelClass: 'pm-dialog',
+      autoFocus: 'first-tabbable',
+    });
+  }
+
+  /** Mo cau chuyen da gan vao mot khoanh khac de doc tron. */
+  openStory(story: PetStory, moment: Memory): void {
+    this.dialog.open<StoryReadDialog, StoryReadRequest>(StoryReadDialog, {
+      data: { story, momentTitle: moment.title, petName: this.facade.pet()?.name ?? '' },
+      width: 'min(640px, 94vw)',
       maxHeight: '92vh',
       panelClass: 'pm-dialog',
       autoFocus: 'first-tabbable',

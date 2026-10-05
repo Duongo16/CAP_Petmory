@@ -1,0 +1,38 @@
+/*
+ * Hop doc tron mot cau chuyen da gan vao khoanh khac.
+ *
+ * Khung, nut dong va tieu de lay tu bo hop thoai dung chung.
+ */
+@use '../../shared/dialog';
+
+:host {
+  display: block;
+}
+
+.sheet-eyebrow {
+  margin: 0 0 var(--pm-space-1);
+  font-size: var(--pm-text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pm-accent-dark);
+}
+
+.sheet-sub {
+  margin: var(--pm-space-1) 0 0;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}
+
+.story-text {
+  max-block-size: 60vh;
+  overflow-y: auto;
+  padding-inline-end: var(--pm-space-2);
+  font-family: var(--pm-font-display);
+  font-size: 1.05rem;
+  line-height: 1.75;
+
+  p {
+    margin: 0 0 var(--pm-space-3);
+  }
+}

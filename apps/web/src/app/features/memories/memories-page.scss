@@ -537,3 +537,12 @@
     opacity: 1;
   }
 }
+
+.moment-story {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-block-start: var(--pm-space-2);
+  font-size: var(--pm-text-sm);
+}

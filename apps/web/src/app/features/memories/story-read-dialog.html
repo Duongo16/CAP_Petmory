@@ -1,0 +1,21 @@
+<div class="sheet">
+  <header class="sheet-head">
+    <div>
+      <p class="sheet-eyebrow">{{ 'MEMORY.STORY_OF' | translate: { moment: data.momentTitle } }}</p>
+      <h2 class="sheet-title" id="story-read-title">{{ data.story.title }}</h2>
+      <p class="sheet-sub">
+        {{ 'MEMORY.STORY_META' | translate: { pet: data.petName, version: data.story.version } }}
+        · {{ data.story.updatedAt | date: 'dd/MM/yyyy' }}
+      </p>
+    </div>
+    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+      <pm-icon name="close" [size]="16" />
+    </button>
+  </header>
+
+  <article class="story-text" aria-labelledby="story-read-title">
+    @for (one of paragraphs; track $index) {
+      <p>{{ one }}</p>
+    }
+  </article>
+</div>

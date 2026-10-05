@@ -206,6 +206,12 @@
                             }
                           </p>
                         }
+                        @if (card.story; as story) {
+                          <button type="button" class="moment-story tw-btn-secondary" (click)="openStory(story, card.raw)">
+                            <pm-icon name="book" [size]="15" />
+                            {{ 'MEMORY.STORY_READ' | translate }}
+                          </button>
+                        }
                       </div>
                       <button
                         type="button"

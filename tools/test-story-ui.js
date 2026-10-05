@@ -86,6 +86,24 @@ async function run() {
     res.push(check('The version shows it is in the journal', (await page.locator('.version.on .tw-badge-success').count()) === 1));
     await page.screenshot({ path: path.join(OUT, 'story-page.png'), fullPage: true });
 
+    // Trang nhat ky co nut doc cau chuyen tren dung khoanh khac da gan.
+    const storyUrl = page.url();
+    await page.goto(`${WEB}/pets/${pet._id}/journal`, { waitUntil: 'networkidle' });
+    await page.locator('.view-switch button:has-text("Dòng thời gian")').click();
+    await page.waitForSelector('.moment', { timeout: 20000 });
+    const withStory = page.locator('.moment', { has: page.locator('.moment-story') });
+    res.push(check('The journal marks the moment that has a story', (await withStory.count()) === 1,
+      String(await withStory.count())));
+    await withStory.locator('.moment-story').click();
+    await page.waitForSelector('#story-read-title', { timeout: 10000 });
+    res.push(check('Reading opens the attached story', (await page.locator('#story-read-title').innerText()).includes('Bong va bien xanh')));
+    res.push(check('The whole story text is shown',
+      (await page.locator('.story-text').innerText()).includes('chay lui chay toi theo tung con song')));
+    await page.screenshot({ path: path.join(OUT, 'story-in-journal.png') });
+    await page.keyboard.press('Escape');
+    await page.goto(storyUrl, { waitUntil: 'networkidle' });
+    await page.waitForSelector('.version', { timeout: 20000 });
+
     await page.click('.version:not(.on)');
     await page.click('#story-remove');
     await page.click('#story-remove');

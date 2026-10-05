@@ -4,6 +4,7 @@ import { EMPTY, catchError, forkJoin, of, switchMap, timer } from 'rxjs';
 import { MemoriesService, WriteMemoryInput } from '../../core/services/memories.service';
 import { PetsService } from '../../core/services/pets.service';
 import { PhotosService } from '../../core/services/photos.service';
+import { StoriesService } from '../../core/services/stories.service';
 import {
   DecorItem,
   DiaryExport,
@@ -13,6 +14,7 @@ import {
   MemoryTopic,
   Pet,
   PetPhoto,
+  PetStory,
 } from '../../core/models/api.model';
 import { TOPIC_ORDER, topicKey, topicTone } from '../../shared/memory-topics';
 
@@ -78,6 +80,8 @@ export interface MomentCard {
   photoCount: number;
   /** Which side of the road the stop sits on in the journey map. */
   side: 'left' | 'right';
+  /** Cau chuyen da gan vao khoanh khac nay, rong khi chua gan. */
+  story: PetStory | null;
 }
 
 /** A run of moments that happened in the same month, as the design groups them. */
@@ -111,6 +115,10 @@ export class MemoriesFacade {
   private readonly service = inject(MemoriesService);
   private readonly pets = inject(PetsService);
   private readonly photos = inject(PhotosService);
+  private readonly stories = inject(StoriesService);
+
+  /** Cau chuyen moi nhat gan vao tung khoanh khac, tra theo ma khoanh khac. */
+  private readonly storyByMoment = signal<Map<string, PetStory>>(new Map());
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly state = signal<ScreenState>('LOADING');
@@ -176,6 +184,7 @@ export class MemoriesFacade {
   readonly months = computed<MonthGroup[]>(() => {
     const groups = new Map<string, MomentCard[]>();
     const seen = this.shotSource();
+    const told = this.storyByMoment();
     let at = 0;
     for (const raw of this.answer().rows) {
       const key = monthOf(raw.happenedAt);
@@ -187,6 +196,7 @@ export class MemoriesFacade {
         cover: first ? (seen[first] ?? '') : '',
         photoCount: raw.photo.length,
         side: at % 2 === 0 ? 'left' : 'right',
+        story: told.get(raw._id) ?? null,
       };
       at += 1;
       const already = groups.get(key);
@@ -214,8 +224,33 @@ export class MemoriesFacade {
           this.state.set('DONE');
           this.loadAlbum();
           this.loadShares();
+          this.loadStories();
         },
         error: () => this.state.set('ERROR'),
+      });
+  }
+
+  /**
+   * Doc cac cau chuyen cua be de biet khoanh khac nao da duoc gan cau chuyen.
+   *
+   * Danh sach xep ban moi truoc, nen gap ban dau tien cho moi khoanh khac la
+   * ban gan gan nhat. Doc hong thi chi khong hien nut doc cau chuyen.
+   */
+  private loadStories(): void {
+    this.stories
+      .list(this.petId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (rows) => {
+          const found = new Map<string, PetStory>();
+          for (const one of rows) {
+            if (one.attachedMemory && !found.has(one.attachedMemory)) {
+              found.set(one.attachedMemory, one);
+            }
+          }
+          this.storyByMoment.set(found);
+        },
+        error: () => this.storyByMoment.set(new Map()),
       });
   }
 
