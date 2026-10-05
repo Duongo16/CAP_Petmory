@@ -285,12 +285,15 @@ export class ChatSessionService {
       lastCode: one.focus?.lastCode ?? '',
     });
     one.focus = basic.focus;
+    // Khong co AI van goi y the san pham (muc 18): do ten san pham va hang co san
+    // trong cau hoi va cau tra loi, cong voi san pham dang duoc noi toi trong phien.
+    const shop = await this.shopWords();
     return {
       text: basic.content,
       suggestion: basic.suggestion,
       path: basic.path ?? '',
-      productCode: [],
-      goodsCode: [],
+      ...cardsFor(`${question}
+${basic.content}`, basic.focus.productTypeCode, shop),
     };
   }
 
@@ -454,6 +457,23 @@ function recallWords(one: ChatSessionDocument): string {
  * Doi chieu lai voi danh muc that chu khong tin cau tra loi, de man hinh
  * khong bao gio dung the cho mot mon hang khong ton tai.
  */
+/**
+ * Chon the san pham kem cau tra loi khi khong co AI (muc 18): san pham va hang
+ * co san duoc nhac toi trong loi noi, cong san pham dang noi toi trong phien.
+ * Toi da ba the moi loai cho gon.
+ */
+export function cardsFor(
+  said: string,
+  focusCode: string,
+  shop: { kinds: Named[]; goods: Named[] },
+): { productCode: string[]; goodsCode: string[] } {
+  const productCode = pickCodes(said, shop.kinds);
+  if (focusCode && !productCode.includes(focusCode)) {
+    productCode.unshift(focusCode);
+  }
+  return { productCode: productCode.slice(0, 3), goodsCode: pickCodes(said, shop.goods).slice(0, 3) };
+}
+
 function pickCodes(text: string, known: Named[]): string[] {
   const upper = text.toUpperCase();
   const low = text.toLowerCase();
