@@ -1,4 +1,4 @@
-const { petWithPhotos } = require('./lib/made-to-order');
+const { petWithPhotos, passPhotoStep } = require('./lib/made-to-order');
 
 let PET_ID = '';
 /**
@@ -60,6 +60,10 @@ async function signIn(page) {
 async function openStudio(page) {
   await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
   await page.waitForSelector('.drawer .tab', { timeout: 40000 });
+}
+
+/** Cho khung ve ba chieu hien ra sau khi da dung mau. */
+async function waitStage(page) {
   await page.waitForFunction(() => Boolean(document.querySelector('pm-viewer-3d canvas')), null, { timeout: 40000 });
   await page.waitForTimeout(1500);
 }
@@ -82,10 +86,26 @@ async function run() {
     res.push(check('Sign in through the interface', true));
     await openStudio(page);
 
+    res.push(check('All five tabs are shown', (await page.locator('.tab').count()) === 5));
+    const order = await page.locator('.tab').evaluateAll((all) => all.map((b) => b.dataset.step).join(','));
+    res.push(check('The steps run photos, model, colour, stand, finish',
+      order === 'PHOTOS,MODEL,COLOR,STAND,FINISH', order));
+    res.push(check('The studio opens on the pet photo step', (await tabOpen(page)) === 1
+      && (await page.locator('.tab[data-step="PHOTOS"]').getAttribute('aria-selected')) === 'true'));
+    res.push(check('Later steps are locked until a model is built',
+      (await page.locator('.tab[data-step="MODEL"]').isDisabled())
+        && (await page.locator('.tab[data-step="FINISH"]').isDisabled())
+        && (await page.locator('.drawer-foot .tw-btn-primary').isDisabled())));
+
+    // Buoc mot: chon be co anh roi dung mau tu anh, studio tu sang buoc chon mau.
+    await passPhotoStep(page, PET_ID);
+    res.push(check('Building from the photo opens the model step', (await tabOpen(page)) === 2));
+    res.push(check('Later steps open once a model is built',
+      !(await page.locator('.tab[data-step="FINISH"]').isDisabled())));
+    await waitStage(page);
+
     const overflow = await page.evaluate(() => document.scrollingElement.scrollHeight - window.innerHeight);
     res.push(check('The workbench fits on one screen without page scroll', overflow <= 2, `${overflow}px extra`));
-    res.push(check('All five tabs are shown', (await page.locator('.tab').count()) === 5));
-    res.push(check('The first tab is open', (await tabOpen(page)) === 1));
 
     const countModel = await page.locator('.model').count();
     res.push(check('The model tab lists the base models', countModel > 0, `${countModel} models`));
@@ -125,7 +145,7 @@ async function run() {
     // --- Tab 2: yarn colours ---
     await page.locator('.drawer-foot .tw-btn-primary').click();
     await page.waitForTimeout(500);
-    res.push(check('The next button opens the yarn tab', (await tabOpen(page)) === 2));
+    res.push(check('The next button opens the yarn tab', (await tabOpen(page)) === 3));
     const countBall = await page.locator('.yarn-ball').count();
     res.push(check('The yarn tab shows the palette as yarn balls', countBall > 0, `${countBall} balls`));
 
@@ -156,8 +176,8 @@ async function run() {
     await page.waitForTimeout(250);
     res.push(check('The held yarn can be put down', (await page.locator('.held').count()) === 0));
 
-    // --- Tab 3: engraving with a live tag ---
-    await page.locator('.tab').nth(2).click();
+    // --- Tab 4: engraving with a live tag ---
+    await page.locator('.tab[data-step="STAND"]').click();
     await page.waitForTimeout(400);
     await page.fill('input[formcontrolname="engravedName"]', 'Mun');
     await page.waitForTimeout(200);
@@ -193,10 +213,11 @@ async function run() {
     await page.waitForTimeout(800);
     await page.screenshot({ path: path.join(OUT, 'studio-3b-stand.png') });
 
-    // --- Tab 4: anh cua be ---
+    // --- Quay lai buoc anh: be da chon tu dau van con, du anh ---
     await page.locator('.tab[data-step="PHOTOS"]').click();
-    await page.selectOption('#studio-pet', PET_ID);
     await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
+    res.push(check('The pet picked in step one stays chosen',
+      (await page.locator('#studio-pet').inputValue()) === PET_ID));
 
     // --- Tab 5: wrap up, photos are taken by themselves ---
     await page.locator('.tab[data-step="FINISH"]').click();
@@ -231,7 +252,7 @@ async function run() {
       stand?.baseCode === 'BASE-ROUND' && stand?.tone === 'WALNUT' && stand?.decorations?.length === 4,
       JSON.stringify(stand)));
 
-    await page.locator('.drawer .tab').nth(2).click();
+    await page.locator('.drawer .tab[data-step="STAND"]').click();
     await page.locator('.tone').nth(0).click();
     await page.locator('.drawer .tab[data-step="FINISH"]').click();
     await page.waitForTimeout(400);

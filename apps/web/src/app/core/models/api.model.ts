@@ -694,6 +694,25 @@ export interface SuggestOption {
   zonePaint: ZonePaint[];
 }
 
+/** Nhung gi he thong nhan ra tu anh cua be khi dung san mau. */
+export interface PhotoMatchInfo {
+  mode: 'LIVE' | 'SAMPLE' | 'LOCAL';
+  kind: string;
+  pose: string;
+  breed: string;
+  modelCode: string;
+  modelName: string;
+  /** Chua co mau nen cho loai nay nen dung mau mac dinh. */
+  fallback: boolean;
+  zonePaint: ZonePaint[];
+}
+
+/** Ket qua dung san mau tu anh: ban thiet ke vua tao va nhung gi nhan ra. */
+export interface PhotoMatch {
+  design: Design;
+  match: PhotoMatchInfo;
+}
+
 /** Mot lan xin goi y thiet ke, kem cac phuong an nhan duoc. */
 export interface DesignSuggestion {
   _id: string;

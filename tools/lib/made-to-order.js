@@ -102,4 +102,20 @@ async function addCustomLine(token, { productTypeCode = 'PT-01', sizeCode = 'FIG
   return { ...ready, status: res.status, body: await asJson(res) };
 }
 
-module.exports = { readyDesign, addCustomLine, samplePhoto, petWithPhotos, ensurePhotos, minPhotosOf };
+/**
+ * Di qua buoc anh cua be o dau studio tren trinh duyet.
+ *
+ * Chon be da co anh, bam dung mau tu anh roi cho san khau sang buoc chon mau.
+ * Khong truyen ma be thi chon be dau tien trong danh sach.
+ */
+async function passPhotoStep(page, petId) {
+  await page.waitForSelector('#studio-pet', { timeout: 40000 });
+  await page.waitForFunction(() => document.querySelectorAll('#studio-pet option').length > 1, null, { timeout: 20000 });
+  const pick = petId || (await page.locator('#studio-pet option').nth(1).getAttribute('value'));
+  await page.selectOption('#studio-pet', pick);
+  await page.waitForSelector('#studio-match:not([disabled])', { timeout: 20000 });
+  await page.click('#studio-match');
+  await page.waitForSelector('[data-step="MODEL"][aria-selected="true"]', { timeout: 60000 });
+}
+
+module.exports = { readyDesign, addCustomLine, samplePhoto, petWithPhotos, ensurePhotos, minPhotosOf, passPhotoStep };

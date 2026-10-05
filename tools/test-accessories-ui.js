@@ -1,4 +1,4 @@
-const { petWithPhotos } = require('./lib/made-to-order');
+const { petWithPhotos, passPhotoStep } = require('./lib/made-to-order');
 /**
  * Kiem thu phu kien tu dau den cuoi (SOW muc 5, 6, 12): khach gan va thao phu kien
  * tren mau nen, moi diem neo mot mon, gioi han theo kich co, gia cong vao bao gia,
@@ -46,6 +46,12 @@ async function run() {
     await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 20000 });
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('#studio-pet', { timeout: 40000 });
+    res.push(check('The studio opens on the pet photo step with the accessory step locked',
+      (await page.locator('[data-step="PHOTOS"]').getAttribute('aria-selected')) === 'true'
+        && (await page.locator('[data-step="STAND"]').isDisabled())));
+    // Buoc mot: chon be co anh roi dung mau, sau do moi gan phu kien duoc.
+    await passPhotoStep(page, petId);
     await page.waitForSelector('.model[data-model]', { timeout: 40000 });
     await page.locator('.model[data-model="BASE-DOG-SIT"]').click();
     await page.waitForTimeout(2500);
@@ -79,9 +85,10 @@ async function run() {
     await page.screenshot({ path: path.join(OUT, 'accessories-studio.png') });
 
     await page.fill('input[formcontrolname="name"]', 'Cun ngoi co phu kien');
+    // Be da chon tu buoc mot, quay lai buoc anh chi de chac be van du anh.
     await page.locator('[data-step="PHOTOS"]').click();
-    await page.selectOption('#studio-pet', petId);
     await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
+    res.push(check('The pet chosen in step one is kept', (await page.locator('#studio-pet').inputValue()) === petId));
     await page.locator('[data-step="FINISH"]').click();
     const expected = plain + price['ACC-BOW'] + price['ACC-COLLAR-TAG'] + price['ACC-GLASSES'];
     await page.waitForFunction((want) => Number((document.querySelector('.quote-price')?.textContent ?? '').replace(/\D/g, '')) === want,
@@ -109,6 +116,7 @@ async function run() {
     res.push(check('The cart page shows the accessories', (await page.locator('.acc-chip').count()) === 3));
 
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
+    await passPhotoStep(page, petId);
     await page.waitForSelector('.model[data-model]', { timeout: 40000 });
     await page.locator('.model[data-model="Q-SHIBA"]').click();
     await page.waitForTimeout(1500);

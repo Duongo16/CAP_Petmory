@@ -1,4 +1,4 @@
-const { petWithPhotos } = require('./lib/made-to-order');
+const { petWithPhotos, passPhotoStep } = require('./lib/made-to-order');
 /**
  * Full browser test of the customiser flow: painting, capturing the six angles,
  * choosing a product and size, showing the real price, engraving, saving a draft,
@@ -93,10 +93,27 @@ async function run() {
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
     await page.waitForSelector('.drawer .tab', { timeout: 40000 });
     res.push(check('The customiser screen opens with the pet photos step', (await page.locator('.drawer .tab').count()) === 5
-      && (await page.locator('.drawer .tab[data-step="PHOTOS"]').count()) === 1));
+      && (await page.locator('.drawer .tab[data-step="PHOTOS"]').getAttribute('aria-selected')) === 'true'));
+    res.push(check('Later steps are locked until a model is built',
+      (await page.locator('.drawer .tab[data-step="COLOR"]').isDisabled())
+        && (await page.locator('.drawer-foot .tw-btn-primary').isDisabled())));
 
-                // --- Painting, in step two ---
-    await page.locator('.drawer .tab').nth(1).click();
+    // Buoc mot: chon be Mun roi dung mau tu anh, studio sang buoc chon mau.
+    await passPhotoStep(page, petId);
+    res.push(check('Building from the photo opens the model step',
+      (await page.locator('.drawer .tab[data-step="MODEL"]').getAttribute('aria-selected')) === 'true'));
+    await page.waitForFunction(() => Boolean(document.querySelector('pm-viewer-3d canvas')), null, { timeout: 40000 });
+    await page.waitForTimeout(1500);
+    // Mau dung tu anh da to san mau cho vai vung, doc lai de biet so mau len mong doi.
+    const authMatch = { headers: { Authorization: `Bearer ${registered.accessToken}` } };
+    const matchedList = await (await page.request.get(`${API}/designs`, authMatch)).json();
+    const matched = await (await page.request.get(`${API}/designs/${matchedList[0]._id}`, authMatch)).json();
+    const expectColors = new Set([...(matched.colorCodesUsed ?? []), 'WOOL-W01']);
+    res.push(check('The model built from the photo comes with fur colours',
+      (matched.colorCodesUsed ?? []).length > 0, (matched.colorCodesUsed ?? []).join(',')));
+
+                // --- Painting, in the colour step ---
+    await page.locator('.drawer .tab[data-step="COLOR"]').click();
     await page.waitForSelector('.yarn-ball', { timeout: 20000 });
     await page.locator('.yarn-ball').first().click();
     await paintWoolModel(page);
@@ -116,7 +133,8 @@ async function run() {
     res.push(check('Step three lists the product types', countKind >= 5, `${countKind} kind`));
 
     const summary = (await page.locator('.summary').innerText()).trim();
-    res.push(check('The summary counts the colours used', summary.startsWith('1 '), summary));
+    res.push(check('The summary counts the photo colours plus the one painted', summary.startsWith(`${expectColors.size} `),
+      `${summary} vs ${expectColors.size}`));
     res.push(check('The summary reports all six angles', summary.includes('6/6'), summary));
 
     await page.locator('.product:has-text("Tượng len chọc")').click();
@@ -133,7 +151,7 @@ async function run() {
     res.push(check('The price comes from the server', price.includes('750.000'), price));
 
                 // --- Stand and engraving, in their own tab ---
-    await page.locator('.drawer .tab').nth(2).click();
+    await page.locator('.drawer .tab[data-step="STAND"]').click();
     await page.locator('.base[data-base="BASE-ROUND"]').click();
     await page.locator('.tone').nth(1).click();
     await page.locator('.decor[data-decor="FLOWERS"]').click();
@@ -142,11 +160,11 @@ async function run() {
     await page.fill('input[formcontrolname="engravedName"]', 'Mun');
     await page.fill('input[formcontrolname="memorialDate"]', '2019-05-20');
     await page.fill('textarea[formcontrolname="message"]', 'Nho be nhieu lam');
-    // Buoc anh cua be: chon be, khung anh hien du so anh da tai.
+    // Buoc anh cua be: be da chon tu buoc mot van con, khung anh hien du so anh da tai.
     await page.locator('.drawer .tab[data-step="PHOTOS"]').click();
-    await page.selectOption('#studio-pet', petId);
     await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
-    res.push(check('The pet photos step confirms the pet has enough photos', true));
+    res.push(check('The pet photos step confirms the pet has enough photos',
+      (await page.locator('#studio-pet').inputValue()) === petId));
     await page.locator('.drawer .tab[data-step="FINISH"]').click();
     await page.waitForSelector('.quote-price', { timeout: 20000 });
     await page.screenshot({ path: path.join(OUT, 'studio-full-1-final-step.png') });
@@ -179,8 +197,9 @@ async function run() {
       `${design?.preview?.length} photo`));
     res.push(check('The server stores the painted colours', (design?.paint?.length ?? 0) >= 1,
       `${design?.paint?.length} mesh`));
-    res.push(check('The server stores the colour codes used', (design?.colorCodesUsed?.length ?? 0) === 1,
-      (design?.colorCodesUsed ?? []).join(',')));
+    const storedColors = design?.colorCodesUsed ?? [];
+    res.push(check('The server stores the colour codes used', storedColors.length === expectColors.size
+      && storedColors.every((one) => expectColors.has(one)), storedColors.join(',')));
     res.push(check('The server stores the colour chosen for each named zone',
       (design?.zonePaint ?? []).some((one) => one.colorCode === 'WOOL-W01'), JSON.stringify(design?.zonePaint)));
     res.push(check('The server stores the engraving', design?.engraving?.name === 'Mun'));
@@ -201,7 +220,9 @@ async function run() {
     await page.goto(`${WEB}/studio?draft=${design._id}`, { waitUntil: 'networkidle' });
     await page.waitForSelector('.drawer .tab', { timeout: 40000 });
     await page.waitForTimeout(1500);
-    await page.locator('.drawer .tab').nth(2).click();
+    res.push(check('Reopening a draft skips the photo step and lands on the model step',
+      (await page.locator('.drawer .tab[data-step="MODEL"]').getAttribute('aria-selected')) === 'true'));
+    await page.locator('.drawer .tab[data-step="STAND"]').click();
     await page.waitForSelector('input[formcontrolname="name"]', { timeout: 30000 });
     res.push(check('Reopening the draft keeps the name',
       (await page.locator('input[formcontrolname="name"]').inputValue()) === 'Ban thiet ke cua Mun'));
@@ -275,7 +296,7 @@ async function run() {
     });
     await page.waitForSelector('.roll-list li', { timeout: 30000 });
     res.push(check('The production file names the wool rolls needed',
-      (await page.locator('.roll-list li').count()) === 1,
+      (await page.locator('.roll-list li').count()) === expectColors.size,
       (await page.locator('.roll-list li').first().innerText()).trim()));
     const zoneText = (await page.locator('.zone-list').innerText().catch(() => '')).replace(SPLIT_LINES, ' ');
     res.push(check('The production file gives the wool code for each painted zone',

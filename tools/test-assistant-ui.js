@@ -87,6 +87,12 @@ async function signIn(page, email) {
     await fresh.click();
   }
   await customer.locator('pm-chat-widget .suggestions .chip', { hasText: 'Giá sản phẩm' }).waitFor({ timeout: 15000 });
+  // Bat dau cuoc moi thi danh sach goi y duoc dung lai, nen cho no on dinh roi moi doc.
+  await customer.waitForFunction(
+    () => [...document.querySelectorAll('pm-chat-widget .suggestions .chip')].some((one) => one.textContent.includes('Giá sản phẩm')),
+    null,
+    { timeout: 15000 },
+  ).catch(() => undefined);
   const chips = await customer.locator('pm-chat-widget .suggestions .chip').allInnerTexts();
   ok('Cau goi y lay tu kho tri thuc', chips.some((one) => one.includes('Giá sản phẩm')), chips.slice(0, 3).join(' | '));
   const before = await customer.locator('pm-chat-widget .bubble').count();

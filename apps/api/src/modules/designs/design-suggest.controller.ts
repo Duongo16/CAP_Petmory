@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { DesignSuggestService } from './design-suggest.service';
-import { AskSuggestionDto, ChooseOptionDto } from './dto/design-suggest.dto';
+import { AskSuggestionDto, ChooseOptionDto, MatchFromPhotoDto } from './dto/design-suggest.dto';
 import { AiQuotaService } from '../ai/ai-quota.service';
 import { AiKind } from '../ai/schemas/ai-usage.schema';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -28,6 +28,13 @@ export class DesignSuggestController {
   @Get('quota')
   quotaLeft(@CurrentUser() user: AuthUser) {
     return this.quota.remaining(user.userId, AiKind.DESIGN_SUGGESTION);
+  }
+
+  /** Dung san mot mau gan giong be nhat tu anh cua be, roi mo sang buoc tuy bien. */
+  @HttpCode(HttpStatus.CREATED)
+  @Post('from-photo')
+  fromPhoto(@Body() dto: MatchFromPhotoDto, @CurrentUser() user: AuthUser) {
+    return this.service.fromPhoto(user.userId, dto.petId);
   }
 
   @Get()

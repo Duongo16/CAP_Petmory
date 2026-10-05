@@ -5,6 +5,7 @@ import { API_BASE } from './api-base';
 import {
   Design,
   DesignSuggestion,
+  PhotoMatch,
   QuotaLeft,
   SuggestStyleChoice,
 } from '../models/api.model';
@@ -40,6 +41,11 @@ export class AiService {
 
   askSuggestion(petId: string, style: string): Observable<DesignSuggestion> {
     return this.http.post<DesignSuggestion>(`${this.base}/design-suggestions`, { petId, style });
+  }
+
+  /** Dung san mot mau gan giong be nhat tu anh cua be. */
+  matchFromPhoto(petId: string): Observable<PhotoMatch> {
+    return this.http.post<PhotoMatch>(`${this.base}/design-suggestions/from-photo`, { petId });
   }
 
   /** Chon mot phuong an va nhan ve ban thiet ke de mo sang buoc tuy bien. */

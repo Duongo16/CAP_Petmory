@@ -7,6 +7,7 @@ import { CatalogService } from '../../core/services/catalog.service';
 import { CartService } from '../../core/services/cart.service';
 import { PetsService } from '../../core/services/pets.service';
 import { PhotosService } from '../../core/services/photos.service';
+import { AiService } from '../../core/services/ai.service';
 import {
   Quote,
   PreviewAngle,
@@ -20,6 +21,7 @@ import {
   Accessory,
   PackagingKind,
   PackagingOption,
+  PhotoMatchInfo,
 } from '../../core/models/api.model';
 import {
   BASE_NONE,
@@ -59,6 +61,7 @@ export class StudioFacade {
   private readonly cart = inject(CartService);
   private readonly petsService = inject(PetsService);
   private readonly photosService = inject(PhotosService);
+  private readonly ai = inject(AiService);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -84,6 +87,47 @@ export class StudioFacade {
     message: ['', [Validators.maxLength(300)]],
     featureNote: ['', [Validators.maxLength(500)]],
   });
+
+  /** Trang thai buoc dung san mau tu anh cua be. */
+  readonly matching = signal(false);
+
+  /** Nhung gi he thong nhan ra tu anh lan gan nhat; rong khi chua dung mau. */
+  readonly match = signal<PhotoMatchInfo | null>(null);
+
+  /** Key loi cua buoc dung mau, rong khi khong co loi. */
+  readonly matchError = signal('');
+
+  /** Da chon be va be co it nhat mot anh thi moi dung mau duoc. */
+  readonly canMatch = computed(() => Boolean(this.petChosen()) && (this.photoCount() ?? 0) > 0 && !this.matching());
+
+  /**
+   * Gui anh cua be cho may chu dung san mot mau gan giong nhat.
+   *
+   * May chu tao san mot ban thiet ke voi mau nen va mau tung vung; man hinh mo
+   * ban do len nhu mo mot ban nhap de khach tuy bien tiep.
+   */
+  matchFromPhoto(onDesign: (designId: string) => void): void {
+    const pet = this.petChosen();
+    if (!this.canMatch()) {
+      return;
+    }
+    this.matching.set(true);
+    this.matchError.set('');
+    this.ai
+      .matchFromPhoto(pet)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (got) => {
+          this.matching.set(false);
+          this.match.set(got.match);
+          onDesign(got.design._id);
+        },
+        error: (trouble: { status?: number }) => {
+          this.matching.set(false);
+          this.matchError.set(trouble?.status === 429 ? 'STUDIO.MATCH.QUOTA' : 'STUDIO.MATCH.FAILED');
+        },
+      });
+  }
 
   /** Be dang gan voi ban thiet ke; hang tuy bien lam theo anh cua chinh be nay. */
   readonly petChosen = signal('');

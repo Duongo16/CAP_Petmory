@@ -7,6 +7,7 @@
  */
 const { chromium } = require('playwright');
 const path = require('path');
+const { petWithPhotos, passPhotoStep } = require('./lib/made-to-order');
 
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
@@ -51,7 +52,11 @@ async function run() {
     await page.goto(`${WEB}/forgot-password`, { waitUntil: 'networkidle' });
     res.push(check('The forgot-password page reads in English', await bodyHas(page, EN.AUTH.FORGOT_TITLE)));
 
-    await page.request.post(`${API}/auth/register`, { data: { email: EMAIL, password: PASSWORD, fullName: 'I18n test' } });
+    const made = await (await page.request.post(`${API}/auth/register`, {
+      data: { email: EMAIL, password: PASSWORD, fullName: 'I18n test' },
+    })).json();
+    // Studio bat dau tu anh cua be, nen khach can san mot be co anh.
+    const petId = await petWithPhotos(made.accessToken, 1, 'Be i18n');
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
     await page.fill('input[formcontrolname="email"]', EMAIL);
     await page.fill('input[formcontrolname="password"]', PASSWORD);
@@ -67,6 +72,16 @@ async function run() {
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
     await page.waitForSelector('.drawer .tab', { timeout: 40000 });
     res.push(check('The 3D studio reads in English', await bodyHas(page, EN.STUDIO.TAB.STAND)));
+    const firstTab = (await page.locator('.drawer .tab').first().innerText()).trim();
+    res.push(check('The studio opens on the pet photo step, labelled in English',
+      firstTab.includes(EN.STUDIO.TAB.PHOTOS)
+        && (await page.locator('.drawer .tab').first().getAttribute('aria-selected')) === 'true'
+        && (await bodyHas(page, EN.STUDIO.PANEL.PHOTOS)), firstTab));
+    res.push(check('Later steps are locked until a model is built',
+      await page.locator('.drawer .tab[data-step="MODEL"]').isDisabled()));
+    await passPhotoStep(page, petId);
+    res.push(check('After building, the model step reads in English',
+      (await bodyHas(page, EN.STUDIO.PANEL.MODEL)) && (await bodyHas(page, EN.STUDIO.TAB.MODEL))));
 
     await page.locator('pm-language-toggle button').first().click();
     res.push(check('Switching back gives Vietnamese again', await bodyHas(page, VI.STUDIO.TAB.STAND)));

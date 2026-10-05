@@ -515,7 +515,7 @@
     "BUBBLE_DRAG": "Kéo để xoay bé, cuộn để phóng to nha",
     "BUBBLE_PICK": "Chọn một cuộn len rồi chạm lên bé để tô",
     "TAB": {
-      "MODEL": "Chọn bé",
+      "MODEL": "Chọn mẫu",
       "COLOR": "Tô len",
       "FINISH": "Gói quà",
       "STAND": "Đế & tên",
@@ -579,7 +579,7 @@
     },
     "FEATURE_NOTE": "Đặc điểm riêng của bé",
     "FEATURE_NOTE_HINT": "Ví dụ: đốm trắng ở chân trái, tai phải hơi cụp, mắt hai màu...",
-    "PHOTOS_SUB": "Chọn bé mà sản phẩm làm theo và tải đủ ảnh. Xưởng dựa vào ảnh để làm đúng dáng và màu lông.",
+    "PHOTOS_SUB": "Bắt đầu từ ảnh của bé: chọn bé rồi tải ảnh rõ mặt, rõ màu lông. Hệ thống dựng sẵn mẫu gần giống bé, xưởng cũng dựa vào ảnh này để làm đúng dáng và màu.",
     "PET_CREATE": "Tạo hồ sơ bé trước",
     "PHOTOS_NEED": "Bé có {{have}} ảnh, kích cỡ này cần ít nhất {{need}} ảnh.",
     "CART_NEED_PHOTOS_HINT": "Cần gắn bé và đủ {{need}} ảnh ở bước Ảnh của bé trước khi thêm vào giỏ.",
@@ -591,6 +591,20 @@
       "FRAME": "Khung trưng bày",
       "NONE": "Không lấy",
       "LINE": "Hộp & khung:"
+    },
+    "MATCH": {
+      "TITLE": "Dựng mẫu từ ảnh của bé",
+      "SUB": "Hệ thống xem ảnh để nhận ra loài, tư thế và màu lông, rồi chọn sẵn mẫu gần giống bé nhất. Sau đó bạn tuỳ biến tiếp như ý.",
+      "RUN": "Dựng mẫu từ ảnh",
+      "AGAIN": "Dựng lại từ ảnh",
+      "WORKING": "Đang xem ảnh của bé…",
+      "FOUND": "Nhận ra:",
+      "MODEL": "Mẫu đã chọn:",
+      "FALLBACK": "Xưởng chưa có mẫu riêng cho loài này nên dùng mẫu mặc định. Bạn có thể đổi mẫu ở bước sau.",
+      "MODE_AI": "Nhận diện bằng AI từ ảnh của bé.",
+      "MODE_LOCAL": "Chưa gọi được AI nên màu được ước lượng trực tiếp từ ảnh.",
+      "FAILED": "Chưa dựng được mẫu từ ảnh. Hãy thử lại.",
+      "QUOTA": "Bạn đã dùng hết lượt dựng mẫu bằng AI hôm nay."
     }
   },
   "HOME": {
@@ -1153,7 +1167,10 @@
     "NEXT": "Tiếp tục",
     "SKIP_PHOTOS": "Bỏ qua ảnh",
     "MAP_START": "Ngày {{name}} về nhà — nơi hành trình bắt đầu",
-    "STORY": "Câu chuyện AI"
+    "STORY": "Câu chuyện AI",
+    "STORY_READ": "Đọc câu chuyện",
+    "STORY_OF": "Câu chuyện của khoảnh khắc: {{moment}}",
+    "STORY_META": "Viết cho bé {{pet}} · bản {{version}}"
   },
   "TODAY": {
     "GREET_MORNING": "Chào buổi sáng, {{name}} ơi!",

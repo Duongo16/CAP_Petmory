@@ -1112,3 +1112,65 @@ ul {
   flex-basis: 100%;
   margin: 0;
 }
+
+.match-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pm-space-2);
+  margin-block-start: var(--pm-space-4);
+  padding-block-start: var(--pm-space-3);
+  border-block-start: 2px dashed var(--pm-paper-mark);
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.match-result {
+  inline-size: 100%;
+  padding: var(--pm-space-3);
+  border-radius: 12px;
+  background: var(--pm-accent-soft);
+}
+
+.match-line {
+  margin: 0 0 4px;
+  font-size: var(--pm-text-sm);
+}
+
+.match-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--pm-text-xs, 0.75rem);
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dot {
+    inline-size: 14px;
+    block-size: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--pm-border);
+  }
+}
+
+.match-mode {
+  margin: 0;
+  font-size: var(--pm-text-xs, 0.75rem);
+  color: var(--pm-text-muted);
+}
+
+.tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

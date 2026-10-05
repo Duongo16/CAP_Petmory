@@ -54,7 +54,11 @@ type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 /** Bon ngan do nghe cua ban len, theo thu tu nguoi dung di qua. */
 export type Step = 'MODEL' | 'COLOR' | 'STAND' | 'PHOTOS' | 'FINISH';
 
-export const STEPS: Step[] = ['MODEL', 'COLOR', 'STAND', 'PHOTOS', 'FINISH'];
+/**
+ * Thu tu cac buoc: anh cua be di truoc, de he thong dung san mot mau gan giong
+ * be nhat roi khach moi chon lai mau, to len va hoan tat.
+ */
+export const STEPS: Step[] = ['PHOTOS', 'MODEL', 'COLOR', 'STAND', 'FINISH'];
 
 /** Nhan va bieu tuong cua tung ngan, viet ra tung key de tim duoc. */
 const STEP_VIEW: Record<Step, { key: string; icon: string }> = {
@@ -127,7 +131,7 @@ export class StudioPage implements OnInit {
   /** Cac ma mau nguoi dung da tha len mau, theo thu tu da dung. */
   private readonly colorCodesUsed = signal<string[]>([]);
 
-  readonly step = signal<Step>('MODEL');
+  readonly step = signal<Step>('PHOTOS');
   readonly status = signal<ScreenState>('LOADING');
   readonly baseModel = signal<BaseModel[]>([]);
   readonly baseModelSelected = signal<BaseModel | null>(null);
@@ -144,6 +148,35 @@ export class StudioPage implements OnInit {
   readonly poseSelected = signal<string | null>(null);
 
   private declaredZones: DeclaredZone[] = [];
+  private library: ModelLibrary | null = null;
+
+  /**
+   * Da co mau de tuy bien chua: vua dung tu anh, hoac dang mo mot ban da co.
+   * Chua co thi chua cho roi buoc anh cua be.
+   */
+  readonly hasDesign = computed(() => this.facade.designId() !== null);
+
+  /** Nut sang buoc tiep bi khoa khi dang o buoc anh ma chua dung mau. */
+  readonly nextLocked = computed(() => this.step() === 'PHOTOS' && !this.hasDesign());
+
+  /** Ten loai, tu the va o mau tung vung cua lan dung mau gan nhat. */
+  readonly matchView = computed(() => {
+    const got = this.facade.match();
+    if (!got) {
+      return null;
+    }
+    const byCode = new Map(this.palette().map((one) => [one.code, one]));
+    return {
+      ...got,
+      kindKey: KEY_KIND[got.kind] ?? 'STUDIO.KIND.OTHER',
+      poseKey: KEY_POSE[got.pose] ?? '',
+      swatches: got.zonePaint.map((one) => ({
+        zone: one.zone,
+        name: byCode.get(one.colorCode)?.displayName ?? one.colorCode,
+        swatch: byCode.get(one.colorCode)?.swatch ?? '#cccccc',
+      })),
+    };
+  });
   private zoneByFile: Record<string, Record<string, ZoneName>> = {};
 
   /** Mau tung vung cua ban thiet ke vua mo, khi ban do chua co mau tung mat luoi. */
@@ -389,18 +422,16 @@ export class StudioPage implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (library) => {
+          this.library = library;
           this.declaredZones = library.zoneMaterial;
           this.zoneByFile = library.zoneByFile ?? {};
           const ready = library.baseModel.filter((m) => m.ready);
           this.baseModel.set(ready);
           this.status.set(ready.length > 0 ? 'READY' : 'ERROR');
           if (codeDraft) {
-            this.facade.openDraft(codeDraft, (tk) => {
-              const code = currentModelCode(tk.modelCode, library);
-              this.baseModelSelected.set(ready.find((m) => m.code === code) ?? ready[0] ?? null);
-              this.colorCodesUsed.set([...tk.colorCodesUsed]);
-              this.zonePaintOpened.set(tk.paint.length === 0 ? (tk.zonePaint ?? []) : []);
-            });
+            // Mo mot ban da co thi khong can dung mau tu anh nua, vao thang buoc chon mau.
+            this.openDesign(codeDraft);
+            this.step.set('MODEL');
             return;
           }
           const first = ready.find((m) => m.pose === 'SITTING') ?? ready[0] ?? null;
@@ -416,7 +447,32 @@ export class StudioPage implements OnInit {
     });
   }
 
+  /** Mo mot ban thiet ke len san khau: chon dung mau nen va nap mau tung vung. */
+  private openDesign(code: string, onOpened?: () => void): void {
+    const library = this.library;
+    if (!library) {
+      return;
+    }
+    const ready = this.baseModel();
+    this.facade.openDraft(code, (tk) => {
+      const modelCode = currentModelCode(tk.modelCode, library);
+      this.baseModelSelected.set(ready.find((m) => m.code === modelCode) ?? ready[0] ?? null);
+      this.colorCodesUsed.set([...tk.colorCodesUsed]);
+      this.zonePaintOpened.set(tk.paint.length === 0 ? (tk.zonePaint ?? []) : []);
+      onOpened?.();
+    });
+  }
+
+  /** Dung san mau tu anh cua be, mo mau do len roi sang buoc chon mau. */
+  matchFromPhoto(): void {
+    this.facade.matchFromPhoto((designId) => this.openDesign(designId, () => this.go('MODEL')));
+  }
+
   go(step: Step): void {
+    // Chua dung mau tu anh thi chua sang duoc cac buoc sau.
+    if (step !== 'PHOTOS' && !this.hasDesign()) {
+      return;
+    }
     this.step.set(step);
     // Sang ngan hoan tat ma chua co anh thi tu chup sau goc, de khoi phai nho bam.
     if (step === 'FINISH' && this.preview().length === 0) {

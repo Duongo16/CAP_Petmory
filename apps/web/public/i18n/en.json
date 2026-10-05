@@ -515,7 +515,7 @@
     "BUBBLE_DRAG": "Drag to spin, scroll to zoom",
     "BUBBLE_PICK": "Pick a yarn ball, then tap the plush to paint",
     "TAB": {
-      "MODEL": "Pick",
+      "MODEL": "Model",
       "COLOR": "Yarn",
       "FINISH": "Wrap up",
       "STAND": "Stand & name",
@@ -579,7 +579,7 @@
     },
     "FEATURE_NOTE": "Distinctive features",
     "FEATURE_NOTE_HINT": "For example: white spot on the left paw, right ear folds a little, two-coloured eyes...",
-    "PHOTOS_SUB": "Pick the pet this product is made from and upload enough photos. The workshop uses them to get the shape and colours right.",
+    "PHOTOS_SUB": "Start from your pet photos: pick the pet and upload clear photos of the face and fur. We build a matching model, and the workshop uses the same photos to get shape and colour right.",
     "PET_CREATE": "Create a pet profile first",
     "PHOTOS_NEED": "This pet has {{have}} photos; this size needs at least {{need}}.",
     "CART_NEED_PHOTOS_HINT": "Link a pet with at least {{need}} photos in the Pet photos step before adding to the cart.",
@@ -591,6 +591,20 @@
       "FRAME": "Display frame",
       "NONE": "None",
       "LINE": "Box & frame:"
+    },
+    "MATCH": {
+      "TITLE": "Build a model from your pet photos",
+      "SUB": "We look at the photos to find the species, pose and fur colours, then pick the closest model. You can customise it afterwards.",
+      "RUN": "Build from photos",
+      "AGAIN": "Rebuild from photos",
+      "WORKING": "Looking at your photos…",
+      "FOUND": "Found:",
+      "MODEL": "Model chosen:",
+      "FALLBACK": "There is no dedicated model for this species yet, so the default one is used. You can change it in the next step.",
+      "MODE_AI": "Recognised by AI from your photos.",
+      "MODE_LOCAL": "AI was unavailable, so colours were estimated from the photo.",
+      "FAILED": "Could not build a model from the photos. Please try again.",
+      "QUOTA": "You have used all AI model builds for today."
     }
   },
   "HOME": {
@@ -1153,7 +1167,10 @@
     "NEXT": "Continue",
     "SKIP_PHOTOS": "Skip photos",
     "MAP_START": "The day {{name}} came home — where the journey began",
-    "STORY": "AI story"
+    "STORY": "AI story",
+    "STORY_READ": "Read the story",
+    "STORY_OF": "Story for the moment: {{moment}}",
+    "STORY_META": "Written for {{pet}} · version {{version}}"
   },
   "TODAY": {
     "GREET_MORNING": "Good morning, {{name}}!",
