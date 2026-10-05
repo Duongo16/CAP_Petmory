@@ -98,7 +98,11 @@ export class DesignSuggestService {
    */
   async ask(owner: string, petId: string, style: SuggestStyle): Promise<DesignSuggestionDocument> {
     const pet = await this.pets.findOwned(petId, owner);
-    const base = this.library.ready();
+    // Phuong an ap len mau nen phu hop nhat (muc 15): uu tien bon mau nen du sau vung
+    // va co diem neo; chi khi thu vien chua co mau nen moi dung cac mau khac.
+    const ready = this.library.ready();
+    const core = ready.filter((one) => one.core);
+    const base = core.length > 0 ? core : ready;
     if (base.length === 0) {
       throw new BadRequestException('Thư viện mô hình đang trống, chưa gợi ý được');
     }

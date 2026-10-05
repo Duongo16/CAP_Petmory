@@ -54,6 +54,29 @@
       </button>
     </form>
 
+    <div class="upload-row">
+      <label class="tw-btn-secondary upload-label" for="suggest-upload" [class.off]="!petChosen() || uploadState() === 'SENDING'">
+        <pm-icon name="camera" [size]="16" />
+        {{ (uploadState() === 'SENDING' ? 'SUGGEST.UPLOADING' : 'SUGGEST.UPLOAD') | translate }}
+      </label>
+      <input id="suggest-upload" class="sr-only" type="file" accept="image/png,image/jpeg" multiple
+        [disabled]="!petChosen() || uploadState() === 'SENDING'" (change)="upload($event)" />
+      @switch (uploadState()) {
+        @case ('DONE') {
+          <span class="upload-note" role="status">{{ 'SUGGEST.UPLOAD_DONE' | translate }}</span>
+        }
+        @case ('WRONG') {
+          <span class="upload-note bad" role="alert">{{ 'PET.PHOTO_WRONG_TYPE' | translate }}</span>
+        }
+        @case ('FAILED') {
+          <span class="upload-note bad" role="alert">{{ 'COMMON.GENERIC_ERROR' | translate }}</span>
+        }
+        @default {
+          <span class="upload-note">{{ 'SUGGEST.UPLOAD_HINT' | translate }}</span>
+        }
+      }
+    </div>
+
     @if (quotaLeft() >= 0) {
       <p class="quota tw-hint -mt-2" id="suggest-quota">
         {{ 'SUGGEST.QUOTA_LEFT' | translate: { count: quotaLeft() } }}
@@ -83,6 +106,11 @@
                 [class.on]="shown()?.key === one.key"
                 (click)="show(one.key)"
               >
+                @if (optionImages()[one.key]; as shot) {
+                  <img class="option-image" [src]="shot" [alt]="one.title" />
+                } @else {
+                  <span class="option-image option-wait" aria-hidden="true"></span>
+                }
                 <span class="option-title text-sm font-bold">{{ one.title }}</span>
                 <span class="swatch-row flex gap-1.5">
                   @for (each of one.zoneLine; track each.zoneKey) {
@@ -144,4 +172,5 @@
       </div>
     }
   }
+  <div #renderBox class="render-box" aria-hidden="true"></div>
 </section>

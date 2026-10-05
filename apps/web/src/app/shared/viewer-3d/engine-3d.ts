@@ -275,6 +275,11 @@ export class Engine3d {
 
   /** Captures stills at the six standard angles, for the production file and the design snapshot. */
   captureSixAngles(edgePhoto = 800): Record<StandardAngle, string> {
+    return this.captureAngles(ANGLES_PREPARE, edgePhoto) as Record<StandardAngle, string>;
+  }
+
+  /** Chup cac goc chi dinh thanh anh vuong, roi tra camera ve cho cu. */
+  captureAngles(angles: StandardAngle[], edgePhoto = 800): Partial<Record<StandardAngle, string>> {
     const previousPosition = this.camera.position.clone();
     const previousTarget = this.controls.target.clone();
     const dimensionsOld = new THREE.Vector2();
@@ -284,8 +289,8 @@ export class Engine3d {
     this.camera.aspect = 1;
     this.camera.updateProjectionMatrix();
 
-    const result = {} as Record<StandardAngle, string>;
-    for (const angle of ANGLES_PREPARE) {
+    const result: Partial<Record<StandardAngle, string>> = {};
+    for (const angle of angles) {
       this.setAngle(angle);
       this.renderer.render(this.scene, this.camera);
       result[angle] = this.renderer.domElement.toDataURL('image/png');

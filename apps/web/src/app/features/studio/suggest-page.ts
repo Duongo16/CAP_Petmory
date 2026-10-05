@@ -2,17 +2,21 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
+  untracked,
+  viewChild,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { exhaustMap, Subject } from 'rxjs';
+import { exhaustMap, forkJoin, Subject } from 'rxjs';
 import { AiService } from '../../core/services/ai.service';
 import { PetsService } from '../../core/services/pets.service';
 import { CatalogService } from '../../core/services/catalog.service';
@@ -25,6 +29,8 @@ import {
 } from '../../core/models/api.model';
 import { BaseModel, ModelLibrary, ZoneName, currentModelCode } from './model-manifest';
 import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
+import { PhotosService } from '../../core/services/photos.service';
+import { renderOptionShots } from './option-renderer';
 import { Icon } from '../../shared/icon/icon';
 
 type ScreenState = 'LOADING' | 'READY' | 'ERROR';
@@ -91,6 +97,21 @@ export class SuggestPage implements OnInit {
   private readonly pets = inject(PetsService);
   private readonly catalog = inject(CatalogService);
   private readonly http = inject(HttpClient);
+  private readonly photos = inject(PhotosService);
+  private readonly renderBox = viewChild<ElementRef<HTMLDivElement>>('renderBox');
+
+  /** Anh phuong an chup tu mo hinh 3D, theo khoa phuong an. */
+  readonly optionImages = signal<Record<string, string>>({});
+  /** Trang thai tai anh cua be ngay tai trang goi y. */
+  readonly uploadState = signal<'IDLE' | 'SENDING' | 'DONE' | 'WRONG' | 'FAILED'>('IDLE');
+  private renderTurn = 0;
+
+  /** Co phuong an moi thi chup lai anh cho tung phuong an. */
+  private readonly shoot = effect(() => {
+    const views = this.options();
+    const box = this.renderBox()?.nativeElement;
+    untracked(() => this.renderShots(views, box));
+  });
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -234,6 +255,51 @@ export class SuggestPage implements OnInit {
     this.problem.set('');
     this.working.set(true);
     this.asked.next();
+  }
+
+  /** Tai mot hay nhieu anh vao album cua be dang chon; goi y lay anh tu album nay. */
+  upload(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    input.value = '';
+    if (files.length === 0 || !this.petChosen()) {
+      return;
+    }
+    if (files.some((file) => !['image/png', 'image/jpeg'].includes(file.type))) {
+      this.uploadState.set('WRONG');
+      return;
+    }
+    this.uploadState.set('SENDING');
+    forkJoin(files.map((file) => this.photos.loadGeneral(this.petChosen(), file)))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.uploadState.set('DONE'),
+        error: () => this.uploadState.set('FAILED'),
+      });
+  }
+
+  private renderShots(views: OptionView[], box: HTMLDivElement | undefined): void {
+    const turn = ++this.renderTurn;
+    this.optionImages.set({});
+    const shots = views
+      .filter((one) => one.modelPath)
+      .map((one) => ({ key: one.key, path: one.modelPath, rotateY: one.rotateY, colorByZone: one.colorByZone }));
+    if (!box || shots.length === 0) {
+      return;
+    }
+    const background = getComputedStyle(box).getPropertyValue('--pm-bg-3d').trim() || '#f2efed';
+    renderOptionShots(box, shots, background)
+      .then((images) => {
+        // Bo ket qua cua lan chup cu neu trong luc do da co phuong an moi.
+        if (turn === this.renderTurn) {
+          this.optionImages.set(images);
+        }
+      })
+      .catch(() => {
+        if (turn === this.renderTurn) {
+          this.optionImages.set({});
+        }
+      });
   }
 
   show(key: string): void {

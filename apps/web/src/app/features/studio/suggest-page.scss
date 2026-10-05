@@ -33,3 +33,62 @@
 .zone-list li.not-drawn {
   opacity: 0.62;
 }
+
+/* Khung ve an de chup anh phuong an; nam ngoai man hinh nhung van co kich thuoc. */
+.render-box {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: -10000px;
+  inline-size: 360px;
+  block-size: 360px;
+  pointer-events: none;
+}
+
+.option-image {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--pm-bg-muted);
+}
+
+.option-wait {
+  animation: wait-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes wait-pulse {
+  from {
+    opacity: 0.55;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-block-start: -10px;
+}
+
+.upload-label {
+  cursor: pointer;
+
+  &.off {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.upload-note {
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+
+  &.bad {
+    color: var(--pm-on-danger-soft);
+  }
+}

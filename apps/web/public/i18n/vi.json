@@ -2012,7 +2012,11 @@
       "VIVID": "Rực rỡ",
       "PASTEL": "Màu phấn"
     },
-    "ZONE_NOT_DRAWN": "Dấu * là vùng tệp mô hình hiện tại chưa tách riêng, nên chưa tô lên bản xem trước được. Mã màu vẫn được ghi vào hồ sơ sản xuất."
+    "ZONE_NOT_DRAWN": "Dấu * là vùng tệp mô hình hiện tại chưa tách riêng, nên chưa tô lên bản xem trước được. Mã màu vẫn được ghi vào hồ sơ sản xuất.",
+    "UPLOAD": "Tải ảnh của bé",
+    "UPLOADING": "Đang tải ảnh...",
+    "UPLOAD_DONE": "Đã thêm ảnh vào album của bé. Bấm Gợi ý để dùng ảnh mới.",
+    "UPLOAD_HINT": "Gợi ý dựa trên ảnh trong album của bé. Có thể tải thêm ảnh ngay tại đây."
   },
   "LANDING": {
     "NAV_DIARY": "Nhật ký",

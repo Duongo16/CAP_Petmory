@@ -2012,7 +2012,11 @@
       "VIVID": "Vivid",
       "PASTEL": "Pastel"
     },
-    "ZONE_NOT_DRAWN": "A * marks a zone this model file does not separate yet, so it cannot be shown on the preview. The colour code still reaches the production sheet."
+    "ZONE_NOT_DRAWN": "A * marks a zone this model file does not separate yet, so it cannot be shown on the preview. The colour code still reaches the production sheet.",
+    "UPLOAD": "Upload pet photos",
+    "UPLOADING": "Uploading...",
+    "UPLOAD_DONE": "Photos added to the album. Ask again to use them.",
+    "UPLOAD_HINT": "Suggestions use the photos in the pet album. You can add more right here."
   },
   "LANDING": {
     "NAV_DIARY": "Diary",
