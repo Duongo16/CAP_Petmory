@@ -161,12 +161,15 @@ export class ReportsService {
       { $group: { _id: '$status', count: { $sum: 1 } } },
     ]);
 
+    const lateWhere = {
+      createdAt: { $gte: period.from, $lte: period.to },
+      estimatedDelivery: { $lt: new Date() },
+      status: { $nin: ARRIVED },
+    };
+    // Dem rieng de con so tre han dung that; danh sach chi in 200 don tre nhat cho nhe.
+    const lateCount = await this.orderModel.countDocuments(lateWhere).exec();
     const lateRows = await this.orderModel
-      .find({
-        createdAt: { $gte: period.from, $lte: period.to },
-        estimatedDelivery: { $lt: new Date() },
-        status: { $nin: ARRIVED },
-      })
+      .find(lateWhere)
       .select('orderCode status estimatedDelivery')
       .sort({ estimatedDelivery: 1 })
       .limit(200)
@@ -180,7 +183,7 @@ export class ReportsService {
         status,
         count: countOf.get(status) ?? 0,
       })),
-      lateCount: lateRows.length,
+      lateCount,
       late: lateRows.map((one) => ({
         orderCode: one.orderCode,
         status: one.status,

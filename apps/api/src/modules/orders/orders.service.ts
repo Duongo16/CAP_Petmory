@@ -364,6 +364,22 @@ export class OrdersService {
     return this.transitionStatus(order, OrderStatus.CANCELLED, customer, 'Khach tu huy don');
   }
 
+  /** Bo co can xu ly sau khi nhan vien da xu ly xong, ghi lai ai bo va ghi chu gi. */
+  async clearAttention(order: OrderDocument, actor: string, note: string): Promise<void> {
+    if (!order.needsAttention) {
+      return;
+    }
+    await this.model.updateOne({ _id: order._id }, { $set: { needsAttention: false } }).exec();
+    await this.audit.write({
+      actor,
+      action: 'ORDER_ATTENTION_CLEARED',
+      resourceType: RESOURCE_TYPE,
+      resourceId: order.orderCode,
+      reason: note,
+      before: { attentionNote: order.attentionNote },
+    });
+  }
+
   /** Danh dau mot don can nguoi that xu ly, kem ly do. */
   async flagForAttention(order: OrderDocument, note: string): Promise<void> {
     await this.model

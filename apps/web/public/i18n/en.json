@@ -1465,7 +1465,11 @@
       "READY_MADE": "Ready-made order",
       "MIXED": "Ready-made and personalised items",
       "READY_MADE_LINE": "Ready-made",
-      "ATTENTION": "This order needs someone to look at it"
+      "ATTENTION": "This order needs someone to look at it",
+      "REASON_REQUIRED": "Enter a reason (at least 5 characters) before changing the status.",
+      "ATTENTION_NOTE": "How it was handled",
+      "ATTENTION_DONE": "Handled, clear flag",
+      "ATTENTION_NOTE_REQUIRED": "Describe how it was handled (at least 5 characters)."
     },
     "RECIPIENT": {
       "ACCOUNT_INFO": "Account",

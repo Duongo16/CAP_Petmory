@@ -64,6 +64,9 @@ function statusKeyOf(value: unknown): string {
   return KEY_STATUS_ORDER[code as OrderStatus] ?? '';
 }
 
+/** Ly do va ghi chu toi thieu bay nhieu ky tu, giu bang phia may chu. */
+const REASON_MIN = 5;
+
 @Injectable()
 export class AdminOrderDetailFacade {
   private readonly service = inject(AdminService);
@@ -183,8 +186,44 @@ export class AdminOrderDetailFacade {
     this.tickWanted.next({ at, done });
   }
 
+  /** Ghi chu khi bo co can xu ly. */
+  readonly attentionNote = signal('');
+
+  /** Bo co can xu ly; can ghi chu da xu ly the nao de nguoi sau doc lai. */
+  clearAttention(): void {
+    const note = this.attentionNote().trim();
+    if (this.saving()) {
+      return;
+    }
+    if (note.length < REASON_MIN) {
+      this.error.set('ADMIN.ORDER.ATTENTION_NOTE_REQUIRED');
+      return;
+    }
+    this.saving.set(true);
+    this.error.set(null);
+    this.service
+      .clearAttention(this.orderCode, note)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (kq) => {
+          this.saving.set(false);
+          this.attentionNote.set('');
+          this.data.set(kq);
+        },
+        error: () => {
+          this.saving.set(false);
+          this.error.set('COMMON.GENERIC_ERROR');
+        },
+      });
+  }
+
   transition(next: OrderStatus): void {
     if (this.saving()) {
+      return;
+    }
+    // Doi trang thai bang tay phai co ly do (muc 10); may chu cung kiem lai.
+    if (this.reason().trim().length < REASON_MIN) {
+      this.error.set('ADMIN.ORDER.REASON_REQUIRED');
       return;
     }
     this.saving.set(true);

@@ -285,7 +285,7 @@ async function seedOrders(token, boss, designs) {
       headers: { 'content-type': 'application/json', authorization: `Apikey ${WEBHOOK_KEY}` },
       body: JSON.stringify({ id: `seed-${code}`, transferAmount: total, content: `${code} thanh toan` }),
     }), 'thanh toan');
-    const move = async (status, reason = '') =>
+    const move = async (status, reason = 'Du lieu trinh dien') =>
       must(await call(`/admin/orders/${code}/status`, asJson(boss, { status, reason }, 'PATCH')), `chuyen ${status}`);
     const tick = async (count) => {
       const detail = must(await call(`/admin/orders/${code}`, { headers: auth(boss) }), 'doc don');

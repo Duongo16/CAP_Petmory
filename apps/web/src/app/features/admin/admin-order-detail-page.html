@@ -36,6 +36,16 @@
           <div class="attention" role="alert">
             <strong>{{ 'ADMIN.ORDER.ATTENTION' | translate }}</strong>
             <span>{{ order.attentionNote }}</span>
+            @if (isManager()) {
+              <div class="attention-clear">
+                <label class="sr-only" for="attention-note">{{ 'ADMIN.ORDER.ATTENTION_NOTE' | translate }}</label>
+                <input id="attention-note" type="text" maxlength="300" [ngModel]="facade.attentionNote()"
+                  (ngModelChange)="facade.attentionNote.set($event)" [placeholder]="'ADMIN.ORDER.ATTENTION_NOTE' | translate" />
+                <button type="button" class="pm-button-secondary attention-done" [disabled]="facade.saving()" (click)="facade.clearAttention()">
+                  {{ 'ADMIN.ORDER.ATTENTION_DONE' | translate }}
+                </button>
+              </div>
+            }
           </div>
         }
 

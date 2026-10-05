@@ -561,7 +561,7 @@ async function seedOrders(people, boss) {
       AWAITING_PAYMENT: [],
     }[plan.to];
     for (const step of steps) {
-      must(await call(`/admin/orders/${code}/status`, asJson(boss, { status: step, reason: '' }, 'PATCH')), `chuyen ${step}`);
+      must(await call(`/admin/orders/${code}/status`, asJson(boss, { status: step, reason: 'Du lieu trinh dien' }, 'PATCH')), `chuyen ${step}`);
     }
     console.log(`  + ${code} cua ${person.fullName}: ${plan.to}`);
   }

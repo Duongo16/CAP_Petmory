@@ -6,6 +6,7 @@ import { User, UserDocument } from '../users/schemas/user.schema';
 import { OrdersService } from '../orders/orders.service';
 import { PetsService } from '../pets/pets.service';
 import { OrderFilterDto, PAGE_SIZE_DEFAULT, CustomerSearchDto } from './dto/admin.dto';
+import { Role } from '../../common/constants/roles';
 import { MSG } from '../../common/constants/messages';
 import { AuditService } from '../../common/audit.service';
 
@@ -129,6 +130,15 @@ export class AdminService {
     return this.detailOrder(orderCode);
   }
 
+  async clearAttention(orderCode: string, actor: string, note: string) {
+    const order = await this.orderModel.findOne({ orderCode: orderCode.toUpperCase() }).exec();
+    if (!order) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    await this.orders.clearAttention(order, actor, note);
+    return this.detailOrder(orderCode);
+  }
+
   /** Tich hoac bo tich mot muc tren phieu kiem tra chat luong cua don. */
   async setQualityTick(orderCode: string, at: number, done: boolean, actor: string) {
     await this.orders.setQualityTick(orderCode, at, done, actor);
@@ -136,7 +146,8 @@ export class AdminService {
   }
 
   async listCustomers(filter: CustomerSearchDto): Promise<PageResult<CustomerRow>> {
-    const where: QueryFilter<UserDocument> = {};
+    // Danh sach khach hang chi gom tai khoan khach, khong lan tai khoan noi bo.
+    const where: QueryFilter<UserDocument> = { roles: Role.CUSTOMER };
     const keyword = filter.keyword?.trim();
     if (keyword) {
       const color = new RegExp(escape(keyword), 'i');

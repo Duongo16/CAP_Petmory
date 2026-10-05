@@ -1465,7 +1465,11 @@
       "READY_MADE": "Đơn hàng có sẵn",
       "MIXED": "Đơn có cả hàng có sẵn và hàng cá nhân hóa",
       "READY_MADE_LINE": "Hàng có sẵn",
-      "ATTENTION": "Đơn này cần người xử lý"
+      "ATTENTION": "Đơn này cần người xử lý",
+      "REASON_REQUIRED": "Cần ghi lý do (ít nhất 5 ký tự) trước khi đổi trạng thái.",
+      "ATTENTION_NOTE": "Ghi chú đã xử lý thế nào",
+      "ATTENTION_DONE": "Đã xử lý, bỏ cờ",
+      "ATTENTION_NOTE_REQUIRED": "Cần ghi chú đã xử lý thế nào (ít nhất 5 ký tự)."
     },
     "RECIPIENT": {
       "ACCOUNT_INFO": "Thông tin tài khoản",

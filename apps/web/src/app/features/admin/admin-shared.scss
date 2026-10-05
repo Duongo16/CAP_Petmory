@@ -1512,3 +1512,22 @@ tr.picked {
   color: var(--pm-text-muted);
   font-size: var(--pm-text-xs);
 }
+
+.attention-clear {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 6px;
+
+  input {
+    flex: 1;
+    min-inline-size: 200px;
+    min-block-size: 38px;
+    padding: 0 10px;
+    border: 1.5px solid var(--pm-border);
+    border-radius: 10px;
+    background: var(--pm-bg-card);
+    color: var(--pm-ink);
+    font: inherit;
+  }
+}

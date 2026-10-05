@@ -6,6 +6,7 @@ import { DesignsService } from '../designs/designs.service';
 import { PreviewAngle } from '../designs/schemas/design.schema';
 import {
   ChangeStatusDto,
+  ClearAttentionDto,
   OrderFilterDto,
   CustomerSearchDto,
   QualityTickDto,
@@ -99,7 +100,18 @@ export class AdminController {
     @Body() dto: ChangeStatusDto,
     @CurrentUser() user: AuthUser,
   ) {
-    return this.service.changeOrderStatus(orderCode, dto.status, user.userId, dto.reason ?? '');
+    return this.service.changeOrderStatus(orderCode, dto.status, user.userId, dto.reason.trim());
+  }
+
+  /** Bo co can xu ly khi nhan vien da xu ly xong, kem ghi chu. */
+  @Roles(Role.MANAGER)
+  @Patch('orders/:orderCode/attention')
+  clearAttention(
+    @Param('orderCode') orderCode: string,
+    @Body() dto: ClearAttentionDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.service.clearAttention(orderCode, user.userId, dto.note.trim());
   }
 
   @Roles(Role.MANAGER)

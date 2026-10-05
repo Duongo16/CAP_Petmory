@@ -57,6 +57,11 @@ export class AdminService {
     );
   }
 
+  /** Bo co can xu ly tren don, kem ghi chu da xu ly the nao. */
+  clearAttention(orderCode: string, note: string): Observable<AdminOrderDetail> {
+    return this.http.patch<AdminOrderDetail>(`${this.base}/admin/orders/${orderCode}/attention`, { note });
+  }
+
   /** Tich hoac bo tich mot muc tren phieu kiem tra chat luong. */
   setQualityTick(orderCode: string, at: number, done: boolean): Observable<AdminOrderDetail> {
     return this.http.patch<AdminOrderDetail>(
