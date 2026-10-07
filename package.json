@@ -7,6 +7,9 @@
     "apps/api",
     "apps/web"
   ],
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
