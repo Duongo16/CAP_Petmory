@@ -1,0 +1,11 @@
+node_modules
+**/dist
+.angular
+test-screenshots
+uploads
+TailMates_PetCareWeb
+TAILMATES_REVIEW.md
+*.log
+.env
+.env.*
+!.env.example

@@ -277,3 +277,43 @@ async function exposure(photo: sharp.Sharp, data: Buffer): Promise<sharp.Sharp> 
   }
   return photo.modulate({ brightness: factor });
 }
+
+/** Anh tra ve hay luu lai khong vuot qua muc nay, vua voi gioi han mot lan tra loi cua nen tang. */
+export const PICTURE_BYTES_MAX = 4 * 1024 * 1024;
+
+/** Anh da gon kem dang tep, de ben goi dat dung ten va dung loai noi dung. */
+export interface FittedPicture {
+  data: Buffer;
+  fileType: 'png' | 'jpg';
+  mimeType: 'image/png' | 'image/jpeg';
+}
+
+/**
+ * Giu anh duoi muc dung luong cho phep.
+ *
+ * Anh PNG con gon thi giu nguyen. Qua nang thi doi sang JPEG voi nen trang,
+ * ha dan chat luong roi thu nho canh dai neu van chua vua. Anh phuc hoi da
+ * phong to len rat de vuot muc, nen moi duong tra hay luu anh phuc hoi deu
+ * di qua day.
+ */
+export async function fitPicture(png: Buffer, limit = PICTURE_BYTES_MAX): Promise<FittedPicture> {
+  if (png.length <= limit) {
+    return { data: png, fileType: 'png', mimeType: 'image/png' };
+  }
+  const info = await sharp(png, { failOn: 'none' }).metadata();
+  let edge = Math.max(info.width ?? 0, info.height ?? 0, 1);
+  for (let round = 0; round < 4; round += 1) {
+    for (const quality of [90, 84, 76]) {
+      const jpeg = await sharp(png, { failOn: 'none' })
+        .resize({ width: edge, height: edge, fit: 'inside', withoutEnlargement: true })
+        .flatten({ background: '#ffffff' })
+        .jpeg({ quality, mozjpeg: true })
+        .toBuffer();
+      if (jpeg.length <= limit) {
+        return { data: jpeg, fileType: 'jpg', mimeType: 'image/jpeg' };
+      }
+    }
+    edge = Math.round(edge * 0.75);
+  }
+  throw new Error('Khong thu nho duoc anh xuong duoi gioi han');
+}

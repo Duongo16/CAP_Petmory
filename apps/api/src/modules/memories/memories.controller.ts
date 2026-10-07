@@ -136,6 +136,12 @@ export class MemoriesController {
     @Res() res: Response,
   ) {
     const file = await this.exporter.fileOf(id, user.userId);
+    if (file.address) {
+      // Dia chi tai het han sau vai phut, chi cap sau khi da kiem chu so huu.
+      res.setHeader('Cache-Control', 'private, no-store');
+      res.redirect(302, file.address);
+      return;
+    }
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${file.name}"`);
     res.setHeader('Cache-Control', 'private, no-store');

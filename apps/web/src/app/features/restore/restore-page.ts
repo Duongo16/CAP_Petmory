@@ -87,8 +87,13 @@ export class RestorePage {
   /** Ten tep tai ve, giu ten goc va them hau to. */
   readonly downloadName = computed(() => {
     const name = this.chosen()?.name ?? 'petmory';
-    return `${name.replace(/\.[^.]+$/, '')}-phuc-hoi.png`;
+    // May chu tra JPEG khi anh phuc hoi qua nang, nen duoi tep theo dung loai nhan duoc.
+    const ending = this.afterType() === 'image/jpeg' ? 'jpg' : 'png';
+    return `${name.replace(/\.[^.]+$/, '')}-phuc-hoi.${ending}`;
   });
+
+  /** Loai anh cua ban phuc hoi vua nhan. */
+  private readonly afterType = signal('image/png');
 
   constructor() {
     this.destroyRef.onDestroy(() => this.dropUrls());
@@ -121,7 +126,7 @@ export class RestorePage {
       return;
     }
     this.saveState.set('SAVING');
-    const file = new File([this.afterBlob], this.downloadName(), { type: 'image/png' });
+    const file = new File([this.afterBlob], this.downloadName(), { type: this.afterBlob.type || 'image/png' });
     this.photos
       .loadGeneral(pet, file)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -184,6 +189,7 @@ export class RestorePage {
         next: ({ picture, resemblance, mode, skipped }) => {
           this.working.set(false);
           this.afterBlob = picture;
+          this.afterType.set(picture.type || 'image/png');
           this.afterUrl.set(URL.createObjectURL(picture));
           this.resemblance.set(resemblance);
           this.mode.set(mode);

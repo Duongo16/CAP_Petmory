@@ -1,9 +1,6 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { promises as fs } from 'node:fs';
-import * as path from 'node:path';
 import { DiaryExport, DiaryExportDocument, ExportState } from './schemas/diary-export.schema';
 import { Memory, MemoryDocument } from './schemas/memory.schema';
 import { PetPhoto, PetPhotoDocument } from '../photos/schemas/pet-photo.schema';
@@ -13,6 +10,7 @@ import { PdfMaker } from './pdf-maker';
 import { BusinessConfigService } from '../business-config/business-config.service';
 import { StorageService, StorageFolder } from '../../common/storage/storage.service';
 import { MSG } from '../../common/constants/messages';
+import { runInBackground } from '../../common/background';
 
 /**
  * Duong ve cua cac hinh trang tri.
@@ -47,8 +45,8 @@ const STICKER_PATH: Record<string, string> = {
     'M62 8c-4 0-8 1-12 2 16 6 26 21 26 40s-10 34-26 40c4 1 8 2 12 2 23 0 42-19 42-42S85 8 62 8z',
 };
 
-/** Thu muc con giu cac tep da xuat, nam trong thu muc tep tai len. */
-const EXPORT_DIRECTORY = 'exports';
+/** Dia chi tai tep da xuat het han sau chung nay giay. */
+const DOWNLOAD_SECONDS = 300;
 
 /** Mot gio tinh bang phan nghin giay. */
 const HOUR_MS = 3_600_000;
@@ -69,7 +67,6 @@ const PENDING_LIMIT = 3;
 @Injectable()
 export class DiaryExportService {
   private readonly logger = new Logger(DiaryExportService.name);
-  private readonly root: string;
 
   constructor(
     @InjectModel(DiaryExport.name) private readonly model: Model<DiaryExportDocument>,
@@ -79,13 +76,7 @@ export class DiaryExportService {
     private readonly maker: PdfMaker,
     private readonly config: BusinessConfigService,
     private readonly store: StorageService,
-    settings: ConfigService,
-  ) {
-    this.root = path.join(
-      path.resolve(settings.getOrThrow<string>('upload.dir')),
-      EXPORT_DIRECTORY,
-    );
-  }
+  ) {}
 
   /**
    * Nhan mot yeu cau xuat va bat dau lam ngay sau do.
@@ -126,9 +117,11 @@ export class DiaryExportService {
       expiresAt: new Date(Date.now() + keepHours * HOUR_MS),
     });
 
-    void this.build(job, pet).catch((trouble: Error) => {
-      this.logger.error(`Khong xuat duoc quyen nhat ky ${job.id}: ${trouble.message}`);
-    });
+    runInBackground(
+      this.build(job, pet).catch((trouble: Error) => {
+        this.logger.error(`Khong xuat duoc quyen nhat ky ${job.id}: ${trouble.message}`);
+      }),
+    );
     return job;
   }
 
@@ -145,17 +138,22 @@ export class DiaryExportService {
    * Chi chu so huu tai duoc, ke ca khi quyen dang de cong khai, va tep het
    * han thi tra ve khong tim thay giong nhu chua tung co.
    */
-  async fileOf(id: string, owner: string): Promise<{ bytes: Buffer; name: string }> {
+  async fileOf(id: string, owner: string): Promise<{ bytes: Buffer | null; address: string | null; name: string }> {
     const job = await this.findOwned(id, owner);
     await this.expireIfDue(job);
     if (job.state !== ExportState.READY || !job.fileName) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
-    const bytes = await fs.readFile(path.join(this.root, job.fileName)).catch(() => null);
+    // Kho co dia chi tai co han dung thi dua dia chi do, tep lon khong phai di qua may chu.
+    const address = this.store.temporaryAddress(StorageFolder.EXPORT, job.fileName, DOWNLOAD_SECONDS);
+    if (address) {
+      return { bytes: null, address, name: job.fileName };
+    }
+    const bytes = await this.store.read(StorageFolder.EXPORT, job.fileName).catch(() => null);
     if (!bytes) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
-    return { bytes, name: job.fileName };
+    return { bytes, address: null, name: job.fileName };
   }
 
   /** Cac lan xuat gan day cua mot quyen, de man hinh biet hien gi. */
@@ -212,7 +210,7 @@ export class DiaryExportService {
     if (!fileName) {
       return;
     }
-    await fs.rm(path.join(this.root, fileName), { force: true }).catch(() => undefined);
+    await this.store.remove(StorageFolder.EXPORT, fileName).catch(() => undefined);
   }
 
   /** Dung tep that su. Chay ngoai duong tra loi cua may chu. */
@@ -222,8 +220,7 @@ export class DiaryExportService {
       const html = await this.pageOf(pet, moments);
       const bytes = await this.maker.fromHtml(html);
       const fileName = `nhat-ky-${job.id}.pdf`;
-      await fs.mkdir(this.root, { recursive: true });
-      await fs.writeFile(path.join(this.root, fileName), bytes);
+      await this.store.save(StorageFolder.EXPORT, fileName, bytes, 'application/pdf');
 
       job.state = ExportState.READY;
       job.fileName = fileName;
@@ -378,9 +375,10 @@ function safe(raw: string): string {
 /** Khung trang in, giu rieng de phan dung noi dung o tren doc gon. */
 function diaryPage(name: string, tagline: string, blocks: string, count: number): string {
   return `<!doctype html><html lang="vi"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400&display=block" />
 <style>
   @page { size: A4; }
-  body { font-family: "Segoe UI", "Noto Sans", sans-serif; color: #231a13; margin: 0; }
+  body { font-family: "Noto Sans", "Segoe UI", sans-serif; color: #231a13; margin: 0; }
   h1 { font-size: 30px; margin: 0 0 4px; }
   .tagline { color: #7c757f; margin: 0 0 6px; font-style: italic; }
   .count { color: #7c757f; margin: 0 0 24px; font-size: 13px; }

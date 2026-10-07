@@ -14,7 +14,18 @@ const REMOTE_FOLDER: Record<StorageFolderName, string> = {
   [StorageFolder.PET]: 'petmory/pets',
   [StorageFolder.DESIGN]: 'petmory/designs',
   [StorageFolder.COMMUNITY]: 'petmory/community',
+  [StorageFolder.EXPORT]: 'petmory/exports',
 };
+
+/**
+ * Loai tai nguyen tren dich vu anh.
+ *
+ * Tep nhat ky xuat ra la PDF. Goi mien phi chan phat PDF khi luu dang anh, nen
+ * nhom nay luu dang tep tho; cac nhom con lai la anh.
+ */
+function resourceOf(folder: StorageFolderName): 'image' | 'raw' {
+  return folder === StorageFolder.EXPORT ? 'raw' : 'image';
+}
 
 /**
  * How a group is delivered.
@@ -70,8 +81,8 @@ export class CloudinaryStorage extends StorageService {
       const upload = cloudinary.uploader.upload_stream(
         {
           public_id: this.idOf(folder, fileName),
-          format: formatOf(fileName),
-          resource_type: 'image',
+          ...(resourceOf(folder) === 'image' ? { format: formatOf(fileName) } : {}),
+          resource_type: resourceOf(folder),
           type: deliveryOf(folder),
           overwrite: true,
           // The name is decided by the calling module, so nothing is derived
@@ -113,7 +124,7 @@ export class CloudinaryStorage extends StorageService {
 
   async remove(folder: StorageFolderName, fileName: string): Promise<void> {
     await cloudinary.uploader.destroy(this.idOf(folder, fileName), {
-      resource_type: 'image',
+      resource_type: resourceOf(folder),
       type: deliveryOf(folder),
       invalidate: true,
     });
@@ -147,13 +158,32 @@ export class CloudinaryStorage extends StorageService {
     });
   }
 
+  /**
+   * Dia chi tai co han dung that.
+   *
+   * Dia chi nay di qua cong tai cua dich vu va duoc kiem han o do: da do, qua
+   * han la bi tu choi. Vi vay cap ra cho trinh duyet duoc, mien la chi cap
+   * sau khi da kiem chu so huu.
+   */
+  temporaryAddress(folder: StorageFolderName, fileName: string, seconds: number): string | null {
+    const raw = resourceOf(folder) === 'raw';
+    return cloudinary.utils.private_download_url(this.idOf(folder, fileName), raw ? '' : formatOf(fileName), {
+      resource_type: resourceOf(folder),
+      type: deliveryOf(folder),
+      expires_at: Math.floor(Date.now() / 1000) + seconds,
+      attachment: true,
+    });
+  }
+
   /** The address the API itself uses to fetch bytes it will then hand on. */
   private privateAddress(folder: StorageFolderName, fileName: string): string {
+    const raw = resourceOf(folder) === 'raw';
     return cloudinary.url(this.idOf(folder, fileName), {
       type: deliveryOf(folder),
+      resource_type: resourceOf(folder),
       sign_url: true,
       secure: true,
-      format: formatOf(fileName),
+      ...(raw ? {} : { format: formatOf(fileName) }),
       force_version: false,
     });
   }
@@ -167,6 +197,8 @@ export class CloudinaryStorage extends StorageService {
    * read would come back empty.
    */
   private idOf(folder: StorageFolderName, fileName: string): string {
-    return `${REMOTE_FOLDER[folder]}/${withoutEnding(fileName)}`;
+    // Tep tho giu nguyen duoi tep trong ten, vi dich vu khong tach duoi cho loai nay.
+    const name = resourceOf(folder) === 'raw' ? fileName : withoutEnding(fileName);
+    return `${REMOTE_FOLDER[folder]}/${name}`;
   }
 }

@@ -16,6 +16,7 @@ const SUBDIRECTORY: Record<StorageFolderName, string> = {
   [StorageFolder.PET]: '',
   [StorageFolder.DESIGN]: '',
   [StorageFolder.COMMUNITY]: 'community',
+  [StorageFolder.EXPORT]: 'exports',
 };
 
 /** Keeps pictures on the disk of the machine running the API. */
@@ -48,6 +49,11 @@ export class DiskStorage extends StorageService {
 
   /** The disk has no address a browser can reach, so the API serves the bytes. */
   addressOf(): string | null {
+    return null;
+  }
+
+  /** O dia cung khong co dia chi tai co han dung, may chu tu tra tep. */
+  temporaryAddress(): string | null {
     return null;
   }
 

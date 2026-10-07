@@ -8,8 +8,13 @@
  * anh. Anh gon san thi gui nguyen, khong ghi lai.
  */
 
-/** Dung luong toi da gui di, de mot khoang duoi gioi han cua may chu. */
-export const UPLOAD_MAX_BYTES = 9 * 1024 * 1024;
+/**
+ * Dung luong toi da gui di.
+ *
+ * Nen tang chay may chu chi nhan moi yeu cau toi khoang bon ruoi MB, nen giu
+ * mot khoang an toan duoi muc do. Canh dai bon nghin diem anh van du net.
+ */
+export const UPLOAD_MAX_BYTES = 4 * 1024 * 1024;
 
 /** Canh dai nhat sau khi thu nho, van du net de xuong lam theo anh. */
 export const UPLOAD_MAX_EDGE = 4096;

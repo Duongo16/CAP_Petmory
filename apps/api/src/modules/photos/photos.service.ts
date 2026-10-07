@@ -16,7 +16,7 @@ import {
   PetPhotoDocument,
 } from './schemas/pet-photo.schema';
 import { RestoreOperation } from './dto/photo.dto';
-import { measureResemblance, restorePhoto, scorePhoto } from './image-tool';
+import { fitPicture, measureResemblance, restorePhoto, scorePhoto } from './image-tool';
 import { PetsService } from '../pets/pets.service';
 import { BusinessConfigService } from '../business-config/business-config.service';
 import { StorageFolder, StorageService } from '../../common/storage/storage.service';
@@ -213,8 +213,10 @@ export class PhotosService {
     // and the workshop can see it rather than taking the result on trust.
     const resemblance = await measureResemblance(rawData, dataNext);
 
-    const fileName = `${randomUUID()}.png`;
-    await this.writeFile(fileName, dataNext);
+    // Ban phuc hoi da phong to de vuot muc dung luong, nen nen lai cho vua truoc khi luu.
+    const fitted = await fitPicture(dataNext);
+    const fileName = `${randomUUID()}.${fitted.fileType}`;
+    await this.writeFile(fileName, fitted.data);
 
         // Each original keeps only one active restored version.
     await this.model.updateMany(
@@ -228,8 +230,8 @@ export class PhotosService {
       angle: angle.angle,
       fileName,
       originalName: angle.originalName,
-      fileType: 'png',
-      fileSize: dataNext.length,
+      fileType: fitted.fileType,
+      fileSize: fitted.data.length,
       quality,
       resemblance,
       originalPhoto: angle._id,

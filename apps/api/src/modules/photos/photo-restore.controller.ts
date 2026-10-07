@@ -31,7 +31,7 @@ export class PhotoRestoreController {
     @Res() res: Response,
   ): Promise<void> {
     const outcome = await this.service.run(user.userId, file, dto.operation ?? []);
-    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Type', outcome.mimeType);
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader(HEADER_RESEMBLANCE, String(outcome.resemblance));
     res.setHeader(HEADER_MODE, outcome.mode);

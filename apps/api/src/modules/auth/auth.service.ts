@@ -11,6 +11,7 @@ import { Role } from '../../common/constants/roles';
 import { PasswordReset, PasswordResetDocument } from './schemas/password-reset.schema';
 import { MailService } from '../../common/mail.service';
 import { AuditService } from '../../common/audit.service';
+import { runInBackground } from '../../common/background';
 
 /** How long a link to set a new password stays good for. */
 const RESET_VALID_MINUTES = 60;
@@ -85,7 +86,7 @@ export class AuthService {
      * cach do xem ai da dang ky. Ma dat lai chi nam trong thu, khong bao gio tra
      * ve cho nguoi goi.
      */
-    void this.mail.send(this.resetMail(user.email, user.fullName, code));
+    runInBackground(this.mail.send(this.resetMail(user.email, user.fullName, code)));
   }
 
   /** La thu dat lai mat khau, co duong dan day du toi trang dat lai tren web. */

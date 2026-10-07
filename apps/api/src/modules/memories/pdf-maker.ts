@@ -18,6 +18,7 @@ interface HeadlessBrowser {
 
 interface HeadlessPage {
   setContent(html: string, options: { waitUntil: 'load' }): Promise<void>;
+  evaluate(work: () => Promise<unknown>): Promise<unknown>;
   pdf(options: {
     format: string;
     printBackground: boolean;
@@ -26,7 +27,30 @@ interface HeadlessPage {
 }
 
 interface BrowserMaker {
-  chromium: { launch(): Promise<HeadlessBrowser> };
+  chromium: { launch(options?: { executablePath?: string; args?: string[] }): Promise<HeadlessBrowser> };
+}
+
+/** Ban Chromium thu gon cho nen tang chay theo tung yeu cau. */
+interface ServerlessChromium {
+  args: string[];
+  executablePath(): Promise<string>;
+}
+
+/**
+ * Mo trinh duyet de in.
+ *
+ * May chu thuong dung bo trinh duyet cua du an. Tren Vercel khong co trinh
+ * duyet nao cai san, nen dung ban Chromium thu gon di kem goi cai dat.
+ */
+async function openBrowser(): Promise<HeadlessBrowser> {
+  if (process.env.VERCEL) {
+    const core = require('playwright-core') as unknown as BrowserMaker;
+    const lite = require('@sparticuz/chromium') as { default?: ServerlessChromium } & ServerlessChromium;
+    const chrome = lite.default ?? lite;
+    return core.chromium.launch({ executablePath: await chrome.executablePath(), args: chrome.args });
+  }
+  const tool = require('playwright') as unknown as BrowserMaker;
+  return tool.chromium.launch();
 }
 
 /** Le tep, dat rong de anh mot trang khong bi cat mat vien. */
@@ -47,11 +71,12 @@ export class BrowserPdfMaker extends PdfMaker {
   private readonly logger = new Logger(BrowserPdfMaker.name);
 
   async fromHtml(html: string): Promise<Buffer> {
-    const tool = require('playwright') as unknown as BrowserMaker;
-    const browser = await tool.chromium.launch();
+    const browser = await openBrowser();
     try {
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: 'load' });
+      // Cho phong chu tieng Viet tai xong roi moi in, de chu co dau khong bi vo.
+      await page.evaluate(() => document.fonts.ready);
       return await page.pdf({ format: 'A4', printBackground: true, margin: MARGIN });
     } finally {
       await browser.close().catch((trouble: Error) => {

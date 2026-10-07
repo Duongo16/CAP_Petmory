@@ -15,6 +15,8 @@ export const StorageFolder = {
   PET: 'pets',
   DESIGN: 'designs',
   COMMUNITY: 'community',
+  /** Tep nhat ky da xuat, chi chu so huu tai duoc va tu het han. */
+  EXPORT: 'exports',
 } as const;
 
 export type StorageFolderName = (typeof StorageFolder)[keyof typeof StorageFolder];
@@ -45,6 +47,15 @@ export abstract class StorageService {
    * cannot be passed around after the owner check that produced it.
    */
   abstract addressOf(folder: StorageFolderName, fileName: string): string | null;
+
+  /**
+   * Dia chi tai tep co han dung that, hoac rong khi kho nay khong cap duoc.
+   *
+   * Khac voi dia chi o tren, dia chi nay het han dung sau so giay cho truoc,
+   * nen chi duoc cap sau khi da kiem chu so huu, va dung cho tep qua lon de
+   * may chu tu tra truc tiep.
+   */
+  abstract temporaryAddress(folder: StorageFolderName, fileName: string, seconds: number): string | null;
 
   /** A short word naming the store, used by the startup log and the checks. */
   abstract get kind(): string;

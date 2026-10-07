@@ -1,36 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { Logger, ValidationPipe } from '@nestjs/common';
-import helmet from 'helmet';
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
-import { HEADER_RESEMBLANCE, HEADER_MODE, HEADER_SKIPPED } from './modules/photos/photo-restore.controller';
+import { configureApp } from './app-setup';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-  const config = app.get(ConfigService);
+  configureApp(app);
 
-  app.use(helmet());
-  app.setGlobalPrefix('api');
-  app.enableCors({
-    origin: config.getOrThrow<string>('webOrigin'),
-    credentials: true,
-    exposedHeaders: [HEADER_RESEMBLANCE, HEADER_MODE, HEADER_SKIPPED],
-  });
-
-  /**
-   * Reject bad input at the boundary. Only fields declared on the DTO are
-   * accepted, so nothing can be assigned into a record by accident.
-   */
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: false },
-    }),
-  );
-
-  const port = config.getOrThrow<number>('port');
+  const port = app.get(ConfigService).getOrThrow<number>('port');
   await app.listen(port);
   Logger.log(`API dang chay tai http://localhost:${port}/api`, 'Bootstrap');
 }

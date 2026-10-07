@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import { ConfigService } from '@nestjs/config';
 import { AiClientService } from '../ai/ai-client.service';
 import { CloudinaryImageAi } from './cloudinary-image-ai';
-import { measureResemblance, restorePhoto, scorePhoto } from './image-tool';
+import { fitPicture, measureResemblance, restorePhoto, scorePhoto } from './image-tool';
 import { BusinessConfigService } from '../business-config/business-config.service';
 import { AiUsageService } from '../ai/ai-usage.service';
 import { AiKind, AiMode } from '../ai/schemas/ai-usage.schema';
@@ -46,6 +46,8 @@ export interface RestoreOutcome {
   mode: AiMode;
   /** Cac thao tac AI da chon nhung khong lam duoc (chua co khoa, goi hong). */
   skipped: string[];
+  /** Loai noi dung cua anh tra ve: PNG khi con gon, JPEG khi phai nen cho vua. */
+  mimeType: string;
 }
 
 /**
@@ -121,7 +123,8 @@ export class PhotoRestoreService {
     }
     const resemblance = await measureResemblance(file.buffer, data);
     await this.usage.record(AiKind.RESTORE_PHOTO, owner, mode, undefined, problem);
-    return { data, resemblance, mode, skipped };
+    const fitted = await fitPicture(data);
+    return { data: fitted.data, resemblance, mode, skipped, mimeType: fitted.mimeType };
   }
 
   /**
