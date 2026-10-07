@@ -8,7 +8,8 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   configureApp(app);
 
-  const port = app.get(ConfigService).getOrThrow<number>('port');
+  // Vercel dat cong qua bien moi truong PORT; chay tren may thi dung cong trong cau hinh.
+  const port = Number(process.env.PORT ?? app.get(ConfigService).getOrThrow<number>('port'));
   await app.listen(port);
   Logger.log(`API dang chay tai http://localhost:${port}/api`, 'Bootstrap');
 }

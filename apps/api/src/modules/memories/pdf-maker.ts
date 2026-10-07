@@ -33,8 +33,19 @@ interface BrowserMaker {
 /** Ban Chromium thu gon cho nen tang chay theo tung yeu cau. */
 interface ServerlessChromium {
   args: string[];
-  executablePath(): Promise<string>;
+  executablePath(input?: string): Promise<string>;
 }
+
+/**
+ * Goi Chromium tai ve luc chay, khop phien ban goi da cai.
+ *
+ * Tai ve thu muc tam cua ham thay vi dong goi kem, de goi ham khong phinh
+ * them va khong phu thuoc cach nen tang chon tep dong goi. Dat bien moi
+ * truong de tro sang ban luu o noi khac neu can.
+ */
+const CHROMIUM_PACK =
+  process.env.CHROMIUM_PACK_URL ??
+  'https://github.com/Sparticuz/chromium/releases/download/v153.0.0/chromium-v153.0.0-pack.x64.tar';
 
 /**
  * Mo trinh duyet de in.
@@ -47,7 +58,7 @@ async function openBrowser(): Promise<HeadlessBrowser> {
     const core = require('playwright-core') as unknown as BrowserMaker;
     const lite = require('@sparticuz/chromium') as { default?: ServerlessChromium } & ServerlessChromium;
     const chrome = lite.default ?? lite;
-    return core.chromium.launch({ executablePath: await chrome.executablePath(), args: chrome.args });
+    return core.chromium.launch({ executablePath: await chrome.executablePath(CHROMIUM_PACK), args: chrome.args });
   }
   const tool = require('playwright') as unknown as BrowserMaker;
   return tool.chromium.launch();

@@ -1,134 +1,132 @@
 # Deploy PETMORY lên Vercel
 
-Một project Vercel chứa cả hai phần:
+PETMORY deploy thành **một project Vercel ở chế độ Services** (https://vercel.com/docs/services), gồm hai service build riêng và dùng chung một tên miền:
 
-- **Web (Angular)** build thành trang tĩnh, phục vụ từ `apps/web/dist/web/browser`.
-- **API (NestJS)** chạy dạng Vercel Function tại `api/index.js`, nhận mọi đường dẫn `/api/*`.
+| Service | Thư mục | Framework | Đường công khai |
+|---|---|---|---|
+| `api` | `apps/api` | NestJS, chạy dạng Vercel Function (Fluid compute) | `/api/*` |
+| `web` | `apps/web` | Angular, trang tĩnh | mọi đường còn lại |
 
-Web gọi API qua `/api` cùng tên miền, nên không cần cấu hình CORS giữa hai tên miền.
+Không service nào là nội bộ, và không có binding:
+
+- Trình duyệt gọi API qua `/api` cùng tên miền (`apiBase: '/api'`).
+- API cần đọc danh sách mô hình (`models/manifest.json`) của web. Vì hai service đóng gói riêng, API tải file này qua đường công khai của chính bản deploy.
 
 ```
-Trình duyệt ──► https://<tên-miền>/            ──► trang tĩnh Angular (index.html cho mọi route)
-            └─► https://<tên-miền>/api/...      ──► api/index.js ──► NestJS (apps/api/dist/serverless.js)
-                                                         ├─► MongoDB Atlas
-                                                         ├─► Cloudinary (ảnh, PDF xuất nhật ký)
-                                                         └─► Gemini (AI văn bản)
+Trình duyệt ──► https://<tên-miền>/...      ──► service web  (index.html cho mọi route Angular)
+            └─► https://<tên-miền>/api/...  ──► service api  (nhận nguyên đường dẫn /api/...)
+                                                    ├─► MongoDB Atlas
+                                                    ├─► Cloudinary (ảnh, PDF xuất nhật ký)
+                                                    ├─► Gemini (AI văn bản)
+                                                    └─► GET /models/manifest.json (đọc từ service web)
 ```
+
+Cấu hình nằm ở `vercel.json` ở gốc repo.
 
 ## Những gì đã chỉnh để chạy được trên Vercel
 
 | Giới hạn của Vercel | Cách xử lý trong code |
 |---|---|
-| Request/response tối đa ~4,5 MB | Trình duyệt tự nén ảnh xuống ≤ 4 MB trước khi gửi (`core/utils/upload-image.ts`). Ảnh phục hồi > 4 MB được đổi sang JPEG (`fitPicture` trong `image-tool.ts`). PDF xuất nhật ký không đi qua API mà tải thẳng từ Cloudinary bằng link hết hạn sau 5 phút. |
-| Không có đĩa lưu lâu dài | Mọi tệp đều lưu qua `StorageService` lên Cloudinary (thêm thư mục `exports` cho PDF, lưu dạng raw). |
-| Tiến trình dừng ngay sau khi trả lời | Việc chạy ngầm (dựng PDF, gửi thư) đi qua `runInBackground`, dùng `waitUntil` của Vercel. |
-| Không có trình duyệt cài sẵn | Dựng PDF bằng `@sparticuz/chromium` + `playwright-core` khi chạy trên Vercel; font Noto Sans tải từ Google Fonts để chữ tiếng Việt có dấu hiển thị đúng. |
-| Không có server chạy liên tục | `apps/api/src/serverless.ts` dựng ứng dụng NestJS một lần cho mỗi lần khởi động lạnh rồi dùng lại. |
-
-Cấu hình nằm ở `vercel.json`: lệnh build, thư mục output, vùng `sin1` (Singapore), thời gian chạy tối đa 60 giây, và các rewrite cho `/api` và cho route của trang Angular.
+| Request/response tối đa ~4,5 MB | Trình duyệt tự nén ảnh xuống ≤ 4 MB trước khi gửi (`core/utils/upload-image.ts`). Ảnh phục hồi > 4 MB được đổi sang JPEG (`fitPicture`). PDF tải thẳng từ Cloudinary bằng link hết hạn sau 5 phút. |
+| Không có đĩa lưu lâu dài | Mọi tệp lưu qua `StorageService` lên Cloudinary (thư mục `exports` cho PDF, lưu dạng raw). |
+| Tiến trình dừng ngay sau khi trả lời | Việc chạy ngầm (dựng PDF, gửi thư) đi qua `runInBackground`, dùng `waitUntil`. |
+| Không có trình duyệt cài sẵn | Dựng PDF bằng `@sparticuz/chromium` + `playwright-core`. Gói Chromium tải về `/tmp` lúc chạy (biến `CHROMIUM_PACK_URL`). Font Noto Sans tải từ Google Fonts. |
+| Preset NestJS cần `app.listen` | `src/main.ts` nghe cổng `process.env.PORT`. Chạy trên máy thì dùng `API_PORT`. |
+| Hai service đóng gói riêng | `ModelLibraryService` không thấy manifest trên đĩa thì tải từ `https://$VERCEL_URL/models/manifest.json`. Không được thì thử `WEB_ORIGIN`. |
 
 ## Lộ trình
 
-### Bước 0. Chuẩn bị tài khoản (làm một lần)
+### Bước 0. Chuẩn bị tài khoản
 
-1. Tạo tài khoản Vercel tại https://vercel.com, đăng nhập bằng GitHub/Bitbucket/GitLab chứa repo `CAP_Petmory`.
+1. Tạo tài khoản Vercel, kết nối GitHub chứa repo `Duongo16/CAP_Petmory`.
 2. Chọn gói:
    - **Hobby (miễn phí):** chỉ dùng phi thương mại, đủ cho demo và nghiệm thu.
-   - **Pro:** cần khi chạy thật. Gói này cho phép tăng `maxDuration` lên 300 giây nếu xuất PDF dài bị cắt.
+   - **Pro:** cần khi chạy thật.
 
 ### Bước 1. Mở MongoDB Atlas cho Vercel
 
-1. Vào Atlas → **Network Access** → **Add IP Address** → **Allow access from anywhere** (`0.0.0.0/0`). Vercel không có IP cố định.
-2. Vào **Database Access** → tạo một user riêng cho bản deploy (ví dụ `petmory-vercel`), quyền `readWrite` trên đúng database, mật khẩu dài và ngẫu nhiên.
-3. Lấy chuỗi kết nối `mongodb+srv://petmory-vercel:<mật-khẩu>@.../<tên-db>?retryWrites=true&w=majority` để dùng ở Bước 3.
+1. Atlas → **Network Access** → **Allow access from anywhere** (`0.0.0.0/0`). Vercel không có IP cố định.
+2. Atlas → **Database Access** → tạo user riêng cho bản deploy (ví dụ `petmory-vercel`), quyền `readWrite`, mật khẩu dài và ngẫu nhiên.
+3. Lấy chuỗi `mongodb+srv://...` để dùng ở Bước 3.
 
-### Bước 2. Tạo project trên Vercel
+### Bước 2. Import project
 
 1. Vercel → **Add New → Project** → chọn repo `CAP_Petmory`.
-2. **Root Directory:** để trống (gốc repo, nơi có `vercel.json`).
-3. **Framework Preset:** `Other`. Mọi lệnh build đã khai trong `vercel.json`, không cần điền ở màn hình này.
-4. **Node.js Version** (Settings → General): chọn **22.x**.
-5. **Chưa bấm Deploy.** Khai biến môi trường ở Bước 3 trước.
+2. Vercel đọc `vercel.json` và hiện hai service `api` và `web`. Giữ nguyên, **không** dán `vercel.json` gợi ý nào khác.
+3. Root Directory để trống (gốc repo).
+4. **Chưa bấm Deploy.** Khai biến môi trường ở Bước 3 trước.
+5. Sau khi tạo project, vào Settings:
+   - **General → Node.js Version:** chọn `22.x`.
+   - **Functions → Function Region:** chọn `Singapore (sin1)`, gần Việt Nam và gần Atlas nếu cluster ở châu Á.
 
-### Bước 3. Khai biến môi trường (Settings → Environment Variables, môi trường Production)
+### Bước 3. Khai biến môi trường (Settings → Environment Variables)
 
-Bắt buộc:
+Biến môi trường dùng chung cho mọi service trong project. Nhóm bắt buộc:
 
 | Biến | Giá trị |
 |---|---|
-| `NODE_ENV` | `production` (ẩn nút đăng nhập nhanh tài khoản mẫu). Khi demo nghiệm thu mà muốn giữ nút này thì đặt `development`. |
+| `NODE_ENV` | `production` (ẩn nút đăng nhập nhanh tài khoản mẫu). Khi demo nghiệm thu mà cần nút này thì đặt `development`. |
 | `MONGODB_URI` | Chuỗi kết nối từ Bước 1 |
-| `JWT_ACCESS_SECRET` | Chuỗi ngẫu nhiên ≥ 32 ký tự. Tạo bằng `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` |
-| `JWT_REFRESH_SECRET` | Một chuỗi ngẫu nhiên khác, cũng ≥ 32 ký tự |
-| `JWT_ACCESS_TTL` / `JWT_REFRESH_TTL` | Giữ như `.env` hiện tại |
-| `WEB_ORIGIN` | `https://<tên-miền>` (ví dụ `https://petmory.vercel.app`). Sửa lại sau Bước 4 nếu tên miền khác. |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Hai chuỗi ngẫu nhiên khác nhau, mỗi chuỗi ≥ 32 ký tự. Tạo bằng `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` |
+| `JWT_ACCESS_TTL` / `JWT_REFRESH_TTL` | Giữ như `.env` |
+| `WEB_ORIGIN` | `https://<tên-miền>`, ví dụ `https://cap-petmory.vercel.app` |
 | `STORAGE_DRIVER` | `cloudinary` |
-| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Như `.env` |
-| `CLOUDINARY_SIGNED_URL_TTL` | Như `.env` |
-| `UPLOAD_DIR` | `/tmp/uploads` (chỉ là chỗ tạm, không lưu gì lâu dài) |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` / `CLOUDINARY_SIGNED_URL_TTL` | Như `.env` |
+| `UPLOAD_DIR` | `/tmp/uploads` |
 | `UPLOAD_MAX_SIZE_MB` | `10` |
 | `AI_PROVIDER` | `gemini` |
 | `GEMINI_API_KEY` | Khoá Gemini |
-| `AI_TIMEOUT_MS` | `45000`. Phải nhỏ hơn `maxDuration` 60 giây. |
-| `SEPAY_WEBHOOK_KEY` | Khoá webhook SePay. **Không** dùng giá trị mẫu `change-this-key-before-running`. |
+| `AI_TIMEOUT_MS` | `45000` |
+| `SEPAY_WEBHOOK_KEY` | Khoá webhook SePay. **Không** dùng giá trị mẫu. |
 
-Tuỳ chọn:
+Nhóm tuỳ chọn:
 
 | Biến | Khi nào cần |
 |---|---|
-| `AI_MODEL`, `AI_IMAGE_PROVIDER`, `AI_IMAGE_MODEL` | Đổi model AI. Để trống thì dùng mặc định: phục hồi ảnh qua Cloudinary. |
+| `AI_MODEL`, `AI_IMAGE_PROVIDER`, `AI_IMAGE_MODEL` | Đổi model AI. Để trống thì dùng mặc định. |
 | `SEPAY_API_BASE`, `SEPAY_API_TOKEN`, `SEPAY_ALLOWED_IPS`, `SEPAY_TIMEOUT_MS` | Nếu đang dùng ở `.env` |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_TIMEOUT_MS` | Cần cho chức năng "Quên mật khẩu" khi `NODE_ENV=production`. Thiếu SMTP thì thư không gửi được và log ghi lỗi. |
+| `SMTP_*` | Chức năng "Quên mật khẩu" khi `NODE_ENV=production` |
+| `CHROMIUM_PACK_URL` | Chỉ khai khi muốn tải gói Chromium từ nơi khác |
 
-Không khai `API_PORT` vì trên Vercel API không tự mở cổng.
+Không khai `API_PORT` và `PORT`, vì Vercel tự đặt.
 
-### Bước 4. Deploy lần đầu
+### Bước 4. Deploy
 
-- **Cách A, qua Git (khuyên dùng):** bấm **Deploy** trên Vercel. Từ đó mỗi lần push lên nhánh chính sẽ tự deploy production, còn push nhánh khác tạo bản preview.
-- **Cách B, bằng CLI từ máy:**
-  ```bash
-  npm i -g vercel
-  vercel login
-  vercel link          # chọn đúng project vừa tạo
-  vercel --prod
-  ```
+- **Qua Git (khuyên dùng):** bấm **Deploy**. Mỗi lần push nhánh chính sẽ tự deploy production, còn các nhánh khác tạo bản preview.
+- **Bằng CLI:** `npm i -g vercel` (bản ≥ 48.4) → `vercel login` → `vercel link` → `vercel --prod`.
 
-Build mất khoảng 2–4 phút. Log build phải có cả `tsc` của API và `Application bundle generation complete` của web.
+Log build phải có hai phần, một cho mỗi service: NestJS (`api`) và `Application bundle generation complete` (`web`).
 
-### Bước 5. Việc cần làm sau khi có tên miền
+### Bước 5. Sau khi có tên miền
 
-1. Cập nhật `WEB_ORIGIN` đúng tên miền thật, rồi **Redeploy**.
-2. SePay → cấu hình webhook → URL `https://<tên-miền>/api/payments/webhook`, header `Authorization: Apikey <SEPAY_WEBHOOK_KEY>`.
-3. (Tuỳ chọn) Gắn tên miền riêng ở Settings → Domains, rồi lặp lại mục 1–2 với tên miền đó.
+1. Sửa `WEB_ORIGIN` cho đúng tên miền thật, rồi **Redeploy**.
+2. SePay → webhook URL `https://<tên-miền>/api/payments/webhook`, header `Authorization: Apikey <SEPAY_WEBHOOK_KEY>`.
+3. Gắn tên miền riêng (tuỳ chọn) ở Settings → Domains, rồi lặp lại mục 1–2.
+4. Bản preview có bật Deployment Protection có thể chặn API tải manifest qua `VERCEL_URL`. Khi đó API tự chuyển sang dùng `WEB_ORIGIN`.
 
 ### Bước 6. Kiểm tra sau deploy
 
 | # | Việc kiểm | Kỳ vọng |
 |---|---|---|
-| 1 | Mở `https://<tên-miền>/api/catalog/packaging` | Trả JSON danh sách hộp/khung. Lần đầu có thể chậm 3–8 giây (khởi động lạnh). |
-| 2 | Mở `https://<tên-miền>/shop`, tải lại trang (F5) | Trang hiện bình thường, không lỗi 404. Rewrite route Angular hoạt động. |
-| 3 | Đăng ký, đăng nhập, tạo hồ sơ bé | Thành công |
-| 4 | Tải ảnh 10–15 MB chụp từ điện thoại | Lên được (đã tự nén ≤ 4 MB) |
-| 5 | Studio: Dựng mẫu từ ảnh | Nhận ra loài và màu, mở bước Chọn mẫu |
-| 6 | Phục hồi ảnh với "Tách nền" | Chạy được (Cloudinary) |
-| 7 | Nhật ký → Xuất PDF → Tải về | Có file PDF, chữ tiếng Việt có dấu đúng |
-| 8 | Đặt hàng → quét QR → SePay báo về | Đơn chuyển sang đã thanh toán |
-| 9 | Trang quản trị: đăng nhập quanly@ | Vào được bàn điều phối |
-| 10 | Vercel → Logs | Không có lỗi `FUNCTION_PAYLOAD_TOO_LARGE`, `FUNCTION_INVOCATION_TIMEOUT`, hay lỗi kết nối Mongo |
+| 1 | `https://<tên-miền>/api/catalog/packaging` | Trả JSON. Lần đầu có thể chậm vài giây (khởi động lạnh). |
+| 2 | `https://<tên-miền>/shop`, tải lại trang (F5) | Không lỗi 404 |
+| 3 | Vercel → Logs của service `api` | Có dòng `Thu vien mo hinh: 16 mau nen, 6 vung` |
+| 4 | Đăng ký, đăng nhập, tạo hồ sơ bé | Thành công |
+| 5 | Tải ảnh 10–15 MB từ điện thoại | Lên được (tự nén ≤ 4 MB) |
+| 6 | Studio → Dựng mẫu từ ảnh | Nhận ra loài và màu, mở bước Chọn mẫu |
+| 7 | Phục hồi ảnh với "Tách nền" | Chạy được |
+| 8 | Nhật ký → Xuất PDF → Tải về | Có file PDF, chữ có dấu hiện đúng. Lần đầu chậm hơn vì phải tải gói Chromium. |
+| 9 | Đặt hàng → SePay báo về | Đơn chuyển sang đã thanh toán |
+| 10 | Đăng nhập quanly@ vào trang quản trị | Vào được bàn điều phối |
 
 ## Khi gặp lỗi
 
 | Hiện tượng | Nguyên nhân thường gặp | Cách xử lý |
 |---|---|---|
 | Mọi `/api` trả 500, log ghi `MongoServerSelectionError` hoặc TLS alert 80 | Atlas chưa mở IP | Bước 1.1 |
-| Log ghi `Missing required environment variable` | Thiếu biến bắt buộc | Bước 3, rồi Redeploy |
+| Log ghi `Missing required environment variable: ...` | Thiếu biến bắt buộc | Bước 3, rồi Redeploy |
+| Log ghi `Khong tim thay ban khai mo hinh` | API không tải được manifest | Kiểm `WEB_ORIGIN` và Deployment Protection |
 | 413 `FUNCTION_PAYLOAD_TOO_LARGE` | Tệp trên 4,5 MB đi qua API | Báo lại kèm đường dẫn API bị lỗi |
-| 504 `FUNCTION_INVOCATION_TIMEOUT` khi xuất PDF dài | Vượt 60 giây | Lên gói Pro rồi tăng `maxDuration` trong `vercel.json` (tối đa 300) |
-| Đăng nhập được nhưng gọi API báo CORS | `WEB_ORIGIN` sai tên miền | Sửa và Redeploy |
-| PDF chữ có dấu bị ô vuông | Không tải được Google Fonts | Kiểm lại mạng của function, hoặc nhúng font vào gói |
-
-## Giới hạn còn lại
-
-- **Khởi động lạnh:** lần gọi API đầu tiên sau một lúc không dùng chậm 3–8 giây.
-- **Ảnh HEIC trên Chrome:** chưa đọc được. Màn hình báo rõ lý do và gợi ý chọn JPG/PNG.
-- **Việc chạy ngầm bị cắt:** việc chạy ngầm (dựng PDF, gửi thư) bị cắt nếu vượt `maxDuration`. Khi đó bản xuất PDF ở lại trạng thái chờ, người dùng cần xuất lại.
+| 504 khi xuất PDF dài | Vượt thời gian chạy tối đa của hàm | Tăng Max Duration ở Settings → Functions (tối đa theo gói) |
+| Gọi API báo CORS | `WEB_ORIGIN` sai tên miền | Sửa và Redeploy |
+| PDF không dựng được, log ghi lỗi Chromium | Không tải được gói Chromium | Kiểm `CHROMIUM_PACK_URL`, hoặc kiểm mạng của hàm |

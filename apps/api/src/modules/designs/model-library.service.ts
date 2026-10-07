@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
@@ -41,20 +41,35 @@ const MAYBE = [
  *
  * Doc mot lan roi giu lai. Them mot tep mo hinh moi thi phai khoi dong lai may
  * chu, doi lay viec khong phai cham dia moi lan co nguoi xin goi y.
+ *
+ * Tren Vercel, API va trang web la hai phan dong goi rieng, nen ban khai khong
+ * nam canh API. Khi do API tai ban khai tu chinh trang web cua ban trien khai.
  */
 @Injectable()
-export class ModelLibraryService {
+export class ModelLibraryService implements OnModuleInit {
   private readonly logger = new Logger(ModelLibraryService.name);
-  private readonly model: BaseModel[];
-  private readonly zone: string[];
+  private model: BaseModel[];
+  private zone: string[];
   /** Ma mau da bo, tro sang mau thay the. */
-  private readonly retired: Record<string, string>;
+  private retired: Record<string, string>;
 
   constructor() {
     const read = this.load();
     this.model = read.model;
     this.zone = read.zone;
     this.retired = read.retired;
+  }
+
+  /** Khong thay ban khai tren dia thi tai qua mang truoc khi nhan yeu cau dau tien. */
+  async onModuleInit(): Promise<void> {
+    if (this.model.length === 0) {
+      const read = await this.loadRemote();
+      if (read) {
+        this.model = read.model;
+        this.zone = read.zone;
+        this.retired = read.retired;
+      }
+    }
     this.logger.log(`Thu vien mo hinh: ${this.model.length} mau nen, ${this.zone.length} vung`);
   }
 
@@ -110,7 +125,34 @@ export class ModelLibraryService {
         this.logger.warn(`Ban khai mo hinh doc khong ra: ${why}`);
       }
     }
-    this.logger.warn('Khong tim thay ban khai mo hinh. Phan goi y thiet ke se khong chay duoc.');
     return { model: [], zone: [], retired: {} };
+  }
+
+  /**
+   * Tai ban khai tu trang web cua chinh ban trien khai.
+   *
+   * Thu dia chi cua ban trien khai truoc, de ban xem truoc dung dung ban khai
+   * cua no; khong duoc thi thu dia chi trang web chinh.
+   */
+  private async loadRemote(): Promise<{ model: BaseModel[]; zone: string[]; retired: Record<string, string> } | null> {
+    const hosts = [
+      process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+      process.env.WEB_ORIGIN ?? '',
+    ].filter(Boolean);
+    for (const host of hosts) {
+      try {
+        const answer = await fetch(new URL('/models/manifest.json', host), { signal: AbortSignal.timeout(8000) });
+        if (!answer.ok) {
+          continue;
+        }
+        const raw = (await answer.json()) as { baseModel?: BaseModel[]; zoneName?: string[]; retired?: Record<string, string> };
+        return { model: raw.baseModel ?? [], zone: raw.zoneName ?? [], retired: raw.retired ?? {} };
+      } catch (trouble) {
+        const why = trouble instanceof Error ? trouble.message : String(trouble);
+        this.logger.warn(`Khong tai duoc ban khai mo hinh tu ${host}: ${why}`);
+      }
+    }
+    this.logger.warn('Khong tim thay ban khai mo hinh. Phan goi y thiet ke se khong chay duoc.');
+    return null;
   }
 }
