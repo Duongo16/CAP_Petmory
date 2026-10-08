@@ -31,6 +31,7 @@ const SUITES = [
   { name: 'shopping', file: 'test-shopping-ui.js' },
   { name: 'checkout', file: 'test-checkout-ui.js' },
   { name: 'packaging', file: 'test-packaging-ui.js' },
+  { name: 'cart-blockers', file: 'test-cart-blockers-ui.js' },
   { name: 'goods', file: 'test-goods-ui.js' },
   { name: 'goods-flow', file: 'test-goods-flow-ui.js' },
   { name: 'community', file: 'test-community-ui.js' },
