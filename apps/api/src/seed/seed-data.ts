@@ -82,9 +82,9 @@ export const PRODUCT_LIST: ProductTypeInit[] = [
     material: 'Vải tái chế cao cấp',
     sortOrder: 1,
     sizes: [
-      { code: 'FIG-S', displayName: 'Nhỏ', dimensions: 'Cao khoảng 8 cm', explainer: 'Vừa lòng bàn tay, hợp để bàn làm việc hoặc kệ nhỏ. Thể hiện được dáng, màu lông chủ đạo và một phụ kiện đơn giản. Các đốm lông nhỏ sẽ được giản lược.', price: '450000', productionDays: 7, minPhotos: 3, maxAccessories: 1 },
-      { code: 'FIG-M', displayName: 'Vừa', dimensions: 'Cao khoảng 12 cm', explainer: 'Size được chọn nhiều nhất. Thể hiện rõ đặc điểm khuôn mặt, các mảng màu lông và đốm lớn, mang được hai tới ba phụ kiện.', price: '750000', productionDays: 10, minPhotos: 4, maxAccessories: 3 },
-      { code: 'FIG-L', displayName: 'Lớn', dimensions: 'Cao khoảng 18 cm', explainer: 'Mức chi tiết cao nhất. Làm được vân lông nhiều lớp, các đốm nhỏ, biểu cảm mắt rõ, trang phục đầy đủ. Phù hợp làm kỷ vật trưng bày lâu dài.', price: '1250000', productionDays: 14, minPhotos: 4, maxAccessories: 5 },
+      { code: 'FIG-S', displayName: 'Nhỏ', dimensions: 'Cao khoảng 8 cm', explainer: 'Vừa lòng bàn tay, hợp để bàn làm việc hoặc kệ nhỏ. Thể hiện được dáng, màu lông chủ đạo và một phụ kiện đơn giản. Các đốm lông nhỏ sẽ được giản lược.', price: '450000', productionDays: 7, minPhotos: 1, maxAccessories: 1 },
+      { code: 'FIG-M', displayName: 'Vừa', dimensions: 'Cao khoảng 12 cm', explainer: 'Size được chọn nhiều nhất. Thể hiện rõ đặc điểm khuôn mặt, các mảng màu lông và đốm lớn, mang được hai tới ba phụ kiện.', price: '750000', productionDays: 10, minPhotos: 1, maxAccessories: 3 },
+      { code: 'FIG-L', displayName: 'Lớn', dimensions: 'Cao khoảng 18 cm', explainer: 'Mức chi tiết cao nhất. Làm được vân lông nhiều lớp, các đốm nhỏ, biểu cảm mắt rõ, trang phục đầy đủ. Phù hợp làm kỷ vật trưng bày lâu dài.', price: '1250000', productionDays: 14, minPhotos: 1, maxAccessories: 5 },
     ],
   },
   {
@@ -94,7 +94,7 @@ export const PRODUCT_LIST: ProductTypeInit[] = [
     material: 'Vải tái chế cao cấp',
     sortOrder: 2,
     sizes: [
-      { code: 'KEY-S', displayName: 'Một cỡ', dimensions: 'Khoảng 5 cm, phần đầu', explainer: 'Chỉ làm phần đầu, giữ lại những nét dễ nhận ra nhất: màu lông, dáng tai, mắt và mũi. Nhẹ, bền, mang theo được hằng ngày.', price: '250000', productionDays: 5, minPhotos: 2, maxAccessories: 1 },
+      { code: 'KEY-S', displayName: 'Một cỡ', dimensions: 'Khoảng 5 cm, phần đầu', explainer: 'Chỉ làm phần đầu, giữ lại những nét dễ nhận ra nhất: màu lông, dáng tai, mắt và mũi. Nhẹ, bền, mang theo được hằng ngày.', price: '250000', productionDays: 5, minPhotos: 1, maxAccessories: 1 },
     ],
   },
   {
@@ -104,9 +104,9 @@ export const PRODUCT_LIST: ProductTypeInit[] = [
     material: 'Vải tái chế và khung gỗ',
     sortOrder: 3,
     sizes: [
-      { code: 'POR-S', displayName: 'Nhỏ', dimensions: 'Khung 15 x 15 cm', explainer: 'Chân dung cận mặt một bé. Tập trung vào khuôn mặt và ánh mắt.', price: '650000', productionDays: 8, minPhotos: 2, maxAccessories: 1 },
-      { code: 'POR-M', displayName: 'Vừa', dimensions: 'Khung 20 x 20 cm', explainer: 'Chân dung nửa thân một bé, có nền đơn giản.', price: '950000', productionDays: 11, minPhotos: 3, maxAccessories: 2 },
-      { code: 'POR-L', displayName: 'Lớn', dimensions: 'Khung 25 x 25 cm', explainer: 'Làm được một tới hai bé, toàn thân, nền có chi tiết. Treo tường như một bức tranh thật.', price: '1450000', productionDays: 15, minPhotos: 4, maxAccessories: 3 },
+      { code: 'POR-S', displayName: 'Nhỏ', dimensions: 'Khung 15 x 15 cm', explainer: 'Chân dung cận mặt một bé. Tập trung vào khuôn mặt và ánh mắt.', price: '650000', productionDays: 8, minPhotos: 1, maxAccessories: 1 },
+      { code: 'POR-M', displayName: 'Vừa', dimensions: 'Khung 20 x 20 cm', explainer: 'Chân dung nửa thân một bé, có nền đơn giản.', price: '950000', productionDays: 11, minPhotos: 1, maxAccessories: 2 },
+      { code: 'POR-L', displayName: 'Lớn', dimensions: 'Khung 25 x 25 cm', explainer: 'Làm được một tới hai bé, toàn thân, nền có chi tiết. Treo tường như một bức tranh thật.', price: '1450000', productionDays: 15, minPhotos: 1, maxAccessories: 3 },
     ],
   },
   {
@@ -116,8 +116,8 @@ export const PRODUCT_LIST: ProductTypeInit[] = [
     material: 'Vải tái chế cao cấp',
     sortOrder: 4,
     sizes: [
-      { code: 'SET-2', displayName: 'Hai bé', dimensions: 'Hai bé trên một đế', explainer: 'Mỗi bé chọn size riêng. Giá bằng tổng giá từng bé cộng phụ phí đế chung.', price: '1600000', productionDays: 18, minPhotos: 8, maxAccessories: 4 },
-      { code: 'SET-3', displayName: 'Ba bé', dimensions: 'Ba bé trên một đế', explainer: 'Mỗi bé chọn size riêng, cùng đặt trên một đế gỗ chung.', price: '2350000', productionDays: 24, minPhotos: 12, maxAccessories: 6 },
+      { code: 'SET-2', displayName: 'Hai bé', dimensions: 'Hai bé trên một đế', explainer: 'Mỗi bé chọn size riêng. Giá bằng tổng giá từng bé cộng phụ phí đế chung.', price: '1600000', productionDays: 18, minPhotos: 2, maxAccessories: 4 },
+      { code: 'SET-3', displayName: 'Ba bé', dimensions: 'Ba bé trên một đế', explainer: 'Mỗi bé chọn size riêng, cùng đặt trên một đế gỗ chung.', price: '2350000', productionDays: 24, minPhotos: 3, maxAccessories: 6 },
     ],
   },
   {
@@ -127,8 +127,8 @@ export const PRODUCT_LIST: ProductTypeInit[] = [
     material: 'Vải tái chế, gỗ và kính',
     sortOrder: 5,
     sizes: [
-      { code: 'BOX-M', displayName: 'Vừa', dimensions: 'Tượng size vừa trong hộp kính', explainer: 'Kèm đế khắc tên và ngày tháng. Dành cho nhu cầu tưởng nhớ, giữ sản phẩm sạch bụi lâu dài.', price: '1150000', productionDays: 14, minPhotos: 4, maxAccessories: 3 },
-      { code: 'BOX-L', displayName: 'Lớn', dimensions: 'Tượng size lớn trong hộp kính', explainer: 'Như trên, mức chi tiết cao nhất, phù hợp làm kỷ vật lâu dài.', price: '1750000', productionDays: 18, minPhotos: 4, maxAccessories: 5 },
+      { code: 'BOX-M', displayName: 'Vừa', dimensions: 'Tượng size vừa trong hộp kính', explainer: 'Kèm đế khắc tên và ngày tháng. Dành cho nhu cầu tưởng nhớ, giữ sản phẩm sạch bụi lâu dài.', price: '1150000', productionDays: 14, minPhotos: 1, maxAccessories: 3 },
+      { code: 'BOX-L', displayName: 'Lớn', dimensions: 'Tượng size lớn trong hộp kính', explainer: 'Như trên, mức chi tiết cao nhất, phù hợp làm kỷ vật lâu dài.', price: '1750000', productionDays: 18, minPhotos: 1, maxAccessories: 5 },
     ],
   },
 ];

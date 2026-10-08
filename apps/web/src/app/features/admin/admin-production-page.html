@@ -151,6 +151,10 @@
               }
               <dt>{{ 'ADMIN.PROFILE.FEATURE_NOTE' | translate }}</dt>
               <dd class="feature-note">{{ item.featureNote || ('ADMIN.PROFILE.FEATURE_NOTE_NONE' | translate) }}</dd>
+              @if (item.aiNote) {
+                <dt>{{ 'ADMIN.PROFILE.AI_NOTE' | translate }}</dt>
+                <dd class="feature-note ai-note">{{ item.aiNote }}</dd>
+              }
             </dl>
 
             @if (item.model; as model) {

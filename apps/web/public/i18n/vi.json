@@ -579,7 +579,7 @@
     },
     "FEATURE_NOTE": "Đặc điểm riêng của bé",
     "FEATURE_NOTE_HINT": "Ví dụ: đốm trắng ở chân trái, tai phải hơi cụp, mắt hai màu...",
-    "PHOTOS_SUB": "Bắt đầu từ ảnh của bé: chọn bé rồi tải ảnh rõ mặt, rõ màu lông. Hệ thống dựng sẵn mẫu gần giống bé, xưởng cũng dựa vào ảnh này để làm đúng dáng và màu.",
+    "PHOTOS_SUB": "Chọn bé mà sản phẩm làm theo và tải ảnh. Chỉ cần ảnh chính diện; thêm các góc khác thì tượng giống bé hơn.",
     "PET_CREATE": "Tạo hồ sơ bé trước",
     "PHOTOS_NEED": "Bé có {{have}} ảnh, kích cỡ này cần ít nhất {{need}} ảnh.",
     "CART_NEED_PHOTOS_HINT": "Cần gắn bé và đủ {{need}} ảnh ở bước Ảnh của bé trước khi thêm vào giỏ.",
@@ -593,10 +593,10 @@
       "LINE": "Hộp & khung:"
     },
     "MATCH": {
-      "TITLE": "Dựng mẫu từ ảnh của bé",
-      "SUB": "Hệ thống xem ảnh để nhận ra loài, tư thế và màu lông, rồi chọn sẵn mẫu gần giống bé nhất. Sau đó bạn tuỳ biến tiếp như ý.",
-      "RUN": "Dựng mẫu từ ảnh",
-      "AGAIN": "Dựng lại từ ảnh",
+      "TITLE": "Chưa biết chọn mẫu nào?",
+      "SUB": "Không bắt buộc: nộp ảnh của bé để hệ thống tự chọn mẫu gần giống và tô sẵn màu lông. Hoặc tự chọn mẫu ngay bên dưới.",
+      "RUN": "Nộp ảnh để hệ thống tự chọn mẫu",
+      "AGAIN": "Chọn lại từ ảnh",
       "WORKING": "Đang xem ảnh của bé…",
       "FOUND": "Nhận ra:",
       "MODEL": "Mẫu đã chọn:",
@@ -604,7 +604,10 @@
       "MODE_AI": "Nhận diện bằng AI từ ảnh của bé.",
       "MODE_LOCAL": "Chưa gọi được AI nên màu được ước lượng trực tiếp từ ảnh.",
       "FAILED": "Chưa dựng được mẫu từ ảnh. Hãy thử lại.",
-      "QUOTA": "Bạn đã dùng hết lượt dựng mẫu bằng AI hôm nay."
+      "QUOTA": "Bạn đã dùng hết lượt dựng mẫu bằng AI hôm nay.",
+      "NEED_PHOTO": "Bé chưa có ảnh nào.",
+      "TO_PHOTOS": "Tải ảnh của bé",
+      "NOTES": "Ghi chú cho xưởng:"
     },
     "CART_BLOCK": {
       "TITLE": "Chưa thêm được vào giỏ, còn thiếu:",
@@ -1246,12 +1249,12 @@
     "VIEW": "Xem ảnh lớn",
     "FRAME": {
       "TITLE": "Khung ảnh theo góc",
-      "SUB": "Bốn góc bắt buộc giúp xưởng làm đúng dáng bé; hai góc còn lại không bắt buộc. Kéo thả ảnh vào từng ô hoặc bấm để chọn.",
-      "REQUIRED_COUNT": "{{done}}/{{total}} góc bắt buộc",
+      "SUB": "Chỉ cần ảnh chính diện là đủ. Thêm ảnh hai bên, phía sau hay cận mặt thì tượng giống bé hơn. Kéo thả ảnh vào từng ô hoặc bấm để chọn.",
+      "REQUIRED_COUNT": "{{done}}/{{total}} ảnh bắt buộc",
       "OPTIONAL": "Tùy chọn",
       "DROP": "Kéo thả hoặc bấm để chọn ảnh",
       "REPLACE": "Thay ảnh",
-      "MISSING": "Còn thiếu góc bắt buộc. Xưởng có thể phải hỏi lại bạn trước khi làm.",
+      "MISSING": "Còn thiếu ảnh chính diện của bé. Xưởng cần ít nhất ảnh này để làm.",
       "ANGLE": {
         "FRONT": "Chính diện",
         "LEFT_SIDE": "Bên trái",
@@ -1711,7 +1714,8 @@
       "QC_NONE": "Đơn này chưa có phiếu kiểm tra.",
       "QC_DRAFT": "Đơn chưa vào sản xuất nên đây là mẫu phiếu theo cấu hình hiện tại. Phiếu riêng của đơn được tạo khi chuyển sang Đang sản xuất.",
       "PACKAGING": "Hộp & khung",
-      "PACKAGING_NONE": "Không lấy hộp hay khung."
+      "PACKAGING_NONE": "Không lấy hộp hay khung.",
+      "AI_NOTE": "Ghi chú AI từ ảnh (tham khảo, phần ghi đoán là AI suy ra)"
     },
     "CHAT": {
       "TITLE": "Trực hội thoại",

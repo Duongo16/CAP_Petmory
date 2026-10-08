@@ -1,6 +1,6 @@
 /**
- * Kiem thu khung nap anh theo goc (SOW muc 3): bon goc bat buoc va hai goc tuy
- * chon, nap bang nut chon hoac keo tha, xem truoc, thay anh, bo anh, cham diem
+ * Kiem thu khung nap anh theo goc (SOW muc 3): chi goc chinh dien la bat buoc,
+ * nam goc con lai tuy chon, nap bang nut chon hoac keo tha, xem truoc, thay anh, bo anh, cham diem
  * chat luong va canh bao khi anh khong dat.
  * Run: node tools/test-photo-frame-ui.js
  */
@@ -69,9 +69,12 @@ async function run() {
     await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 20000 });
     await page.goto(`${WEB}/pets/${pet._id}/journal?view=photos`, { waitUntil: 'networkidle' });
     await page.waitForSelector('.slots .slot', { timeout: 20000 });
-    res.push(check('The frame shows four required and two optional angles',
-      (await page.locator('.slot').count()) === 6 && (await page.locator('.slot .slot-optional').count()) === 2));
-    res.push(check('The counter starts at zero required angles', (await page.locator('.frame-count').innerText()).startsWith('0/4')));
+    res.push(check('The frame shows one required and five optional angles',
+      (await page.locator('.slot').count()) === 6 && (await page.locator('.slot .slot-optional').count()) === 5));
+    res.push(check('Only the front angle is required',
+      (await page.locator('.slot[data-angle="FRONT"] .slot-optional').count()) === 0));
+    res.push(check('The counter starts at zero of one required angle', (await page.locator('.frame-count').innerText()).startsWith('0/1')));
+    res.push(check('The missing front photo is pointed out', (await page.locator('.frame-warn').count()) === 1));
 
     await page.setInputFiles('#slot-FRONT', good);
     await keepInDialog(page);
@@ -94,7 +97,9 @@ async function run() {
     await keepInDialog(page);
     await page.waitForSelector('.slot[data-angle="LEFT_SIDE"].filled img', { timeout: 20000 });
     res.push(check('Dropping a file onto an angle fills it', true));
-    res.push(check('The counter follows the filled required angles', (await page.locator('.frame-count').innerText()).startsWith('2/4')));
+    res.push(check('The counter counts only required angles', (await page.locator('.frame-count').innerText()).startsWith('1/1'),
+      await page.locator('.frame-count').innerText()));
+    res.push(check('The warning is gone once the front photo is in', (await page.locator('.frame-warn').count()) === 0));
 
     await page.setInputFiles('#slot-FRONT', better);
     await keepInDialog(page);
@@ -115,7 +120,7 @@ async function run() {
     res.push(check('A photo that falls short is flagged with a warning',
       (await page.locator('.slot[data-angle="BACK"] .quality.warn').count()) === 1,
       await page.locator('.slot[data-angle="BACK"] .quality').innerText()));
-    res.push(check('Missing required angles are pointed out', (await page.locator('.frame-warn').count()) === 1));
+    res.push(check('A weak optional photo does not bring back the missing warning', (await page.locator('.frame-warn').count()) === 0));
     await page.screenshot({ path: path.join(OUT, 'photo-frame.png'), fullPage: true });
 
     await page.locator('.slot[data-angle="BACK"] .slot-remove').click();

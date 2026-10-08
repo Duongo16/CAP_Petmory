@@ -290,6 +290,7 @@ export class OrdersService {
         pet: design.pet,
         petPhoto: photos.filter((one) => !one.isHidden).map((one) => one._id),
         featureNote: design.featureNote ?? '',
+        aiNote: design.aiNote ?? '',
         takenAt: new Date(),
       };
     } catch {

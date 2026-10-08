@@ -8,6 +8,7 @@
  * Run: node tools/test-upload-ui.js
  */
 const { chromium, request } = require('playwright');
+const { waitOverlayGone } = require('./lib/made-to-order');
 const path = require('path');
 const sharp = require('sharp');
 
@@ -64,7 +65,11 @@ async function run() {
     await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 20000 });
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('#studio-pet', { timeout: 40000 });
+    await page.waitForSelector('[data-step="PHOTOS"]', { timeout: 40000 });
+    await waitOverlayGone(page);
+    // Khung chon be va o tai anh nam o buoc anh cua be.
+    await page.locator('[data-step="PHOTOS"]').click();
+    await page.waitForSelector('#studio-pet', { timeout: 20000 });
     await page.selectOption('#studio-pet', pet._id);
     await page.waitForSelector('#album-file', { state: 'attached', timeout: 20000 });
     res.push(check('The picker lets every image format through', (await page.locator('#album-file').getAttribute('accept')) === 'image/*'));

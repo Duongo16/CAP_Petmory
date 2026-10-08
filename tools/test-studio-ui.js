@@ -88,20 +88,18 @@ async function run() {
 
     res.push(check('All five tabs are shown', (await page.locator('.tab').count()) === 5));
     const order = await page.locator('.tab').evaluateAll((all) => all.map((b) => b.dataset.step).join(','));
-    res.push(check('The steps run photos, model, colour, stand, finish',
-      order === 'PHOTOS,MODEL,COLOR,STAND,FINISH', order));
-    res.push(check('The studio opens on the pet photo step', (await tabOpen(page)) === 1
-      && (await page.locator('.tab[data-step="PHOTOS"]').getAttribute('aria-selected')) === 'true'));
-    res.push(check('Later steps are locked until a model is built',
-      (await page.locator('.tab[data-step="MODEL"]').isDisabled())
-        && (await page.locator('.tab[data-step="FINISH"]').isDisabled())
-        && (await page.locator('.drawer-foot .tw-btn-primary').isDisabled())));
+    res.push(check('The steps run model, colour, stand, photos, finish',
+      order === 'MODEL,COLOR,STAND,PHOTOS,FINISH', order));
+    res.push(check('The studio opens on the model step', (await tabOpen(page)) === 1
+      && (await page.locator('.tab[data-step="MODEL"]').getAttribute('aria-selected')) === 'true'));
+    res.push(check('No step is locked',
+      !(await page.locator('.tab[data-step="PHOTOS"]').isDisabled())
+        && !(await page.locator('.tab[data-step="FINISH"]').isDisabled())
+        && !(await page.locator('.drawer-foot .tw-btn-primary').isDisabled())));
 
-    // Buoc mot: chon be co anh roi dung mau tu anh, studio tu sang buoc chon mau.
+    // Tuy chon: chon be co anh roi dung mau tu anh ngay trong buoc chon mau.
     await passPhotoStep(page, PET_ID);
-    res.push(check('Building from the photo opens the model step', (await tabOpen(page)) === 2));
-    res.push(check('Later steps open once a model is built',
-      !(await page.locator('.tab[data-step="FINISH"]').isDisabled())));
+    res.push(check('Building from the photo stays on the model step', (await tabOpen(page)) === 1));
     await waitStage(page);
 
     const overflow = await page.evaluate(() => document.scrollingElement.scrollHeight - window.innerHeight);
@@ -145,7 +143,7 @@ async function run() {
     // --- Tab 2: yarn colours ---
     await page.locator('.drawer-foot .tw-btn-primary').click();
     await page.waitForTimeout(500);
-    res.push(check('The next button opens the yarn tab', (await tabOpen(page)) === 3));
+    res.push(check('The next button opens the yarn tab', (await tabOpen(page)) === 2));
     const countBall = await page.locator('.yarn-ball').count();
     res.push(check('The yarn tab shows the palette as yarn balls', countBall > 0, `${countBall} balls`));
 
@@ -213,10 +211,10 @@ async function run() {
     await page.waitForTimeout(800);
     await page.screenshot({ path: path.join(OUT, 'studio-3b-stand.png') });
 
-    // --- Quay lai buoc anh: be da chon tu dau van con, du anh ---
+    // --- Sang buoc anh: be da chon o khung dung mau van con, du anh ---
     await page.locator('.tab[data-step="PHOTOS"]').click();
     await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
-    res.push(check('The pet picked in step one stays chosen',
+    res.push(check('The pet picked in the model step stays chosen',
       (await page.locator('#studio-pet').inputValue()) === PET_ID));
 
     // --- Tab 5: wrap up, photos are taken by themselves ---

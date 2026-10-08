@@ -92,7 +92,7 @@
           @for (tab of tabs(); track tab.code) {
             <button type="button" role="tab" class="tab" [class.on]="tab.on" [class.done]="tab.done"
               [attr.aria-selected]="tab.on" aria-controls="drawer-panel" [attr.data-step]="tab.code"
-              [disabled]="tab.code !== 'PHOTOS' && !hasDesign()" (click)="go(tab.code)">
+              (click)="go(tab.code)">
               <span class="tab-paw" aria-hidden="true">
                 @if (tab.done) {
                   <pm-icon name="check" [size]="15" />
@@ -109,6 +109,69 @@
           @switch (step()) {
             @case ('MODEL') {
               <h2 class="panel-title">{{ 'STUDIO.PANEL.MODEL' | translate }}</h2>
+              <div class="match-box" id="studio-match-box">
+                <h3 class="group-title first">{{ 'STUDIO.MATCH.TITLE' | translate }}</h3>
+                <p class="hint">{{ 'STUDIO.MATCH.SUB' | translate }}</p>
+                <div class="match-row" [formGroup]="facade.form">
+                  <label class="sr-only" for="studio-match-pet">{{ 'STUDIO.PET_LABEL' | translate }}</label>
+                  <select id="studio-match-pet" formControlName="petId" class="tw-select">
+                    <option value="">{{ 'STUDIO.PET_NONE' | translate }}</option>
+                    @for (pet of facade.pets(); track pet._id) {
+                      <option [value]="pet._id">{{ pet.name }}</option>
+                    }
+                  </select>
+                <button type="button" class="tw-btn-primary" id="studio-match" [disabled]="!facade.canMatch()" (click)="matchFromPhoto()">
+                  @if (facade.matching()) {
+                    <mat-spinner diameter="16" />{{ 'STUDIO.MATCH.WORKING' | translate }}
+                  } @else {
+                    <pm-icon name="sparkle" [size]="16" />{{ (matchView() ? 'STUDIO.MATCH.AGAIN' : 'STUDIO.MATCH.RUN') | translate }}
+                  }
+                </button>
+                </div>
+                @if (facade.petChosen() && facade.photoCount() === 0) {
+                  <p class="match-hint" id="studio-match-need-photo">
+                    {{ 'STUDIO.MATCH.NEED_PHOTO' | translate }}
+                    <button type="button" class="cart-block-fix" (click)="go('PHOTOS')">{{ 'STUDIO.MATCH.TO_PHOTOS' | translate }}</button>
+                  </p>
+                } @else if (facade.pets().length === 0) {
+                  <p class="match-hint"><a class="suggest-link" routerLink="/pets">{{ 'STUDIO.PET_CREATE' | translate }}</a></p>
+                }
+                @if (facade.matchError(); as codeError) {
+                  <p class="note danger" role="alert">{{ codeError | translate }}</p>
+                }
+                @if (matchView(); as got) {
+                  <div class="match-result" id="studio-match-result" role="status">
+                    <p class="match-line">
+                      {{ 'STUDIO.MATCH.FOUND' | translate }}
+                      <strong>{{ got.kindKey | translate }}</strong>
+                      @if (got.breed) {
+                        · {{ got.breed }}
+                      }
+                      @if (got.poseKey) {
+                        · {{ got.poseKey | translate }}
+                      }
+                    </p>
+                    <p class="match-line">
+                      {{ 'STUDIO.MATCH.MODEL' | translate }} <strong id="studio-match-model">{{ got.modelName }}</strong>
+                    </p>
+                    @if (got.fallback) {
+                      <p class="note warn" id="studio-match-fallback">{{ 'STUDIO.MATCH.FALLBACK' | translate }}</p>
+                    }
+                    <ul class="match-swatches">
+                      @for (one of got.swatches; track one.zone) {
+                        <li><span class="dot" [style.background]="one.swatch" aria-hidden="true"></span>{{ one.name }}</li>
+                      }
+                    </ul>
+                    @if (got.notes) {
+                      <p class="match-line match-notes">{{ 'STUDIO.MATCH.NOTES' | translate }} {{ got.notes }}</p>
+                    }
+                    <p class="match-mode">
+                      {{ (got.mode === 'LIVE' ? 'STUDIO.MATCH.MODE_AI' : 'STUDIO.MATCH.MODE_LOCAL') | translate }}
+                    </p>
+                  </div>
+                }
+              </div>
+
               <div class="chips" role="group" [attr.aria-label]="'STUDIO.KIND_LABEL' | translate">
                 @for (one of kindTabs(); track one.kind) {
                   <button type="button" class="chip" [class.on]="kindSelected() === one.kind"
@@ -333,48 +396,6 @@
                 <pm-pet-photos [petId]="pet" (changed)="facade.refreshPhotos()" />
               }
 
-              <div class="match-box">
-                <h3 class="group-title">{{ 'STUDIO.MATCH.TITLE' | translate }}</h3>
-                <p class="hint">{{ 'STUDIO.MATCH.SUB' | translate }}</p>
-                <button type="button" class="tw-btn-primary" id="studio-match" [disabled]="!facade.canMatch()" (click)="matchFromPhoto()">
-                  @if (facade.matching()) {
-                    <mat-spinner diameter="16" />{{ 'STUDIO.MATCH.WORKING' | translate }}
-                  } @else {
-                    <pm-icon name="sparkle" [size]="16" />{{ (matchView() ? 'STUDIO.MATCH.AGAIN' : 'STUDIO.MATCH.RUN') | translate }}
-                  }
-                </button>
-                @if (facade.matchError(); as codeError) {
-                  <p class="note danger" role="alert">{{ codeError | translate }}</p>
-                }
-                @if (matchView(); as got) {
-                  <div class="match-result" id="studio-match-result" role="status">
-                    <p class="match-line">
-                      {{ 'STUDIO.MATCH.FOUND' | translate }}
-                      <strong>{{ got.kindKey | translate }}</strong>
-                      @if (got.breed) {
-                        · {{ got.breed }}
-                      }
-                      @if (got.poseKey) {
-                        · {{ got.poseKey | translate }}
-                      }
-                    </p>
-                    <p class="match-line">
-                      {{ 'STUDIO.MATCH.MODEL' | translate }} <strong id="studio-match-model">{{ got.modelName }}</strong>
-                    </p>
-                    @if (got.fallback) {
-                      <p class="note warn" id="studio-match-fallback">{{ 'STUDIO.MATCH.FALLBACK' | translate }}</p>
-                    }
-                    <ul class="match-swatches">
-                      @for (one of got.swatches; track one.zone) {
-                        <li><span class="dot" [style.background]="one.swatch" aria-hidden="true"></span>{{ one.name }}</li>
-                      }
-                    </ul>
-                    <p class="match-mode">
-                      {{ (got.mode === 'LIVE' ? 'STUDIO.MATCH.MODE_AI' : 'STUDIO.MATCH.MODE_LOCAL') | translate }}
-                    </p>
-                  </div>
-                }
-              </div>
             }
 
             @case ('FINISH') {
@@ -533,7 +554,7 @@
             <button type="button" class="tw-btn-secondary" [disabled]="isFirst()" (click)="back()">
               {{ 'STUDIO.BACK' | translate }}
             </button>
-            <button type="button" class="tw-btn-primary grow" [disabled]="nextLocked()" (click)="next()">
+            <button type="button" class="tw-btn-primary grow" (click)="next()">
               {{ 'STUDIO.NEXT_TO' | translate: { step: (nextKey() | translate) } }}
               <pm-icon name="arrow" [size]="15" />
             </button>

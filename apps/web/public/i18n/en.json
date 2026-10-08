@@ -579,7 +579,7 @@
     },
     "FEATURE_NOTE": "Distinctive features",
     "FEATURE_NOTE_HINT": "For example: white spot on the left paw, right ear folds a little, two-coloured eyes...",
-    "PHOTOS_SUB": "Start from your pet photos: pick the pet and upload clear photos of the face and fur. We build a matching model, and the workshop uses the same photos to get shape and colour right.",
+    "PHOTOS_SUB": "Choose the pet this piece follows and upload photos. A front photo is enough; more angles make the figure look more like your pet.",
     "PET_CREATE": "Create a pet profile first",
     "PHOTOS_NEED": "This pet has {{have}} photos; this size needs at least {{need}}.",
     "CART_NEED_PHOTOS_HINT": "Link a pet with at least {{need}} photos in the Pet photos step before adding to the cart.",
@@ -593,10 +593,10 @@
       "LINE": "Box & frame:"
     },
     "MATCH": {
-      "TITLE": "Build a model from your pet photos",
-      "SUB": "We look at the photos to find the species, pose and fur colours, then pick the closest model. You can customise it afterwards.",
-      "RUN": "Build from photos",
-      "AGAIN": "Rebuild from photos",
+      "TITLE": "Not sure which model to pick?",
+      "SUB": "Optional: send your pet photos and we pick the closest model with the fur colours filled in. Or choose a model yourself below.",
+      "RUN": "Send photos to pick a model for me",
+      "AGAIN": "Pick again from photos",
       "WORKING": "Looking at your photos…",
       "FOUND": "Found:",
       "MODEL": "Model chosen:",
@@ -604,7 +604,10 @@
       "MODE_AI": "Recognised by AI from your photos.",
       "MODE_LOCAL": "AI was unavailable, so colours were estimated from the photo.",
       "FAILED": "Could not build a model from the photos. Please try again.",
-      "QUOTA": "You have used all AI model builds for today."
+      "QUOTA": "You have used all AI model builds for today.",
+      "NEED_PHOTO": "This pet has no photos yet.",
+      "TO_PHOTOS": "Upload pet photos",
+      "NOTES": "Notes for the workshop:"
     },
     "CART_BLOCK": {
       "TITLE": "Cannot add to cart yet, still missing:",
@@ -1246,12 +1249,12 @@
     "VIEW": "View larger",
     "FRAME": {
       "TITLE": "Photos by angle",
-      "SUB": "The four required angles help the workshop get the shape right; the other two are optional. Drop a photo onto each box or click to choose.",
-      "REQUIRED_COUNT": "{{done}}/{{total}} required angles",
+      "SUB": "A front photo is all that is required. Side, back or close-up photos make the figure look more like your pet. Drag photos onto each box or click to choose.",
+      "REQUIRED_COUNT": "{{done}}/{{total}} required photo",
       "OPTIONAL": "Optional",
       "DROP": "Drop or click to choose a photo",
       "REPLACE": "Replace",
-      "MISSING": "Some required angles are missing. The workshop may need to ask you before starting.",
+      "MISSING": "The front photo is still missing. The workshop needs at least this one.",
       "ANGLE": {
         "FRONT": "Front",
         "LEFT_SIDE": "Left side",
@@ -1711,7 +1714,8 @@
       "QC_NONE": "This order has no checklist yet.",
       "QC_DRAFT": "The order is not in production yet, so this is the checklist template from the current settings. The order gets its own checklist when it moves to In production.",
       "PACKAGING": "Box & frame",
-      "PACKAGING_NONE": "No box or frame."
+      "PACKAGING_NONE": "No box or frame.",
+      "AI_NOTE": "AI notes from photos (for reference; parts marked as guesses are inferred)"
     },
     "CHAT": {
       "TITLE": "Chat desk",

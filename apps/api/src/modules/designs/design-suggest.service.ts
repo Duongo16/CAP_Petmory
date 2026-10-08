@@ -35,6 +35,8 @@ export interface PhotoMatch {
     /** Chua co mau nen cho loai nay nen dung mau mac dinh. */
     fallback: boolean;
     zonePaint: { zone: string; colorCode: string }[];
+    /** Dac diem AI doc tu anh de xuong tham khao, rong khi khong goi duoc AI. */
+    notes: string;
   };
 }
 
@@ -222,6 +224,7 @@ export class DesignSuggestService {
         zonePaint,
         colorCodesUsed: [...new Set(zonePaint.map((each) => each.colorCode))],
         pet: pet._id,
+        aiNote: reading.notes ?? '',
       });
       await this.usage.record(AiKind.DESIGN_SUGGESTION, owner, mode, design._id.toString(), problem);
       return {
@@ -235,6 +238,7 @@ export class DesignSuggestService {
           modelName: picked.model.name,
           fallback: picked.fallback,
           zonePaint,
+          notes: reading.notes ?? '',
         },
       };
     } catch (trouble) {
@@ -401,7 +405,9 @@ function matchAskWords(zones: string[]): string {
     'breed là giống đoán được, để trống nếu không chắc;',
     'colors là màu thật của từng vùng trên con vật: MAIN_FUR là lông thân, BELLY_FUR là lông bụng và ngực,',
     'EAR là tai, TAIL là đuôi, EYE là mắt, NOSE là mũi. Vùng không thấy thì để trống.',
-    `Trả về đúng khuôn: {"kind":"","pose":"","breed":"","colors":{${colours}}}`,
+    'notes là ghi chú cho nghệ nhân bằng tiếng Việt, tối đa 3 câu: đốm, vệt, mảng màu hay nét riêng nhìn thấy trên con vật.',
+    'Phần nào không thấy trong ảnh (lưng, đuôi, hông) mà phải đoán thì ghi rõ chữ "đoán" ngay cạnh, không được bịa như chắc chắn.',
+    `Trả về đúng khuôn: {"kind":"","pose":"","breed":"","notes":"","colors":{${colours}}}`,
   ].join('\n');
 }
 

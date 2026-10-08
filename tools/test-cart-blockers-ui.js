@@ -1,4 +1,4 @@
-const { passPhotoStep, samplePhoto } = require('./lib/made-to-order');
+const { samplePhoto, minPhotosOf, waitOverlayGone } = require('./lib/made-to-order');
 /**
  * Kiem thu nut them vao gio o studio (SOW muc 7, 12).
  *
@@ -45,7 +45,7 @@ async function run() {
     const made = await (await api.post(`${API}/auth/register`, { data: { email: EMAIL, password: PASSWORD, fullName: 'Gio hang test' } })).json();
     const auth = { Authorization: `Bearer ${made.accessToken}` };
     const pet = await (await api.post(`${API}/pets`, { headers: auth, data: { name: 'Na', kind: 'DOG' } })).json();
-    await upload(api, auth, pet._id, 1);
+    const need = await minPhotosOf('PT-01', 'FIG-M');
 
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
     await page.fill('input[formcontrolname="email"]', EMAIL);
@@ -53,10 +53,16 @@ async function run() {
     await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 20000 });
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
-    await passPhotoStep(page, pet._id);
+    await page.waitForSelector('#studio-match-pet', { timeout: 40000 });
+    await waitOverlayGone(page);
+    // Be chua co anh nao nen kich co nao cung con thieu anh.
+    await page.selectOption('#studio-match-pet', pet._id);
+    await page.waitForSelector('#studio-match-need-photo', { timeout: 20000 });
+    await waitOverlayGone(page);
 
     // --- Chua chon san pham: van bam duoc, va bao ly do ---
     await page.locator('[data-step="FINISH"]').click();
+    await waitOverlayGone(page);
     res.push(check('The add to cart button is clickable before anything is ready', !(await page.locator(ADD).isDisabled())));
     await page.locator(ADD).click();
     await page.waitForSelector(BLOCK, { timeout: 10000 });
@@ -68,21 +74,30 @@ async function run() {
     await page.waitForFunction((sel) => document.querySelector(sel)?.textContent?.includes('ảnh'), BLOCK, { timeout: 15000 });
     const photosLine = (await page.locator(BLOCK).innerText()).replace(/\s+/g, ' ');
     res.push(check('The list updates by itself once the product is chosen', !photosLine.includes('Chưa chọn sản phẩm'), photosLine.slice(0, 90)));
-    res.push(check('It says how many photos the pet has and needs', photosLine.includes('Bé mới có 1 ảnh'), photosLine.slice(0, 90)));
+    res.push(check('It says how many photos the pet has and needs',
+      photosLine.includes('Bé mới có 0 ảnh') && photosLine.includes(`cần ít nhất ${need} ảnh`), photosLine.slice(0, 90)));
     await page.screenshot({ path: path.join(OUT, 'cart-blockers.png') });
 
-    await page.locator(`${BLOCK} .cart-block-fix[data-fix="PHOTOS"]`).click();
-    res.push(check('Fix it takes the customer to the photo step',
-      (await page.locator('[data-step="PHOTOS"]').getAttribute('aria-selected')) === 'true'));
+    // Lop cho co the hien muon va nuot cu bam, nen cho buoc anh duoc chon han, khong thi bam lai mot lan.
+    const photoTab = '[data-step="PHOTOS"][aria-selected="true"]';
+    let reached = false;
+    for (let attempt = 0; attempt < 2 && !reached; attempt += 1) {
+      await waitOverlayGone(page);
+      await page.locator(`${BLOCK} .cart-block-fix[data-fix="PHOTOS"]`).click();
+      reached = await page.waitForSelector(photoTab, { timeout: 5000 }).then(() => true, () => false);
+    }
+    res.push(check('Fix it takes the customer to the photo step', reached));
 
     // --- Bo sung du anh roi quay lai: tu luu va them vao gio ---
-    for (const seed of [2, 3, 4]) {
+    for (let seed = 1; seed <= need; seed += 1) {
       await upload(api, auth, pet._id, seed);
     }
     await page.selectOption('#studio-pet', '');
     await page.selectOption('#studio-pet', pet._id);
     await page.waitForTimeout(1500);
+    await waitOverlayGone(page);
     await page.locator('[data-step="FINISH"]').click();
+    await waitOverlayGone(page);
     await page.locator(ADD).click();
     await page.waitForSelector('a:has-text("Xem giỏ hàng")', { timeout: 40000 });
     const cart = await (await api.get(`${API}/cart`, { headers: auth })).json();

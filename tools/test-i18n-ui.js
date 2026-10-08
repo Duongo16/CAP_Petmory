@@ -73,15 +73,21 @@ async function run() {
     await page.waitForSelector('.drawer .tab', { timeout: 40000 });
     res.push(check('The 3D studio reads in English', await bodyHas(page, EN.STUDIO.TAB.STAND)));
     const firstTab = (await page.locator('.drawer .tab').first().innerText()).trim();
-    res.push(check('The studio opens on the pet photo step, labelled in English',
-      firstTab.includes(EN.STUDIO.TAB.PHOTOS)
+    res.push(check('The studio opens on the model step, labelled in English',
+      firstTab.includes(EN.STUDIO.TAB.MODEL)
         && (await page.locator('.drawer .tab').first().getAttribute('aria-selected')) === 'true'
-        && (await bodyHas(page, EN.STUDIO.PANEL.PHOTOS)), firstTab));
-    res.push(check('Later steps are locked until a model is built',
-      await page.locator('.drawer .tab[data-step="MODEL"]').isDisabled()));
+        && (await bodyHas(page, EN.STUDIO.PANEL.MODEL)), firstTab));
+    // Tieu de khung duoc in hoa bang giao dien nen so khop khong phan biet hoa thuong.
+    const matchBox = (await page.locator('#studio-match-box').innerText()).toLowerCase();
+    res.push(check('The build-from-photos box reads in English',
+      matchBox.includes(EN.STUDIO.MATCH.TITLE.toLowerCase()) && matchBox.includes(EN.STUDIO.MATCH.RUN.toLowerCase()), matchBox.slice(0, 80)));
+    res.push(check('No step is locked',
+      !(await page.locator('.drawer .tab[data-step="PHOTOS"]').isDisabled())));
     await passPhotoStep(page, petId);
-    res.push(check('After building, the model step reads in English',
-      (await bodyHas(page, EN.STUDIO.PANEL.MODEL)) && (await bodyHas(page, EN.STUDIO.TAB.MODEL))));
+    res.push(check('After building, the result reads in English',
+      (await bodyHas(page, EN.STUDIO.MATCH.MODEL)) && (await bodyHas(page, EN.STUDIO.TAB.MODEL))));
+    await page.locator('.drawer .tab[data-step="PHOTOS"]').click();
+    res.push(check('The pet photos step reads in English', await bodyHas(page, EN.STUDIO.PANEL.PHOTOS)));
 
     await page.locator('pm-language-toggle button').first().click();
     res.push(check('Switching back gives Vietnamese again', await bodyHas(page, VI.STUDIO.TAB.STAND)));

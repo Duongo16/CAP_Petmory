@@ -92,15 +92,15 @@ async function run() {
 
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
     await page.waitForSelector('.drawer .tab', { timeout: 40000 });
-    res.push(check('The customiser screen opens with the pet photos step', (await page.locator('.drawer .tab').count()) === 5
-      && (await page.locator('.drawer .tab[data-step="PHOTOS"]').getAttribute('aria-selected')) === 'true'));
-    res.push(check('Later steps are locked until a model is built',
-      (await page.locator('.drawer .tab[data-step="COLOR"]').isDisabled())
-        && (await page.locator('.drawer-foot .tw-btn-primary').isDisabled())));
+    res.push(check('The customiser screen opens with the model step', (await page.locator('.drawer .tab').count()) === 5
+      && (await page.locator('.drawer .tab[data-step="MODEL"]').getAttribute('aria-selected')) === 'true'));
+    res.push(check('No step is locked',
+      !(await page.locator('.drawer .tab[data-step="COLOR"]').isDisabled())
+        && !(await page.locator('.drawer-foot .tw-btn-primary').isDisabled())));
 
-    // Buoc mot: chon be Mun roi dung mau tu anh, studio sang buoc chon mau.
+    // Tuy chon: chon be Mun roi dung mau tu anh ngay trong buoc chon mau.
     await passPhotoStep(page, petId);
-    res.push(check('Building from the photo opens the model step',
+    res.push(check('Building from the photo stays on the model step',
       (await page.locator('.drawer .tab[data-step="MODEL"]').getAttribute('aria-selected')) === 'true'));
     await page.waitForFunction(() => Boolean(document.querySelector('pm-viewer-3d canvas')), null, { timeout: 40000 });
     await page.waitForTimeout(1500);
@@ -160,7 +160,7 @@ async function run() {
     await page.fill('input[formcontrolname="engravedName"]', 'Mun');
     await page.fill('input[formcontrolname="memorialDate"]', '2019-05-20');
     await page.fill('textarea[formcontrolname="message"]', 'Nho be nhieu lam');
-    // Buoc anh cua be: be da chon tu buoc mot van con, khung anh hien du so anh da tai.
+    // Buoc anh cua be: be da chon o khung dung mau van con, khung anh hien du so anh da tai.
     await page.locator('.drawer .tab[data-step="PHOTOS"]').click();
     await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
     res.push(check('The pet photos step confirms the pet has enough photos',
@@ -220,7 +220,7 @@ async function run() {
     await page.goto(`${WEB}/studio?draft=${design._id}`, { waitUntil: 'networkidle' });
     await page.waitForSelector('.drawer .tab', { timeout: 40000 });
     await page.waitForTimeout(1500);
-    res.push(check('Reopening a draft skips the photo step and lands on the model step',
+    res.push(check('Reopening a draft lands on the model step',
       (await page.locator('.drawer .tab[data-step="MODEL"]').getAttribute('aria-selected')) === 'true'));
     await page.locator('.drawer .tab[data-step="STAND"]').click();
     await page.waitForSelector('input[formcontrolname="name"]', { timeout: 30000 });

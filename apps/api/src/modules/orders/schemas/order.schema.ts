@@ -76,6 +76,10 @@ export class DesignSnapshot {
   @Prop({ trim: true, default: '' })
   featureNote!: string;
 
+  /** Dac diem AI doc tu anh, chi de xuong tham khao. */
+  @Prop({ trim: true, default: '' })
+  aiNote!: string;
+
   @Prop({ type: Date, required: true })
   takenAt!: Date;
 }

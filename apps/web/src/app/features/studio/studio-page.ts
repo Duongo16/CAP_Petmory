@@ -55,10 +55,10 @@ type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 export type Step = 'MODEL' | 'COLOR' | 'STAND' | 'PHOTOS' | 'FINISH';
 
 /**
- * Thu tu cac buoc: anh cua be di truoc, de he thong dung san mot mau gan giong
- * be nhat roi khach moi chon lai mau, to len va hoan tat.
+ * Thu tu cac buoc. Dung mau tu anh la tuy chon, nam gon trong buoc chon mau:
+ * khach nop anh de he thong tu chon mau, hoac tu chon lay.
  */
-export const STEPS: Step[] = ['PHOTOS', 'MODEL', 'COLOR', 'STAND', 'FINISH'];
+export const STEPS: Step[] = ['MODEL', 'COLOR', 'STAND', 'PHOTOS', 'FINISH'];
 
 /** Nhan va bieu tuong cua tung ngan, viet ra tung key de tim duoc. */
 const STEP_VIEW: Record<Step, { key: string; icon: string }> = {
@@ -131,7 +131,7 @@ export class StudioPage implements OnInit {
   /** Cac ma mau nguoi dung da tha len mau, theo thu tu da dung. */
   private readonly colorCodesUsed = signal<string[]>([]);
 
-  readonly step = signal<Step>('PHOTOS');
+  readonly step = signal<Step>('MODEL');
   readonly status = signal<ScreenState>('LOADING');
   readonly baseModel = signal<BaseModel[]>([]);
   readonly baseModelSelected = signal<BaseModel | null>(null);
@@ -149,15 +149,6 @@ export class StudioPage implements OnInit {
 
   private declaredZones: DeclaredZone[] = [];
   private library: ModelLibrary | null = null;
-
-  /**
-   * Da co mau de tuy bien chua: vua dung tu anh, hoac dang mo mot ban da co.
-   * Chua co thi chua cho roi buoc anh cua be.
-   */
-  readonly hasDesign = computed(() => this.facade.designId() !== null);
-
-  /** Nut sang buoc tiep bi khoa khi dang o buoc anh ma chua dung mau. */
-  readonly nextLocked = computed(() => this.step() === 'PHOTOS' && !this.hasDesign());
 
   /** Ten loai, tu the va o mau tung vung cua lan dung mau gan nhat. */
   readonly matchView = computed(() => {
@@ -429,9 +420,7 @@ export class StudioPage implements OnInit {
           this.baseModel.set(ready);
           this.status.set(ready.length > 0 ? 'READY' : 'ERROR');
           if (codeDraft) {
-            // Mo mot ban da co thi khong can dung mau tu anh nua, vao thang buoc chon mau.
             this.openDesign(codeDraft);
-            this.step.set('MODEL');
             return;
           }
           const first = ready.find((m) => m.pose === 'SITTING') ?? ready[0] ?? null;
@@ -463,16 +452,12 @@ export class StudioPage implements OnInit {
     });
   }
 
-  /** Dung san mau tu anh cua be, mo mau do len roi sang buoc chon mau. */
+  /** Dung san mau tu anh cua be va mo mau do len ngay trong buoc chon mau. */
   matchFromPhoto(): void {
-    this.facade.matchFromPhoto((designId) => this.openDesign(designId, () => this.go('MODEL')));
+    this.facade.matchFromPhoto((designId) => this.openDesign(designId));
   }
 
   go(step: Step): void {
-    // Chua dung mau tu anh thi chua sang duoc cac buoc sau.
-    if (step !== 'PHOTOS' && !this.hasDesign()) {
-      return;
-    }
     this.step.set(step);
     // Sang ngan hoan tat ma chua co anh thi tu chup sau goc, de khoi phai nho bam.
     if (step === 'FINISH' && this.preview().length === 0) {
