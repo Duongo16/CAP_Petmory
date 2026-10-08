@@ -2,12 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   computed,
   effect,
   inject,
   input,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -83,7 +85,16 @@ export class Slideshow {
 
   readonly at = signal(0);
   readonly playing = signal(false);
-  readonly muted = signal(true);
+  readonly muted = signal(false);
+
+  /**
+   * The phat nhac nen.
+   *
+   * Trinh duyet chan tu phat nhac khi nguoi xem chua bam gi, nen nhac chi bat
+   * khi nguoi xem bam phat, va dung khi bam tam dung. Viec bat tat phai goi
+   * thang vao the phat, vi khong co cach rang buoc nao khac lam duoc dieu nay.
+   */
+  private readonly player = viewChild<ElementRef<HTMLAudioElement>>('player');
 
   private ticker: ReturnType<typeof setInterval> | null = null;
 
@@ -128,6 +139,20 @@ export class Slideshow {
   readonly effectClass = computed(() => `is-${this.setting().effect.toLowerCase()}`);
 
   constructor() {
+    // Nhac di theo trang thai trinh chieu: dang chay thi phat, tam dung thi dung.
+    effect(() => {
+      const player = this.player()?.nativeElement;
+      const wanted = this.playing() && this.track() !== null;
+      if (!player) {
+        return;
+      }
+      if (wanted) {
+        player.play().catch(() => this.playing.set(false));
+      } else {
+        player.pause();
+      }
+    });
+
     /*
      * Doi thoi luong moi anh thi nhip chay phai doi theo ngay, khong doi den
      * luc nguoi xem dung roi chay lai.
