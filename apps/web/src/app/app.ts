@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { RouterOutlet } from '@angular/router';
 import { LanguageService } from './core/services/language.service';
 import { ThemeService } from './core/services/theme.service';
+import { LoadingOverlay } from './shared/loading-overlay/loading-overlay';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  template: '<router-outlet />',
+  imports: [RouterOutlet, LoadingOverlay],
+  template: '<router-outlet /><app-loading-overlay />',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App implements OnInit {

@@ -1,0 +1,43 @@
+@if (loading.isLoading()) {
+  <div class="pm-loading-overlay" aria-live="polite" aria-busy="true">
+    <div class="pm-loading-backdrop"></div>
+    <div class="pm-loading-card">
+      <div class="pm-pet-spinner-wrap">
+        <!-- Vong xoay mau ho phach thuong hieu -->
+        <div class="pm-spinner-ring"></div>
+        <div class="pm-spinner-ring-inner"></div>
+
+        <!-- Mascot thu cung Petmory nhun nhay o tam -->
+        <div class="pm-pet-mascot">
+          <img src="/img/logo-mark.png" alt="Petmory Mascot" class="pm-mascot-img" />
+        </div>
+      </div>
+
+      <!-- Hang vet chan thu cung dang buoc di -->
+      <div class="pm-paw-track">
+        <svg class="pm-paw-icon pm-paw-1" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 10.5c-2.4 0-4.5 1.5-4.5 4 0 2.2 2 3.5 4.5 3.5s4.5-1.3 4.5-3.5c0-2.5-2.1-4-4.5-4zm-4.8-1.5c1 0 1.8-1.1 1.8-2.5S8.2 4 7.2 4 5.4 5.1 5.4 6.5s.8 2.5 1.8 2.5zm9.6 0c1 0 1.8-1.1 1.8-2.5S17.8 4 16.8 4s-1.8 1.1-1.8 2.5.8 2.5 1.8 2.5zM4 12c.9 0 1.6-1 1.6-2.2S4.9 7.6 4 7.6 2.4 8.6 2.4 9.8 3.1 12 4 12zm16 0c.9 0 1.6-1 1.6-2.2S20.9 7.6 20 7.6s-1.6 1-1.6 2.2.7 2.2 1.6 2.2z"/>
+        </svg>
+        <svg class="pm-paw-icon pm-paw-2" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 10.5c-2.4 0-4.5 1.5-4.5 4 0 2.2 2 3.5 4.5 3.5s4.5-1.3 4.5-3.5c0-2.5-2.1-4-4.5-4zm-4.8-1.5c1 0 1.8-1.1 1.8-2.5S8.2 4 7.2 4 5.4 5.1 5.4 6.5s.8 2.5 1.8 2.5zm9.6 0c1 0 1.8-1.1 1.8-2.5S17.8 4 16.8 4s-1.8 1.1-1.8 2.5.8 2.5 1.8 2.5zM4 12c.9 0 1.6-1 1.6-2.2S4.9 7.6 4 7.6 2.4 8.6 2.4 9.8 3.1 12 4 12zm16 0c.9 0 1.6-1 1.6-2.2S20.9 7.6 20 7.6s-1.6 1-1.6 2.2.7 2.2 1.6 2.2z"/>
+        </svg>
+        <svg class="pm-paw-icon pm-paw-3" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 10.5c-2.4 0-4.5 1.5-4.5 4 0 2.2 2 3.5 4.5 3.5s4.5-1.3 4.5-3.5c0-2.5-2.1-4-4.5-4zm-4.8-1.5c1 0 1.8-1.1 1.8-2.5S8.2 4 7.2 4 5.4 5.1 5.4 6.5s.8 2.5 1.8 2.5zm9.6 0c1 0 1.8-1.1 1.8-2.5S17.8 4 16.8 4s-1.8 1.1-1.8 2.5.8 2.5 1.8 2.5zM4 12c.9 0 1.6-1 1.6-2.2S4.9 7.6 4 7.6 2.4 8.6 2.4 9.8 3.1 12 4 12zm16 0c.9 0 1.6-1 1.6-2.2S20.9 7.6 20 7.6s-1.6 1-1.6 2.2.7 2.2 1.6 2.2z"/>
+        </svg>
+      </div>
+
+      <!-- Chu thich -->
+      <div class="pm-loading-text-group">
+        <h4 class="pm-loading-title">PETMORY</h4>
+        <p class="pm-loading-desc">
+          {{ loading.message() || ('COMMON.LOADING' | translate) }}
+          <span class="pm-dots">
+            <span class="dot">.</span>
+            <span class="dot">.</span>
+            <span class="dot">.</span>
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+}
