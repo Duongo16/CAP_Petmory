@@ -173,9 +173,9 @@ async function run() {
     const photoBeforeWhenSave = path.join(TEMP, 'before-save.png');
     await captureFrame3d(page, photoBeforeWhenSave);
 
-                // --- Nothing can be added to the cart before the draft is saved ---
-    res.push(check('Without saving, add to cart is disabled',
-      await page.locator('button:has-text("Thêm vào giỏ hàng")').isDisabled()));
+                // --- Nut them vao gio luon bam duoc, thieu gi thi bao khi bam ---
+    res.push(check('The add to cart button is always clickable',
+      !(await page.locator('button:has-text("Thêm vào giỏ hàng")').isDisabled())));
 
                 // --- Save a draft ---
     await page.locator('button:has-text("Lưu bản thiết kế")').click();

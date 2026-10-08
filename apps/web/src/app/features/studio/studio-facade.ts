@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of, switchMap } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { forkJoin, map, of, switchMap } from 'rxjs';
 import { DesignsService } from '../../core/services/designs.service';
 import { CatalogService } from '../../core/services/catalog.service';
 import { CartService } from '../../core/services/cart.service';
@@ -225,14 +225,41 @@ export class StudioFacade {
     () => Boolean(this.codeKindSelected()) && Boolean(this.sizeCodeSelected()),
   );
 
-  readonly canAddToCart = computed(
-    () =>
-      this.chosenProduct() &&
-      this.designId() !== null &&
-      !this.addedToCart() &&
-      !this.standDirty() &&
-      this.photosReady(),
-  );
+  /** Ten ban thiet ke da hop le chua, doc lien tuc tu o nhap. */
+  private readonly nameValid = toSignal(this.form.controls.name.statusChanges.pipe(map((one) => one === 'VALID')), {
+    initialValue: this.form.controls.name.valid,
+  });
+
+  /** Dang gui dong hang vao gio, de khoa nut trong luc cho. */
+  readonly addingToCart = signal(false);
+
+  /**
+   * Nhung dieu con thieu truoc khi them vao gio, kem buoc can quay lai de sua.
+   *
+   * Ban thiet ke chua luu hay vua doi khong nam o day, vi bam them vao gio se
+   * tu luu truoc. Danh sach rong la du dieu kien.
+   */
+  readonly cartBlockers = computed<CartBlocker[]>(() => {
+    const out: CartBlocker[] = [];
+    if (!this.codeKindSelected()) {
+      out.push({ key: 'STUDIO.CART_BLOCK.NO_PRODUCT', step: 'FINISH' });
+    } else if (!this.sizeCodeSelected()) {
+      out.push({ key: 'STUDIO.CART_BLOCK.NO_SIZE', step: 'FINISH' });
+    }
+    if (!this.petChosen()) {
+      out.push({ key: 'STUDIO.CART_BLOCK.NO_PET', step: 'PHOTOS' });
+    } else if (this.chosenProduct() && !this.photosReady()) {
+      out.push({
+        key: 'STUDIO.CART_BLOCK.NEED_PHOTOS',
+        step: 'PHOTOS',
+        params: { have: this.photoCount() ?? 0, need: this.minPhotos() },
+      });
+    }
+    if (!this.nameValid()) {
+      out.push({ key: 'STUDIO.CART_BLOCK.NO_NAME', step: 'STAND' });
+    }
+    return out;
+  });
 
   /** Loads the pet profiles the design can be tied to. */
   loadPets(): void {
@@ -400,6 +427,7 @@ export class StudioFacade {
     colorCodesUsed: string[],
     zonePaint: { zone: string; colorCode: string }[],
     sixAnglePhotos: { angle: PreviewAngle; photo: string }[],
+    onSaved?: () => void,
   ): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -444,6 +472,7 @@ export class StudioFacade {
           this.nameDraft.set(tk.name);
           this.standDirty.set(false);
           this.statusSave.set('SAVED');
+          onSaved?.();
         },
         error: () => {
           this.statusSave.set('ERROR');
@@ -467,6 +496,8 @@ export class StudioFacade {
     if (!code || !this.chosenProduct()) {
       return;
     }
+    this.addingToCart.set(true);
+    this.error.set(null);
     this.cart
       .add({
         productTypeCode: this.codeKindSelected(),
@@ -479,8 +510,14 @@ export class StudioFacade {
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.addedToCart.set(true),
-        error: (trouble: { error?: { code?: string } }) => this.error.set(cartErrorKey(trouble?.error?.code)),
+        next: () => {
+          this.addingToCart.set(false);
+          this.addedToCart.set(true);
+        },
+        error: (trouble: { error?: { code?: string } }) => {
+          this.addingToCart.set(false);
+          this.error.set(cartErrorKey(trouble?.error?.code));
+        },
       });
   }
 
@@ -530,6 +567,13 @@ const CART_ERROR: Record<string, string> = {
   NEED_PET: 'STUDIO.CART_NEED_PET',
   NEED_PHOTOS: 'STUDIO.CART_NEED_PHOTOS',
 };
+
+/** Mot dieu con thieu truoc khi them vao gio, kem buoc can quay lai de sua. */
+export interface CartBlocker {
+  key: string;
+  step?: 'PHOTOS' | 'STAND' | 'FINISH';
+  params?: Record<string, number>;
+}
 
 export function cartErrorKey(code: string | undefined): string {
   return (code && CART_ERROR[code]) || 'COMMON.GENERIC_ERROR';

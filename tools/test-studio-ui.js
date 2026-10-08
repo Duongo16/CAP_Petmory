@@ -256,9 +256,10 @@ async function run() {
     await page.locator('.tone').nth(0).click();
     await page.locator('.drawer .tab[data-step="FINISH"]').click();
     await page.waitForTimeout(400);
-    res.push(check('Changing the stand after saving asks for another save',
+    // Doi de sau khi luu thi bao chua luu, nhung nut van bam duoc va se tu luu lai.
+    res.push(check('Changing the stand after saving says it is not saved yet, and the button stays clickable',
       (await page.locator('.note.warn').count()) === 1
-        && (await page.locator('.drawer-foot .tw-btn-primary').isDisabled())));
+        && !(await page.locator('#studio-add-cart').isDisabled())));
     await page.locator('.drawer-foot .tw-btn-secondary').click();
     await page.waitForFunction(() => !document.querySelector('.note.warn'), null, { timeout: 40000 });
     res.push(check('Saving a second time works, the six photos upload side by side',

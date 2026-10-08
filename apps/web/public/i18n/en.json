@@ -605,6 +605,15 @@
       "MODE_LOCAL": "AI was unavailable, so colours were estimated from the photo.",
       "FAILED": "Could not build a model from the photos. Please try again.",
       "QUOTA": "You have used all AI model builds for today."
+    },
+    "CART_BLOCK": {
+      "TITLE": "Cannot add to cart yet, still missing:",
+      "NO_PRODUCT": "No product chosen.",
+      "NO_SIZE": "No size chosen.",
+      "NO_PET": "No pet chosen for this design.",
+      "NEED_PHOTOS": "The pet has {{have}} photos; this size needs at least {{need}}.",
+      "NO_NAME": "The design has no name.",
+      "FIX": "Fix it"
     }
   },
   "HOME": {

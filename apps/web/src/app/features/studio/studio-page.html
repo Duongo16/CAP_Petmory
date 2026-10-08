@@ -509,11 +509,25 @@
             <button type="button" class="tw-btn-secondary" [disabled]="facade.statusSave() === 'SAVING'" (click)="saveDraft()">
               {{ 'STUDIO.SAVE_DRAFT' | translate }}
             </button>
-            <button type="button" class="tw-btn-primary grow" [disabled]="!facade.canAddToCart()" (click)="addToCart()">
+            <button type="button" class="tw-btn-primary grow" id="studio-add-cart" [disabled]="cartBusy()" (click)="addToCart()">
               <pm-icon name="cart" [size]="16" />{{ 'STUDIO.ADD_IN_HOUR' | translate }}
             </button>
-            @if (facade.chosenProduct() && !facade.photosReady()) {
-              <p class="cart-block" id="studio-cart-block">{{ 'STUDIO.CART_NEED_PHOTOS_HINT' | translate: { need: facade.minPhotos() } }}</p>
+            @if (cartProblems().length > 0) {
+              <div class="cart-block" id="studio-cart-block" role="alert">
+                <p class="cart-block-title">{{ 'STUDIO.CART_BLOCK.TITLE' | translate }}</p>
+                <ul class="cart-block-list">
+                  @for (one of cartProblems(); track one.key) {
+                    <li>
+                      <span>{{ one.key | translate: one.params }}</span>
+                      @if (one.step; as where) {
+                        <button type="button" class="cart-block-fix" [attr.data-fix]="where" (click)="go(where)">
+                          {{ 'STUDIO.CART_BLOCK.FIX' | translate }}
+                        </button>
+                      }
+                    </li>
+                  }
+                </ul>
+              </div>
             }
           } @else {
             <button type="button" class="tw-btn-secondary" [disabled]="isFirst()" (click)="back()">

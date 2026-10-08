@@ -595,7 +595,7 @@ export class StudioPage implements OnInit {
     );
   }
 
-  saveDraft(): void {
+  saveDraft(onSaved?: () => void): void {
     const model = this.baseModelSelected();
     if (!model) {
       return;
@@ -606,12 +606,39 @@ export class StudioPage implements OnInit {
       this.colorCodesUsed(),
       this.zonePaintOf(model),
       this.preview().map((m) => ({ angle: m.angle as PreviewAngle, photo: m.photo })),
+      onSaved,
     );
   }
 
+  /**
+   * Them vao gio.
+   *
+   * Nut luon bam duoc. Con thieu dieu kien thi hien danh sach ly do, moi ly do
+   * kem nut dua ve dung buoc can sua. Ban thiet ke chua luu hay vua doi thi tu
+   * luu truoc roi moi them, khach khong phai nho bam luu.
+   */
   addToCart(): void {
-    this.facade.addToCart(this.facade.form.getRawValue().engravedName.trim());
+    this.cartTried.set(true);
+    if (this.facade.cartBlockers().length > 0) {
+      this.facade.form.controls.name.markAsTouched();
+      return;
+    }
+    const petName = this.facade.form.getRawValue().engravedName.trim();
+    if (this.facade.designId() === null || this.facade.standDirty()) {
+      this.saveDraft(() => this.facade.addToCart(petName));
+      return;
+    }
+    this.facade.addToCart(petName);
   }
+
+  /** Da bam them vao gio it nhat mot lan, tu do moi hien ly do con thieu. */
+  private readonly cartTried = signal(false);
+
+  /** Ly do chua them duoc vao gio, cap nhat ngay khi khach sua xong tung muc. */
+  readonly cartProblems = computed(() => (this.cartTried() ? this.facade.cartBlockers() : []));
+
+  /** Nut them vao gio chi khoa trong luc dang luu hoac dang gui. */
+  readonly cartBusy = computed(() => this.facade.statusSave() === 'SAVING' || this.facade.addingToCart());
 
   /** Dat san ten ban thiet ke theo mau vua chon, neu nguoi dung chua tu dat. */
   private nameDraftFor(model: BaseModel | null): void {

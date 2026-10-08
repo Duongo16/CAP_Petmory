@@ -605,6 +605,15 @@
       "MODE_LOCAL": "Chưa gọi được AI nên màu được ước lượng trực tiếp từ ảnh.",
       "FAILED": "Chưa dựng được mẫu từ ảnh. Hãy thử lại.",
       "QUOTA": "Bạn đã dùng hết lượt dựng mẫu bằng AI hôm nay."
+    },
+    "CART_BLOCK": {
+      "TITLE": "Chưa thêm được vào giỏ, còn thiếu:",
+      "NO_PRODUCT": "Chưa chọn sản phẩm.",
+      "NO_SIZE": "Chưa chọn kích cỡ.",
+      "NO_PET": "Chưa chọn bé cho bản thiết kế.",
+      "NEED_PHOTOS": "Bé mới có {{have}} ảnh, kích cỡ này cần ít nhất {{need}} ảnh.",
+      "NO_NAME": "Bản thiết kế chưa có tên.",
+      "FIX": "Sửa ngay"
     }
   },
   "HOME": {

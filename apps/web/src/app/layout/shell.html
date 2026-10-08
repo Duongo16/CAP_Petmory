@@ -108,6 +108,18 @@
                     (click)="closeMenu()"
                   >{{ item.key | translate }}</a>
                 }
+                <!-- Cac trang rieng cua khach: don hang, thiet ke, ho so be, phuc hoi anh, bang mau -->
+                @for (item of accountMenu; track item.path) {
+                  <a
+                    class="personal-link px-3 py-2 rounded-md no-underline text-ink text-sm
+                           transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
+                    role="menuitem"
+                    [attr.data-path]="item.path"
+                    [routerLink]="item.path" routerLinkActive="selected"
+                    (click)="closeMenu()"
+                  >{{ item.key | translate }}</a>
+                }
+                <span class="my-1 border-t border-edge" aria-hidden="true"></span>
               }
 
               <!-- Staff section -->
