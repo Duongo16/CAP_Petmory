@@ -6,6 +6,8 @@
     -->
     <div
       class="book one-page"
+      [style.--pm-book-cover]="coverColor()"
+      [style.--pm-book-cover-ink]="coverInk()"
       (pointerdown)="grab($event)"
       (pointerup)="letGo($event)"
       (pointercancel)="letGo($event)"
@@ -35,6 +37,8 @@
   } @else {
     <div
       class="book"
+      [style.--pm-book-cover]="coverColor()"
+      [style.--pm-book-cover-ink]="coverInk()"
       [class.holding]="drag()"
       (pointerdown)="grab($event)"
       (pointermove)="move($event)"

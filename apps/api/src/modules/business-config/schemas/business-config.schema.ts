@@ -3,6 +3,9 @@ import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type BusinessConfigDocument = HydratedDocument<BusinessConfig>;
 
+/** Anh QR demo duoc dong goi cung web, dung khi chua nhap QR rieng cua cua hang. */
+export const DEFAULT_PAYMENT_QR_IMAGE_URL = '/payment-qr.png';
+
 /** Cac tieu chi mac dinh hien thi tren phieu kiem tra cua xuong. */
 export const DEFAULT_QC_CHECKLIST = [
   'Đúng phom dáng đã duyệt',
@@ -118,8 +121,8 @@ export class BusinessConfig {
   @Prop({ trim: true, default: 'PETMORY DEMO' })
   accountHolder!: string;
 
-  /** Anh QR tinh do cua hang cap; chi chap nhan URL HTTPS hoac tep /img/ tren web. */
-  @Prop({ trim: true, default: '', maxlength: 500 })
+  /** Anh QR tinh do cua hang cap; mac dinh dung anh mau dong goi trong web. */
+  @Prop({ trim: true, default: DEFAULT_PAYMENT_QR_IMAGE_URL, maxlength: 500 })
   paymentQrImageUrl!: string;
 
   /**

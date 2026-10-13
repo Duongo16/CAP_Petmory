@@ -301,6 +301,16 @@ async function run() {
   );
   ok('Xin gap tu van vien thi phien chuyen sang hang cho',
     handed.body?.state === 'WAITING', String(handed.body?.state));
+  ok('Loi nhan kem theo duoc gui thanh tin nhan cua khach',
+    (handed.body?.turn ?? []).some((one) => one.side === 'USER' && one.text === 'Muon hoi ky ve kich co'));
+
+  const whileWaiting = await call(
+    `/assistant/sessions/${code}/ask`,
+    asJson(mine, { question: 'Toi muon hoi them ve mau sac' }),
+  );
+  ok('Khach gui tin ngay khi chua co tu van vien phan hoi',
+    whileWaiting.status === 200 && (whileWaiting.body?.turn ?? []).slice(-1)[0]?.text === 'Toi muon hoi them ve mau sac',
+    String(whileWaiting.status));
 
   const queue = await call('/admin/chats', withToken(support));
   ok('Phien vua xin gap hien ra o trang truc',
@@ -313,21 +323,14 @@ async function run() {
   ok('Nhom CSKH khong mo duoc kho tri thuc cua tro ly', deskKnowledge.status === 403,
     String(deskKnowledge.status));
 
-  const replyEarly = await call(
-    `/admin/chats/${code}/reply`,
-    asJson(support, { text: 'Chua nhan ma da tra loi' }),
-  );
-  ok('Chua nhan phien thi chua tra loi duoc', replyEarly.status === 400, String(replyEarly.status));
-
-  const took = await call(`/admin/chats/${code}/take`, asJson(support, {}));
-  ok('Nhan vien nhan duoc phien', took.body?.state === 'WITH_STAFF', String(took.body?.state));
-
-  const answered = await call(
+  const firstReply = await call(
     `/admin/chats/${code}/reply`,
     asJson(support, { text: 'Chao ban, minh la tu van vien cua PETMORY.' }),
   );
-  ok('Nhan vien tra loi duoc', answered.status === 200, String(answered.status));
-  const last = (answered.body?.turn ?? []).slice(-1)[0];
+  ok('Nhan vien tra loi ngay va phien tu gan cho ho',
+    firstReply.status === 200 && firstReply.body?.state === 'WITH_STAFF',
+    `${firstReply.status} / ${firstReply.body?.state}`);
+  const last = (firstReply.body?.turn ?? []).slice(-1)[0];
   ok('Luot tra loi duoc ghi la do nhan vien noi', last?.side === 'STAFF', String(last?.side));
 
   const seen = await call(`/assistant/sessions/${code}`, withToken(mine));
@@ -341,7 +344,7 @@ async function run() {
   );
   const botTurn = (whileStaff.body?.turn ?? []).slice(-1)[0];
   ok('Khi nhan vien dang tra loi thi may khong chen vao giua',
-    String(botTurn?.text ?? '').includes('tư vấn viên'),
+    botTurn?.side === 'USER' && botTurn?.text === 'Con size nao khong?',
     String(botTurn?.text ?? '').slice(0, 40));
 
   const closed = await call(`/admin/chats/${code}/close`, asJson(support, {}));

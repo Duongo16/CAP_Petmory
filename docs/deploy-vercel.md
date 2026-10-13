@@ -98,7 +98,7 @@ Log build phải có hai phần, một cho mỗi service: NestJS (`api`) và `Ap
 ### Bước 5. Sau khi có tên miền
 
 1. Sửa `WEB_ORIGIN` cho đúng tên miền thật, rồi **Redeploy**.
-2. Đăng nhập tài khoản Quản lý → **Tham số → Tài khoản nhận tiền**, đặt ảnh QR tĩnh bằng URL HTTPS hoặc tệp ở `/img/`, rồi lưu.
+2. Đăng nhập tài khoản Quản lý → **Tham số → Tài khoản nhận tiền** để thay ảnh QR mẫu `/payment-qr.png` bằng URL HTTPS hoặc tệp ở `/img/` của cửa hàng, rồi lưu.
 3. Gắn tên miền riêng (tuỳ chọn) ở Settings → Domains, rồi lặp lại mục 1–2.
 4. Bản preview có bật Deployment Protection có thể chặn API tải manifest qua `VERCEL_URL`. Khi đó API tự chuyển sang dùng `WEB_ORIGIN`.
 

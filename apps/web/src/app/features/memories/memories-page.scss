@@ -51,6 +51,46 @@
   margin: 0;
 }
 
+.cover-picker {
+  border: 1px solid var(--pm-border);
+  background: var(--pm-bg-card);
+}
+
+.cover-swatch {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--swatch);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--pm-border-strong);
+  }
+
+  &.on {
+    border-color: var(--pm-ink);
+    box-shadow: 0 0 0 2px var(--pm-bg-card), 0 0 0 4px var(--pm-ink);
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+}
+
+.cover-custom input {
+  width: 30px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--pm-border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
 /* =====================================================================
    Ban do hanh trinh: mot con duong uon luon, moi thang la mot tam bien,
    moi khoanh khac la mot diem dung voi tam buu thiep ben canh.

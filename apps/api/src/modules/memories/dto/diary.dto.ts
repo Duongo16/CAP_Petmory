@@ -6,6 +6,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  Matches,
   Max,
   MaxLength,
   Min,
@@ -90,6 +91,12 @@ export class SlideSettingDto {
   @Min(3)
   @Max(10)
   seconds?: number;
+}
+
+/** Mau nen tuy chon cho bia quyen nhat ky. */
+export class DiaryCoverDto {
+  @Matches(/^#[0-9a-fA-F]{6}$/)
+  color!: string;
 }
 
 /** Khoang thoi gian muon xuat. De trong ca hai la lay ca quyen. */

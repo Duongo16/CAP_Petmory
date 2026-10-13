@@ -20,9 +20,9 @@ export enum ChatSide {
 export enum ChatState {
   /** May dang tra loi. */
   BOT = 'BOT',
-  /** Da xin gap nguoi, dang cho mot nhan vien nhan. */
+  /** Da chuyen den quầy truc, chua co tu van vien phan hoi. */
   WAITING = 'WAITING',
-  /** Mot nhan vien da nhan va dang tra loi. */
+  /** Mot tu van vien da phan hoi va dang tiep tuc tro chuyen. */
   WITH_STAFF = 'WITH_STAFF',
   /** Da khep lai. */
   CLOSED = 'CLOSED',
@@ -86,7 +86,7 @@ export class ChatSession {
   @Prop({ type: String, enum: ChatState, default: ChatState.BOT, index: true })
   state!: ChatState;
 
-  /** Nhan vien dang nhan phien nay. */
+  /** Tu van vien da phan hoi phien nay. */
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', default: null })
   staff!: Types.ObjectId | null;
 

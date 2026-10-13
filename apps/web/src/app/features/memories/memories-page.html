@@ -46,6 +46,33 @@
             </button>
           }
         </nav>
+        <div class="cover-picker tw-card flex flex-wrap items-center gap-2 px-3 py-2" [attr.aria-busy]="facade.coverSaving()">
+          <span class="cover-label text-sm font-semibold text-ink">{{ 'BOOK.COVER_COLOR' | translate }}</span>
+          <div class="cover-swatches flex items-center gap-1" role="group" [attr.aria-label]="'BOOK.COVER_COLOR' | translate">
+            @for (color of coverColors; track color) {
+              <button
+                type="button"
+                class="cover-swatch"
+                [style.--swatch]="color"
+                [class.on]="facade.coverColor() === color"
+                [attr.aria-label]="'BOOK.COVER_CHOOSE' | translate: { color: color }"
+                [attr.aria-pressed]="facade.coverColor() === color"
+                [disabled]="facade.coverSaving()"
+                (click)="chooseCoverColor(color)"
+              ></button>
+            }
+          </div>
+          <label class="cover-custom inline-flex items-center gap-1 text-xs text-ink-muted">
+            <span>{{ 'BOOK.COVER_CUSTOM' | translate }}</span>
+            <input
+              type="color"
+              [value]="facade.coverColor()"
+              [disabled]="facade.coverSaving()"
+              [attr.aria-label]="'BOOK.COVER_CUSTOM' | translate"
+              (change)="chooseCoverColorFromInput($event)"
+            />
+          </label>
+        </div>
         <div class="book-tools flex flex-wrap items-center gap-2 ms-auto max-nav:ms-0">
           <button type="button" class="tool tw-btn-secondary" (click)="openShares()">
             <pm-icon name="users" [size]="15" />
@@ -79,6 +106,7 @@
           [faces]="faces()"
           [sourceOf]="facade.shotSource()"
           [attachedStories]="facade.attachedStories()"
+          [coverColor]="facade.coverColor()"
           [canEdit]="true"
           (editWanted)="decorate($event)"
           (storyWanted)="openStory($event.story, $event.moment)"

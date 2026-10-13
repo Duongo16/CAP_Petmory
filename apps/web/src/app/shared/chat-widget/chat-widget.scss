@@ -26,7 +26,7 @@
   padding: 0 20px;
   border: none;
   border-radius: var(--pm-radius-pill);
-  background: var(--pm-accent);
+  background: color-mix(in srgb, var(--pm-accent) 90%, white);
   color: var(--pm-on-accent);
   font: inherit;
   font-size: var(--pm-text-sm);
@@ -409,21 +409,6 @@
   font-weight: 600;
 }
 
-.spinner {
-  width: 12px;
-  height: 12px;
-  border: 2px solid currentColor;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 900ms linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* ---------- Goi y ---------- */
 
 .suggestions {
@@ -671,7 +656,6 @@
 @media (prefers-reduced-motion: reduce) {
   .panel,
   .typing-dot,
-  .spinner,
   .head-state .dot {
     animation: none;
   }

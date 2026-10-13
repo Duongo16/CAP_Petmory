@@ -165,6 +165,15 @@ export class Pet {
   @Prop({ type: SlideSettingSchema, default: () => ({}) })
   slideSetting!: SlideSetting;
 
+  /** Mau bia cua quyen nhat ky, luu theo tung be de ca chu va nguoi doc thay cung mot mau. */
+  @Prop({
+    trim: true,
+    default: '#c4661a',
+    maxlength: 7,
+    match: /^#[0-9a-fA-F]{6}$/,
+  })
+  diaryCoverColor!: string;
+
   /** Soft delete, per the rule that business data is never hard deleted. */
   @Prop({ default: false, index: true })
   isHidden!: boolean;

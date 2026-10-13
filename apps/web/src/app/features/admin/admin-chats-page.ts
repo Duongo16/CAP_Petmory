@@ -47,9 +47,8 @@ interface QueueRow {
 /**
  * Trang truc hoi thoai cua nhom Cham soc khach hang, theo Phu luc 01 muc 18.
  *
- * Hang cho xep theo nguoi doi lau nhat len truoc. Mot phien phai duoc nhan
- * truoc khi tra loi duoc, nen hai nhan vien khong cung tra loi mot khach va
- * khach khong nhan hai cau tra loi nguoc nhau.
+ * Hang cho xep theo nguoi doi lau nhat len truoc. Phan hoi dau tien tu dong
+ * gan phien cho nhan vien gui de khong co hai nguoi cung tra loi mot khach.
  */
 @Component({
   selector: 'pm-admin-chats-page',
@@ -66,7 +65,7 @@ export class AdminChatsPage implements OnInit {
   /**
    * Cac thao tac ghi, di lan luot chu khong song song.
    *
-   * Nhan phien, tra loi va khep phien deu doi trang thai, nen chung phai den
+   * Tra loi va khep phien deu doi trang thai, nen chung phai den
    * may chu dung thu tu nguoi truc da bam.
    */
   private readonly acted = new Subject<Observable<ChatSession>>();
@@ -107,9 +106,11 @@ export class AdminChatsPage implements OnInit {
     return one ? KEY_STATE[one.state] : '';
   });
 
-  /** Chua nhan thi chua tra loi duoc, dung nhu may chu bat buoc. */
-  readonly canTake = computed(() => this.open()?.state === 'WAITING');
-  readonly canReply = computed(() => this.open()?.state === 'WITH_STAFF');
+  /** Co the tra loi ngay; lan dau se tu dong nhan phien. */
+  readonly canReply = computed(() => {
+    const now = this.open()?.state;
+    return now === 'WAITING' || now === 'WITH_STAFF';
+  });
   readonly canClose = computed(() => {
     const now = this.open()?.state;
     return now === 'WAITING' || now === 'WITH_STAFF';
@@ -157,15 +158,6 @@ export class AdminChatsPage implements OnInit {
         next: (got) => this.open.set(got),
         error: () => this.problem.set('ADMIN.CHAT.ERROR_READ'),
       });
-  }
-
-  take(): void {
-    const code = this.open()?.code;
-    if (!code || this.working()) {
-      return;
-    }
-    this.begin();
-    this.acted.next(this.service.takeChat(code));
   }
 
   send(): void {

@@ -68,7 +68,7 @@
         </nav>
 
         @if (asBook()) {
-          <pm-diary-book [faces]="faces()" [sourceOf]="sourceOf()" />
+          <pm-diary-book [faces]="faces()" [sourceOf]="sourceOf()" [coverColor]="whole.pet.coverColor" />
         }
 
         @if (cards().length === 0) {

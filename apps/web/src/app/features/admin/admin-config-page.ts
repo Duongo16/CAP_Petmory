@@ -180,7 +180,7 @@ export class AdminConfigPage implements OnInit {
     bankName: ['', [Validators.required, Validators.maxLength(100)]],
     accountNumber: ['', [Validators.required, Validators.pattern(/^\d{6,20}$/)]],
     accountHolder: ['', [Validators.required, Validators.pattern(COLOR_ACCOUNT_HOLDER)]],
-    paymentQrImageUrl: ['', [Validators.required, Validators.pattern(/^(https:\/\/\S{3,500}|\/img\/[A-Za-z0-9._/-]{1,490})$/)]],
+    paymentQrImageUrl: ['', [Validators.required, Validators.pattern(/^(https:\/\/\S{3,500}|\/img\/[A-Za-z0-9._/-]{1,490}|\/payment-qr\.png)$/)]],
   });
 
   ngOnInit(): void {

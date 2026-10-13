@@ -49,11 +49,6 @@
             </p>
           </div>
           <div class="thread-actions">
-            @if (canTake()) {
-              <button type="button" class="main-button tw-btn-primary" id="chat-take" [disabled]="working()" (click)="take()">
-                {{ 'ADMIN.CHAT.TAKE' | translate }}
-              </button>
-            }
             @if (canClose()) {
               <button type="button" class="plain-button tw-btn-secondary" id="chat-close" [disabled]="working()" (click)="close()">
                 {{ 'ADMIN.CHAT.CLOSE' | translate }}
@@ -93,8 +88,6 @@
               {{ 'ADMIN.CHAT.SEND' | translate }}
             </button>
           </form>
-        } @else {
-          <p class="hint">{{ 'ADMIN.CHAT.TAKE_FIRST' | translate }}</p>
         }
       </div>
     } @else {

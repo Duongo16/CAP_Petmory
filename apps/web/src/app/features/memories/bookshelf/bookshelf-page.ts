@@ -38,6 +38,7 @@ interface Book {
   tone: Tone;
   kind: string;
   avatarUrl: string;
+  coverColor: string;
 }
 
 /** A book on its way from the shelf to the middle of the screen. */
@@ -165,6 +166,7 @@ export class BookshelfPage implements OnInit {
           tone: TONES[at % TONES.length],
           kind: pet.kind,
           avatarUrl: pet.avatarUrl,
+          coverColor: pet.diaryCoverColor || '#c4661a',
         }),
       ),
     );

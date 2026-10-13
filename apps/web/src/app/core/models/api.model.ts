@@ -69,6 +69,8 @@ export interface Pet {
   carer: Carer[];
   /** Cach trinh chieu quyen nhat ky cua be nay. */
   slideSetting: { trackCode: string; effect: string; seconds: number };
+  /** Mau bia tuy chon cua quyen nhat ky. */
+  diaryCoverColor: string;
   /** Quyen nhat ky cua be nay co cho nguoi ngoai doc khong. */
   diaryPublic: boolean;
   /** Quan tri vien da an quyen nay khoi cong dong hay chua. */
@@ -468,6 +470,7 @@ export interface DiaryCard {
   ownerName: string;
   ownerId: string;
   ownerAvatarUrl: string;
+  coverColor: string;
   slide: { trackCode: string; effect: string; seconds: number };
 }
 

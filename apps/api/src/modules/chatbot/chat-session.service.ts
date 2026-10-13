@@ -36,7 +36,7 @@ const HELLO =
 
 /** Loi bao khi phien dang cho mot nhan vien. */
 const WAITING_WORDS =
-  'Mình đã chuyển cuộc trò chuyện sang tư vấn viên. Bạn chờ một chút nhé, tin nhắn của bạn vẫn được lưu lại.';
+  'Mình đã chuyển cuộc trò chuyện sang tư vấn viên. Bạn có thể gửi tin nhắn ngay; tư vấn viên sẽ phản hồi khi có mặt.';
 
 /** Loi bao khi phien da khep lai. */
 const CLOSED_WORDS = 'Cuộc trò chuyện này đã kết thúc. Bạn mở cuộc mới để hỏi tiếp nhé.';
@@ -136,8 +136,6 @@ export class ChatSessionService {
     if (one.state === ChatState.BOT) {
       const answer = await this.answer(one, owner, question);
       this.push(one, { side: ChatSide.BOT, ...answer });
-    } else {
-      this.push(one, { side: ChatSide.BOT, text: WAITING_WORDS });
     }
 
     one.lastAt = new Date();
@@ -148,7 +146,11 @@ export class ChatSessionService {
   async handover(code: string, owner: string | null, note: string): Promise<ChatSessionDocument> {
     const one = await this.findFor(code, owner);
     this.moveTo(one, ChatState.WAITING);
-    one.handoverNote = note.slice(0, 500);
+    const message = note.trim();
+    one.handoverNote = message.slice(0, 500);
+    if (message) {
+      this.push(one, { side: ChatSide.USER, text: message });
+    }
     this.push(one, { side: ChatSide.BOT, text: WAITING_WORDS });
     one.lastAt = new Date();
     return one.save();
@@ -180,32 +182,36 @@ export class ChatSessionService {
 
   /** Nhan vien nhan mot phien dang cho. */
   async take(code: string, staff: string): Promise<ChatSessionDocument> {
-    const one = await this.model.findOne({ code }).exec();
-    if (!one) {
+    const one = await this.model.findOneAndUpdate(
+      { code, state: ChatState.WAITING, staff: null },
+      { $set: { state: ChatState.WITH_STAFF, staff: new Types.ObjectId(staff), lastAt: new Date() } },
+      { new: true },
+    ).exec();
+    if (one) {
+      return one;
+    }
+    if (!(await this.model.exists({ code }))) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
-    this.moveTo(one, ChatState.WITH_STAFF);
-    one.staff = new Types.ObjectId(staff);
-    one.lastAt = new Date();
-    return one.save();
+    throw new BadRequestException('Cuộc trò chuyện đã có tư vấn viên hoặc đã kết thúc');
   }
 
-  /**
-   * Nhan vien tra loi.
-   *
-   * Chi nguoi da nhan phien moi tra loi duoc. Khong kiem cho nay thi hai nhan
-   * vien cung tra loi mot khach va hai cau tra loi co the nguoc nhau.
-   */
+  /** Phan hoi dau tien tu dong nhan phien; cac phan hoi sau chi cua nguoi do. */
   async reply(code: string, staff: string, text: string): Promise<ChatSessionDocument> {
-    const one = await this.model.findOne({ code }).exec();
+    const claimed = await this.model.findOneAndUpdate(
+      { code, state: ChatState.WAITING, staff: null },
+      { $set: { state: ChatState.WITH_STAFF, staff: new Types.ObjectId(staff) } },
+      { new: true },
+    ).exec();
+    const one = claimed ?? await this.model.findOne({ code }).exec();
     if (!one) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
     if (one.state !== ChatState.WITH_STAFF) {
-      throw new BadRequestException('Phiên này chưa được nhận');
+      throw new BadRequestException('Cuộc trò chuyện chưa được chuyển cho tư vấn viên hoặc đã kết thúc');
     }
     if (one.staff?.toString() !== staff) {
-      throw new ForbiddenException('Phiên này do người khác đang nhận');
+      throw new ForbiddenException('Cuộc trò chuyện này do tư vấn viên khác đang trả lời');
     }
     this.push(one, { side: ChatSide.STAFF, text });
     one.lastAt = new Date();

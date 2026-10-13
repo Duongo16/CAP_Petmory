@@ -236,12 +236,12 @@ async function signIn(page, email, password) {
   await page.waitForFunction(
     () => {
       const line = document.querySelector('pm-chat-widget .head-state');
-      return line ? line.textContent.includes('chờ tư vấn viên') : false;
+      return line ? line.textContent.includes('Đã chuyển tới tư vấn viên') : false;
     },
     undefined,
     { timeout: 30000 },
   );
-  ok('Xin gap nguoi thi cua so bao dang cho tu van vien', true);
+  ok('Xin gap nguoi thi cua so bao da chuyen toi tu van vien', true);
   ok('Dang cho thi khong con nut xin gap nua',
     (await page.locator('pm-chat-widget .handover-link').count()) === 0);
   await page.screenshot({ path: path.join(OUT, 'ai-4-chat-waiting.png') });
@@ -264,12 +264,8 @@ async function signIn(page, email, password) {
   ok('Nhan vien doc duoc toan bo mach hoi thoai',
     (await staff.locator('#chat-thread .turn').count()) >= 5,
     String(await staff.locator('#chat-thread .turn').count()));
-  ok('Chua nhan thi chua co o de go cau tra loi',
-    (await staff.locator('#chat-reply').count()) === 0);
-
-  await staff.locator('#chat-take').click();
   await staff.waitForSelector('#chat-reply', { timeout: 30000 });
-  ok('Nhan cuoc roi thi moi go duoc cau tra loi', true);
+  ok('Nhan vien co the go cau tra loi ngay', true);
 
   await staff.fill('#chat-reply', 'Chao ban, minh la tu van vien cua PETMORY.');
   await staff.locator('#chat-send').click();

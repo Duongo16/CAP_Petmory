@@ -27,7 +27,7 @@
   background:
     linear-gradient(135deg, rgb(255 255 255 / 10%), rgb(0 0 0 / 14%)),
     var(--pm-book-cover);
-  color: #fff8ef;
+  color: var(--pm-book-cover-ink, #fff8ef);
 
   &::after {
     position: absolute;

@@ -230,8 +230,8 @@ export class UpdateConfigDto {
 
   /** Anh QR tinh: tep trong web hoac URL HTTPS cong khai. */
   @IsOptional()
-  @Matches(/^(https:\/\/\S{3,500}|\/img\/[A-Za-z0-9._/-]{1,490})$/, {
-    message: 'Anh QR phai la URL HTTPS hoac duong dan /img/ten-tep',
+  @Matches(/^(https:\/\/\S{3,500}|\/img\/[A-Za-z0-9._/-]{1,490}|\/payment-qr\.png)$/, {
+    message: 'Anh QR phai la URL HTTPS, /payment-qr.png hoac duong dan /img/ten-tep',
   })
   paymentQrImageUrl?: string;
 }

@@ -1,7 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BusinessConfig, BusinessConfigDocument } from './schemas/business-config.schema';
+import {
+  BusinessConfig,
+  BusinessConfigDocument,
+  DEFAULT_PAYMENT_QR_IMAGE_URL,
+} from './schemas/business-config.schema';
 import { UpdateConfigDto } from './dto/business-config.dto';
 
 const KEY_DEFAULT = 'DEFAULT';
@@ -20,13 +24,30 @@ export class BusinessConfigService {
    * and the second was refused by the database.
    */
   async get(): Promise<BusinessConfigDocument> {
-    return this.model
+    const config = await this.model
       .findOneAndUpdate(
         { key: KEY_DEFAULT },
         { $setOnInsert: { key: KEY_DEFAULT } },
         { upsert: true, new: true, setDefaultsOnInsert: true },
       )
       .exec();
+
+    // Existing deployments may have a config row created before the bundled
+    // demo QR was added. Keep those rows usable without overwriting a QR that
+    // the Manager has already configured.
+    if (!config.paymentQrImageUrl?.trim()) {
+      await this.model
+        .updateOne(
+          {
+            key: KEY_DEFAULT,
+            paymentQrImageUrl: { $in: [null, ''] },
+          },
+          { $set: { paymentQrImageUrl: DEFAULT_PAYMENT_QR_IMAGE_URL } },
+        )
+        .exec();
+      config.paymentQrImageUrl = DEFAULT_PAYMENT_QR_IMAGE_URL;
+    }
+    return config;
   }
 
   async update(

@@ -118,7 +118,7 @@ async function signIn(page, email) {
   await customer.fill('#assistant-input', HANDOVER_NOTE);
   await customer.locator('pm-chat-widget .handover-link').click();
   await customer.waitForTimeout(1500);
-  ok('Khach chuyen duoc sang tu van vien', (await customer.locator('pm-chat-widget .head-state').innerText()).includes('chờ'));
+  ok('Khach chuyen duoc sang tu van vien', (await customer.locator('pm-chat-widget .head-state').innerText()).includes('Đã chuyển'));
 
   // --- Nhom Cham soc khach hang tren trang truc ---
   const support = await browser.newPage({ viewport: { width: 1280, height: 860 } });
@@ -131,8 +131,6 @@ async function signIn(page, email) {
   ok('Thanh ben cua Cham soc khach hang khong co kho hang va tham so',
     !nav.some((one) => /Tham số|Hàng có sẵn|Kho tri thức/.test(one)));
   await support.locator('#chat-queue .queue-card', { hasText: String(STAMP) }).first().click();
-  await support.waitForSelector('#chat-take', { timeout: 10000 });
-  await support.locator('#chat-take').click();
   await support.waitForSelector('#chat-reply', { timeout: 10000 });
   await support.fill('#chat-reply', 'Chào bạn, mình là tư vấn viên PETMORY, mình kiểm tra đơn giúp bạn nhé.');
   await support.locator('.reply-row button[type=submit]').click();

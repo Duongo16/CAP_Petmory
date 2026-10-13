@@ -37,6 +37,9 @@ const DIARY_TABS: { view: DiaryView; key: string }[] = [
   { view: 'PHOTOS', key: 'BOOK.AS_PHOTOS' },
 ];
 
+/** Mot so mau bia de chon nhanh, van co the mo bang mau tuy chinh. */
+const COVER_COLORS = ['#c4661a', '#6f7e4f', '#7d4e57', '#4d6b7a', '#8a6a42', '#7b5c8d'];
+
 /** Doc tab tu duong dan, chi nhan nhung tab co that. */
 function viewFrom(raw: string | null): DiaryView {
   const wanted = (raw ?? '').toUpperCase();
@@ -67,6 +70,7 @@ export class MemoriesPage implements OnInit {
   readonly asBook = computed(() => this.view() === 'BOOK');
 
   readonly tabs = DIARY_TABS;
+  readonly coverColors = COVER_COLORS;
 
   /** Ma cua be dang mo, doc mot lan tu duong dan. */
   petId = '';
@@ -143,6 +147,14 @@ export class MemoriesPage implements OnInit {
   photosChanged(): void {
     this.petFaces.refresh(this.petId);
     this.facade.loadAlbum();
+  }
+
+  chooseCoverColor(color: string): void {
+    this.facade.setCoverColor(color);
+  }
+
+  chooseCoverColorFromInput(event: Event): void {
+    this.chooseCoverColor((event.target as HTMLInputElement).value);
   }
 
   /** Mo hop bay tri cho mot trang, roi luu lai nhung gi nguoi dung dat. */

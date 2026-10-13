@@ -32,6 +32,7 @@ const OPEN_WIDTH = 300;
 interface Book {
   card: DiaryCard;
   tone: Tone;
+  coverColor: string;
 }
 
 /** Mot quyen dang bay tu gia ra giua man hinh. */
@@ -75,7 +76,11 @@ export class DiaryListPage implements OnInit {
   ];
 
   readonly books = computed<Book[]>(() =>
-    this.answer().rows.map((card, at) => ({ card, tone: TONES[at % TONES.length] })),
+    this.answer().rows.map((card, at) => ({
+      card,
+      tone: TONES[at % TONES.length],
+      coverColor: card.coverColor || '#c4661a',
+    })),
   );
   readonly page = computed(() => this.answer().page);
   readonly pageCount = computed(() => this.answer().pageCount);

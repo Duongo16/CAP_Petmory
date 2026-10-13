@@ -128,6 +128,7 @@ export class MemoriesFacade {
   private readonly topic = signal<MemoryTopic | null>(null);
   private readonly petRow = signal<Pet | null>(null);
   private readonly saving = signal(false);
+  private readonly coverSavingRow = signal(false);
   private petId = '';
 
   /** The pet whose diary is open. */
@@ -163,6 +164,8 @@ export class MemoriesFacade {
   readonly pet = this.petRow.asReadonly();
   readonly chosen = this.topic.asReadonly();
   readonly pending = this.saving.asReadonly();
+  readonly coverSaving = this.coverSavingRow.asReadonly();
+  readonly coverColor = computed(() => this.petRow()?.diaryCoverColor || '#c4661a');
 
   readonly total = computed(() => this.answer().total);
   readonly page = computed(() => this.answer().page);
@@ -348,6 +351,28 @@ export class MemoriesFacade {
           this.loadShares();
         },
         error: () => undefined,
+      });
+  }
+
+  /** Luu mau bia, roi cap nhat mau dang hien ngay tren quyen so. */
+  setCoverColor(color: string): void {
+    if (!/^#[0-9a-fA-F]{6}$/.test(color) || this.coverSavingRow()) {
+      return;
+    }
+    this.coverSavingRow.set(true);
+    this.pageProblem.set(null);
+    this.service
+      .setCoverColor(this.petId, color)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (pet) => {
+          this.petRow.set(pet);
+          this.coverSavingRow.set(false);
+        },
+        error: () => {
+          this.coverSavingRow.set(false);
+          this.pageProblem.set('BOOK.COVER_SAVE_FAILED');
+        },
       });
   }
 

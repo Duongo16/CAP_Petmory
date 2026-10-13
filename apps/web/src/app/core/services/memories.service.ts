@@ -83,6 +83,11 @@ export class MemoriesService {
     return this.http.patch<Pet>(`${this.base}/memories/pet/${petId}/privacy`, { isPublic });
   }
 
+  /** Luu mau bia cua quyen nhat ky. */
+  setCoverColor(petId: string, color: string): Observable<Pet> {
+    return this.http.patch<Pet>(`${this.base}/memories/pet/${petId}/cover`, { color });
+  }
+
   /**
    * Tao mot duong dan chia se.
    *

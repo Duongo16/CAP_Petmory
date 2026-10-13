@@ -87,6 +87,20 @@ export class DiaryBookView {
 
   readonly faces = input.required<PageFace[]>();
   readonly sourceOf = input.required<Record<string, string>>();
+  readonly coverColor = input('#c4661a');
+
+  /** Chon mau chu de giu do tuong phan voi ca mau bia sang va toi. */
+  readonly coverInk = computed(() => {
+    const hex = this.coverColor().replace('#', '');
+    if (!/^[0-9a-fA-F]{6}$/.test(hex)) {
+      return '#fff8ef';
+    }
+    const red = Number.parseInt(hex.slice(0, 2), 16);
+    const green = Number.parseInt(hex.slice(2, 4), 16);
+    const blue = Number.parseInt(hex.slice(4, 6), 16);
+    const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+    return luminance > 0.62 ? '#3b281e' : '#fff8ef';
+  });
 
   /** Cac cau chuyen AI duoc gan vao tung khoanh khac trong quyen so. */
   readonly attachedStories = input<ReadonlyMap<string, PetStory>>(new Map());

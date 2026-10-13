@@ -54,6 +54,7 @@
                   type="button"
                   class="book"
                   [attr.data-tone]="book.tone"
+                  [style.--book]="book.coverColor"
                   [class.taken]="flight()?.book?.card?.petId === book.card.petId"
                   [attr.aria-label]="'DIARY.BOOK_OF' | translate: { pet: book.card.name, owner: book.card.ownerName }"
                   (click)="pick(book, $event)"
@@ -100,6 +101,7 @@
   <div
     class="flight"
     [attr.data-tone]="f.book.tone"
+    [style.--book]="f.book.coverColor"
     [style.--dx.px]="f.dx"
     [style.--dy.px]="f.dy"
     [style.--s]="f.scale"

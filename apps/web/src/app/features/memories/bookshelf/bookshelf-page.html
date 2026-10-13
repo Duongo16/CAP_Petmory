@@ -58,6 +58,7 @@
                 class="book"
                 [attr.data-pet]="book.id"
                 [attr.data-tone]="book.tone"
+                [style.--book]="book.coverColor"
                 [class.taken]="flight()?.book?.id === book.id"
                 (click)="pick(book, $event)"
               >
@@ -86,6 +87,7 @@
   <div
     class="flight"
     [attr.data-tone]="f.book.tone"
+    [style.--book]="f.book.coverColor"
     [style.--dx.px]="f.dx"
     [style.--dy.px]="f.dy"
     [style.--s]="f.scale"

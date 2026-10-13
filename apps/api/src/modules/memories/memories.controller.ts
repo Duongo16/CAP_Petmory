@@ -8,6 +8,7 @@ import { DiaryExportService } from './diary-export.service';
 import { CreateMemoryDto, UpdateMemoryDto } from './dto/memory.dto';
 import {
   DiaryPrivacyDto,
+  DiaryCoverDto,
   ExportDiaryDto,
   MakeShareDto,
   SlideSettingDto,
@@ -80,6 +81,16 @@ export class MemoriesController {
     @CurrentUser() user: AuthUser,
   ) {
     return this.diary.setSlide(petId, user.userId, dto);
+  }
+
+  /** Luu mau bia cua quyen nay, chi chu so huu duoc phep doi. */
+  @Patch('pet/:petId/cover')
+  setCover(
+    @Param('petId') petId: string,
+    @Body() dto: DiaryCoverDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.diary.setCoverColor(petId, user.userId, dto.color);
   }
 
   /**

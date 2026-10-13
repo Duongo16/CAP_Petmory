@@ -12,7 +12,7 @@ export class SessionAskDto {
 export class HandoverDto {
   @IsOptional()
   @IsString()
-  @MaxLength(500)
+  @MaxLength(1000)
   note?: string;
 }
 

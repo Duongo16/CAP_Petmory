@@ -15,6 +15,7 @@ const PAGE_SIZE = 12;
 
 /** Do dai ma chia se, tinh bang byte truoc khi doi sang chu so muoi sau. */
 const CODE_BYTES = 32;
+const DEFAULT_COVER_COLOR = '#c4661a';
 
 /** Mot quyen nhat ky nhin tu ben ngoai, da bo het du lieu dinh danh. */
 export interface DiaryCard {
@@ -29,6 +30,7 @@ export interface DiaryCard {
   /** Chi de mo trang cong dong cua chu nhan, trang do tu kiem quyen. */
   ownerId: string;
   ownerAvatarUrl: string;
+  coverColor: string;
   slide: { trackCode: string; effect: string; seconds: number };
 }
 
@@ -194,6 +196,13 @@ export class DiaryService {
       effect: wanted.effect ?? pet.slideSetting.effect,
       seconds: wanted.seconds ?? pet.slideSetting.seconds,
     };
+    return pet.save();
+  }
+
+  /** Luu mau bia tuy chon cho quyen nhat ky cua chu. */
+  async setCoverColor(petId: string, owner: string, color: string): Promise<PetDocument> {
+    const pet = await this.pets.findOwned(petId, owner);
+    pet.diaryCoverColor = color.toLowerCase();
     return pet.save();
   }
 
@@ -416,6 +425,7 @@ export class DiaryService {
       ownerName: owner.fullName,
       ownerId: owner.id,
       ownerAvatarUrl: owner.avatarUrl,
+      coverColor: pet.diaryCoverColor || DEFAULT_COVER_COLOR,
       slide: {
         trackCode: pet.slideSetting.trackCode,
         effect: pet.slideSetting.effect,
