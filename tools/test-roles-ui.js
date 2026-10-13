@@ -72,7 +72,7 @@ const RAIL_MODERATION = 'Kiểm duyệt cộng đồng';
 const RAIL_AUDIT = 'Nhật ký thao tác';
 
 /** Ban truc ma nhom Cham soc khach hang duoc vao. */
-const DESK_SCREENS = ['/admin/orders', '/admin/customers', '/admin/chats', '/admin/payment-log'];
+const DESK_SCREENS = ['/admin/orders', '/admin/customers', '/admin/chats'];
 
 /** Cac man chi nhom Quan ly duoc vao. */
 const MANAGER_SCREENS = [

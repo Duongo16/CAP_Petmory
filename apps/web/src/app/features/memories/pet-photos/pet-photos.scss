@@ -315,22 +315,3 @@
     cursor: pointer;
   }
 }
-
-.quality {
-  justify-self: start;
-  padding: 1px 8px;
-  border-radius: var(--pm-radius-pill);
-  background: var(--pm-accent-soft);
-  color: var(--pm-ink);
-  font-size: 11px;
-  font-weight: 700;
-
-  &.warn {
-    background: var(--pm-danger-soft);
-    color: var(--pm-on-danger-soft);
-  }
-}
-
-.shot-quality {
-  margin: 0 12px 10px;
-}

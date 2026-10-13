@@ -250,9 +250,6 @@ export class Order {
   @Prop({ type: Date, required: true })
   estimatedDelivery!: Date;
 
-  @Prop({ type: Date, required: true })
-  paymentDeadline!: Date;
-
   @Prop({ type: Date, default: null })
   paidAt!: Date | null;
 

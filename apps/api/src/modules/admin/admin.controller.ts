@@ -25,8 +25,8 @@ const RESOURCE_TYPE_DIARY = 'PetDiary';
 /**
  * Operations screens for internal staff.
  *
- * All three internal groups can read. Only Manager and Admin may move an order
- * by hand, because that action changes cash flow and the production schedule.
+ * Nhom Dieu phoi (Manager va Support) doc don va xac nhan trang thai bang tay.
+ * Moi lan chuyen van bat buoc ly do va duoc ghi vao nhat ky thao tac.
  */
 @Controller('admin')
 export class AdminController {
@@ -109,7 +109,7 @@ export class AdminController {
     return this.service.detailOrder(orderCode);
   }
 
-  @Roles(Role.MANAGER)
+  @Roles(...DESK)
   @Patch('orders/:orderCode/status')
   changeStatus(
     @Param('orderCode') orderCode: string,

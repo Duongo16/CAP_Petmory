@@ -21,6 +21,11 @@ async function scenario(report) {
   const customer = await h.newCustomer('journey');
   const manager = await h.signInInternal(h.ACCOUNT_MANAGER);
   const workshop = await h.signInInternal(h.ACCOUNT_WORKSHOP);
+  await h.call('/settings', {
+    method: 'PATCH',
+    headers: manager.auth,
+    body: JSON.stringify({ paymentQrImageUrl: '/img/payment-qr.png' }),
+  });
 
   // --- Pet profile ---
   report.step('A pet profile is created');
@@ -138,18 +143,17 @@ async function scenario(report) {
   report.check('The cart is emptied once the order is placed', emptied.body.items.length === 0);
 
   // --- Payment ---
-  report.step('The money arrives and the order moves itself');
+  report.step('Staff confirm the transfer after checking it');
   const qr = await h.call(`/payments/qr/${orderCode}`, { headers: customer.auth });
-  report.require('A payment code is generated', qr.status === 200, String(qr.status));
-  report.check('The payment code carries the order total',
+  report.require('Static payment instructions are available', qr.status === 200, String(qr.status));
+  report.check('The payment instructions carry the order total',
     h.dong(qr.body.amount) === orderTotal, String(qr.body.amount));
   report.check('The transfer message carries the reference',
     String(qr.body.transferMessage ?? '').includes(order.body.reference),
     qr.body.transferMessage);
 
-  const transfer = await h.sendTransfer(orderCode, Number(orderTotal));
-  report.require('The notification matches the order', transfer.body.result === 'MATCHED',
-    transfer.body.result);
+  const transfer = await h.confirmPaymentByStaff(orderCode, Number(orderTotal));
+  report.require('A staff confirmation moves the order to paid', transfer.status === 200, String(transfer.status));
 
   const paid = await h.call(`/orders/${orderCode}`, { headers: customer.auth });
   report.check('The order is now paid', paid.body.status === 'PAID');

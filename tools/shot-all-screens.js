@@ -176,7 +176,6 @@ async function run() {
     await shoot(page, '/admin/chats', '37-truc-hoi-thoai', folder);
     await shoot(page, '/admin/materials', '38-vat-lieu', folder);
     await shoot(page, '/admin/settings', '39-tham-so', folder);
-    await shoot(page, '/admin/payment-log', '40-nhat-ky-thanh-toan', folder);
 
     await page.close();
   }

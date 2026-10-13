@@ -1,28 +1,5 @@
 :host { display: block; }
 
-/* Decor glows */
-.glow {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(70px);
-  opacity: 0.55;
-  pointer-events: none;
-}
-.glow-purple {
-  width: 384px; height: 384px;
-  top: -100px; right: 40px;
-  background: var(--pm-accent-soft);
-}
-.glow-amber {
-  width: 288px; height: 288px;
-  top: 320px; left: -110px;
-  background: var(--pm-amber-soft);
-}
-
-/* Craft step colour accents driven by data-tone */
-[data-tone='amber'] .craft-step-no { color: var(--pm-amber); }
-[data-tone='green'] .craft-step-no { color: var(--pm-success); }
-
 /* Bill card follows scroll */
 .bill {
   position: sticky;
@@ -112,15 +89,6 @@
       color: var(--pm-accent);
     }
 
-    .select-pill {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 9999px;
-      background: var(--pm-accent-soft);
-      color: var(--pm-accent-dark);
-      letter-spacing: 0.02em;
-    }
   }
 
   .btn-remove-selected {
@@ -319,7 +287,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  min-width: 120px;
+  min-width: 110px;
   flex-shrink: 0;
 
   .line-total-price {
@@ -330,12 +298,6 @@
     white-space: nowrap;
   }
 
-  .line-unit-price {
-    font-size: 0.7rem;
-    color: var(--pm-text-muted);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
 }
 
 .line-remove-btn {

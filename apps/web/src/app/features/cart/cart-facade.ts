@@ -24,41 +24,8 @@ export interface CartCard {
   designQuery: Record<string, string> | null;
 }
 
-/** One suggestion under the cart, taken from the real catalogue. */
-export interface Suggestion {
-  code: string;
-  name: string;
-  blurb: string;
-  imageUrl: string | null;
-  priceFrom: string | null;
-  badgeKey: string;
-}
-
 /**
- * The badges the design puts on the suggestion cards, in the order they appear.
- * They belong to the presentation rather than the catalogue, so they live here
- * with every key written out in full.
- */
-const SUGGESTION_BADGES: string[] = [
-  'CART.SUGGEST.BADGE_PROTECT',
-  'CART.SUGGEST.BADGE_SACRED',
-  'CART.SUGGEST.BADGE_DESK',
-];
-
-/** How many suggestions the design shows in a row. */
-const SUGGESTION_COUNT = 3;
-
-/** The lowest price of a product, as an integer string in dong. */
-function priceFrom(product: ProductType): string | null {
-  const prices = product.sizes.map((s) => BigInt(s.price.$numberDecimal));
-  if (prices.length === 0) {
-    return null;
-  }
-  return prices.reduce((low, one) => (one < low ? one : low)).toString();
-}
-
-/**
- * Holds the cart, the suggestions beside it and every change the screen makes.
+ * Holds the cart and every change the screen makes.
  * The component only reads signals and issues commands, keeping no state of its own.
  */
 @Injectable()
@@ -69,16 +36,11 @@ export class CartFacade {
 
   private readonly state = signal<ScreenState>('LOADING');
   private readonly products = signal<ProductType[]>([]);
-  private readonly voucher = signal('');
-  private readonly voucherTried = signal(false);
   private readonly lineTrouble = signal<string | null>(null);
   private readonly selectedIds = signal<Set<string>>(new Set());
 
   readonly status = this.state.asReadonly();
   readonly cart = this.cartService.cart;
-  readonly voucherCode = this.voucher.asReadonly();
-  /** The shop takes no codes yet, so an attempt says so rather than pretending. */
-  readonly voucherRejected = this.voucherTried.asReadonly();
   /** Mot dong khong doi duoc so luong hay khong bo duoc, noi ngay tren trang. */
   readonly problem = this.lineTrouble.asReadonly();
 
@@ -168,22 +130,6 @@ export class CartFacade {
     return ids.length > 0 ? { items: ids.join(',') } : {};
   });
 
-  /** Products the cart does not already hold, so the row never repeats a line. */
-  readonly suggestions = computed<Suggestion[]>(() => {
-    const inCart = new Set(this.cart().items.map((i) => i.productTypeCode));
-    return this.products()
-      .filter((p) => !inCart.has(p.code))
-      .slice(0, SUGGESTION_COUNT)
-      .map((p, at) => ({
-        code: p.code,
-        name: p.name,
-        blurb: p.description,
-        imageUrl: p.imageUrl ?? null,
-        priceFrom: priceFrom(p),
-        badgeKey: SUGGESTION_BADGES[at % SUGGESTION_BADGES.length],
-      }));
-  });
-
   load(): void {
     this.state.set('LOADING');
     forkJoin({
@@ -269,12 +215,4 @@ export class CartFacade {
       });
   }
 
-  setVoucher(code: string): void {
-    this.voucher.set(code);
-    this.voucherTried.set(false);
-  }
-
-  applyVoucher(): void {
-    this.voucherTried.set(this.voucher().trim().length > 0);
-  }
 }

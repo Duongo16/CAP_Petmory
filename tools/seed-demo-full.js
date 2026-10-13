@@ -12,7 +12,7 @@ const { addCustomLine, ensurePhotos, minPhotosOf } = require('./lib/made-to-orde
  *   PETMORY_API=http://localhost:3001/api SEED_DB_URI=<chuoi ket noi> node tools/seed-demo-full.js
  */
 const {
-  PASSWORD, BOSS, WEBHOOK_KEY, LAYOUTS,
+  PASSWORD, BOSS, LAYOUTS,
   call, auth, asJson, must, photoUrls, asJpeg, uploadPhoto, decorOf, signIn,
 } = require('./seed-showcase');
 
@@ -288,13 +288,9 @@ async function seedOrders(token, boss, designs) {
     })), 'dat hang');
     const code = order.orderCode;
     const total = Number(String(order.total?.$numberDecimal ?? order.total).split('.')[0]);
-    const pay = async () => must(await call('/payments/webhook', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', authorization: `Apikey ${WEBHOOK_KEY}` },
-      body: JSON.stringify({ id: `seed-${code}`, transferAmount: total, content: `${code} thanh toan` }),
-    }), 'thanh toan');
     const move = async (status, reason = 'Du lieu trinh dien') =>
       must(await call(`/admin/orders/${code}/status`, asJson(boss, { status, reason }, 'PATCH')), `chuyen ${status}`);
+    const pay = async () => move('PAID', `Da doi chieu thanh toan ${total} dong`);
     const tick = async (count) => {
       const detail = must(await call(`/admin/orders/${code}`, { headers: auth(boss) }), 'doc don');
       const all = detail.order.qualityCheck.length;

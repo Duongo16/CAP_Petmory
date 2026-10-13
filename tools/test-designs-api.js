@@ -8,7 +8,6 @@ const { samplePhoto } = require('./lib/made-to-order');
 const sharp = require('sharp');
 
 const API = 'http://localhost:3000/api';
-const WEBHOOK_KEY = 'change-this-key-before-running';
 const PASSWORD_INTERNAL = 'Petmory@2026';
 const ANGLES = ['FRONT', 'LEFT', 'RIGHT', 'BACK', 'TOP', 'ISO'];
 
@@ -245,19 +244,15 @@ async function run() {
   const orderCode = order.body.orderCode;
   check('The order carries the design id', order.body.rows[0].designId === designId);
 
-  await call('/payments/webhook', {
-    method: 'POST',
-    headers: { Authorization: `Apikey ${WEBHOOK_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      id: `tk-${Date.now()}`,
-      transferAmount: 750000,
-      content: `CT DEN ${orderCode}`,
-    }),
+  const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
+  const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
+  await call(`/admin/orders/${orderCode}/status`, {
+    method: 'PATCH',
+    headers: authHeaders(managerToken),
+    body: JSON.stringify({ status: 'PAID', reason: 'Da doi chieu thanh toan cho don thiet ke' }),
   });
 
         // --- Production file ---
-  const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
-  const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
 
   const file = await call(`/admin/orders/${orderCode}/production-file`, { headers: authHeaders(managerToken) });
   check('The production file can be opened', file.status === 200, String(file.status));

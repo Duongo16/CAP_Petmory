@@ -5,7 +5,6 @@ const { addCustomLine } = require('./lib/made-to-order');
  * Run: node tools/test-admin-api.js
  */
 const API = 'http://localhost:3000/api';
-const WEBHOOK_KEY = 'change-this-key-before-running';
 const PASSWORD_INTERNAL = 'Petmory@2026';
 
 let passed = 0;
@@ -65,15 +64,11 @@ async function makeCustomerWithOrder(fullName) {
   return { email, token, orderCode: order.body.orderCode, customerId: dk.body.user.id };
 }
 
-async function returnMoney(orderCode, amount) {
-  return call('/payments/webhook', {
-    method: 'POST',
-    headers: { Authorization: `Apikey ${WEBHOOK_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      id: `qt-${Date.now()}-${Math.random()}`,
-      transferAmount: amount,
-      content: `CT DEN ${orderCode}`,
-    }),
+async function confirmPayment(orderCode, amount, managerToken) {
+  return call(`/admin/orders/${orderCode}/status`, {
+    method: 'PATCH',
+    headers: authHeaders(managerToken),
+    body: JSON.stringify({ status: 'PAID', reason: `Da doi chieu chuyen khoan ${amount} dong` }),
   });
 }
 
@@ -87,7 +82,7 @@ async function run() {
   check('Hai tai khoan noi bo deu dang nhap duoc', Boolean(managerToken && supportToken));
 
   const customer = await makeCustomerWithOrder('Nguyen Van Kiem Thu');
-  await returnMoney(customer.orderCode, 250000);
+  await confirmPayment(customer.orderCode, 250000, managerToken);
 
         // --- Dispatch board ---
   const stats = await call('/admin/orders/stats', { headers: authHeaders(managerToken) });

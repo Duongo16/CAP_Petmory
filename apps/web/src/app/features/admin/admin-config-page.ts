@@ -152,7 +152,6 @@ export class AdminConfigPage implements OnInit {
    */
   readonly form = this.fb.nonNullable.group({
     defaultPetProfileLimit: [5, [Validators.required, Validators.min(1), Validators.max(100)]],
-    qrExpiryHours: [24, [Validators.required, Validators.min(1), Validators.max(720)]],
     estimatedShippingDays: [3, [Validators.required, Validators.min(1), Validators.max(60)]],
     goodShortEdgePx: [
       1024,
@@ -181,6 +180,7 @@ export class AdminConfigPage implements OnInit {
     bankName: ['', [Validators.required, Validators.maxLength(100)]],
     accountNumber: ['', [Validators.required, Validators.pattern(/^\d{6,20}$/)]],
     accountHolder: ['', [Validators.required, Validators.pattern(COLOR_ACCOUNT_HOLDER)]],
+    paymentQrImageUrl: ['', [Validators.required, Validators.pattern(/^(https:\/\/\S{3,500}|\/img\/[A-Za-z0-9._/-]{1,490})$/)]],
   });
 
   ngOnInit(): void {
@@ -250,7 +250,6 @@ export class AdminConfigPage implements OnInit {
     this.service
       .updateConfig({
         defaultPetProfileLimit: v.defaultPetProfileLimit,
-        qrExpiryHours: v.qrExpiryHours,
         estimatedShippingDays: v.estimatedShippingDays,
         goodShortEdgePx: v.goodShortEdgePx,
         warnShortEdgePx: v.warnShortEdgePx,
@@ -272,6 +271,7 @@ export class AdminConfigPage implements OnInit {
         bankName: v.bankName,
         accountNumber: v.accountNumber,
         accountHolder: v.accountHolder,
+        paymentQrImageUrl: v.paymentQrImageUrl,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -382,7 +382,6 @@ export class AdminConfigPage implements OnInit {
     this.musicTracks.set(cf.musicLibrary ?? []);
     this.form.patchValue({
       defaultPetProfileLimit: cf.defaultPetProfileLimit,
-      qrExpiryHours: cf.qrExpiryHours,
       estimatedShippingDays: cf.estimatedShippingDays,
       goodShortEdgePx: cf.goodShortEdgePx,
       warnShortEdgePx: cf.warnShortEdgePx,
@@ -408,6 +407,7 @@ export class AdminConfigPage implements OnInit {
       bankName: cf.bankName,
       accountNumber: cf.accountNumber,
       accountHolder: cf.accountHolder,
+      paymentQrImageUrl: cf.paymentQrImageUrl ?? '',
     });
     this.lastEditedBy.set(cf.lastEditedBy);
     if (!this.isManager()) {

@@ -12,7 +12,6 @@ const madeToOrder = require('../lib/made-to-order');
 const sharp = require('sharp');
 
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
-const WEBHOOK_KEY = process.env.SEPAY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const PASSWORD = 'Password@123';
 const INTERNAL_PASSWORD = 'Petmory@2026';
 
@@ -143,12 +142,17 @@ async function uploadPhoto(auth, petId, angle, data, fileName = 'photo.png') {
   return { status: res.status, body: await res.json().catch(() => null) };
 }
 
-/** Sends a bank transfer notification exactly as the payment service would. */
-async function sendTransfer(orderCode, amount, id = `it-${Date.now()}-${Math.random()}`) {
-  return call('/payments/webhook', {
-    method: 'POST',
-    headers: { Authorization: `Apikey ${WEBHOOK_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, transferAmount: amount, content: `CT DEN ${orderCode}` }),
+/**
+ * Nhan vien xac nhan da doi chieu giao dich thuc te. Khong co gateway hay
+ * webhook trong luong kiem thu: viec doi trang thai di qua cung API voi man
+ * hinh dieu phoi va bat buoc co ly do de luu audit.
+ */
+async function confirmPaymentByStaff(orderCode, amount) {
+  const manager = await signInInternal(ACCOUNT_MANAGER);
+  return call(`/admin/orders/${orderCode}/status`, {
+    method: 'PATCH',
+    headers: manager.auth,
+    body: JSON.stringify({ status: 'PAID', reason: `IT da doi chieu chuyen khoan ${amount} dong` }),
   });
 }
 
@@ -217,7 +221,7 @@ module.exports = {
   signInInternal,
   makePhoto,
   uploadPhoto,
-  sendTransfer,
+  confirmPaymentByStaff,
   dong,
   runScenario,
 };

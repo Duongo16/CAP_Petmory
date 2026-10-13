@@ -177,6 +177,19 @@
   transform: rotate(180deg);
 }
 
+.story-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--pm-space-2);
+}
+
+.story-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .leaf {
     transition: none;

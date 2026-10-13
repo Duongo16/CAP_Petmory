@@ -1,24 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import {
-  PaymentNotification,
-  PaymentNotificationSchema,
-} from './schemas/payment-notification.schema';
-import { PaymentsService } from './payments.service';
-import { PaymentsController } from './payments.controller';
-import { SePayClient } from './sepay-client';
-import { OrdersModule } from '../orders/orders.module';
 import { BusinessConfigModule } from '../business-config/business-config.module';
+import { OrdersModule } from '../orders/orders.module';
+import { PaymentsController } from './payments.controller';
+import { PaymentsService } from './payments.service';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: PaymentNotification.name, schema: PaymentNotificationSchema },
-    ]),
-    OrdersModule,
-    BusinessConfigModule,
-  ],
+  imports: [OrdersModule, BusinessConfigModule],
   controllers: [PaymentsController],
-  providers: [PaymentsService, SePayClient],
+  providers: [PaymentsService],
 })
 export class PaymentsModule {}

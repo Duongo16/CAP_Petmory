@@ -1,8 +1,8 @@
 const { addCustomLine } = require('./lib/made-to-order');
 /**
  * Browser test: the order dispatch board, order detail, customer profiles and the
- * payment log. Also checks the difference between the manager and the support
- * desk, which only sees the desk screens.
+ * and customer profiles. Also checks the difference between the manager and
+ * the support desk, which can confirm order status from the dispatch board.
  * Run: node tools/test-admin-ui.js
  */
 const { chromium } = require('playwright');
@@ -11,11 +11,9 @@ const fs = require('fs');
 
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
-const WEBHOOK_KEY = 'change-this-key-before-running';
 /** Cac o khac tren man quan tri, cung duoc chi den nhieu lan. */
 const ROW_TABLE = '.table tbody tr';
 const CHIP_STATUS = '.status-chip.large';
-const FILTER_LOG = '.log-filters .filter';
 const CARD_SETTING = 'form .card';
 const STATE_MAKING = 'Đang làm';
 const STATE_SHIPPING = 'Đang giao';
@@ -75,9 +73,13 @@ async function makeCustomerWithOrder(page, fullName) {
   });
   const orderCode = (await order.json()).orderCode;
 
-  await page.request.post(`${API}/payments/webhook`, {
-    headers: { Authorization: `Apikey ${WEBHOOK_KEY}` },
-    data: { id: `gq-${Date.now()}`, transferAmount: 250000, content: `CT DEN ${orderCode}` },
+  const managerLogin = await page.request.post(`${API}/auth/login`, {
+    data: { email: 'quanly@petmory.local', password: 'Petmory@2026' },
+  });
+  const managerToken = (await managerLogin.json()).accessToken;
+  await page.request.patch(`${API}/admin/orders/${orderCode}/status`, {
+    headers: { Authorization: `Bearer ${managerToken}` },
+    data: { status: 'PAID', reason: 'Da doi chieu thanh toan du lieu kiem thu' },
   });
   return { email, fullName, orderCode };
 }
@@ -307,39 +309,6 @@ async function run() {
       (await page.locator('.tier-rail').count()) === 1));
     await page.screenshot({ path: path.join(OUT, 'admin-4-customer-profile.png') });
     await page.keyboard.press('Escape');
-
-                // --- Payment log ---
-    await page.goto(`${WEB}/admin/payment-log`, { waitUntil: 'networkidle' });
-    await page.waitForSelector(ROW_TABLE, { timeout: 20000 });
-    res.push(check('The payment log has entries', (await page.locator(ROW_TABLE).count()) >= 1));
-    res.push(check('The payment log links through to the order',
-      (await page.locator(`.table a:has-text("${customer.orderCode}")`).count()) >= 1));
-
-    // The log is long, so it must arrive a page at a time rather than all at once.
-    const logRows = await page.locator(ROW_TABLE).count();
-    res.push(check('The log shows one page at a time', logRows <= 25, `${logRows} rows`));
-    res.push(check('The log reports five outcome groups',
-      (await page.locator(FILTER_LOG).count()) === 5));
-    res.push(check('The log carries a money summary',
-      (await page.locator('.money-tile').count()) === 4));
-
-    // Every outcome group must hold only its own kind of notice.
-    await page.locator(FILTER_LOG).nth(1).click();
-    await page.waitForTimeout(600);
-    const onlyMatched = await page.locator('.table tbody .status-chip').allInnerTexts();
-    res.push(check('Filtering the log keeps only that outcome',
-      onlyMatched.length > 0 && onlyMatched.every((t) => t.trim() === 'Khớp đơn'),
-      `${onlyMatched.length} rows`));
-
-    // The counts on the pills must add up to the whole log.
-    const pill = await page.locator(FILTER_LOG).allInnerTexts();
-    const figures = pill.map((t) => Number(/\((\d+)\)/.exec(t)[1]));
-    res.push(check('The group counts add up to the whole log',
-      figures[0] === figures[1] + figures[2] + figures[3] + figures[4], figures.join(' vs ')));
-
-    await page.locator(FILTER_LOG).first().click();
-    await page.waitForTimeout(600);
-    await page.screenshot({ path: path.join(OUT, 'admin-5-payment-log.png') });
 
                 // --- Materials palette: adding and editing through the dialog ---
                 //

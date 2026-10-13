@@ -58,9 +58,6 @@ export class BusinessConfig {
   @Prop({ type: Number, default: 5, min: 1 })
   defaultPetProfileLimit!: number;
 
-  @Prop({ type: Number, default: 24, min: 1 })
-  qrExpiryHours!: number;
-
   @Prop({ type: Number, default: 3, min: 1 })
   estimatedShippingDays!: number;
 
@@ -109,6 +106,10 @@ export class BusinessConfig {
 
   @Prop({ trim: true, default: 'PETMORY DEMO' })
   accountHolder!: string;
+
+  /** Anh QR tinh do cua hang cap; chi chap nhan URL HTTPS hoac tep /img/ tren web. */
+  @Prop({ trim: true, default: '', maxlength: 500 })
+  paymentQrImageUrl!: string;
 
   /**
    * Cac muc tich cua phieu kiem tra chat luong, theo dung thu tu xuong lam.

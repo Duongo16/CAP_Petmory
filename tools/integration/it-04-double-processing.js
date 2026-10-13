@@ -56,47 +56,21 @@ async function scenario(report) {
     baskets.every((one) => one.body?.countItem === 0),
     baskets.map((one) => one.body?.countItem).join(', '));
 
-  // --- The same transaction id arriving twice ---
-  report.step('The same bank transaction sent twice is only acted on once');
+  // --- Two staff confirmations at the same instant ---
+  report.step('Two staff confirmations at the same instant move the order once');
   const order = await placeOrder(customer);
-  const transactionId = `it-dup-${Date.now()}`;
-
-  const firstSend = await h.sendTransfer(order.code, Number(order.total), transactionId);
-  report.require('The first notification matches', firstSend.body.result === 'MATCHED',
-    firstSend.body.result);
-
-  const secondSend = await h.sendTransfer(order.code, Number(order.total), transactionId);
-  report.check('The repeat is recognised as already handled',
-    secondSend.body.result === 'ALREADY_PROCESSED', secondSend.body.result);
+  const [firstSend, secondSend] = await Promise.all([
+    h.confirmPaymentByStaff(order.code, Number(order.total)),
+    h.confirmPaymentByStaff(order.code, Number(order.total)),
+  ]);
+  const firstOutcomes = [firstSend.status, secondSend.status];
+  report.check('Exactly one confirmation is accepted',
+    firstOutcomes.filter((status) => status === 200).length === 1, firstOutcomes.join(' + '));
 
   const afterRepeat = await h.call(`/orders/${order.code}`, { headers: customer.auth });
   report.check('The order is paid exactly once', afterRepeat.body.status === 'PAID');
   report.check('The order total did not double',
     h.dong(afterRepeat.body.total) === order.total, String(h.dong(afterRepeat.body.total)));
-
-  const log = await h.call('/payments/log', { headers: manager.auth });
-  const sameId = log.body.filter((r) => r.transactionId === transactionId);
-  report.check('The log keeps one row per transaction id',
-    sameId.length === 1, `${sameId.length} rows`);
-
-  // --- Two notifications at the same instant ---
-  report.step('Two notifications firing at the same instant');
-  const racy = await placeOrder(customer);
-  const raceId = `it-race-${Date.now()}`;
-  const [a, b] = await Promise.all([
-    h.sendTransfer(racy.code, Number(racy.total), raceId),
-    h.sendTransfer(racy.code, Number(racy.total), raceId),
-  ]);
-  const outcomes = [a.body.result, b.body.result].sort();
-  report.check('Exactly one of the two is treated as the payment',
-    outcomes.filter((r) => r === 'MATCHED').length === 1, outcomes.join(' + '));
-
-  const afterRace = await h.call(`/orders/${racy.code}`, { headers: customer.auth });
-  report.check('The order still ends up paid once', afterRace.body.status === 'PAID');
-
-  const raceLog = await h.call('/payments/log', { headers: manager.auth });
-  report.check('Only one row was written for the racing pair',
-    raceLog.body.filter((r) => r.transactionId === raceId).length === 1);
 
   // --- A heart toggled twice at the same instant ---
   report.step('A heart clicked twice at the same instant settles on one answer');
@@ -136,7 +110,7 @@ async function scenario(report) {
   // --- The same review sent twice ---
   report.step('The same review sent twice leaves one review');
   const journey = await placeOrder(customer);
-  await h.sendTransfer(journey.code, Number(journey.total));
+  await h.confirmPaymentByStaff(journey.code, Number(journey.total));
   for (const status of ['IN_PRODUCTION', 'SHIPPING', 'COMPLETED']) {
     // Khong roi khau kiem dinh khi phieu con muc chua tich.
     if (status === 'SHIPPING') {

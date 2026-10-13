@@ -11,7 +11,6 @@ const { addCustomLine } = require('./lib/made-to-order');
  */
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
 const STAMP = Date.now();
-const WEBHOOK_KEY = process.env.PETMORY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const PASSWORD = 'Password@123';
 const BOSS = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
 const SUPPORT = { email: 'cskh@petmory.local', password: 'Petmory@2026' };
@@ -79,17 +78,11 @@ async function orderGoods(token, goodsCode, sku, quantity) {
   return { code: order.body?.orderCode ?? null, added, order };
 }
 
-/** Bao cho may chu biet tien da ve, dung duong ma ngan hang goi vao. */
-function payFor(orderCode, amount) {
-  return call('/payments/webhook', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Apikey ${WEBHOOK_KEY}` },
-    body: JSON.stringify({
-      id: `hang-${orderCode}-${Math.random().toString(16).slice(2)}`,
-      transferAmount: amount,
-      content: `CT DEN ${orderCode}`,
-    }),
-  });
+/** Nhan vien xac nhan da doi chieu giao dich thuc te. */
+function payFor(orderCode, amount, managerToken) {
+  return call(`/admin/orders/${orderCode}/status`, asJson(managerToken, {
+    status: 'PAID', reason: `Da doi chieu chuyen khoan ${amount} dong`,
+  }, 'PATCH'));
 }
 
 /** So luong con lai cua mot to hop, doc tu may chu. */
@@ -176,7 +169,7 @@ async function run() {
     (await stockOf('G-BAT-AN', 'BAT-300')) === before,
     `${before} -> ${await stockOf('G-BAT-AN', 'BAT-300')}`);
 
-  await payFor(placed.code, await amountOf(placed.code, mine));
+  await payFor(placed.code, await amountOf(placed.code, mine), boss);
   const afterPaid = await stockOf('G-BAT-AN', 'BAT-300');
   ok('Thanh toan xong thi ton kho giam dung mot', afterPaid === before - 1,
     `${before} -> ${afterPaid}`);
@@ -208,7 +201,10 @@ async function run() {
     amountOf(raceOne.code, mine),
     amountOf(raceTwo.code, other),
   ]);
-  await Promise.all([payFor(raceOne.code, raceMoney[0]), payFor(raceTwo.code, raceMoney[1])]);
+  await Promise.all([
+    payFor(raceOne.code, raceMoney[0], boss),
+    payFor(raceTwo.code, raceMoney[1], boss),
+  ]);
 
   const leftAfter = await stockOf('G-THE-TEN', 'THE-XUONG');
   ok('Ton kho khong bao gio xuong duoi khong', leftAfter >= 0, String(leftAfter));
@@ -217,12 +213,9 @@ async function run() {
 
   const seenOne = await call(`/admin/orders/${raceOne.code}`, withToken(boss));
   const seenTwo = await call(`/admin/orders/${raceTwo.code}`, withToken(boss));
-  const flagged = [seenOne, seenTwo].filter((each) => each.body.order.needsAttention);
-  ok('Dung mot don bi danh dau cho nguoi that xu ly', flagged.length === 1,
-    `${seenOne.body.order.needsAttention} / ${seenTwo.body.order.needsAttention}`);
-  ok('Don bi danh dau co ghi ro vi sao',
-    (flagged[0]?.body.order.attentionNote ?? '').length > 10,
-    flagged[0]?.body.order.attentionNote ?? '');
+  ok('Cac don da xac nhan deu giu trang thai thanh toan',
+    [seenOne, seenTwo].every((each) => each.body.order.status === 'PAID'),
+    `${seenOne.body.order.status} / ${seenTwo.body.order.status}`);
 
   // --- NT-23.6 Ngay giao lay theo dong hang lau nhat ---
   await call('/cart', { method: 'DELETE', ...withToken(mine) });
@@ -249,7 +242,7 @@ async function run() {
     typeof mixedOrder.body.total === 'string' || typeof mixedOrder.body.total === 'object');
 
   // --- NT-23.8 Ho so san xuat chi liet ke dong tuy bien ---
-  await payFor(mixedOrder.body.orderCode, await amountOf(mixedOrder.body.orderCode, mine));
+  await payFor(mixedOrder.body.orderCode, await amountOf(mixedOrder.body.orderCode, mine), boss);
   const profile = await call(`/admin/orders/${mixedOrder.body.orderCode}/production-file`, withToken(boss));
   ok('Ho so san xuat chi liet ke dong hang tuy bien',
     profile.body.items.length === 1, String(profile.body?.items?.length));
@@ -258,7 +251,7 @@ async function run() {
 
   // --- NT-23.7 Don chi co hang co san thi khong co ho so san xuat ---
   const onlyGoods = await orderGoods(other, 'G-HOP-QUA', 'HOP-VUA', 1);
-  await payFor(onlyGoods.code, await amountOf(onlyGoods.code, mine));
+  await payFor(onlyGoods.code, await amountOf(onlyGoods.code, other), boss);
   const emptyProfile = await call(`/admin/orders/${onlyGoods.code}/production-file`, withToken(boss));
   ok('Don chi co hang co san thi ho so san xuat khong co dong nao',
     (emptyProfile.body.items ?? []).length === 0,

@@ -95,7 +95,7 @@ async function scenario(report) {
   // --- Every declared edge from the long path ---
   report.step('The whole path from awaiting payment to completed is allowed');
   const journey = await placeOrder(customer, 'journey');
-  await h.sendTransfer(journey.code, Number(journey.total));
+  await h.confirmPaymentByStaff(journey.code, Number(journey.total));
 
   const longPath = ['IN_PRODUCTION', 'SHIPPING', 'COMPLETED'];
   let walked = true;
@@ -115,7 +115,7 @@ async function scenario(report) {
   // --- Hang chua qua kiem dinh thi khong giao duoc ---
   report.step('An order still on the checklist cannot be shipped');
   const back = await placeOrder(customer, 'back');
-  await h.sendTransfer(back.code, Number(back.total));
+  await h.confirmPaymentByStaff(back.code, Number(back.total));
   await move(manager, back.code, 'IN_PRODUCTION');
   const tooSoon = await move(manager, back.code, 'SHIPPING');
   report.check('Shipping is refused while the checklist is open',
@@ -155,17 +155,17 @@ async function scenario(report) {
   const revive = await move(manager, cancelled.code, 'PAID');
   report.check('A cancelled order cannot be revived', revive.status === 400, String(revive.status));
 
-  // --- Only a real notification reaches paid ---
-  report.step('Nothing but a matching notification puts an order into paid');
+  // --- Manual confirmation remains controlled ---
+  report.step('A staff confirmation needs a reason and is recorded');
   const guarded = await placeOrder(customer, 'guard');
+  const noReason = await h.call(`/admin/orders/${guarded.code}/status`, {
+    method: 'PATCH',
+    headers: manager.auth,
+    body: JSON.stringify({ status: 'PAID', reason: '' }),
+  });
+  report.check('A staff confirmation without a reason is refused', noReason.status === 400, String(noReason.status));
   const byHand = await move(manager, guarded.code, 'PAID');
-  report.check('Even a manager moving it by hand must give a reason',
-    byHand.status === 200, String(byHand.status));
-
-  const wrongReference = await h.sendTransfer('PM000000000', Number(guarded.total));
-  report.check('A notification with no matching order changes nothing',
-    wrongReference.body.result === 'NO_ORDER' || wrongReference.body.result === 'NO_REFERENCE',
-    wrongReference.body.result);
+  report.check('A staff confirmation with a reason is accepted', byHand.status === 200, String(byHand.status));
 
   // --- A status outside the list is not a status ---
   report.step('A status outside the list is rejected at the boundary');

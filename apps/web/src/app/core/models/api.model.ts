@@ -567,7 +567,6 @@ export interface Order {
   status: OrderStatus;
   productionDays: number;
   estimatedDelivery: string;
-  paymentDeadline: string;
   paidAt: string | null;
   createdAt: string;
   /** Phieu kiem tra chat luong, lap khi don buoc vao khau kiem dinh. */
@@ -587,10 +586,7 @@ export interface PaymentQr {
   bankName: string;
   accountNumber: string;
   accountHolder: string;
-  qrImage: string;
-  paymentDeadline: string;
-  /** Da qua han thanh toan ma don van dang cho tien. */
-  expired: boolean;
+  qrImageUrl: string;
   status: OrderStatus;
 }
 
@@ -791,39 +787,6 @@ export interface CustomerProfile {
   orders: Order[];
 }
 
-export type ReconcileResult =
-  | 'MATCHED'
-  | 'OVERPAID'
-  | 'UNDERPAID'
-  | 'LATE'
-  | 'NO_REFERENCE'
-  | 'IGNORED'
-  | 'ALREADY_PROCESSED';
-
-export interface TransferNotification {
-  _id: string;
-  transactionId: string;
-  amount: string;
-  transferMessage: string;
-  detectedReference: string;
-  result: ReconcileResult;
-  /** Bao qua webhook hay lay ve khi doi soat. */
-  source?: 'WEBHOOK' | 'RECONCILE';
-  gateway?: string;
-  referenceCode?: string;
-  createdAt: string;
-}
-
-/** Tom tat mot lan doi soat voi SePay. */
-export interface ReconcileSummary {
-  sinceDate: string;
-  fetched: number;
-  alreadyKnown: number;
-  added: number;
-  skipped: number;
-  byResult: Partial<Record<ReconcileResult, number>>;
-}
-
 export interface OrderFilter {
   status?: OrderStatus | '';
   keyword?: string;
@@ -854,7 +817,6 @@ export interface AiUnitPriceInput {
 
 export interface BusinessConfig {
   defaultPetProfileLimit: number;
-  qrExpiryHours: number;
   estimatedShippingDays: number;
   goodShortEdgePx: number;
   warnShortEdgePx: number;
@@ -878,6 +840,8 @@ export interface BusinessConfig {
   bankName: string;
   accountNumber: string;
   accountHolder: string;
+  /** Anh QR tinh cho trang thanh toan. */
+  paymentQrImageUrl: string;
   lastEditedBy: string | null;
 }
 

@@ -24,7 +24,6 @@ require('dotenv').config({
 });
 
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
-const WEBHOOK_KEY = process.env.SEPAY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const PASSWORD = 'Petmory@2026';
 const BOSS = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
 
@@ -548,14 +547,10 @@ async function seedOrders(people, boss) {
       fullName: person.fullName, phone: person.phone, ...person.address, note: plan.note,
     })), 'dat hang');
     const code = order.orderCode;
-    const total = Number(String(order.total?.$numberDecimal ?? order.total).split('.')[0]);
-
     if (plan.to !== 'AWAITING_PAYMENT') {
-      must(await call('/payments/webhook', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: `Apikey ${WEBHOOK_KEY}` },
-        body: JSON.stringify({ id: `seed-${code}`, transferAmount: total, content: `${code} thanh toan don hang` }),
-      }), 'thanh toan');
+      must(await call(`/admin/orders/${code}/status`, asJson(boss, {
+        status: 'PAID', reason: 'Da doi chieu thanh toan du lieu trinh dien',
+      }, 'PATCH')), 'xac nhan thanh toan');
     }
     const steps = {
       COMPLETED: ['SHIPPING', 'COMPLETED'],
@@ -616,7 +611,7 @@ async function run() {
 }
 
 module.exports = {
-  API, PASSWORD, BOSS, WEBHOOK_KEY, LAYOUTS,
+  API, PASSWORD, BOSS, LAYOUTS,
   call, auth, asJson, must, photoUrls, asJpeg, uploadPhoto, decorOf, signIn,
 };
 

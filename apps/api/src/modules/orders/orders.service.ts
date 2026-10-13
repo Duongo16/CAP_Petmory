@@ -136,9 +136,6 @@ export class OrdersService {
     const now = new Date();
     const deliveryDate = new Date(now);
     deliveryDate.setDate(deliveryDate.getDate() + productionDays + config.estimatedShippingDays);
-    const paymentDeadline = new Date(now);
-    paymentDeadline.setHours(paymentDeadline.getHours() + config.qrExpiryHours);
-
     for (let attempt = 1; ; attempt += 1) {
       const orderCode = await this.generateOrderCode();
       try {
@@ -153,8 +150,7 @@ export class OrdersService {
           status: OrderStatus.AWAITING_PAYMENT,
           productionDays,
           estimatedDelivery: deliveryDate,
-          paymentDeadline,
-          // Chot tai khoan nhan tien luc dat (muc 13): doi tai khoan sau do khong doi QR cua don nay.
+          // Luu lai tai khoan nhan tien de truy vet don cu; QR tinh hien theo cau hinh dang dung.
           payee: {
             bankCode: config.bankCode,
             bankName: config.bankName,

@@ -38,7 +38,6 @@
     "ORDER": "Đơn hàng",
     "DISPATCH_ORDER": "Đơn hàng",
     "CUSTOMER": "Khách hàng",
-    "LOG_PAYMENT": "Nhật ký thanh toán",
     "SETTINGS": "Tham số",
     "COMMUNITY": "Cộng đồng",
     "SEARCH": "Tìm kiếm",
@@ -846,15 +845,11 @@
   },
   "PAYMENT": {
     "TITLE": "Thanh toán chuyển khoản",
-    "DESCRIPTION": "Quét mã bằng ứng dụng ngân hàng bất kỳ, hoặc chuyển khoản thủ công theo thông tin bên cạnh.",
-    "AUTO_GATE": "CỔNG THANH TOÁN TỰ ĐỘNG",
-    "VIETQR": "VietQR",
-    "NAPAS": "Napas 247",
+    "DESCRIPTION": "Quét mã bằng ứng dụng ngân hàng hoặc chuyển khoản theo thông tin bên cạnh.",
+    "STATIC_QR": "QR CHUYỂN KHOẢN",
     "DUE_LABEL": "SỐ TIỀN CẦN THANH TOÁN",
-    "VALID_FOR": "Mã QR có hiệu lực trong:",
-    "EXPIRED": "Đã hết hạn",
     "QR_CODE": "Mã QR chuyển khoản",
-    "WAITING": "Đang chờ thanh toán. Hệ thống tự nhận diện ngay sau khi bạn chuyển.",
+    "WAITING_STAFF": "Đã chuyển khoản? Nhân viên Petmory sẽ kiểm tra và xác nhận đơn.",
     "MANUAL_TRANSFER": "Thông tin chuyển khoản thủ công",
     "INTERNET_BANKING": "Internet Banking",
     "BANK": "Ngân hàng thụ hưởng",
@@ -866,10 +861,9 @@
     "COPY": "Sao chép",
     "COPIED": "Đã chép",
     "WARNING_TITLE": "Lưu ý quan trọng:",
-    "WARNING_CONTENT": "Vui lòng điền chính xác tuyệt đối nội dung chuyển khoản {{message}}. Nếu sai nội dung, hệ thống sẽ không thể tự động kích hoạt đơn hàng cho thú cưng của bạn.",
+    "WARNING_CONTENT": "Vui lòng điền chính xác nội dung chuyển khoản {{message}} để nhân viên đối chiếu và xác nhận đúng đơn hàng.",
     "SEE_MY_ORDERS": "Xem đơn hàng của tôi",
-    "I_HAVE_PAID": "Tôi đã chuyển tiền xong",
-    "EXPIRY_NOTE": "Mã thanh toán có thời hạn. Quá hạn mà chưa chuyển khoản thì hãy huỷ đơn và đặt lại.",
+    "STAFF_CONFIRMATION": "Sau khi chuyển khoản, nhân viên Petmory sẽ kiểm tra giao dịch và cập nhật trạng thái đơn. Bạn không cần bấm xác nhận ở đây.",
     "PAYMENT_RECEIVED": "Đã nhận được tiền thành công!",
     "PAYMENT_RECEIVED_TEXT": "Đơn hàng {{orderCode}} đã được chuyển sang xưởng sản xuất len thủ công. Nghệ nhân của Petmory sẽ tỉ mẩn từng chi tiết để tái hiện trọn vẹn kỷ vật của bé cưng gửi tới bạn.",
     "RECAP": "THÔNG TIN ĐƠN HÀNG",
@@ -883,8 +877,6 @@
     "DONE_NOTE": "Bạn theo dõi tiến độ đơn hàng trong mục Đơn hàng.",
     "CANCELLED_TITLE": "Đơn hàng đã huỷ",
     "CANCELLED_TEXT": "Đơn {{orderCode}} đã được huỷ nên không cần chuyển khoản nữa. Nếu bạn đã lỡ chuyển tiền, cửa hàng sẽ liên hệ để hoàn lại.",
-    "EXPIRED_TITLE": "Mã thanh toán đã hết hạn",
-    "EXPIRED_TEXT": "Đừng chuyển khoản theo mã này nữa. Nếu bạn đã chuyển trước đó, tiền vẫn được ghi nhận khi về tới. Nếu chưa, hãy vào Đơn hàng để huỷ và đặt lại.",
     "BACK_TO_SHOP": "Về cửa hàng"
   },
   "ORDER": {
@@ -917,7 +909,7 @@
     "HELP_RESTORE": "Phục hồi ảnh mẫu của bé",
     "GROUP": {
       "ALL": "Tất cả",
-      "AWAITING": "Chờ thanh toán",
+      "AWAITING": "Chờ xác nhận chuyển khoản",
       "MAKING": "Đang sản xuất",
       "SHIPPING": "Đang vận chuyển",
       "FINISHED": "Hoàn tất"
@@ -929,7 +921,7 @@
       "PACKING": "Đóng gói & giao"
     },
     "MINE_STATUS": {
-      "AWAITING_PAYMENT": "Chờ thanh toán",
+      "AWAITING_PAYMENT": "Chờ xác nhận chuyển khoản",
       "PAID": "Đã thanh toán, chờ xưởng nhận",
       "IN_PRODUCTION": "Đang chọc len thủ công",
       "SHIPPING": "Đang vận chuyển",
@@ -937,7 +929,7 @@
       "CANCELLED": "Đã hủy"
     },
     "STATUS": {
-      "AWAITING_PAYMENT": "Chờ thanh toán",
+      "AWAITING_PAYMENT": "Chờ xác nhận chuyển khoản",
       "PAID": "Đã thanh toán",
       "IN_PRODUCTION": "Đang làm",
       "SHIPPING": "Đang giao",
@@ -1312,7 +1304,7 @@
   },
   "ADMIN": {
     "TILE": {
-      "AWAITING_PAYMENT": "Chờ tiền về",
+      "AWAITING_PAYMENT": "Chờ xác nhận chuyển khoản",
       "PAID": "Cần tiếp nhận",
       "IN_PRODUCTION": "Xưởng thủ công",
       "SHIPPING": "Đang trên đường",
@@ -1544,32 +1536,7 @@
       "HISTORY_ORDER": "Lịch sử đơn hàng"
     },
     "LOG": {
-      "TITLE": "Nhật ký thông báo chuyển khoản",
-      "EYEBROW": "ĐỐI SOÁT TỰ ĐỘNG",
-      "SUMMARY": "Tổng quan đối soát",
-      "TAKEN_TODAY": "Tổng tiền nhận hôm nay",
-      "MATCHED_FULLY": "Đã khớp hoàn toàn",
-      "AUTO_SHARE": "Tỷ lệ tự động {{share}}%",
-      "SHORT": "Cần kiểm tra",
-      "SHORT_NOTE": "Chuyển thiếu, chuyển dư hoặc tiền về trễ",
-      "LOOSE": "Chưa rõ mã đơn",
-      "LOOSE_NOTE": "Cần xử lý thủ công",
-      "GROUP_ALL": "Tất cả",
-      "FILTER_LABEL": "Lọc nhật ký theo kết quả",
-      "SEARCH_INPUT": "Tìm mã giao dịch, số tiền hoặc nội dung chuyển khoản…",
-      "DESCRIPTION": "Mọi thông báo nhận được đều ghi lại, kể cả thông báo không khớp đơn nào.",
-      "EMPTY": "Chưa nhận được thông báo nào.",
-      "AT": "Thời điểm",
-      "TRANSACTION_ID": "Mã giao dịch",
-      "AMOUNT": "Số tiền",
-      "CONTENT": "Nội dung chuyển khoản",
-      "ORDER_CODE": "Đơn khớp",
-      "RESULT": "Kết quả",
-      "GROUP_NEEDS_CHECK": "Cần kiểm tra",
-      "RECONCILE": "Đối soát SePay",
-      "RECONCILING": "Đang đối soát…",
-      "RECONCILE_DONE": "Đã đối soát từ ngày {{since}}: SePay có {{fetched}} giao dịch, bổ sung {{added}}, đã có sẵn {{known}}.",
-      "RECONCILE_FAILED": "Đối soát không thành công."
+      "GROUP_ALL": "Tất cả"
     },
     "ACTION": {
       "ORDER_CREATED": "Tạo đơn",
@@ -1625,8 +1592,6 @@
       "ORDERS_GROUP": "Đơn hàng và hồ sơ",
       "PET_LIMIT": "Số hồ sơ thú cưng mặc định",
       "PET_LIMIT_HINT": "Áp dụng cho tài khoản chưa được cấp giới hạn riêng.",
-      "QR_EXPIRY": "Hạn thanh toán mã QR (giờ)",
-      "QR_EXPIRY_HINT": "Quá hạn thì đơn chuyển sang hết hạn thanh toán.",
       "SHIPPING_DAYS": "Số ngày vận chuyển ước tính",
       "SHIPPING_DAYS_HINT": "Cộng vào thời gian sản xuất để ra ngày giao dự kiến.",
       "PHOTOS_GROUP": "Chấm điểm ảnh",
@@ -1650,6 +1615,8 @@
       "ACCOUNT_NUMBER_HINT": "Từ sáu đến hai mươi chữ số.",
       "ACCOUNT_HOLDER": "Tên chủ tài khoản",
       "ACCOUNT_HOLDER_HINT": "Chữ in hoa không dấu, vì mã thanh toán không mang được dấu tiếng Việt.",
+      "STATIC_QR_IMAGE": "Ảnh QR chuyển khoản tĩnh",
+      "STATIC_QR_IMAGE_HINT": "Nhập URL HTTPS hoặc đường dẫn ảnh trong /img/. Ảnh này hiển thị cho mọi đơn chờ xác nhận.",
       "TABS_LABEL": "Cấu hình tham số",
       "BANK_CARD": "Thẻ thụ hưởng thanh toán",
       "BANK_PLACEHOLDER": "NGÂN HÀNG",

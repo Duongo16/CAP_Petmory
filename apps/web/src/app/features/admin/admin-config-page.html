@@ -63,18 +63,13 @@
                     <h2>{{ 'ADMIN.CONFIG.ORDERS_GROUP' | translate }}</h2>
                     <p class="group-sub">{{ 'ADMIN.CONFIG.ORDERS_GROUP_SUB' | translate }}</p>
                   </div>
-                  <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 3 } }}</span>
+                  <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 2 } }}</span>
                 </div>
                 <div class="field-grid-compact">
                   <label>
                     <span>{{ 'ADMIN.CONFIG.PET_LIMIT' | translate }}</span>
                     <input type="number" formControlName="defaultPetProfileLimit" min="1" max="100" />
                     <small>{{ 'ADMIN.CONFIG.PET_LIMIT_HINT' | translate }}</small>
-                  </label>
-                  <label>
-                    <span>{{ 'ADMIN.CONFIG.QR_EXPIRY' | translate }}</span>
-                    <input type="number" formControlName="qrExpiryHours" min="1" max="720" />
-                    <small>{{ 'ADMIN.CONFIG.QR_EXPIRY_HINT' | translate }}</small>
                   </label>
                   <label>
                     <span>{{ 'ADMIN.CONFIG.SHIPPING_DAYS' | translate }}</span>
@@ -120,7 +115,7 @@
                     <h2>{{ 'ADMIN.CONFIG.BANK_GROUP' | translate }}</h2>
                     <p class="group-sub">{{ 'ADMIN.CONFIG.BANK_WARNING' | translate }}</p>
                   </div>
-                  <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 4 } }}</span>
+                  <span class="group-count">{{ 'ADMIN.CONFIG.PARAM_COUNT' | translate: { count: 5 } }}</span>
                 </div>
                 <div class="field-grid-compact">
                   <label>
@@ -141,6 +136,11 @@
                     <span>{{ 'ADMIN.CONFIG.ACCOUNT_HOLDER' | translate }}</span>
                     <input type="text" formControlName="accountHolder" maxlength="100" />
                     <small>{{ 'ADMIN.CONFIG.ACCOUNT_HOLDER_HINT' | translate }}</small>
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.CONFIG.STATIC_QR_IMAGE' | translate }}</span>
+                    <input type="url" formControlName="paymentQrImageUrl" maxlength="500" placeholder="/img/payment-qr.png" />
+                    <small>{{ 'ADMIN.CONFIG.STATIC_QR_IMAGE_HINT' | translate }}</small>
                   </label>
                 </div>
 

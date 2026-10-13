@@ -134,7 +134,6 @@ async function scenario(report) {
   const internal = [
     ['the dispatch board', '/admin/orders'],
     ['the customer list', '/admin/customers'],
-    ['the payment log', '/payments/log'],
     ['the business settings', '/settings'],
     ['the production file', `/admin/orders/${order.body.orderCode}/production-file`],
   ];

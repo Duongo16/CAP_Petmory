@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ImageUnreadable, looksLikeImage } from '../../../core/utils/upload-image';
 import { Observable, forkJoin, of, switchMap } from 'rxjs';
-import { PetPhoto, PhotoAngle, PhotoRules, QualityLabel } from '../../../core/models/api.model';
+import { PetPhoto, PhotoAngle, PhotoRules } from '../../../core/models/api.model';
 import { PhotosService } from '../../../core/services/photos.service';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'EMPTY' | 'HAS_DATA';
@@ -12,9 +12,6 @@ type ScreenState = 'LOADING' | 'ERROR' | 'EMPTY' | 'HAS_DATA';
 export interface PhotoCard {
   photo: PetPhoto;
   source: string;
-  /** Nhan chat luong may chu cham, va co can canh bao hay khong. */
-  qualityKey: string;
-  warn: boolean;
 }
 
 const PHOTO_MAX = 20;
@@ -56,13 +53,6 @@ const SLOTS: { angle: PhotoAngle; required: boolean; key: string }[] = [
   { angle: 'FAVOURITE_POSE', required: false, key: 'PHOTO.FRAME.ANGLE.FAVOURITE_POSE' },
 ];
 
-const QUALITY_KEY: Record<QualityLabel, string> = {
-  GOOD: 'PHOTO.QUALITY.GOOD',
-  ACCEPTABLE: 'PHOTO.QUALITY.ACCEPTABLE',
-  SHOULD_RESTORE: 'PHOTO.QUALITY.SHOULD_RESTORE',
-  UNUSABLE: 'PHOTO.QUALITY.UNUSABLE',
-};
-
 /** Mot o trong khung nap theo goc, kem anh dang nam o goc do neu co. */
 export interface AngleSlot {
   angle: PhotoAngle;
@@ -102,8 +92,6 @@ export class PetPhotosFacade {
       .map((photo) => ({
         photo,
         source: seen[photo._id] ?? '',
-        qualityKey: QUALITY_KEY[photo.quality?.label] ?? QUALITY_KEY.ACCEPTABLE,
-        warn: photo.quality?.label === 'SHOULD_RESTORE' || photo.quality?.label === 'UNUSABLE',
       }));
   });
 

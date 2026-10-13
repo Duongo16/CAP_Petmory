@@ -38,7 +38,6 @@ const STAFF_PAGES = [
   ['Truc hoi thoai', '/admin/chats'],
   ['Vat lieu', '/admin/materials'],
   ['Tham so', '/admin/settings'],
-  ['Nhat ky thanh toan', '/admin/payment-log'],
 ];
 
 async function signIn(page, who) {

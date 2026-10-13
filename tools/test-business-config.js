@@ -74,7 +74,7 @@ async function run() {
     (await call('/settings', { headers: authHeaders(customerToken) })).status === 403);
   check('Signed out requests cannot read the settings', (await call('/settings')).status === 401);
   check('The support desk cannot change the settings',
-    (await update(supportToken, { qrExpiryHours: 12 })).status === 403);
+    (await update(supportToken, { paymentQrImageUrl: '/img/payment-qr.png' })).status === 403);
 
         // --- Reject fields outside the list ---
   check('Rejects an undeclared field', (await update(managerToken, { key: 'BAY' })).status === 400);
@@ -83,8 +83,8 @@ async function run() {
 
         // --- Reject values outside the allowed range ---
   const badCases = [
-    ['A negative number', { qrExpiryHours: -5 }],
-    ['A number that is too large', { qrExpiryHours: 99999 }],
+    ['A QR image with an insecure URL', { paymentQrImageUrl: 'http://example.test/payment-qr.png' }],
+    ['A QR image outside the public image path', { paymentQrImageUrl: '/uploads/payment-qr.png' }],
     ['An image size of zero', { maxPhotoSizeMb: 0 }],
     ['A fraction where a whole number is required', { estimatedShippingDays: 2.5 }],
     ['An account number with letters in it', { accountNumber: '12AB34' }],
@@ -157,18 +157,19 @@ async function run() {
     String(listSet.body?.qcChecklist?.length));
 
         // --- A valid change, and the audit entry it writes ---
-  const change = await update(managerToken, { qrExpiryHours: 48, accountHolder: 'PETMORY DEMO' });
-  check('The payment code lifetime can be changed', change.status === 200 && change.body.qrExpiryHours === 48,
-    String(change.body?.qrExpiryHours));
+  const imageUrl = '/img/payment-qr.png';
+  const change = await update(managerToken, { paymentQrImageUrl: imageUrl, accountHolder: 'PETMORY DEMO' });
+  check('The static QR image can be changed', change.status === 200 && change.body.paymentQrImageUrl === imageUrl,
+    String(change.body?.paymentQrImageUrl));
   check('Records who made the last change', Boolean(change.body?.lastEditedBy));
 
         // The change really does take effect on a new order
   const cfAfter = await call('/settings', { headers: authHeaders(managerToken) });
-  check('The new value is stored', cfAfter.body.qrExpiryHours === 48);
+  check('The new QR image is stored', cfAfter.body.paymentQrImageUrl === imageUrl);
 
         // --- Put everything back as it was ---
   const restore = await update(managerToken, {
-    qrExpiryHours: old.qrExpiryHours,
+    paymentQrImageUrl: old.paymentQrImageUrl,
     goodShortEdgePx: old.goodShortEdgePx,
     warnShortEdgePx: old.warnShortEdgePx,
     accountHolder: old.accountHolder,
@@ -181,8 +182,8 @@ async function run() {
     },
   });
   check('Puts the settings back as they were',
-    restore.status === 200 && restore.body.qrExpiryHours === old.qrExpiryHours,
-    `lifetime = ${restore.body?.qrExpiryHours}`);
+    restore.status === 200 && restore.body.paymentQrImageUrl === old.paymentQrImageUrl,
+    `qr image = ${restore.body?.paymentQrImageUrl}`);
 
   console.log('='.repeat(66));
   console.log(failed === 0 ? `ALL ${passed} CHECKS PASSED` : `${failed}/${passed + failed} CHECKS FAILED`);

@@ -93,6 +93,34 @@
     </button>
   </nav>
 
+  @if (narrow()) {
+    @if (storyFor(onePage())) {
+      <div class="story-actions">
+        <button type="button" class="story-button tw-btn-secondary tw-btn-sm" (click)="readStory(onePage())">
+          <pm-icon name="book" [size]="14" />
+          {{ 'MEMORY.STORY_READ' | translate }}
+        </button>
+      </div>
+    }
+  } @else {
+    @if (storyFor(leftFace()) || storyFor(rightFace())) {
+      <div class="story-actions">
+        @if (storyFor(leftFace())) {
+          <button type="button" class="story-button tw-btn-secondary tw-btn-sm" (click)="readStory(leftFace())">
+            <pm-icon name="book" [size]="14" />
+            {{ 'MEMORY.STORY_READ' | translate }}
+          </button>
+        }
+        @if (storyFor(rightFace())) {
+          <button type="button" class="story-button tw-btn-secondary tw-btn-sm" (click)="readStory(rightFace())">
+            <pm-icon name="book" [size]="14" />
+            {{ 'MEMORY.STORY_READ' | translate }}
+          </button>
+        }
+      </div>
+    }
+  }
+
   @if (canEdit()) {
     <div class="decorate flex flex-wrap justify-center gap-2">
       @if (narrow()) {

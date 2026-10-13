@@ -16,7 +16,6 @@ const CORE_STOPS: Stop[] = [
   { path: '/admin/orders', key: 'NAV.DISPATCH_ORDER', icon: 'cart' },
   { path: '/admin/customers', key: 'NAV.CUSTOMER', icon: 'user' },
   { path: '/admin/chats', key: 'NAV.CHAT_DESK', icon: 'comment' },
-  { path: '/admin/payment-log', key: 'NAV.LOG_PAYMENT', icon: 'tag' },
 ];
 
 /** Chi nhom Quan ly: hang co san va kho tri thuc cua tro ly. */

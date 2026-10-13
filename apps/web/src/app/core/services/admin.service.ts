@@ -15,8 +15,6 @@ import {
   OrderStatus,
   PageResult,
   ProductionFile,
-  ReconcileSummary,
-  TransferNotification,
   UpdateBusinessConfig,
 } from '../models/api.model';
 
@@ -130,17 +128,6 @@ export class AdminService {
 
   updateConfig(replaceChange: UpdateBusinessConfig): Observable<BusinessConfig> {
     return this.http.patch<BusinessConfig>(`${this.base}/settings`, replaceChange);
-  }
-
-  /** Doi soat voi SePay: lay giao dich vai ngay gan nhat va ghi nhan giao dich webhook da bo lo. */
-  reconcileSepay(days = 2): Observable<ReconcileSummary> {
-    return this.http.post<ReconcileSummary>(`${this.base}/payments/reconcile`, { days });
-  }
-
-  logPayment(limit = 100): Observable<TransferNotification[]> {
-    return this.http.get<TransferNotification[]>(`${this.base}/payments/log`, {
-      params: new HttpParams().set('limit', limit),
-    });
   }
 
   /** Nhat ky cong khai hoac da bi an, cho man kiem duyet cong dong. */

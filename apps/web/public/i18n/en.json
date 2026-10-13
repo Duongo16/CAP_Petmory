@@ -38,7 +38,6 @@
     "ORDER": "Orders",
     "DISPATCH_ORDER": "Orders",
     "CUSTOMER": "Customers",
-    "LOG_PAYMENT": "Payment log",
     "SETTINGS": "Settings",
     "COMMUNITY": "Community",
     "SEARCH": "Search",
@@ -846,15 +845,11 @@
   },
   "PAYMENT": {
     "TITLE": "Bank transfer payment",
-    "DESCRIPTION": "Scan the code with any banking app, or transfer manually with the details alongside.",
-    "AUTO_GATE": "AUTOMATIC PAYMENT GATEWAY",
-    "VIETQR": "VietQR",
-    "NAPAS": "Napas 247",
+    "DESCRIPTION": "Scan the code with a banking app, or make a transfer using the details alongside.",
+    "STATIC_QR": "TRANSFER QR CODE",
     "DUE_LABEL": "AMOUNT DUE",
-    "VALID_FOR": "The QR code is valid for:",
-    "EXPIRED": "Expired",
     "QR_CODE": "Transfer QR code",
-    "WAITING": "Waiting for payment. The system detects it as soon as you transfer.",
+    "WAITING_STAFF": "Transferred already? A Petmory staff member will check and confirm your order.",
     "MANUAL_TRANSFER": "Manual transfer details",
     "INTERNET_BANKING": "Internet Banking",
     "BANK": "Beneficiary bank",
@@ -866,10 +861,9 @@
     "COPY": "Copy",
     "COPIED": "Copied",
     "WARNING_TITLE": "Important:",
-    "WARNING_CONTENT": "Please enter the transfer message exactly as {{message}}. With a different message, the system cannot activate your order automatically.",
+    "WARNING_CONTENT": "Please enter the transfer message exactly as {{message}} so staff can match and confirm the right order.",
     "SEE_MY_ORDERS": "See my orders",
-    "I_HAVE_PAID": "I have transferred the money",
-    "EXPIRY_NOTE": "The payment code has a time limit. If it runs out before you pay, cancel the order and place it again.",
+    "STAFF_CONFIRMATION": "After you transfer, Petmory staff will check the transaction and update your order. You do not need to confirm it here.",
     "PAYMENT_RECEIVED": "Payment received!",
     "PAYMENT_RECEIVED_TEXT": "Order {{orderCode}} has gone to the handmade wool workshop. Petmory's artisans will work through every detail to recreate your pet's keepsake for you.",
     "RECAP": "ORDER DETAILS",
@@ -883,8 +877,6 @@
     "DONE_NOTE": "You can follow the order progress in My orders.",
     "CANCELLED_TITLE": "Order cancelled",
     "CANCELLED_TEXT": "Order {{orderCode}} was cancelled, so no transfer is needed. If you already sent money, the shop will contact you to refund it.",
-    "EXPIRED_TITLE": "This payment code has expired",
-    "EXPIRED_TEXT": "Please do not transfer with this code any more. A transfer made earlier is still recorded when it arrives. Otherwise, cancel the order in My orders and place it again.",
     "BACK_TO_SHOP": "Back to the shop"
   },
   "ORDER": {
@@ -917,7 +909,7 @@
     "HELP_RESTORE": "Restore your pet's reference photo",
     "GROUP": {
       "ALL": "All",
-      "AWAITING": "Awaiting payment",
+      "AWAITING": "Awaiting transfer confirmation",
       "MAKING": "In production",
       "SHIPPING": "Shipping",
       "FINISHED": "Completed"
@@ -929,7 +921,7 @@
       "PACKING": "Packing & delivery"
     },
     "MINE_STATUS": {
-      "AWAITING_PAYMENT": "Awaiting payment",
+      "AWAITING_PAYMENT": "Awaiting transfer confirmation",
       "PAID": "Paid, waiting for the workshop",
       "IN_PRODUCTION": "Being felted by hand",
       "SHIPPING": "On its way to you",
@@ -937,7 +929,7 @@
       "CANCELLED": "Cancelled"
     },
     "STATUS": {
-      "AWAITING_PAYMENT": "Awaiting payment",
+      "AWAITING_PAYMENT": "Awaiting transfer confirmation",
       "PAID": "Paid",
       "IN_PRODUCTION": "Being made",
       "SHIPPING": "On the way",
@@ -1312,7 +1304,7 @@
   },
   "ADMIN": {
     "TILE": {
-      "AWAITING_PAYMENT": "Waiting for the transfer",
+      "AWAITING_PAYMENT": "Awaiting transfer confirmation",
       "PAID": "Needs picking up",
       "IN_PRODUCTION": "In the workshop",
       "SHIPPING": "On its way",
@@ -1544,32 +1536,7 @@
       "HISTORY_ORDER": "Order history"
     },
     "LOG": {
-      "EYEBROW": "AUTOMATIC RECONCILIATION",
-      "SUMMARY": "Reconciliation at a glance",
-      "TAKEN_TODAY": "Taken today",
-      "MATCHED_FULLY": "Matched in full",
-      "AUTO_SHARE": "{{share}}% matched without help",
-      "SHORT": "Needs checking",
-      "SHORT_NOTE": "Underpaid, overpaid or late payments",
-      "LOOSE": "No order code",
-      "LOOSE_NOTE": "Needs handling by hand",
-      "GROUP_ALL": "All",
-      "FILTER_LABEL": "Filter the log by outcome",
-      "SEARCH_INPUT": "Search by transaction, amount or message…",
-      "TITLE": "Bank transfer notifications",
-      "DESCRIPTION": "Every notification is logged, including ones that match no order.",
-      "EMPTY": "No notifications received yet.",
-      "AT": "Time",
-      "TRANSACTION_ID": "Transaction id",
-      "AMOUNT": "Amount",
-      "CONTENT": "Transfer message",
-      "ORDER_CODE": "Matched order",
-      "RESULT": "Result",
-      "GROUP_NEEDS_CHECK": "Needs checking",
-      "RECONCILE": "Reconcile with SePay",
-      "RECONCILING": "Reconciling…",
-      "RECONCILE_DONE": "Reconciled from {{since}}: SePay listed {{fetched}} transactions, {{added}} added, {{known}} already recorded.",
-      "RECONCILE_FAILED": "Reconciliation failed."
+      "GROUP_ALL": "All"
     },
     "ACTION": {
       "ORDER_CREATED": "Order created",
@@ -1625,8 +1592,6 @@
       "ORDERS_GROUP": "Orders and profiles",
       "PET_LIMIT": "Default pet profile limit",
       "PET_LIMIT_HINT": "Applies to accounts without their own limit.",
-      "QR_EXPIRY": "QR payment window (hours)",
-      "QR_EXPIRY_HINT": "After this the order moves to payment expired.",
       "SHIPPING_DAYS": "Estimated shipping days",
       "SHIPPING_DAYS_HINT": "Added to production time to get the delivery estimate.",
       "PHOTOS_GROUP": "Photo scoring",
@@ -1650,6 +1615,8 @@
       "ACCOUNT_NUMBER_HINT": "Six to twenty digits.",
       "ACCOUNT_HOLDER": "Account holder",
       "ACCOUNT_HOLDER_HINT": "Uppercase without accents, because the payment code cannot carry them.",
+      "STATIC_QR_IMAGE": "Static transfer QR image",
+      "STATIC_QR_IMAGE_HINT": "Enter an HTTPS URL or an image path under /img/. This image appears for every order awaiting confirmation.",
       "TABS_LABEL": "Business settings",
       "BANK_CARD": "Payee card",
       "BANK_PLACEHOLDER": "BANK",

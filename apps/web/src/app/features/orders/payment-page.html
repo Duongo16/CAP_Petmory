@@ -74,7 +74,7 @@
             </div>
           </section>
         } @else {
-          <!-- ---------- Dang cho tien ve ---------- -->
+          <!-- ---------- Cho nhan vien xac nhan thanh toan ---------- -->
           <header class="head flex flex-col gap-1">
             <h1 class="title pm-page-title tw-page-title">{{ 'PAYMENT.TITLE' | translate }}</h1>
             <p class="sub flex items-center gap-2 m-0 text-sm text-body">
@@ -87,36 +87,20 @@
             <!-- Cot trai: ma QR -->
             <section class="qr-card tw-card flex flex-col items-center gap-2 p-8 max-[600px]:p-5">
               <div class="qr-tags flex items-center justify-between gap-3 flex-wrap w-full pb-4 border-b border-edge">
-                <span class="tag-green tw-badge tw-badge-success">{{ 'PAYMENT.AUTO_GATE' | translate }}</span>
-                <span class="tag-pair inline-flex gap-2">
-                  <span class="tag-blue tw-badge tw-badge-accent">{{ 'PAYMENT.VIETQR' | translate }}</span>
-                  <span class="tag-amber tw-badge tw-badge-amber">{{ 'PAYMENT.NAPAS' | translate }}</span>
-                </span>
+                <span class="tag-green tw-badge tw-badge-success">{{ 'PAYMENT.STATIC_QR' | translate }}</span>
               </div>
 
               <p class="due-name mt-4 mb-0 text-xs font-semibold tracking-[0.04em] text-ink-muted">{{ 'PAYMENT.DUE_LABEL' | translate }}</p>
               <p class="due-money m-0 font-serif text-[2.25rem] max-[600px]:text-[1.875rem] font-bold leading-[1.15] text-accent">{{ qr.amount | amount: qr.currency }}</p>
 
-              <p class="clock inline-flex items-center gap-1 mt-2 mb-0 px-3 py-1 rounded-full bg-amber-soft text-xs text-on-amber" [class.is-out]="expired()">
-                {{ 'PAYMENT.VALID_FOR' | translate }}
-                <strong>{{ expired() ? ('PAYMENT.EXPIRED' | translate) : countdown() }}</strong>
-              </p>
-
-              @if (expired()) {
-                <div class="expired-box mt-4 p-5 rounded-lg bg-danger-soft text-on-danger-soft text-center" role="alert">
-                  <strong class="block mb-1">{{ 'PAYMENT.EXPIRED_TITLE' | translate }}</strong>
-                  <p class="m-0 text-sm leading-[1.6]">{{ 'PAYMENT.EXPIRED_TEXT' | translate }}</p>
-                </div>
-              } @else {
-                <div class="qr-frame grid place-items-center mt-4 p-4 rounded-lg bg-card border border-edge">
-                  <img [src]="qr.qrImage" [alt]="'PAYMENT.QR_CODE' | translate" />
-                </div>
-              }
+              <div class="qr-frame grid place-items-center mt-4 p-4 rounded-lg bg-card border border-edge">
+                <img [src]="qr.qrImageUrl" [alt]="'PAYMENT.QR_CODE' | translate" />
+              </div>
               <p class="qr-bank mt-2 mb-0 text-xs font-medium text-ink-muted">{{ qr.bankName }}</p>
 
               <p class="waiting flex items-center gap-3 w-full mt-5 mb-0 px-4 py-3 rounded-md bg-accent-soft text-sm font-medium text-body" role="status">
                 <span class="waiting-dot" aria-hidden="true"></span>
-                {{ 'PAYMENT.WAITING' | translate }}
+                {{ 'PAYMENT.WAITING_STAFF' | translate }}
               </p>
             </section>
 
@@ -139,7 +123,6 @@
                   </div>
                 </dl>
 
-                @if (!expired()) {
                 <div class="copy-box">
                   <span class="copy-name">{{ 'PAYMENT.ACCOUNT_NUMBER' | translate }}</span>
                   <span class="copy-row flex items-center justify-between gap-3">
@@ -173,7 +156,6 @@
                   </span>
                 </div>
 
-                }
                 <aside class="warn p-4 rounded-lg bg-amber-soft">
                   <strong class="block mb-1 text-xs font-bold text-on-amber">{{ 'PAYMENT.WARNING_TITLE' | translate }}</strong>
                   <p class="m-0 text-xs leading-[1.6] text-on-amber">{{ 'PAYMENT.WARNING_CONTENT' | translate: { message: qr.transferMessage } }}</p>
@@ -181,13 +163,9 @@
               </div>
 
               <div class="manual-deeds tw-card flex flex-col gap-3 p-5">
-                <button type="button" class="deeds-go tw-btn-primary tw-btn-lg tw-btn-block" [disabled]="checkingNow()" (click)="checkNow()">
-                  {{ 'PAYMENT.I_HAVE_PAID' | translate }}
-                </button>
+                <p class="m-0 text-sm leading-[1.6] text-body">{{ 'PAYMENT.STAFF_CONFIRMATION' | translate }}</p>
                 <a class="deeds-back tw-btn-ghost tw-btn-block" routerLink="/orders">{{ 'PAYMENT.SEE_MY_ORDERS' | translate }}</a>
               </div>
-
-              <p class="note tw-hint">{{ 'PAYMENT.EXPIRY_NOTE' | translate }}</p>
             </section>
           </div>
         }

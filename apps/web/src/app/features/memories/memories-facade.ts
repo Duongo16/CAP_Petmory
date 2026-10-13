@@ -119,6 +119,8 @@ export class MemoriesFacade {
 
   /** Cau chuyen moi nhat gan vao tung khoanh khac, tra theo ma khoanh khac. */
   private readonly storyByMoment = signal<Map<string, PetStory>>(new Map());
+  /** Cac cau chuyen da gan, de trang quyển sổ biet trang nao can nut doc. */
+  readonly attachedStories = this.storyByMoment.asReadonly();
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly state = signal<ScreenState>('LOADING');

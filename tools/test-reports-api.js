@@ -11,7 +11,6 @@ const sharp = require('sharp');
 
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
 const STAMP = Date.now();
-const WEBHOOK_KEY = process.env.PETMORY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const PASSWORD = 'Password@123';
 const BOSS = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
 const SUPPORT = { email: 'cskh@petmory.local', password: 'Petmory@2026' };
@@ -68,16 +67,10 @@ async function orderGoods(token, goodsCode, sku, quantity) {
   return { code: order.body.orderCode, total };
 }
 
-function payFor(orderCode, amount) {
-  return call('/payments/webhook', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Apikey ${WEBHOOK_KEY}` },
-    body: JSON.stringify({
-      id: `bc-${orderCode}-${Math.random().toString(16).slice(2)}`,
-      transferAmount: amount,
-      content: `CT DEN ${orderCode}`,
-    }),
-  });
+function payFor(orderCode, amount, managerToken) {
+  return call(`/admin/orders/${orderCode}/status`, asJson(managerToken, {
+    status: 'PAID', reason: `Da doi chieu chuyen khoan ${amount} dong`,
+  }, 'PATCH'));
 }
 
 /**
@@ -139,7 +132,7 @@ async function run() {
   const paid = [];
   for (let i = 0; i < 3; i += 1) {
     const one = await orderGoods(mine, 'G-HOP-QUA', 'HOP-NHO', 1);
-    await payFor(one.code, one.total);
+    await payFor(one.code, one.total, boss);
     paid.push(one);
   }
   const unpaid = await orderGoods(mine, 'G-HOP-QUA', 'HOP-NHO', 1);

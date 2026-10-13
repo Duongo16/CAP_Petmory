@@ -6,7 +6,6 @@ export interface AppConfig {
   port: number;
   mongodbUri: string;
   webOrigin: string;
-  sepayWebhookKey: string;
   mail: {
     /** May chu SMTP. Rong thi khong gui thu; o moi truong phat trien noi dung thu duoc ghi ra nhat ky. */
     host: string;
@@ -15,14 +14,6 @@ export interface AppConfig {
     user: string;
     pass: string;
     from: string;
-    timeoutMs: number;
-  };
-  sepay: {
-    /** Token goi API giao dich cua SePay, dung cho doi soat. Rong thi tat doi soat. */
-    apiToken: string;
-    apiBase: string;
-    /** IP duoc phep goi webhook, cach nhau dau phay. Rong thi khong kiem IP. */
-    allowedIps: string[];
     timeoutMs: number;
   };
   jwt: {
@@ -80,17 +71,6 @@ export default (): AppConfig => ({
     pass: process.env.SMTP_PASS ?? '',
     from: (process.env.SMTP_FROM ?? 'Petmory <no-reply@petmory.local>').trim(),
     timeoutMs: Number(process.env.SMTP_TIMEOUT_MS ?? 10000),
-  },
-  // Khong co gia tri mac dinh: thieu khoa thi webhook tu choi moi yeu cau.
-  sepayWebhookKey: (process.env.SEPAY_WEBHOOK_KEY ?? '').trim(),
-  sepay: {
-    apiToken: (process.env.SEPAY_API_TOKEN ?? '').trim(),
-    apiBase: (process.env.SEPAY_API_BASE ?? 'https://my.sepay.vn/userapi').replace(/\/+$/, ''),
-    allowedIps: (process.env.SEPAY_ALLOWED_IPS ?? '')
-      .split(',')
-      .map((one) => one.trim())
-      .filter(Boolean),
-    timeoutMs: Number(process.env.SEPAY_TIMEOUT_MS ?? 10000),
   },
   jwt: {
     accessSecret: required('JWT_ACCESS_SECRET'),

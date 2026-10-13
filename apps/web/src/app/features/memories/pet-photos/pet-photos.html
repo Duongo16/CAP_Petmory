@@ -67,7 +67,6 @@
                     <img [src]="card.source" alt="" />
                   }
                 </button>
-                <span class="quality" [class.warn]="card.warn">{{ card.qualityKey | translate }}</span>
                 <div class="slot-tools">
                   <label class="tw-btn-secondary tw-btn-sm slot-replace" [attr.for]="'slot-' + slot.angle">{{ 'PHOTO.FRAME.REPLACE' | translate }}</label>
                   <button type="button" class="tw-btn-ghost tw-btn-sm slot-remove" (click)="removeFromSlot(slot)">{{ 'COMMON.REMOVE' | translate }}</button>
@@ -107,7 +106,6 @@
                   }
                 </button>
                 <span class="shot-date">{{ card.photo.createdAt | date: 'dd/MM/yyyy' }}</span>
-                <span class="quality shot-quality" [class.warn]="card.warn">{{ card.qualityKey | translate }}</span>
                 <button type="button" class="shot-drop" (click)="remove(card)" [attr.aria-label]="'COMMON.REMOVE' | translate">
                   <pm-icon name="trash" [size]="14" />
                 </button>

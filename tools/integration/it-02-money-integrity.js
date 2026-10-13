@@ -12,7 +12,6 @@ const h = require('./harness');
 
 async function scenario(report) {
   const customer = await h.newCustomer('money');
-  const manager = await h.signInInternal(h.ACCOUNT_MANAGER);
 
   const product = await h.call('/catalog/products/PT-01');
   const sizes = product.body.sizes.filter((s) => s.enabled);
@@ -128,31 +127,18 @@ async function scenario(report) {
   report.check('The payment code asks for the order total',
     h.dong(qr.body.amount) === cartTotal, String(h.dong(qr.body.amount)));
 
-  // --- Underpaying does not move the order ---
-  report.step('Short payment is refused, exact payment is accepted');
-  const short = await h.sendTransfer(orderCode, Number(cartTotal - 1000n));
-  report.check('A short transfer is recorded but does not match',
-    short.body.result === 'UNDERPAID', short.body.result);
-
-  const stillWaiting = await h.call(`/orders/${orderCode}`, { headers: customer.auth });
-  report.check('The order is still awaiting payment',
-    stillWaiting.body.status === 'AWAITING_PAYMENT', stillWaiting.body.status);
-
-  const exact = await h.sendTransfer(orderCode, Number(cartTotal));
-  report.check('The exact amount matches', exact.body.result === 'MATCHED', exact.body.result);
+  // --- Staff confirmation keeps the financial snapshot unchanged ---
+  report.step('A staff member confirms the transfer after checking it');
+  const exact = await h.confirmPaymentByStaff(orderCode, Number(cartTotal));
+  report.check('The staff confirmation is accepted', exact.status === 200, String(exact.status));
 
   const paid = await h.call(`/orders/${orderCode}`, { headers: customer.auth });
   report.check('The order moves to paid', paid.body.status === 'PAID');
   report.check('The paid order still holds the same total',
     h.dong(paid.body.total) === cartTotal, String(h.dong(paid.body.total)));
 
-  // --- A later price change leaves the order alone ---
-  report.step('Changing the catalog later does not touch a placed order');
-  const log = await h.call('/payments/log', { headers: manager.auth });
-  report.check('Both notifications are in the log',
-    log.body.filter((r) => String(r.rawData?.content ?? '').includes(orderCode)).length >= 2,
-    `${log.body.length} entries`);
-
+  // --- A later read leaves the financial snapshot unchanged ---
+  report.step('The confirmed order keeps its financial snapshot');
   const after = await h.call(`/orders/${orderCode}`, { headers: customer.auth });
   report.check('The order total is unchanged after everything',
     h.dong(after.body.total) === cartTotal, String(h.dong(after.body.total)));

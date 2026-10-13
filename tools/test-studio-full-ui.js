@@ -19,7 +19,6 @@ const SPLIT_LINES = new RegExp(String.fromCharCode(10), 'g');
 const TEMP = path.join(OUT, 'temp');
 const EMAIL = `sd.${Date.now()}@petmory.local`;
 const PASSWORD = 'Password@123';
-const WEBHOOK_KEY = 'change-this-key-before-running';
 
 function check(name, passed, note = '') {
   console.log(`  ${passed ? 'PASS  ' : 'FAIL  '} ${name}${note ? '  ' + note : ''}`);
@@ -277,9 +276,13 @@ async function run() {
     const orderTotal = String(orderBody.total?.$numberDecimal ?? orderBody.total ?? '0').split('.')[0];
     res.push(check('The order total includes the stand price', orderTotal === '870000', orderTotal));
 
-    await page.request.post(`${API}/payments/webhook`, {
-      headers: { Authorization: `Apikey ${WEBHOOK_KEY}` },
-      data: { id: `sd-${Date.now()}`, transferAmount: Number(orderTotal), content: `CT DEN ${orderCode}` },
+    const managerLogin = await page.request.post(`${API}/auth/login`, {
+      data: { email: 'quanly@petmory.local', password: 'Petmory@2026' },
+    });
+    const managerToken = (await managerLogin.json()).accessToken;
+    await page.request.patch(`${API}/admin/orders/${orderCode}/status`, {
+      headers: { Authorization: `Bearer ${managerToken}` },
+      data: { status: 'PAID', reason: `Da doi chieu thanh toan ${orderTotal} dong` },
     });
 
     // Switch to an operations account to open the production file

@@ -13,6 +13,7 @@ import { map } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PageFace, PageFaceView } from './page-face';
 import { Icon } from '../../../shared/icon/icon';
+import { Memory, PetStory } from '../../../core/models/api.model';
 
 /** Mot to giay trong quyen: mat truoc va mat sau. */
 interface Leaf {
@@ -87,11 +88,17 @@ export class DiaryBookView {
   readonly faces = input.required<PageFace[]>();
   readonly sourceOf = input.required<Record<string, string>>();
 
+  /** Cac cau chuyen AI duoc gan vao tung khoanh khac trong quyen so. */
+  readonly attachedStories = input<ReadonlyMap<string, PetStory>>(new Map());
+
   /** Nguoi dang xem co duoc bay tri trang khong. */
   readonly canEdit = input(false);
 
   /** Bao ra ngoai khi nguoi dung muon bay tri mot trang. */
   readonly editWanted = output<PageFace>();
+
+  /** Bao ra ngoai khi nguoi dung muon doc cau chuyen tren trang dang mo. */
+  readonly storyWanted = output<{ story: PetStory; moment: Memory }>();
 
   /** Da lat bao nhieu to giay, dung cho man hinh rong. */
   readonly turned = signal(0);
@@ -263,6 +270,20 @@ export class DiaryBookView {
 
   editRight(): void {
     this.askEdit(this.narrow() ? this.onePage() : this.rightFace());
+  }
+
+  /** Câu chuyện gắn vào khoảnh khắc của một mặt giấy, nếu có. */
+  storyFor(face: PageFace | null): PetStory | null {
+    const moment = face?.moment;
+    return moment ? this.attachedStories().get(moment._id) ?? null : null;
+  }
+
+  readStory(face: PageFace | null): void {
+    const moment = face?.moment;
+    const story = this.storyFor(face);
+    if (moment && story) {
+      this.storyWanted.emit({ story, moment });
+    }
   }
 
   private askEdit(face: PageFace | null): void {

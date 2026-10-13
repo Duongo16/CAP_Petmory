@@ -12,8 +12,8 @@
 const sharp = require('sharp');
 
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
-const WEBHOOK_KEY = process.env.PETMORY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const WHO = { email: 'khachhang@petmory.local', password: 'Petmory@2026' };
+const MANAGER = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
 
 async function call(where, options = {}) {
   const answer = await fetch(`${API}${where}`, options);
@@ -199,15 +199,10 @@ async function run() {
         const amount = Number(
           String(typeof raw === 'object' && raw ? raw.$numberDecimal : raw).split('.')[0],
         );
-        await call('/payments/webhook', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', authorization: `Apikey ${WEBHOOK_KEY}` },
-          body: JSON.stringify({
-            id: `demo-${code}`,
-            transferAmount: amount,
-            content: `CT DEN ${code}`,
-          }),
-        });
+        const manager = await call('/auth/login', asJson(null, MANAGER));
+        await call(`/admin/orders/${code}/status`, asJson(manager.body?.accessToken, {
+          status: 'PAID', reason: `Da doi chieu thanh toan demo ${amount} dong`,
+        }, 'PATCH'));
         console.log(`  don      ${code} da dat va da thanh toan`);
       }
     }

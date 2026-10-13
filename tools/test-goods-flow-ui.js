@@ -13,7 +13,6 @@ const { chromium } = require('playwright');
 
 const WEB = process.env.PETMORY_WEB ?? 'http://localhost:4200';
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
-const WEBHOOK_KEY = process.env.PETMORY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const OUT = path.join(__dirname, '..', 'test-screenshots');
 const STAMP = Date.now();
 const CODE = `UI-${STAMP}`;
@@ -168,11 +167,7 @@ async function quantityShown(page) {
   await page.waitForTimeout(1500);
   ok('Bam lan thu hai thi don duoc huy', (await page.locator('.deed-cancel').count()) === 0);
 
-  // --- Tien ve cho don da huy: nhom Quan ly thay canh bao ---
-  await req.post(`${API}/payments/webhook`, {
-    headers: { authorization: `Apikey ${WEBHOOK_KEY}` },
-    data: { id: `ui-late-${STAMP}`, transferAmount: 45000, content: `CT ${orderCode}` },
-  });
+  // --- Don da huy van mo duoc cho nhom Quan ly ---
   const adminCtx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const admin = await adminCtx.newPage();
   admin.on('pageerror', (e) => errors.push(e.message));
@@ -182,7 +177,7 @@ async function quantityShown(page) {
   await admin.waitForSelector('.header-note');
   ok('Trang don cua Quan ly ghi dung la don hang co san',
     (await admin.locator('.header-note').innerText()).includes('có sẵn'));
-  ok('Tien ve cho don da huy hien canh bao can xu ly', (await admin.locator('.attention').count()) === 1);
+  ok('Don da huy khong hien nut xac nhan thanh toan', (await admin.locator('.button-row button').count()) === 0);
   await admin.screenshot({ path: path.join(OUT, 'goods-flow-4-admin.png') });
 
   await req.delete(`${API}/admin/goods/${CODE}`, { headers: asBoss });

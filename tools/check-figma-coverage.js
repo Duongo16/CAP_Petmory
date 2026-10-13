@@ -36,7 +36,6 @@ const PLAN = [
 
   { id: '1:1048', route: 'admin/orders/:orderCode', state: 'DONE', note: 'Co bon chang va lich su' },
   { id: '1:1439', route: 'admin/customers/:id', state: 'DONE', note: 'Co ba con so va muc chi tieu' },
-  { id: '1:1862', route: 'admin/payment-log', state: 'DONE', note: 'Co tom tat, loc va phan trang' },
   { id: '1:2428', route: 'admin/settings', state: 'DONE', note: 'Nhom tham so co mo ta va so dem' },
   { id: '1:2818', route: 'admin/orders', state: 'DONE', note: 'Co thanh ben, o dem va cot san pham' },
 

@@ -324,12 +324,6 @@ export const routes: Routes = [
               import('./features/admin/admin-chats-page').then((m) => m.AdminChatsPage),
           },
           {
-            path: 'payment-log',
-            canActivate: [deskGuard],
-            loadComponent: () =>
-              import('./features/admin/admin-payments-page').then((m) => m.AdminPaymentsPage),
-          },
-          {
             path: 'audit',
             canActivate: [moderatorGuard],
             loadComponent: () => import('./features/admin/admin-audit-page').then((m) => m.AdminAuditPage),

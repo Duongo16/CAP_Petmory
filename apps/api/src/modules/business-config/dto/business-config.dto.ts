@@ -125,12 +125,6 @@ export class UpdateConfigDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Max(720)
-  qrExpiryHours?: number;
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
   @Max(60)
   estimatedShippingDays?: number;
 
@@ -233,4 +227,11 @@ export class UpdateConfigDto {
     message: 'Ten chu tai khoan chi gom chu in hoa khong dau, chu so va khoang trang',
   })
   accountHolder?: string;
+
+  /** Anh QR tinh: tep trong web hoac URL HTTPS cong khai. */
+  @IsOptional()
+  @Matches(/^(https:\/\/\S{3,500}|\/img\/[A-Za-z0-9._/-]{1,490})$/, {
+    message: 'Anh QR phai la URL HTTPS hoac duong dan /img/ten-tep',
+  })
+  paymentQrImageUrl?: string;
 }

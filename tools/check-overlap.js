@@ -23,7 +23,7 @@ const SIZES = [
 const BUYER_PAGES = ['/home', '/products', '/goods', '/colors', '/pets', '/today',
   '/studio', '/suggest', '/restore', '/cart', '/checkout', '/orders', '/community'];
 const STAFF_PAGES = ['/admin/orders', '/admin/customers', '/admin/goods',
-  '/admin/reports', '/admin/chats', '/admin/materials', '/admin/settings', '/admin/payment-log'];
+  '/admin/reports', '/admin/chats', '/admin/materials', '/admin/settings'];
 
 let failed = 0;
 let checked = 0;

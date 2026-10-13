@@ -10,7 +10,6 @@
  */
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
 const STAMP = Date.now();
-const WEBHOOK_KEY = process.env.PETMORY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const PASSWORD = 'Password@123';
 const BOSS = { email: 'quanly@petmory.local', password: 'Petmory@2026' };
 const CODE = `T-${STAMP}`;
@@ -92,15 +91,7 @@ async function placeOrder(token) {
 }
 
 function payFor(orderCode, amount) {
-  return call('/payments/webhook', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Apikey ${WEBHOOK_KEY}` },
-    body: JSON.stringify({
-      id: `luong-${orderCode}-${Math.random().toString(16).slice(2)}`,
-      transferAmount: amount,
-      content: `CT DEN ${orderCode}`,
-    }),
-  });
+  return setStatus(orderCode, 'PAID', `Da doi chieu chuyen khoan ${amount} dong`);
 }
 
 function setStatus(orderCode, status, reason = 'Kiem thu') {
@@ -235,14 +226,6 @@ async function run() {
   ok('Khach tu huy duoc don chua thanh toan',
     selfCancel.status === 201 && selfCancel.body?.status === 'CANCELLED',
     `${selfCancel.status} ${selfCancel.body?.status}`);
-
-  // --- Tien ve cho mot don da huy thi duoc danh dau cho nguoi xu ly ---
-  await payFor(own.body.orderCode, 50000);
-  const late = await adminOrder(own.body.orderCode);
-  ok('Tien ve cho don da huy thi don duoc danh dau can xu ly',
-    late.order.needsAttention === true && late.order.status === 'CANCELLED',
-    `${late.order.needsAttention} ${late.order.status}`);
-  ok('Tien ve cho don da huy khong lam tru kho', (await stockNow()) === 10, String(await stockNow()));
 
   // --- Khach khong huy duoc don da thanh toan ---
   await fillCart(a, 1);

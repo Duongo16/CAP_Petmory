@@ -78,8 +78,10 @@
         <pm-diary-book
           [faces]="faces()"
           [sourceOf]="facade.shotSource()"
+          [attachedStories]="facade.attachedStories()"
           [canEdit]="true"
           (editWanted)="decorate($event)"
+          (storyWanted)="openStory($event.story, $event.moment)"
         />
       }
 

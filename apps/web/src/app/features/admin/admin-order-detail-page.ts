@@ -29,6 +29,7 @@ export class AdminOrderDetailPage implements OnInit {
   readonly facade = inject(AdminOrderDetailFacade);
   readonly stageKeys = DESK_STAGE_KEYS;
   readonly isManager = inject(AuthService).isManager;
+  readonly isDesk = inject(AuthService).isDesk;
 
   /** Tich hoac bo tich mot muc tren phieu kiem tra chat luong. */
   tickChanged(at: number, event: Event): void {

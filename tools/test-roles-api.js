@@ -79,7 +79,6 @@ async function signIn(who) {
 const DESK_PATHS = [
   ['Bang dieu phoi don', PATH_ORDERS],
   ['Danh sach khach hang', '/admin/customers?page=1'],
-  ['Nhat ky thanh toan', '/payments/log?page=1'],
   ['Hang cho hoi thoai', '/admin/chats'],
 ];
 
@@ -120,6 +119,15 @@ async function checkPaths(manager, support, customer) {
     const byCustomer = await call(where, withToken(customer));
     ok(`Khach KHONG mo duoc ${name}`, byCustomer.status === 403, String(byCustomer.status));
   }
+
+  const missingOrder = 'PM000000000';
+  const statusBody = { status: 'PAID', reason: 'Kiem tra quyen xac nhan thanh toan' };
+  const statusByManager = await call(`/admin/orders/${missingOrder}/status`, asJson(manager, statusBody, PATCH));
+  const statusBySupport = await call(`/admin/orders/${missingOrder}/status`, asJson(support, statusBody, PATCH));
+  const statusByCustomer = await call(`/admin/orders/${missingOrder}/status`, asJson(customer, statusBody, PATCH));
+  ok('Nhom Quan ly duoc phep goi thao tac xac nhan thanh toan', statusByManager.status === 404, String(statusByManager.status));
+  ok('Nhom CSKH duoc phep goi thao tac xac nhan thanh toan', statusBySupport.status === 404, String(statusBySupport.status));
+  ok('Khach KHONG duoc goi thao tac xac nhan thanh toan', statusByCustomer.status === 403, String(statusByCustomer.status));
 
   console.log('');
   console.log('Phan chi danh cho nhom Quan ly');

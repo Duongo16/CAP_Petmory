@@ -77,14 +77,12 @@ Biến môi trường dùng chung cho mọi service trong project. Nhóm bắt b
 | `AI_PROVIDER` | `gemini` |
 | `GEMINI_API_KEY` | Khoá Gemini |
 | `AI_TIMEOUT_MS` | `45000` |
-| `SEPAY_WEBHOOK_KEY` | Khoá webhook SePay. **Không** dùng giá trị mẫu. |
 
 Nhóm tuỳ chọn:
 
 | Biến | Khi nào cần |
 |---|---|
 | `AI_MODEL`, `AI_IMAGE_PROVIDER`, `AI_IMAGE_MODEL` | Đổi model AI. Để trống thì dùng mặc định. |
-| `SEPAY_API_BASE`, `SEPAY_API_TOKEN`, `SEPAY_ALLOWED_IPS`, `SEPAY_TIMEOUT_MS` | Nếu đang dùng ở `.env` |
 | `SMTP_*` | Chức năng "Quên mật khẩu" khi `NODE_ENV=production` |
 | `CHROMIUM_PACK_URL` | Chỉ khai khi muốn tải gói Chromium từ nơi khác |
 
@@ -100,7 +98,7 @@ Log build phải có hai phần, một cho mỗi service: NestJS (`api`) và `Ap
 ### Bước 5. Sau khi có tên miền
 
 1. Sửa `WEB_ORIGIN` cho đúng tên miền thật, rồi **Redeploy**.
-2. SePay → webhook URL `https://<tên-miền>/api/payments/webhook`, header `Authorization: Apikey <SEPAY_WEBHOOK_KEY>`.
+2. Đăng nhập tài khoản Quản lý → **Tham số → Tài khoản nhận tiền**, đặt ảnh QR tĩnh bằng URL HTTPS hoặc tệp ở `/img/`, rồi lưu.
 3. Gắn tên miền riêng (tuỳ chọn) ở Settings → Domains, rồi lặp lại mục 1–2.
 4. Bản preview có bật Deployment Protection có thể chặn API tải manifest qua `VERCEL_URL`. Khi đó API tự chuyển sang dùng `WEB_ORIGIN`.
 
@@ -116,7 +114,7 @@ Log build phải có hai phần, một cho mỗi service: NestJS (`api`) và `Ap
 | 6 | Studio → Dựng mẫu từ ảnh | Nhận ra loài và màu, mở bước Chọn mẫu |
 | 7 | Phục hồi ảnh với "Tách nền" | Chạy được |
 | 8 | Nhật ký → Xuất PDF → Tải về | Có file PDF, chữ có dấu hiện đúng. Lần đầu chậm hơn vì phải tải gói Chromium. |
-| 9 | Đặt hàng → SePay báo về | Đơn chuyển sang đã thanh toán |
+| 9 | Đặt hàng → quét QR và nhân viên chuyển trạng thái đơn | Khách thấy QR tĩnh; đơn chỉ sang đã thanh toán sau thao tác nhân viên |
 | 10 | Đăng nhập quanly@ vào trang quản trị | Vào được bàn điều phối |
 
 ## Khi gặp lỗi

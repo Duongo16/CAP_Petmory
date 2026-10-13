@@ -181,7 +181,7 @@
             </section>
           }
 
-          @if (!isManager()) {
+          @if (!isDesk()) {
             <p class="note">{{ 'ADMIN.READ_ONLY' | translate }}</p>
           } @else if (facade.buttons().length === 0) {
             <p class="note">{{ 'ADMIN.ORDER.NONE_STEP' | translate }}</p>

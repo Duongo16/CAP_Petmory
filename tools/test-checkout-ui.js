@@ -9,7 +9,6 @@ const fs = require('fs');
 
 const WEB = 'http://localhost:4200';
 const API = 'http://localhost:3000/api';
-const WEBHOOK_KEY = process.env.SEPAY_WEBHOOK_KEY ?? 'change-this-key-before-running';
 const OUT = path.join(__dirname, '..', 'test-screenshots');
 const EMAIL = `dh.${Date.now()}@petmory.local`;
 const PASSWORD = 'Password@123';
@@ -46,6 +45,13 @@ async function run() {
     const registered = await (await page.request.post(`${API}/auth/register`, {
       data: { email: EMAIL, password: PASSWORD, fullName: 'Checkout test' },
     })).json();
+    const manager = await page.request.post(`${API}/auth/login`, {
+      data: { email: 'quanly@petmory.local', password: 'Petmory@2026' },
+    });
+    await page.request.patch(`${API}/settings`, {
+      headers: { Authorization: `Bearer ${(await manager.json()).accessToken}` },
+      data: { paymentQrImageUrl: '/img/payment-qr.png' },
+    });
     await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
     await settle(page);
     await page.fill('input[formcontrolname="email"]', EMAIL);
@@ -98,7 +104,7 @@ async function run() {
 
     await page.waitForSelector('.qr-frame img', { timeout: 15000 });
     const srcQr = await page.locator('.qr-frame img').getAttribute('src');
-    res.push(check('The payment code is drawn', Boolean(srcQr && srcQr.startsWith('data:image/png'))));
+    res.push(check('The configured static QR image is shown', Boolean(srcQr && srcQr.length > 0)));
 
     const content = await page.locator('.copy-box.is-key code').innerText();
     res.push(check('The transfer message is the order code', content === orderCode, content));
@@ -109,29 +115,13 @@ async function run() {
     const steps = await page.locator('.stop.is-here .stop-name').innerText();
     res.push(check('The stepper marks the payment step', steps.includes('Thanh toán'), steps));
 
-    const clock = await page.locator('.clock strong').innerText();
-    res.push(check('The code shows how long it is good for',
-      /^\d+:\d{2}(:\d{2})?$/.test(clock.trim()), clock));
+    res.push(check('The page tells customers staff will confirm the transfer',
+      (await page.locator('.waiting').innerText()).includes('nhân viên')));
     await page.screenshot({ path: path.join(OUT, 'checkout-2-payment.png') });
 
     // The cart must be empty once the order has been placed
     res.push(check('The cart badge is gone once the order is placed',
       (await page.locator('a[href="/cart"] [role="status"]').count()) === 0));
-
-    // Send a transfer notification exactly as the real service would
-    const bao1 = await page.request.post(`${API}/payments/webhook`, {
-      headers: { Authorization: `Apikey ${WEBHOOK_KEY}` },
-      data: { id: `web-${Date.now()}`, transferAmount: 250000, content: `CT DEN ${orderCode}` },
-    });
-    res.push(check('The transfer notice is matched to the order',
-      (await bao1.json()).result === 'MATCHED'));
-
-    // The page updates itself; nothing is refreshed by hand
-    await page.waitForSelector('.done-mark', { timeout: 20000 });
-    res.push(check('The page turns itself over when the money lands', true));
-    res.push(check('The recap shows the order code',
-      (await page.locator('.recap-rows dd').first().innerText()) === orderCode));
-    await page.screenshot({ path: path.join(OUT, 'checkout-3-paid.png') });
 
     // Order list
     await page.locator('a:has-text("Xem đơn hàng")').click();
@@ -140,18 +130,7 @@ async function run() {
     res.push(check('The order appears in the list', (await page.locator('.order').count()) === 1));
 
     const status = await page.locator('.chip-status').innerText();
-    res.push(check('The order shows as paid', status.includes('Đã thanh toán'), status));
-
-    res.push(check('A paid order no longer offers a pay button',
-      (await page.locator('.deed-solid:has-text("Thanh toán")').count()) === 0));
-
-    const done = await page.locator('.track-step.done').count();
-    res.push(check('The workshop progress marks the paid stage', done === 2, `${done} stages`));
-
-    await page.locator('.filter:has-text("Chờ thanh toán")').click();
-    await page.waitForTimeout(400);
-    res.push(check('Filtering by awaiting payment hides a paid order',
-      (await page.locator('.order').count()) === 0));
+    res.push(check('The order remains awaiting staff confirmation', status.includes('xác nhận'), status));
 
     await page.locator('.filter:has-text("Tất cả")').click();
     await page.waitForTimeout(400);
