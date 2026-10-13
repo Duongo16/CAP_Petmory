@@ -531,7 +531,13 @@ export class CommunityService {
       update['phone'] = normalizeVietnamesePhone(dto.phone) || null;
     }
     if (dto.avatarUrl !== undefined) {
-      update['avatarUrl'] = dto.avatarUrl.trim() || null;
+      const avatarUrl = dto.avatarUrl.trim();
+      // A relative avatar URL must only point to a file generated for the
+      // authenticated user. External URLs are checked by the DTO instead.
+      if (avatarUrl && avatarUrl.startsWith('/api/') && !this.isOwnAvatarUrl(id, avatarUrl)) {
+        throw new BadRequestException('Duong dan anh dai dien khong hop le');
+      }
+      update['avatarUrl'] = avatarUrl || null;
     }
     const before = await this.userModel.findByIdAndUpdate(id, { $set: update }).select('fullName phone avatarUrl').exec();
     await this.audit.write({
@@ -592,6 +598,14 @@ export class CommunityService {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
     return new Types.ObjectId(value);
+  }
+
+  /** A user cannot attach another person's internally stored avatar to their profile. */
+  private isOwnAvatarUrl(userId: Types.ObjectId, avatarUrl: string): boolean {
+    const owner = userId.toString();
+    const prefix = `/api/community/users/${owner}/avatar/avatar-${owner}-`;
+    const fileName = avatarUrl.slice(prefix.length);
+    return avatarUrl.startsWith(prefix) && AVATAR_FILE.test(`avatar-${owner}-${fileName}`);
   }
 
   /** A post may only point at a pet profile the author owns. */

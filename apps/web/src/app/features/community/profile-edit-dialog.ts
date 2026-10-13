@@ -22,6 +22,10 @@ export interface ProfileEditResult {
 type AvatarSource = 'DEVICE' | 'LINK';
 type Problem = { key?: string; message?: string };
 
+// Locally uploaded avatars use a same-origin `/api/...` path in production;
+// pasting an external avatar remains restricted to HTTP(S).
+const AVATAR_URL = /^(?:https?:\/\/\S+|\/api\/community\/users\/[a-f0-9]{24}\/avatar\/avatar-[a-f0-9]{24}-[0-9a-f-]{36}\.(?:jpg|png|webp))?$/i;
+
 interface EditForm {
   fullName: FormControl<string>;
   phone: FormControl<string>;
@@ -66,7 +70,7 @@ export class ProfileEditDialog {
     }),
     avatarUrl: new FormControl(this.profile.avatarUrl ?? '', {
       nonNullable: true,
-      validators: [Validators.maxLength(500), Validators.pattern(/^(https?:\/\/\S+)?$/)],
+      validators: [Validators.maxLength(500), Validators.pattern(AVATAR_URL)],
     }),
   });
 

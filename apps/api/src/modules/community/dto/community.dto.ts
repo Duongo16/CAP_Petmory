@@ -4,6 +4,9 @@ import { PostTopic } from '../schemas/post.schema';
 
 const TAG_PATTERN = /^[\p{L}\p{N} _-]{1,30}$/u;
 const VIETNAMESE_PHONE = /^(0\d{9})?$/;
+// Uploaded avatars are served by this API through a same-origin relative URL in
+// production (`/api/...`).  External avatars must still use an HTTP(S) URL.
+const AVATAR_URL = /^(?:https?:\/\/\S+|\/api\/community\/users\/[a-f0-9]{24}\/avatar\/avatar-[a-f0-9]{24}-[0-9a-f-]{36}\.(?:jpg|png|webp))?$/i;
 
 /** Converts only the conventional Vietnamese forms that have one clear value. */
 export function normalizeVietnamesePhone(value: string): string {
@@ -61,7 +64,7 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  @Matches(/^(https?:\/\/\S+)?$/, { message: 'Duong dan anh phai bat dau bang http:// hoac https://' })
+  @Matches(AVATAR_URL, { message: 'Duong dan anh dai dien khong hop le' })
   avatarUrl?: string;
 }
 
