@@ -11,7 +11,7 @@ import { AiKind, AiMode } from '../ai/schemas/ai-usage.schema';
 import { MSG } from '../../common/constants/messages';
 
 /** Bo thao tac mac dinh khi khach khong chon gi. */
-const OPERATIONS: RestoreOperation[] = ['UPSCALE', 'SHARPEN', 'DENOISE', 'EXPOSURE'];
+const OPERATIONS: RestoreOperation[] = ['UPSCALE', 'SHARPEN', 'DENOISE', 'EXPOSURE', 'FACE_DETAIL'];
 
 /** Loi dan cho tung thao tac AI; luon nhac giu nguyen dac diem cua be. */
 const AI_INSTRUCTION: Record<string, string> = {
@@ -71,10 +71,10 @@ export class PhotoRestoreService {
     private readonly config: ConfigService,
   ) {}
 
-  /** Dung dich vu anh tru khi da chon ro Gemini, hoac dich vu anh chua cau hinh. */
+  /** Lua chon Cloudinary ro rang khong duoc tu chuyen sang Gemini. */
   private get useCloud(): boolean {
     const wanted = this.config.get<string>('ai.imageProvider') ?? '';
-    return wanted !== 'gemini' && this.cloud.ready;
+    return wanted === 'cloudinary' || (wanted !== 'gemini' && this.cloud.ready);
   }
 
   async run(owner: string, file: Express.Multer.File | undefined, chosen: RestoreOperation[] = []): Promise<RestoreOutcome> {

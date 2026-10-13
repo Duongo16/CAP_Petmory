@@ -2008,11 +2008,11 @@
   "RESTORE": {
     "EYEBROW": "PHỤC HỒI ẢNH",
     "TITLE": "Làm mới một tấm ảnh cũ",
-    "SUB": "Gửi lên một tấm ảnh bất kỳ. Hệ thống làm nét, khử nhiễu và cân sáng, cho bạn so sánh trước sau rồi tải bản mới về máy. Ảnh không được lưu lại trên hệ thống.",
+    "SUB": "Gửi ảnh thú cưng để AI phục hồi chi tiết, làm nét và cân sáng. Bạn có thể so sánh trước sau rồi tải về; bản phục hồi chỉ được lưu khi bạn chọn lưu vào album.",
     "DROP": "Kéo thả ảnh vào đây",
     "DROP_SUB": "Hoặc bấm để chọn tệp. Nhận JPG và PNG, tối đa 25 MB.",
     "WORKING": "Đang phục hồi...",
-    "WORKING_SUB": "Ảnh lớn có thể mất vài giây.",
+    "WORKING_SUB": "AI có thể cần đến một phút để xử lý ảnh.",
     "WRONG_TYPE": "Chỉ nhận ảnh JPG hoặc PNG",
     "TOO_BIG": "Ảnh vượt quá 25 MB",
     "FAILED": "Phục hồi không thành công. Vui lòng thử lại.",
@@ -2028,7 +2028,7 @@
     "ANOTHER": "Phục hồi ảnh khác",
     "QUOTA": "Bạn đã dùng hết lượt phục hồi ảnh. Hãy quay lại sau khi lượt được cộng lại.",
     "OPERATIONS": "Chọn cách phục hồi",
-    "AI_HINT": "Hai thao tác có nhãn AI dùng mô hình sửa ảnh, tính vào lượt phục hồi.",
+    "AI_HINT": "Khôi phục bằng AI được chọn sẵn. Ảnh được gửi tạm đến dịch vụ AI để xử lý và tính vào hạn mức; tắt lựa chọn AI để chỉ dùng bộ lọc.",
     "PICK_ONE": "Hãy chọn ít nhất một cách phục hồi.",
     "MODE_LIVE": "Đã dùng AI để phục hồi ảnh này.",
     "MODE_LOCAL": "Ảnh này được phục hồi bằng bộ lọc tại máy chủ, không dùng AI.",
@@ -2042,7 +2042,7 @@
       "DENOISE": "Giảm nhiễu",
       "EXPOSURE": "Cân sáng",
       "CONTRAST": "Tăng tương phản",
-      "FACE_DETAIL": "Tăng chi tiết khuôn mặt",
+      "FACE_DETAIL": "Khôi phục chi tiết bằng AI",
       "REMOVE_BACKGROUND": "Tách nền"
     },
     "QUOTA_LEFT": "Còn {{left}} lượt phục hồi, tối đa {{day}} lượt mỗi ngày."

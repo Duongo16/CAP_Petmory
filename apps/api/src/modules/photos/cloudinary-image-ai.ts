@@ -79,7 +79,11 @@ export class CloudinaryImageAi {
     }
     let publicId = '';
     try {
-      const uploaded = await this.upload(data);
+      // e_gen_restore chi nhan anh khong trong suot; lot nen trang cho PNG co alpha.
+      const ready = operations.includes('FACE_DETAIL')
+        ? await sharp(data).flatten({ background: '#ffffff' }).png().toBuffer()
+        : data;
+      const uploaded = await this.upload(ready);
       publicId = uploaded.public_id;
       let edited = await this.download(publicId, effects);
       // Tach nen cho ra nen trong suot; lot nen trang de anh dung duoc ngay nhu loi dan cu.

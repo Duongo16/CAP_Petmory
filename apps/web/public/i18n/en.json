@@ -2008,11 +2008,11 @@
   "RESTORE": {
     "EYEBROW": "PHOTO RESTORATION",
     "TITLE": "Bring an old photograph back",
-    "SUB": "Upload any picture. It is sharpened, denoised and rebalanced, then you can compare before and after and download the new copy. Nothing is kept on the server.",
+    "SUB": "Upload a pet photo for AI detail restoration, sharpening and light adjustment. Compare the result and download it; the restored copy is saved only if you choose to add it to an album.",
     "DROP": "Drop a photograph here",
     "DROP_SUB": "Or click to choose a file. JPG and PNG, up to 25 MB.",
     "WORKING": "Working on it...",
-    "WORKING_SUB": "A large photograph can take a few seconds.",
+    "WORKING_SUB": "AI processing can take up to a minute.",
     "WRONG_TYPE": "Only JPG or PNG photographs are accepted",
     "TOO_BIG": "The photograph is larger than 25 MB",
     "FAILED": "The restoration did not work. Please try again.",
@@ -2028,7 +2028,7 @@
     "ANOTHER": "Restore another picture",
     "QUOTA": "You have used all your photo restores. Please come back once your turns are topped up.",
     "OPERATIONS": "Choose how to restore",
-    "AI_HINT": "The two options marked AI use an image model and count towards your restorations.",
+    "AI_HINT": "AI restoration is selected by default. The image is sent temporarily to an AI service and counts toward your quota; turn off the AI option to use server filters only.",
     "PICK_ONE": "Choose at least one option.",
     "MODE_LIVE": "This photo was restored with AI.",
     "MODE_LOCAL": "This photo was restored with server filters, without AI.",
@@ -2042,7 +2042,7 @@
       "DENOISE": "Reduce noise",
       "EXPOSURE": "Balance light",
       "CONTRAST": "Boost contrast",
-      "FACE_DETAIL": "Face detail",
+      "FACE_DETAIL": "Restore details with AI",
       "REMOVE_BACKGROUND": "Remove background"
     },
     "QUOTA_LEFT": "{{left}} restores left, up to {{day}} a day."

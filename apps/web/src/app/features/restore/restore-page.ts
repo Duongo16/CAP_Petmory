@@ -23,7 +23,7 @@ const OPERATION_LIST: { code: RestoreOperation; key: string; ai: boolean }[] = [
   { code: 'REMOVE_BACKGROUND', key: 'RESTORE.OP.REMOVE_BACKGROUND', ai: true },
 ];
 
-const OPERATION_DEFAULT: RestoreOperation[] = ['UPSCALE', 'SHARPEN', 'DENOISE', 'EXPOSURE'];
+const OPERATION_DEFAULT: RestoreOperation[] = ['UPSCALE', 'SHARPEN', 'DENOISE', 'EXPOSURE', 'FACE_DETAIL'];
 
 /** Kich thuoc that cua mot tam anh, doc khi anh tai xong. */
 interface Size {
@@ -50,7 +50,7 @@ export class RestorePage {
   private readonly petsService = inject(PetsService);
   private readonly photos = inject(PhotosService);
 
-  /** Thao tac dang chon; mac dinh bon bo loc tai may. */
+  /** Thao tac dang chon; mac dinh phuc hoi bang AI sau bon bo loc tai may. */
   readonly operations = signal<RestoreOperation[]>([...OPERATION_DEFAULT]);
   readonly operationCards = computed(() =>
     OPERATION_LIST.map((one) => ({ ...one, on: this.operations().includes(one.code) })),

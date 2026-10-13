@@ -55,8 +55,11 @@ async function run() {
     await page.waitForSelector('.ops .op', { timeout: 15000 });
     res.push(check('The customer can choose among seven operations, two marked AI',
       (await page.locator('.ops .op').count()) === 7 && (await page.locator('.ops .ai-tag').count()) === 2));
+    res.push(check('Cloudinary restoration is selected by default',
+      (await page.locator('.op[data-op="FACE_DETAIL"]').getAttribute('aria-pressed')) === 'true'));
 
     // Chi bo loc tai may: ket qua ghi ro khong dung AI.
+    await page.click('.op[data-op="FACE_DETAIL"]');
     await page.click('#restore-run');
     await page.waitForSelector('#restore-mode', { timeout: 60000 });
     res.push(check('Filters only are reported as not using AI', (await page.locator('#restore-mode.note-ok').count()) === 0));
@@ -65,16 +68,12 @@ async function run() {
     await page.goto(`${WEB}/restore`, { waitUntil: 'networkidle' });
     await page.setInputFiles('#restore-file', file);
     await page.waitForSelector('.ops .op', { timeout: 15000 });
-    for (const code of ['UPSCALE', 'SHARPEN', 'DENOISE', 'EXPOSURE']) {
-      await page.click(`.op[data-op="${code}"]`);
-    }
-    await page.click('.op[data-op="REMOVE_BACKGROUND"]');
     await page.click('#restore-run');
     await page.waitForSelector('#restore-mode', { timeout: 120000 });
     const live = (await page.locator('#restore-mode.note-ok').count()) === 1;
     const skipped = (await page.locator('#restore-skipped').count()) === 1;
-    // Dich vu anh chay duoc tren goi mien phi, nen tach nen phai chay that chu khong duoc bo qua.
-    res.push(check('Background removal runs for real through the image service', live && !skipped,
+    // e_gen_restore phai chay that chu khong duoc bo qua.
+    res.push(check('Generative restoration runs for real through Cloudinary', live && !skipped,
       live ? 'AI that' : 'bao khong lam duoc'));
     await page.screenshot({ path: path.join(OUT, 'restore-ai.png'), fullPage: true });
 
