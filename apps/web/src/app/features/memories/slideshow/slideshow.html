@@ -49,10 +49,11 @@
 
     @if (track(); as tune) {
       <audio
+        #player
         class="tune"
         [src]="tune.url"
         [muted]="muted()"
-        autoplay
+        preload="auto"
         loop
       ></audio>
       <p class="credit m-0 text-center text-xs text-ink-muted">{{ tune.title }}@if (tune.credit) { — {{ tune.credit }}}</p>

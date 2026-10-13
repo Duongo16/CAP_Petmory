@@ -102,20 +102,29 @@ async function addCustomLine(token, { productTypeCode = 'PT-01', sizeCode = 'FIG
   return { ...ready, status: res.status, body: await asJson(res) };
 }
 
+/** Cho lop phu dang tai bien mat, neu no khong hien thi thi bo qua. */
+async function waitOverlayGone(page, timeout = 30000) {
+  await page.waitForSelector('.pm-loading-overlay', { state: 'detached', timeout }).catch(() => undefined);
+}
+
 /**
- * Di qua buoc anh cua be o dau studio tren trinh duyet.
+ * Dung mau tu anh cua be ngay trong buoc chon mau tren trinh duyet.
  *
- * Chon be da co anh, bam dung mau tu anh roi cho san khau sang buoc chon mau.
+ * Buoc nay khong bat buoc: chon be trong o dung mau tu anh, bam nut nop anh roi
+ * cho khung ket qua hien ra. Studio van o buoc chon mau voi mau vua chon.
  * Khong truyen ma be thi chon be dau tien trong danh sach.
  */
 async function passPhotoStep(page, petId) {
-  await page.waitForSelector('#studio-pet', { timeout: 40000 });
-  await page.waitForFunction(() => document.querySelectorAll('#studio-pet option').length > 1, null, { timeout: 20000 });
-  const pick = petId || (await page.locator('#studio-pet option').nth(1).getAttribute('value'));
-  await page.selectOption('#studio-pet', pick);
+  await page.waitForSelector('#studio-match-box', { timeout: 40000 });
+  await page.waitForFunction(() => document.querySelectorAll('#studio-match-pet option').length > 1, null, { timeout: 20000 });
+  const pick = petId || (await page.locator('#studio-match-pet option').nth(1).getAttribute('value'));
+  await waitOverlayGone(page);
+  await page.selectOption('#studio-match-pet', pick);
   await page.waitForSelector('#studio-match:not([disabled])', { timeout: 20000 });
+  await waitOverlayGone(page);
   await page.click('#studio-match');
-  await page.waitForSelector('[data-step="MODEL"][aria-selected="true"]', { timeout: 60000 });
+  await page.waitForSelector('#studio-match-result', { timeout: 60000 });
+  await waitOverlayGone(page);
 }
 
-module.exports = { readyDesign, addCustomLine, samplePhoto, petWithPhotos, ensurePhotos, minPhotosOf, passPhotoStep };
+module.exports = { readyDesign, addCustomLine, samplePhoto, petWithPhotos, ensurePhotos, minPhotosOf, passPhotoStep, waitOverlayGone };

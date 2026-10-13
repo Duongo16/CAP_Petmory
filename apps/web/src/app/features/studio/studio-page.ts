@@ -55,10 +55,10 @@ type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 export type Step = 'MODEL' | 'COLOR' | 'STAND' | 'PHOTOS' | 'FINISH';
 
 /**
- * Thu tu cac buoc: anh cua be di truoc, de he thong dung san mot mau gan giong
- * be nhat roi khach moi chon lai mau, to len va hoan tat.
+ * Thu tu cac buoc. Dung mau tu anh la tuy chon, nam gon trong buoc chon mau:
+ * khach nop anh de he thong tu chon mau, hoac tu chon lay.
  */
-export const STEPS: Step[] = ['PHOTOS', 'MODEL', 'COLOR', 'STAND', 'FINISH'];
+export const STEPS: Step[] = ['MODEL', 'COLOR', 'STAND', 'PHOTOS', 'FINISH'];
 
 /** Nhan va bieu tuong cua tung ngan, viet ra tung key de tim duoc. */
 const STEP_VIEW: Record<Step, { key: string; icon: string }> = {
@@ -131,7 +131,7 @@ export class StudioPage implements OnInit {
   /** Cac ma mau nguoi dung da tha len mau, theo thu tu da dung. */
   private readonly colorCodesUsed = signal<string[]>([]);
 
-  readonly step = signal<Step>('PHOTOS');
+  readonly step = signal<Step>('MODEL');
   readonly status = signal<ScreenState>('LOADING');
   readonly baseModel = signal<BaseModel[]>([]);
   readonly baseModelSelected = signal<BaseModel | null>(null);
@@ -149,15 +149,6 @@ export class StudioPage implements OnInit {
 
   private declaredZones: DeclaredZone[] = [];
   private library: ModelLibrary | null = null;
-
-  /**
-   * Da co mau de tuy bien chua: vua dung tu anh, hoac dang mo mot ban da co.
-   * Chua co thi chua cho roi buoc anh cua be.
-   */
-  readonly hasDesign = computed(() => this.facade.designId() !== null);
-
-  /** Nut sang buoc tiep bi khoa khi dang o buoc anh ma chua dung mau. */
-  readonly nextLocked = computed(() => this.step() === 'PHOTOS' && !this.hasDesign());
 
   /** Ten loai, tu the va o mau tung vung cua lan dung mau gan nhat. */
   readonly matchView = computed(() => {
@@ -429,9 +420,7 @@ export class StudioPage implements OnInit {
           this.baseModel.set(ready);
           this.status.set(ready.length > 0 ? 'READY' : 'ERROR');
           if (codeDraft) {
-            // Mo mot ban da co thi khong can dung mau tu anh nua, vao thang buoc chon mau.
             this.openDesign(codeDraft);
-            this.step.set('MODEL');
             return;
           }
           const first = ready.find((m) => m.pose === 'SITTING') ?? ready[0] ?? null;
@@ -463,16 +452,12 @@ export class StudioPage implements OnInit {
     });
   }
 
-  /** Dung san mau tu anh cua be, mo mau do len roi sang buoc chon mau. */
+  /** Dung san mau tu anh cua be va mo mau do len ngay trong buoc chon mau. */
   matchFromPhoto(): void {
-    this.facade.matchFromPhoto((designId) => this.openDesign(designId, () => this.go('MODEL')));
+    this.facade.matchFromPhoto((designId) => this.openDesign(designId));
   }
 
   go(step: Step): void {
-    // Chua dung mau tu anh thi chua sang duoc cac buoc sau.
-    if (step !== 'PHOTOS' && !this.hasDesign()) {
-      return;
-    }
     this.step.set(step);
     // Sang ngan hoan tat ma chua co anh thi tu chup sau goc, de khoi phai nho bam.
     if (step === 'FINISH' && this.preview().length === 0) {
@@ -595,7 +580,7 @@ export class StudioPage implements OnInit {
     );
   }
 
-  saveDraft(): void {
+  saveDraft(onSaved?: () => void): void {
     const model = this.baseModelSelected();
     if (!model) {
       return;
@@ -606,12 +591,39 @@ export class StudioPage implements OnInit {
       this.colorCodesUsed(),
       this.zonePaintOf(model),
       this.preview().map((m) => ({ angle: m.angle as PreviewAngle, photo: m.photo })),
+      onSaved,
     );
   }
 
+  /**
+   * Them vao gio.
+   *
+   * Nut luon bam duoc. Con thieu dieu kien thi hien danh sach ly do, moi ly do
+   * kem nut dua ve dung buoc can sua. Ban thiet ke chua luu hay vua doi thi tu
+   * luu truoc roi moi them, khach khong phai nho bam luu.
+   */
   addToCart(): void {
-    this.facade.addToCart(this.facade.form.getRawValue().engravedName.trim());
+    this.cartTried.set(true);
+    if (this.facade.cartBlockers().length > 0) {
+      this.facade.form.controls.name.markAsTouched();
+      return;
+    }
+    const petName = this.facade.form.getRawValue().engravedName.trim();
+    if (this.facade.designId() === null || this.facade.standDirty()) {
+      this.saveDraft(() => this.facade.addToCart(petName));
+      return;
+    }
+    this.facade.addToCart(petName);
   }
+
+  /** Da bam them vao gio it nhat mot lan, tu do moi hien ly do con thieu. */
+  private readonly cartTried = signal(false);
+
+  /** Ly do chua them duoc vao gio, cap nhat ngay khi khach sua xong tung muc. */
+  readonly cartProblems = computed(() => (this.cartTried() ? this.facade.cartBlockers() : []));
+
+  /** Nut them vao gio chi khoa trong luc dang luu hoac dang gui. */
+  readonly cartBusy = computed(() => this.facade.statusSave() === 'SAVING' || this.facade.addingToCart());
 
   /** Dat san ten ban thiet ke theo mau vua chon, neu nguoi dung chua tu dat. */
   private nameDraftFor(model: BaseModel | null): void {

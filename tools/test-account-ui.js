@@ -38,6 +38,16 @@ async function run() {
     await page.fill('input[formcontrolname="password"]', PASSWORD);
     await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 20000 });
+
+    // Menu avatar dua thang toi cac trang rieng cua khach, trong do co Thiet ke cua toi.
+    await page.locator('.account-button').click();
+    await page.waitForSelector('.account-menu', { timeout: 10000 });
+    const designsLink = page.locator('.account-menu .personal-link[data-path="/designs"]');
+    res.push(check('The avatar menu lists My designs', (await designsLink.innerText()).includes('Thiết kế của tôi')));
+    await designsLink.click();
+    await page.waitForURL('**/designs', { timeout: 15000 });
+    res.push(check('My designs opens from the avatar menu', page.url().endsWith('/designs'), page.url()));
+
     await page.goto(`${WEB}/account`, { waitUntil: 'networkidle' });
     await page.waitForSelector('#account-name', { timeout: 20000 });
     res.push(check('The account page opens with the current name', (await page.inputValue('#account-name')) === 'Tai khoan test'));

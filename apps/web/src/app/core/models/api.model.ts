@@ -705,6 +705,8 @@ export interface PhotoMatchInfo {
   /** Chua co mau nen cho loai nay nen dung mau mac dinh. */
   fallback: boolean;
   zonePaint: ZonePaint[];
+  /** Dac diem AI doc tu anh de xuong tham khao. */
+  notes?: string;
 }
 
 /** Ket qua dung san mau tu anh: ban thiet ke vua tao va nhung gi nhan ra. */
@@ -1038,6 +1040,8 @@ export interface ProductionItem {
   packaging?: { code: string; kind: PackagingKind; displayName: string }[];
   /** Dac diem rieng cua be khach ghi. */
   featureNote?: string;
+  /** Dac diem AI doc tu anh cua be, chi de tham khao. */
+  aiNote?: string;
   /** Vi tri dong trong don, de doc anh tu ban chup cua dong. */
   rowIndex?: number;
   pet?: { name: string; breed: string; kind: string; trait: string[] } | null;

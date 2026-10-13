@@ -1,4 +1,4 @@
-const { petWithPhotos, passPhotoStep } = require('./lib/made-to-order');
+const { petWithPhotos, passPhotoStep, waitOverlayGone } = require('./lib/made-to-order');
 /**
  * Kiem thu phu kien tu dau den cuoi (SOW muc 5, 6, 12): khach gan va thao phu kien
  * tren mau nen, moi diem neo mot mon, gioi han theo kich co, gia cong vao bao gia,
@@ -13,6 +13,15 @@ const API = 'http://localhost:3000/api';
 const EMAIL = `acc.${Date.now()}@petmory.local`;
 const PASSWORD = 'Password@123';
 const OUT = path.join(__dirname, '..', 'test-screenshots');
+
+/**
+ * Bam sau khi lop phu dang tai bien mat. Moi lan doi phu kien studio goi may chu
+ * va lop phu che man hinh, bam ngay luc do thi cu bam roi vao lop phu.
+ */
+async function tap(page, selector) {
+  await waitOverlayGone(page);
+  await page.locator(selector).click();
+}
 
 function check(name, passed, note = '') {
   console.log(`  ${passed ? 'PASS  ' : 'FAIL  '} ${name}${note ? '  ' + note : ''}`);
@@ -46,37 +55,37 @@ async function run() {
     await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 20000 });
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('#studio-pet', { timeout: 40000 });
-    res.push(check('The studio opens on the pet photo step with the accessory step locked',
-      (await page.locator('[data-step="PHOTOS"]').getAttribute('aria-selected')) === 'true'
-        && (await page.locator('[data-step="STAND"]').isDisabled())));
-    // Buoc mot: chon be co anh roi dung mau, sau do moi gan phu kien duoc.
+    await page.waitForSelector('#studio-match-box', { timeout: 40000 });
+    res.push(check('The studio opens on the model step with the accessory step open',
+      (await page.locator('[data-step="MODEL"]').getAttribute('aria-selected')) === 'true'
+        && !(await page.locator('[data-step="STAND"]').isDisabled())));
+    // Dung mau tu anh cua be o buoc chon mau, roi chon mau cun ngoi de gan phu kien.
     await passPhotoStep(page, petId);
     await page.waitForSelector('.model[data-model]', { timeout: 40000 });
-    await page.locator('.model[data-model="BASE-DOG-SIT"]').click();
+    await tap(page, '.model[data-model="BASE-DOG-SIT"]');
     await page.waitForTimeout(2500);
 
     // Chon san pham va kich co truoc de biet gioi han phu kien.
-    await page.locator('[data-step="FINISH"]').click();
-    await page.locator('.product:has-text("Tượng len chọc")').click();
-    await page.locator('.chip:has-text("Vừa")').click();
+    await tap(page, '[data-step="FINISH"]');
+    await tap(page, '.product:has-text("Tượng len chọc")');
+    await tap(page, '.chip:has-text("Vừa")');
     await page.waitForSelector('.quote-price', { timeout: 20000 });
     const plain = digits(await page.locator('.quote-price').innerText());
 
-    await page.locator('[data-step="STAND"]').click();
+    await tap(page, '[data-step="STAND"]');
     await page.waitForSelector('.accessory', { timeout: 10000 });
     res.push(check('The stand step lists the accessories', (await page.locator('.accessory').count()) === 6));
-    await page.locator('.accessory[data-accessory="ACC-KNIT-HAT"]').click();
-    await page.locator('.accessory[data-accessory="ACC-BOW"]').click();
+    await tap(page, '.accessory[data-accessory="ACC-KNIT-HAT"]');
+    await tap(page, '.accessory[data-accessory="ACC-BOW"]');
     res.push(check('A second accessory on the same anchor replaces the first',
       (await page.locator('.accessory[data-accessory="ACC-KNIT-HAT"]').getAttribute('aria-pressed')) === 'false'
       && (await page.locator('.accessory[data-accessory="ACC-BOW"]').getAttribute('aria-pressed')) === 'true'));
-    await page.locator('.accessory[data-accessory="ACC-COLLAR-TAG"]').click();
-    await page.locator('.accessory[data-accessory="ACC-GLASSES"]').click();
+    await tap(page, '.accessory[data-accessory="ACC-COLLAR-TAG"]');
+    await tap(page, '.accessory[data-accessory="ACC-GLASSES"]');
     const counter = (await page.locator('.group-title .count').first().innerText()).trim();
     const max = Number(counter.split('/')[1]);
     if (max <= 3) {
-      await page.locator('.accessory[data-accessory="ACC-CAPE"]').click();
+      await tap(page, '.accessory[data-accessory="ACC-CAPE"]');
       res.push(check('Going over the size limit is refused with a note',
         (await page.locator('.acc-note').count()) === 1
         && (await page.locator('.accessory[data-accessory="ACC-CAPE"]').getAttribute('aria-pressed')) === 'false', counter));
@@ -85,11 +94,11 @@ async function run() {
     await page.screenshot({ path: path.join(OUT, 'accessories-studio.png') });
 
     await page.fill('input[formcontrolname="name"]', 'Cun ngoi co phu kien');
-    // Be da chon tu buoc mot, quay lai buoc anh chi de chac be van du anh.
-    await page.locator('[data-step="PHOTOS"]').click();
+    // Be da chon o khung dung mau, sang buoc anh chi de chac be van du anh.
+    await tap(page, '[data-step="PHOTOS"]');
     await page.waitForSelector('#studio-photo-need.ok', { timeout: 20000 });
-    res.push(check('The pet chosen in step one is kept', (await page.locator('#studio-pet').inputValue()) === petId));
-    await page.locator('[data-step="FINISH"]').click();
+    res.push(check('The pet chosen in the model step is kept', (await page.locator('#studio-pet').inputValue()) === petId));
+    await tap(page, '[data-step="FINISH"]');
     const expected = plain + price['ACC-BOW'] + price['ACC-COLLAR-TAG'] + price['ACC-GLASSES'];
     await page.waitForFunction((want) => Number((document.querySelector('.quote-price')?.textContent ?? '').replace(/\D/g, '')) === want,
       expected, { timeout: 15000 }).catch(() => undefined);
@@ -98,14 +107,14 @@ async function run() {
     res.push(check('The price line names the accessories',
       (await page.locator('.acc-line').innerText()).includes('Nơ cài đầu')));
 
-    await page.locator('button:has-text("Lưu bản thiết kế")').click();
+    await tap(page, 'button:has-text("Lưu bản thiết kế")');
     await page.waitForSelector('.note.ok', { timeout: 40000 });
     const list = await (await api.get(`${API}/designs`, { headers: auth })).json();
     const design = await (await api.get(`${API}/designs/${list[0]._id}`, { headers: auth })).json();
     res.push(check('The design stores the accessories',
       (design.accessories ?? []).join(',') === 'ACC-BOW,ACC-COLLAR-TAG,ACC-GLASSES', (design.accessories ?? []).join(',')));
 
-    await page.locator('button:has-text("Thêm vào giỏ hàng")').click();
+    await tap(page, 'button:has-text("Thêm vào giỏ hàng")');
     await page.waitForSelector('a:has-text("Xem giỏ hàng")', { timeout: 20000 });
     const cart = await (await api.get(`${API}/cart`, { headers: auth })).json();
     const line = cart.items[0];
@@ -118,9 +127,9 @@ async function run() {
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
     await passPhotoStep(page, petId);
     await page.waitForSelector('.model[data-model]', { timeout: 40000 });
-    await page.locator('.model[data-model="Q-SHIBA"]').click();
+    await tap(page, '.model[data-model="Q-SHIBA"]');
     await page.waitForTimeout(1500);
-    await page.locator('[data-step="STAND"]').click();
+    await tap(page, '[data-step="STAND"]');
     await page.waitForSelector('.acc-hint', { timeout: 10000 }).catch(() => undefined);
     res.push(check('A model without anchors explains it cannot take accessories',
       (await page.locator('.acc-hint').count()) === 1 && (await page.locator('.accessory').count()) === 0));

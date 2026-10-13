@@ -210,6 +210,20 @@ async function makePhoto(where, shift) {
   ok('Doi hieu ung roi mo lai van giu nguyen',
     (await page.locator('.knobs .chip.on').innerText()).includes('Phóng'),
     (await page.locator('.knobs .chip.on').innerText()).trim());
+  // Nhac nen: chon bai, bam phat thi nhac chay that, bam tam dung thi nhac dung.
+  await page.selectOption('.knobs select', { index: 1 });
+  await page.waitForSelector('audio.tune', { state: 'attached', timeout: 15000 });
+  ok('Chon bai thi trinh chieu co the phat nhac', (await page.locator('audio.tune').count()) === 1);
+  await page.locator('.bar .tw-btn-primary').click();
+  const sounding = await page.waitForFunction(() => {
+    const player = document.querySelector('audio.tune');
+    return player && !player.paused && player.currentTime > 0.2;
+  }, null, { timeout: 15000 }).then(() => true, () => false);
+  ok('Bam phat thi nhac chay', sounding);
+  ok('Nhac mo san tieng', !(await page.locator('audio.tune').evaluate((one) => one.muted)));
+  await page.locator('.bar .tw-btn-primary').click();
+  await page.waitForTimeout(500);
+  ok('Bam tam dung thi nhac dung', await page.locator('audio.tune').evaluate((one) => one.paused));
   await page.screenshot({ path: path.join(OUT, 'diary-4-slideshow.png') });
 
   // --- Trang cong dong doc duoc khi chua dang nhap ---

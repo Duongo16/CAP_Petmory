@@ -42,6 +42,8 @@ export interface ProductionItem {
   /** Hop va khung khach chon, xuong dong goi kem. */
   packaging: { code: string; kind: string; displayName: string }[];
   featureNote?: string;
+  /** Dac diem AI doc tu anh cua be, chi de tham khao. */
+  aiNote?: string;
   /** Vi tri dong trong don. */
   rowIndex?: number;
   pet?: { name: string; breed: string; kind: string; trait: string[] } | null;
@@ -216,6 +218,7 @@ export class ProductionFileService {
     const pet = petId ? await this.petModel.findById(petId).select('name breed trait kind').exec() : null;
     return {
       featureNote: taken?.featureNote ?? older?.featureNote ?? '',
+      aiNote: taken?.aiNote ?? older?.aiNote ?? '',
       pet: pet ? { name: pet.name, breed: pet.breed, kind: pet.kind, trait: [...(pet.trait ?? [])] } : null,
       sizeSpec,
       model: model ? { code: model.code, file: model.file, fileFull: model.fileFull ?? model.file } : null,

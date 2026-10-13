@@ -13,6 +13,8 @@ export interface PhotoReading {
   pose: string;
   breed: string;
   colours: Partial<Record<string, string>>;
+  /** Dac diem nhin thay trong anh, viet bang loi cho xuong, ghi ro phan nao la doan. */
+  notes?: string;
 }
 
 /** Mau nen chon cho ban dung san, va co phai dung mau mac dinh vi chua co mau cho loai do. */
@@ -195,7 +197,7 @@ export function cleanReading(raw: unknown, zones: string[]): PhotoReading | null
   if (!raw || typeof raw !== 'object') {
     return null;
   }
-  const one = raw as { kind?: unknown; pose?: unknown; breed?: unknown; colors?: unknown; colours?: unknown };
+  const one = raw as { kind?: unknown; pose?: unknown; breed?: unknown; colors?: unknown; colours?: unknown; notes?: unknown };
   const kind = String(one.kind ?? '').toUpperCase();
   const pose = String(one.pose ?? '').toUpperCase();
   const given = (one.colors ?? one.colours ?? {}) as Record<string, unknown>;
@@ -214,5 +216,6 @@ export function cleanReading(raw: unknown, zones: string[]): PhotoReading | null
     pose: ['SITTING', 'STANDING', 'LYING'].includes(pose) ? pose : '',
     breed: String(one.breed ?? '').slice(0, 80),
     colours,
+    notes: String(one.notes ?? '').trim().slice(0, 1000),
   };
 }

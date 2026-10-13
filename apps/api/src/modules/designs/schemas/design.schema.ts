@@ -182,6 +182,15 @@ export class Design {
   @Prop({ trim: true, default: '', maxlength: 500 })
   featureNote!: string;
 
+  /**
+   * Dac diem AI doc duoc tu anh cua be, chi de xuong tham khao.
+   *
+   * Khach chi bat buoc gui anh chinh dien, nen phan lung va duoi co the la do
+   * AI doan; doan nao cung duoc ghi ro la doan.
+   */
+  @Prop({ trim: true, default: '', maxlength: 1000 })
+  aiNote!: string;
+
   @Prop({ type: [PreviewImageSchema], default: [] })
   preview!: Preview[];
 

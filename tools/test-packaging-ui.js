@@ -102,12 +102,12 @@ async function run() {
     const chips = await page.locator('.pack-chip').allInnerTexts();
     res.push(check('The cart shows the box and frame on the line', chips.length === 2, chips.join(' | ')));
 
-    // Be cua ban thiet ke san da du anh, nen dung mau tu anh o buoc mot duoc ngay.
+    // Be cua ban thiet ke san da du anh, nen dung mau tu anh o buoc chon mau duoc ngay.
     await page.goto(`${WEB}/studio`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('#studio-pet', { timeout: 40000 });
-    res.push(check('The studio opens on the pet photo step with the finish step locked',
-      (await page.locator('[data-step="PHOTOS"]').getAttribute('aria-selected')) === 'true'
-        && (await page.locator('[data-step="FINISH"]').isDisabled())));
+    await page.waitForSelector('#studio-match-box', { timeout: 40000 });
+    res.push(check('The studio opens on the model step with the finish step open',
+      (await page.locator('[data-step="MODEL"]').getAttribute('aria-selected')) === 'true'
+        && !(await page.locator('[data-step="FINISH"]').isDisabled())));
     await passPhotoStep(page, ready.petId);
     await page.waitForSelector('.model[data-model]', { timeout: 40000 });
     await page.locator('.model[data-model="BASE-DOG-SIT"]').click();

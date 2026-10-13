@@ -69,7 +69,13 @@ describe('zonePaintOf', () => {
 describe('cleanReading', () => {
   it('keeps only known kinds, poses and well formed colours', () => {
     const read = cleanReading({ kind: 'cat', pose: 'flying', colors: { MAIN_FUR: '#8a8987', TAIL: '', EYE: 'green' } }, ZONES);
-    expect(read).toEqual({ kind: 'CAT', pose: '', breed: '', colours: { MAIN_FUR: '#8a8987' } });
+    expect(read).toEqual({ kind: 'CAT', pose: '', breed: '', colours: { MAIN_FUR: '#8a8987' }, notes: '' });
+  });
+
+  it('keeps the notes for the workshop, cut to a safe length', () => {
+    const read = cleanReading({ kind: 'DOG', notes: `  Dom nau o tai trai. ${'x'.repeat(2000)}` }, ZONES);
+    expect(read?.notes?.startsWith('Dom nau o tai trai.')).toBe(true);
+    expect(read?.notes?.length).toBe(1000);
   });
 
   it('gives up on an answer with nothing usable', () => {

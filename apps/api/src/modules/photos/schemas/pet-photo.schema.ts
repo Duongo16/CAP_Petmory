@@ -21,12 +21,15 @@ export enum PhotoAngle {
   FAVOURITE_POSE = 'FAVOURITE_POSE',
 }
 
-export const ANGLE_REQUIRED: PhotoAngle[] = [
-  PhotoAngle.FRONT,
-  PhotoAngle.LEFT_SIDE,
-  PhotoAngle.RIGHT_SIDE,
-  PhotoAngle.BACK,
-];
+/**
+ * Goc anh bat buoc: chi anh chinh dien.
+ *
+ * Doi bon goc bat buoc lam khach nan, nen chi giu anh chinh dien la bat buoc;
+ * cac goc con lai la khuyen khich. Phan AI khong nhin thay duoc ghi la doan
+ * trong ghi chu cho xuong. Thay doi nay lech muc 3 cua Phu luc 01, can Ben A
+ * ky nhan.
+ */
+export const ANGLE_REQUIRED: PhotoAngle[] = [PhotoAngle.FRONT];
 
 /** Overall quality label, which decides whether to suggest a restoration. */
 export enum QualityLabel {

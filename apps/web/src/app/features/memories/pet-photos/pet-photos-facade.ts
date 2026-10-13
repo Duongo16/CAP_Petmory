@@ -41,12 +41,17 @@ function uploadErrorKey(trouble: unknown, fallback: string): string {
   return fallback;
 }
 
-/** Khung nap theo goc (muc 3): bon goc bat buoc va hai goc tuy chon. */
+/**
+ * Khung nap theo goc (muc 3).
+ *
+ * Chi anh chinh dien la bat buoc; cac goc con lai la khuyen khich, them vao
+ * thi tuong giong be hon. Lech muc 3 cua Phu luc 01, can Ben A ky nhan.
+ */
 const SLOTS: { angle: PhotoAngle; required: boolean; key: string }[] = [
   { angle: 'FRONT', required: true, key: 'PHOTO.FRAME.ANGLE.FRONT' },
-  { angle: 'LEFT_SIDE', required: true, key: 'PHOTO.FRAME.ANGLE.LEFT_SIDE' },
-  { angle: 'RIGHT_SIDE', required: true, key: 'PHOTO.FRAME.ANGLE.RIGHT_SIDE' },
-  { angle: 'BACK', required: true, key: 'PHOTO.FRAME.ANGLE.BACK' },
+  { angle: 'LEFT_SIDE', required: false, key: 'PHOTO.FRAME.ANGLE.LEFT_SIDE' },
+  { angle: 'RIGHT_SIDE', required: false, key: 'PHOTO.FRAME.ANGLE.RIGHT_SIDE' },
+  { angle: 'BACK', required: false, key: 'PHOTO.FRAME.ANGLE.BACK' },
   { angle: 'FACE_CLOSEUP', required: false, key: 'PHOTO.FRAME.ANGLE.FACE_CLOSEUP' },
   { angle: 'FAVOURITE_POSE', required: false, key: 'PHOTO.FRAME.ANGLE.FAVOURITE_POSE' },
 ];

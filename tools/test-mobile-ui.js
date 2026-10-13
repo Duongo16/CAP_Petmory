@@ -10,6 +10,7 @@
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
+const { waitOverlayGone } = require('./lib/made-to-order');
 
 const WEB = process.env.PETMORY_WEB ?? 'http://localhost:4200';
 const API = process.env.PETMORY_API ?? 'http://localhost:3000/api';
@@ -85,6 +86,8 @@ async function run() {
       (await page.locator('pm-bottom-nav .stop').count()) === 5));
 
     // Nut tro giup noi phai nam tren thanh, khong duoc che cho den nao.
+    // Cho lop phu dang tai bien mat truoc, vi no che ca man hinh trong luc goi may chu.
+    await waitOverlayGone(page);
     const covered = await page.evaluate(() => {
       const hidden = [];
       for (const stop of document.querySelectorAll('pm-bottom-nav .stop')) {
