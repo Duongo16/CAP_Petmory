@@ -195,7 +195,7 @@ export class CommunityController {
     @Res() res: Response,
   ) {
     const data = await this.service.readAvatar(id, fileName);
-    res.setHeader('Content-Type', fileName.endsWith('.png') ? 'image/png' : 'image/jpeg');
+    res.setHeader('Content-Type', fileName.endsWith('.png') ? 'image/png' : fileName.endsWith('.webp') ? 'image/webp' : 'image/jpeg');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.send(data);

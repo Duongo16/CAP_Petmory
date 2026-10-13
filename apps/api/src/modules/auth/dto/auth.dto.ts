@@ -1,4 +1,16 @@
-import { IsEmail, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import {
+  normalizeVietnamesePhone,
+  VIETNAMESE_PHONE,
+} from '../../../common/validation/vietnamese-phone';
 
 export class RegisterDto {
   @IsEmail({}, { message: 'Email khong dung dinh dang' })
@@ -16,7 +28,15 @@ export class RegisterDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^0[0-9]{9}$/, { message: 'So dien thoai phai gom 10 chu so va bat dau bang 0' })
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') {
+      return value;
+    }
+    return normalizeVietnamesePhone(value) || undefined;
+  })
+  @Matches(VIETNAMESE_PHONE, {
+    message: 'So dien thoai phai gom 10 chu so va bat dau bang 0',
+  })
   phone?: string;
 }
 

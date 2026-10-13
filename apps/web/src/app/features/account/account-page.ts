@@ -3,14 +3,16 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
+import { map, switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { CommunityService } from '../../core/services/community.service';
 import { samePassword } from '../auth/password-match';
-import { looksLikeImage } from '../../core/utils/upload-image';
+import { avatarUploadErrorMessage } from '../../core/utils/avatar-upload-error';
+import { PICK_MAX_BYTES, looksLikeImage } from '../../core/utils/upload-image';
+import { normalizeVietnamesePhone, optionalVietnamesePhone } from '../../core/utils/vietnamese-phone';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
-
-const PHONE = /^(0\d{9})?$/;
+type Note = { bad: boolean; key?: string; message?: string };
 
 /**
  * Tai khoan cua toi (muc 2): sua ho ten, so dien thoai, anh dai dien va doi mat
@@ -34,13 +36,13 @@ export class AccountPage implements OnInit {
   readonly status = signal<ScreenState>('LOADING');
   readonly avatar = signal<string | null>(null);
   readonly profileBusy = signal(false);
-  readonly profileNote = signal<{ key: string; bad: boolean } | null>(null);
+  readonly profileNote = signal<Note | null>(null);
   readonly passwordBusy = signal(false);
   readonly passwordNote = signal<{ key: string; bad: boolean } | null>(null);
 
   readonly profile = new FormGroup({
     fullName: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2), Validators.maxLength(100)] }),
-    phone: new FormControl('', { nonNullable: true, validators: [Validators.pattern(PHONE)] }),
+    phone: new FormControl('', { nonNullable: true, validators: [optionalVietnamesePhone] }),
   });
 
   readonly password = new FormGroup(
@@ -71,7 +73,7 @@ export class AccountPage implements OnInit {
       });
   }
 
-  /** Tai anh dai dien len truoc; ho so chi doi khi bam luu. */
+  /** Uploading an image also saves its URL, so it cannot be lost on a refresh. */
   pickAvatar(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -81,24 +83,45 @@ export class AccountPage implements OnInit {
       return;
     }
     if (!looksLikeImage(file)) {
-      this.profileNote.set({ key: 'PET.PHOTO_WRONG_TYPE', bad: true });
+      this.profileNote.set({ key: 'COMMUNITY.PROFILE.AVATAR_TYPE_ERROR', bad: true });
+      return;
+    }
+    if (file.size > PICK_MAX_BYTES) {
+      this.profileNote.set({ key: 'COMMUNITY.PROFILE.AVATAR_SIZE_ERROR', bad: true });
       return;
     }
     this.profileBusy.set(true);
+    this.profileNote.set(null);
     this.community
       .uploadAvatar(file)
+      .pipe(
+        switchMap((got) => {
+          const avatarUrl = this.community.avatarUrl(me.id, got.fileName);
+          return this.community.updateProfile({ avatarUrl }).pipe(map(() => avatarUrl));
+        }),
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (got) => {
+        next: (avatarUrl) => {
           this.profileBusy.set(false);
-          this.avatar.set(this.community.avatarUrl(me.id, got.fileName));
-          this.profile.markAsDirty();
+          this.avatar.set(avatarUrl);
+          this.auth.patchUser({ avatarUrl });
+          this.profileNote.set({ key: 'ACCOUNT.PROFILE_SAVED', bad: false });
         },
-        error: () => {
+        error: (trouble: unknown) => {
           this.profileBusy.set(false);
-          this.profileNote.set({ key: 'COMMON.GENERIC_ERROR', bad: true });
+          const message = avatarUploadErrorMessage(trouble);
+          this.profileNote.set(message ? { message, bad: true } : { key: 'COMMUNITY.PROFILE.AVATAR_UPLOAD_FAILED', bad: true });
         },
       });
+  }
+
+  normalizePhone(): void {
+    const control = this.profile.controls.phone;
+    const normalized = normalizeVietnamesePhone(control.value);
+    if (normalized !== control.value) {
+      control.setValue(normalized);
+    }
   }
 
   saveProfile(): void {
@@ -107,8 +130,9 @@ export class AccountPage implements OnInit {
       this.profileNote.set({ key: 'ACCOUNT.PROFILE_INVALID', bad: true });
       return;
     }
+    this.normalizePhone();
     const value = this.profile.getRawValue();
-    const body = { fullName: value.fullName.trim(), phone: value.phone.trim(), avatarUrl: this.avatar() ?? '' };
+    const body = { fullName: value.fullName.trim(), phone: value.phone, avatarUrl: this.avatar() ?? '' };
     this.profileBusy.set(true);
     this.profileNote.set(null);
     this.community
@@ -121,9 +145,10 @@ export class AccountPage implements OnInit {
           this.profile.markAsPristine();
           this.profileNote.set({ key: 'ACCOUNT.PROFILE_SAVED', bad: false });
         },
-        error: () => {
+        error: (trouble: HttpErrorResponse) => {
           this.profileBusy.set(false);
-          this.profileNote.set({ key: 'COMMON.GENERIC_ERROR', bad: true });
+          const message = avatarUploadErrorMessage(trouble);
+          this.profileNote.set(message ? { message, bad: true } : { key: 'COMMON.GENERIC_ERROR', bad: true });
         },
       });
   }

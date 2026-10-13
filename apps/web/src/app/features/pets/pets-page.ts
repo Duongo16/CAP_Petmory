@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -41,7 +48,6 @@ export class PetsPage implements OnInit {
   readonly status = signal<ScreenState>('LOADING');
   readonly error = signal<string | null>(null);
   readonly working = signal(false);
-
 
   ngOnInit(): void {
     this.reload();
@@ -159,13 +165,13 @@ export class PetsPage implements OnInit {
     this.working.set(true);
     this.error.set(null);
 
-    // Ngay de trong phai gui di dang khong co, neu gui chuoi rong thi may chu
-    // coi do la mot ngay khong hop le.
+    // Dates can be cleared during edit. Send null deliberately: omitting a
+    // field means "keep the stored value" to PATCH, while null means "clear".
     const body = {
       ...result.values,
-      birthDate: result.values.birthDate || undefined,
-      passedAwayDate: result.values.passedAwayDate || undefined,
-      adoptionDate: result.values.adoptionDate || undefined,
+      birthDate: result.values.birthDate || null,
+      passedAwayDate: result.values.passedAwayDate || null,
+      adoptionDate: result.values.adoptionDate || null,
     };
 
     const saved: Observable<Pet> = pet
@@ -188,9 +194,7 @@ export class PetsPage implements OnInit {
         },
         error: (failure: { status?: number }) => {
           this.working.set(false);
-          this.error.set(
-            failure.status === 403 ? 'PET.QUOTA_REACHED' : 'COMMON.GENERIC_ERROR',
-          );
+          this.error.set(failure.status === 403 ? 'PET.QUOTA_REACHED' : 'COMMON.GENERIC_ERROR');
         },
       });
   }

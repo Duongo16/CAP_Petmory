@@ -13,6 +13,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { MemoriesFacade } from './memories-facade';
 import { MemoriesService } from '../../core/services/memories.service';
 import { Icon } from '../../shared/icon/icon';
+import { vietnamDayEnd, vietnamDayStart } from '../../core/utils/date-only';
 
 /** Cai hop nay lam viec thang tren kho cua man hinh nhat ky dang mo. */
 export interface ExportRequest {
@@ -58,8 +59,8 @@ export class ExportDialog {
     this.ready.set('');
     const raw = this.form.getRawValue();
     this.facade.askExport(
-      raw.fromDate ? new Date(raw.fromDate).toISOString() : undefined,
-      raw.toDate ? new Date(raw.toDate).toISOString() : undefined,
+      raw.fromDate ? vietnamDayStart(raw.fromDate) : undefined,
+      raw.toDate ? vietnamDayEnd(raw.toDate) : undefined,
     );
   }
 

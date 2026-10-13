@@ -9,11 +9,11 @@ export interface CreatePetInput {
   kind?: Pet['kind'];
   breed?: string;
   gender?: Pet['gender'];
-  birthDate?: string;
+  birthDate?: string | null;
   status?: Pet['status'];
-  passedAwayDate?: string;
+  passedAwayDate?: string | null;
   tagline?: string;
-  adoptionDate?: string;
+  adoptionDate?: string | null;
   microchip?: string;
   neutered?: boolean;
   trait?: string[];

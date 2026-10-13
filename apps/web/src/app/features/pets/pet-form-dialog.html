@@ -6,7 +6,12 @@
         {{ (editing ? 'PET.FORM_EDIT' : 'PET.FORM_ADD') | translate }}
       </h2>
     </div>
-    <button type="button" class="shut" (click)="close()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+    <button
+      type="button"
+      class="shut"
+      (click)="close()"
+      [attr.aria-label]="'COMMON.CLOSE' | translate"
+    >
       <pm-icon name="close" [size]="17" />
     </button>
   </header>
@@ -15,7 +20,12 @@
     <div class="pair">
       <div class="field">
         <label class="field-name" for="pet-name">{{ 'PET.NAME' | translate }} *</label>
-        <input id="pet-name" type="text" formControlName="name" [placeholder]="'PET.NAME_HINT' | translate" />
+        <input
+          id="pet-name"
+          type="text"
+          formControlName="name"
+          [placeholder]="'PET.NAME_HINT' | translate"
+        />
         @if (form.controls.name.touched && form.controls.name.invalid) {
           <p class="field-error">{{ 'PET.NAME_ERROR' | translate }}</p>
         }
@@ -34,7 +44,12 @@
     <div class="pair">
       <div class="field">
         <label class="field-name" for="pet-breed">{{ 'PET.BREED' | translate }}</label>
-        <input id="pet-breed" type="text" formControlName="breed" [placeholder]="'PET.BREED_HINT' | translate" />
+        <input
+          id="pet-breed"
+          type="text"
+          formControlName="breed"
+          [placeholder]="'PET.BREED_HINT' | translate"
+        />
       </div>
 
       <div class="field">
@@ -145,6 +160,9 @@
     @if (form.hasError('birthAhead') || form.hasError('goneAhead')) {
       <p class="field-error">{{ 'PET.ERROR_DATE_AHEAD' | translate }}</p>
     }
+    @if (form.hasError('birthTooOld')) {
+      <p class="field-error">{{ 'PET.ERROR_DOG_BIRTH_LIMIT' | translate }}</p>
+    }
 
     <section class="album">
       <div class="album-head">
@@ -178,7 +196,6 @@
         (dropLink)="dropLink($event)"
       />
     </section>
-
   </div>
 
   <footer class="sheet-foot">

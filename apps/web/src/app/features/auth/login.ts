@@ -88,7 +88,7 @@ export class LoginPage implements OnInit {
     this.error.set(null);
 
     this.auth
-      .login(value.email, value.password)
+      .login(value.email, value.password, value.remember)
       .pipe(
         // A pet started on the welcome page joins the account it signs in to.
         switchMap(() => this.drafts.claim()),

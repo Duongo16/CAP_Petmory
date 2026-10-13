@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { samePassword } from './password-match';
@@ -10,6 +11,7 @@ import { PetDraftService } from '../../core/services/pet-draft.service';
 import { Icon } from '../../shared/icon/icon';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
+import { normalizeVietnamesePhone, optionalVietnamesePhone } from '../../core/utils/vietnamese-phone';
 
 /** A benefit shown in the left panel. Both keys are written out in full. */
 interface Perk {
@@ -93,7 +95,7 @@ export class RegisterPage {
     {
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.pattern(/^0[0-9]{9}$/)]],
+      phone: ['', [optionalVietnamesePhone]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirm: ['', [Validators.required]],
       terms: [false, [Validators.requiredTrue]],
@@ -113,8 +115,16 @@ export class RegisterPage {
     this.peekingConfirm.set(!this.peekingConfirm());
   }
 
+  normalizePhone(): void {
+    const control = this.form.controls.phone;
+    const normalized = normalizeVietnamesePhone(control.value);
+    if (normalized !== control.value) {
+      control.setValue(normalized);
+    }
+  }
 
   send(): void {
+    this.normalizePhone();
     if (this.form.invalid || this.pendingSend()) {
       this.form.markAllAsTouched();
       return;
@@ -135,9 +145,9 @@ export class RegisterPage {
           this.pendingSend.set(false);
           void this.router.navigate(['/home']);
         },
-        error: () => {
+        error: (trouble: HttpErrorResponse) => {
           this.pendingSend.set(false);
-          this.error.set('AUTH.BAD_CREDENTIALS');
+          this.error.set(trouble.status === 409 ? 'AUTH.EMAIL_TAKEN' : 'COMMON.GENERIC_ERROR');
         },
       });
   }

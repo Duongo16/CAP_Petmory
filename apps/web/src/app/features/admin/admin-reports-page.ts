@@ -24,6 +24,7 @@ import { KEY_STATUS_ORDER } from '../../shared/order-status';
 import { OrderStatus } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { Icon } from '../../shared/icon/icon';
+import { vietnamDayEnd, vietnamDayStart, vietnamToday } from '../../core/utils/date-only';
 
 Chart.register(...registerables);
 
@@ -86,8 +87,8 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
   private chartInstances: Record<string, Chart> = {};
 
   readonly form = this.fb.nonNullable.group({
-    from: [dayText(new Date(Date.now() - DEFAULT_DAYS * DAY_MS))],
-    to: [dayText(new Date())],
+    from: [vietnamToday(new Date(Date.now() - DEFAULT_DAYS * DAY_MS))],
+    to: [vietnamToday()],
   });
 
   private readonly cleanup = this.destroyRef.onDestroy(() => {
@@ -186,8 +187,8 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
     }
 
     this.form.patchValue({
-      from: dayText(from),
-      to: dayText(now),
+      from: vietnamToday(from),
+      to: vietnamToday(now),
     });
 
     this.read();
@@ -578,8 +579,8 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
   private periodOf() {
     const raw = this.form.getRawValue();
     return {
-      from: raw.from ? new Date(raw.from).toISOString() : undefined,
-      to: raw.to ? new Date(`${raw.to}T23:59:59`).toISOString() : undefined,
+      from: raw.from ? vietnamDayStart(raw.from) : undefined,
+      to: raw.to ? vietnamDayEnd(raw.to) : undefined,
     };
   }
 
@@ -591,10 +592,6 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
   }
 }
 
-function dayText(when: Date): string {
-  const two = (value: number) => String(value).padStart(2, '0');
-  return `${when.getFullYear()}-${two(when.getMonth() + 1)}-${two(when.getDate())}`;
-}
 
 function formatDateLabel(isoDate: string): string {
   if (!isoDate) return '';

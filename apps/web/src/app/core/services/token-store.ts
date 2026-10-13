@@ -22,10 +22,22 @@ export class TokenStore {
     return this.read(KEY_REFRESH);
   }
 
-  save(accessToken: string, refreshToken: string, user: User): void {
-    this.write(KEY_ACCESS, accessToken);
-    this.write(KEY_REFRESH, refreshToken);
-    this.write(KEY_USER, JSON.stringify(user));
+  /**
+   * Keeps the session after browser restarts only when the user opted in.
+   * Sessions without that choice live in sessionStorage and end with the tab.
+   */
+  save(accessToken: string, refreshToken: string, user: User, remember = this.isPersistent()): void {
+    const preferred = remember ? this.local() : this.session();
+    const fallback = remember ? this.session() : this.local();
+
+    // A user may switch the checkbox between logins, so never leave a
+    // duplicate credential set in the other browser store.
+    this.clear(this.local());
+    this.clear(this.session());
+    if (!this.writeSession(preferred, accessToken, refreshToken, user)) {
+      this.clear(preferred);
+      this.writeSession(fallback, accessToken, refreshToken, user);
+    }
     this.user.set(user);
   }
 
@@ -35,14 +47,13 @@ export class TokenStore {
       return;
     }
     const updated = { ...current, ...patch };
-    this.write(KEY_USER, JSON.stringify(updated));
+    this.write(this.isPersistent() ? this.local() : this.session(), KEY_USER, JSON.stringify(updated));
     this.user.set(updated);
   }
 
   remove(): void {
-    this.write(KEY_ACCESS, null);
-    this.write(KEY_REFRESH, null);
-    this.write(KEY_USER, null);
+    this.clear(this.local());
+    this.clear(this.session());
     this.user.set(null);
   }
 
@@ -59,22 +70,73 @@ export class TokenStore {
   }
 
   private read(key: string): string | null {
+    return this.readFrom(this.local(), key) ?? this.readFrom(this.session(), key);
+  }
+
+  private readFrom(storage: Storage | null, key: string): string | null {
+    if (!storage) {
+      return null;
+    }
     try {
-      return localStorage.getItem(key);
+      return storage.getItem(key);
     } catch {
       return null;
     }
   }
 
-  private write(key: string, value: string | null): void {
+  private write(storage: Storage | null, key: string, value: string): boolean {
+    if (!storage) {
+      return false;
+    }
     try {
-      if (value === null) {
-        localStorage.removeItem(key);
-      } else {
-        localStorage.setItem(key, value);
-      }
+      storage.setItem(key, value);
+      return true;
     } catch {
+      return false;
+    }
+  }
+
+  private writeSession(storage: Storage | null, accessToken: string, refreshToken: string, user: User): boolean {
+    return (
+      this.write(storage, KEY_ACCESS, accessToken) &&
+      this.write(storage, KEY_REFRESH, refreshToken) &&
+      this.write(storage, KEY_USER, JSON.stringify(user))
+    );
+  }
+
+  private clear(storage: Storage | null): void {
+    if (!storage) {
       return;
+    }
+    try {
+      storage.removeItem(KEY_ACCESS);
+      storage.removeItem(KEY_REFRESH);
+      storage.removeItem(KEY_USER);
+    } catch {
+      // Storage can be unavailable in private browsing; memory still updates.
+    }
+  }
+
+  private isPersistent(): boolean {
+    return this.readFrom(this.local(), KEY_USER) !== null;
+  }
+
+  private local(): Storage | null {
+    return this.storage('localStorage');
+  }
+
+  private session(): Storage | null {
+    return this.storage('sessionStorage');
+  }
+
+  private storage(name: 'localStorage' | 'sessionStorage'): Storage | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    try {
+      return window[name];
+    } catch {
+      return null;
     }
   }
 }

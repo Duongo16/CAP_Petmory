@@ -185,7 +185,7 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string): Promise<LoginResult> {
-    let payload: { sub: string };
+    let payload: { sub: string; epoch?: number };
     try {
       payload = await this.jwt.verifyAsync(refreshToken, {
         secret: this.config.getOrThrow<string>('jwt.refreshSecret'),
@@ -193,7 +193,14 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException(MSG.INVALID_TOKEN);
     }
-    const user = await this.users.findById(payload.sub);
+
+    // Refresh tokens are sessions too. Without the epoch check, a refresh
+    // token issued before a password change could mint a new valid access
+    // token after all access tokens had been invalidated.
+    const user = await this.users.findById(payload.sub).catch(() => null);
+    if (!user || !user.active || typeof payload.epoch !== 'number' || payload.epoch !== user.tokenEpoch) {
+      throw new UnauthorizedException(MSG.INVALID_TOKEN);
+    }
     return this.issueTokens(user.id, user.email, user.fullName, user.roles, user.avatarUrl ?? null);
   }
 
@@ -206,10 +213,11 @@ export class AuthService {
   ): Promise<LoginResult> {
     // The mang theo moc phien, de doi mat khau la moi the cu mat hieu luc.
     const holder = await this.users.findById(id);
-    const payload = { sub: id, email, roles, epoch: holder.tokenEpoch };
+    const accessPayload = { sub: id, email, roles, epoch: holder.tokenEpoch };
+    const refreshPayload = { sub: id, epoch: holder.tokenEpoch };
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwt.signAsync(payload, this.signOptions('jwt.accessSecret', 'jwt.accessTtl')),
-      this.jwt.signAsync({ sub: id }, this.signOptions('jwt.refreshSecret', 'jwt.refreshTtl')),
+      this.jwt.signAsync(accessPayload, this.signOptions('jwt.accessSecret', 'jwt.accessTtl')),
+      this.jwt.signAsync(refreshPayload, this.signOptions('jwt.refreshSecret', 'jwt.refreshTtl')),
     ]);
     return { accessToken, refreshToken, user: { id, email, fullName, roles, avatarUrl } };
   }

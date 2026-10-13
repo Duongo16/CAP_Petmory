@@ -42,7 +42,7 @@
               id="profile-avatar-file"
               class="sr-only"
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               [disabled]="uploading()"
               (change)="upload($event)"
             />
@@ -58,13 +58,13 @@
           </div>
         }
         @if (preview()) {
-          <button type="button" class="plain small remove-avatar" (click)="clearAvatar()">
+          <button type="button" class="plain small remove-avatar" [disabled]="uploading() || saving()" (click)="clearAvatar()">
             <pm-icon name="trash" [size]="14" />
             {{ 'COMMUNITY.PROFILE.REMOVE_AVATAR' | translate }}
           </button>
         }
         @if (problem(); as message) {
-          <p class="field-error">{{ message | translate }}</p>
+          <p class="field-error">@if (message.key; as key) { {{ key | translate }} } @else { {{ message.message }} }</p>
         }
       </div>
     </div>
@@ -79,7 +79,10 @@
       </div>
       <div class="field">
         <label class="field-name" for="profile-phone">{{ 'COMMUNITY.PROFILE.PHONE' | translate }}</label>
-        <input id="profile-phone" type="tel" formControlName="phone" />
+        <input id="profile-phone" type="tel" maxlength="16" inputmode="tel" autocomplete="tel-national" formControlName="phone" (blur)="normalizePhone()" />
+        @if (form.controls.phone.touched && form.controls.phone.invalid) {
+          <p class="field-error">{{ 'AUTH.PHONE_ERROR' | translate }}</p>
+        }
       </div>
     </div>
   </div>

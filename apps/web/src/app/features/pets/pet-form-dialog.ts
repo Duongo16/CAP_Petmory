@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Carer, Gender, Pet, PetKind, PetStatus } from '../../core/models/api.model';
@@ -7,6 +13,7 @@ import { Icon } from '../../shared/icon/icon';
 import { ImageLink } from '../../shared/image-link/image-link';
 import { PhotoPreviews } from '../../shared/photo-previews/photo-previews';
 import { looksLikeImage } from '../../core/utils/upload-image';
+import { vietnamToday } from '../../core/utils/date-only';
 
 /** What the dialog is opened with. A missing pet means it is adding a new one. */
 export interface PetFormInput {
@@ -66,6 +73,9 @@ const LINE_BREAK = String.fromCharCode(10);
 
 const PHOTO_MAX = 8;
 
+/** Data-entry cap for dogs only; it is not a lifespan claim. */
+const DOG_PROFILE_MAX_AGE_YEARS = 30;
+
 /**
  * Checks the dates against each other and against the status.
  *
@@ -74,12 +84,16 @@ const PHOTO_MAX = 8;
  */
 function checkDates(group: AbstractControl): ValidationErrors | null {
   const status = group.get('status')?.value as PetStatus;
+  const kind = group.get('kind')?.value as PetKind;
   const birth = group.get('birthDate')?.value as string;
   const gone = group.get('passedAwayDate')?.value as string;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = vietnamToday();
 
   if (birth && birth > today) {
     return { birthAhead: true };
+  }
+  if (kind === 'DOG' && birth && birth < dateYearsAgo(DOG_PROFILE_MAX_AGE_YEARS)) {
+    return { birthTooOld: true };
   }
   if (status !== 'PASSED_AWAY') {
     return null;
@@ -105,7 +119,7 @@ function checkCameHome(group: AbstractControl): ValidationErrors | null {
   if (!came) {
     return null;
   }
-  if (came > new Date().toISOString().slice(0, 10)) {
+  if (came > vietnamToday()) {
     return { cameAhead: true };
   }
   const birth = group.get('birthDate')?.value as string;
@@ -193,8 +207,7 @@ export class PetFormDialog {
   readonly memorial = computed(() => this.status() === 'PASSED_AWAY');
 
   /** Today, so neither date box offers a day that has not happened. */
-  readonly today = new Date().toISOString().slice(0, 10);
-
+  readonly today = vietnamToday();
   setStatus(value: PetStatus): void {
     this.status.set(value);
     this.form.controls.status.setValue(value);
@@ -269,4 +282,10 @@ export class PetFormDialog {
 /** The date part of a stored timestamp, in the shape a date box expects. */
 function dayOf(value: string | null | undefined): string {
   return value ? value.slice(0, 10) : '';
+}
+
+/** Returns the calendar day at the profile data-entry age limit. */
+function dateYearsAgo(years: number, today = vietnamToday()): string {
+  const [year, month, day] = today.split('-').map(Number);
+  return `${(year - years).toString().padStart(4, '0')}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 }

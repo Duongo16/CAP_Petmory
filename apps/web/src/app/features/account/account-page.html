@@ -26,7 +26,14 @@
               }
             </span>
             <label class="tw-btn-secondary tw-btn-sm" for="account-avatar">{{ 'ACCOUNT.CHANGE_AVATAR' | translate }}</label>
-            <input id="account-avatar" class="sr-only" type="file" accept="image/*" (change)="pickAvatar($event)" />
+            <input
+              id="account-avatar"
+              class="sr-only"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              [disabled]="profileBusy()"
+              (change)="pickAvatar($event)"
+            />
           </div>
           <form class="account-form" [formGroup]="profile" (submit)="$event.preventDefault(); saveProfile()">
             <label class="tw-field">
@@ -39,11 +46,14 @@
             </label>
             <label class="tw-field">
               <span class="tw-label">{{ 'ACCOUNT.PHONE' | translate }}</span>
-              <input id="account-phone" class="tw-input" type="tel" maxlength="10" inputmode="numeric" formControlName="phone" />
+              <input id="account-phone" class="tw-input" type="tel" maxlength="16" inputmode="tel" autocomplete="tel-national" formControlName="phone" (blur)="normalizePhone()" />
               <span class="tw-hint">{{ 'ACCOUNT.PHONE_HINT' | translate }}</span>
+              @if (profile.controls.phone.touched && profile.controls.phone.invalid) {
+                <span class="account-note bad">{{ 'AUTH.PHONE_ERROR' | translate }}</span>
+              }
             </label>
             @if (profileNote(); as note) {
-              <p class="account-note" [class.bad]="note.bad" [attr.role]="note.bad ? 'alert' : 'status'">{{ note.key | translate }}</p>
+              <p class="account-note" [class.bad]="note.bad" [attr.role]="note.bad ? 'alert' : 'status'">@if (note.key; as key) { {{ key | translate }} } @else { {{ note.message }} }</p>
             }
             <button id="account-save" type="submit" class="tw-btn-primary" [disabled]="profileBusy()">{{ 'COMMON.SAVE' | translate }}</button>
           </form>

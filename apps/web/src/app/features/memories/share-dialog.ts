@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MemoriesFacade } from './memories-facade';
 import { Icon } from '../../shared/icon/icon';
+import { vietnamDayEnd } from '../../core/utils/date-only';
 
 /** Cai hop nay lam viec thang tren kho cua man hinh nhat ky dang mo. */
 export interface ShareRequest {
@@ -43,7 +44,7 @@ export class ShareDialog {
 
   make(): void {
     const chosen = this.form.getRawValue().expiresAt;
-    this.facade.makeShare(chosen ? new Date(chosen).toISOString() : undefined);
+    this.facade.makeShare(chosen ? vietnamDayEnd(chosen) : undefined);
   }
 
   revoke(id: string): void {

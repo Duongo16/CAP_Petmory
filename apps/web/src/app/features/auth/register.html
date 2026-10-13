@@ -102,8 +102,11 @@
               id="up-phone"
               type="tel"
               formControlName="phone"
+              maxlength="16"
+              inputmode="tel"
               autocomplete="tel"
               [placeholder]="'AUTH.PHONE_PLACEHOLDER' | translate"
+              (blur)="normalizePhone()"
             />
             <span class="ap-input-icon" aria-hidden="true"><pm-icon name="comment" [size]="15" /></span>
           </div>

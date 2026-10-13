@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, Injector, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
 import { API_BASE } from './api-base';
 import { TokenStore } from './token-store';
 import { DemoAccount, LoginResult, Role } from '../models/api.model';
@@ -88,10 +88,10 @@ export class AuthService {
     this.store.patchUser(patch as never);
   }
 
-  login(email: string, password: string): Observable<LoginResult> {
+  login(email: string, password: string, remember = true): Observable<LoginResult> {
     return this.http
       .post<LoginResult>(`${this.base}/auth/login`, { email, password })
-      .pipe(tap((result) => this.store.save(result.accessToken, result.refreshToken, result.user)));
+      .pipe(tap((result) => this.store.save(result.accessToken, result.refreshToken, result.user, remember)));
   }
 
   register(
@@ -107,6 +107,17 @@ export class AuthService {
         fullName,
         ...(phone ? { phone } : {}),
       })
+      .pipe(tap((result) => this.store.save(result.accessToken, result.refreshToken, result.user)));
+  }
+
+  /** Refreshes the current session after an expired access token. */
+  refresh(): Observable<LoginResult> {
+    const refreshToken = this.store.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token is available'));
+    }
+    return this.http
+      .post<LoginResult>(`${this.base}/auth/refresh`, { refreshToken })
       .pipe(tap((result) => this.store.save(result.accessToken, result.refreshToken, result.user)));
   }
 

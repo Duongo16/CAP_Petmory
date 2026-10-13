@@ -12,7 +12,7 @@ import {
   SavedPost,
   SavedPostDocument,
 } from './schemas/reaction.schema';
-import { FeedQueryDto, UpdateProfileDto, WriteCommentDto, WritePostDto } from './dto/community.dto';
+import { FeedQueryDto, normalizeVietnamesePhone, UpdateProfileDto, WriteCommentDto, WritePostDto } from './dto/community.dto';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Pet, PetDocument } from '../pets/schemas/pet.schema';
 import { StorageFolder, StorageService } from '../../common/storage/storage.service';
@@ -29,7 +29,7 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const NOT_AN_IMAGE = 'Chi nhan anh JPG, PNG hoac WEBP';
 const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
 /** Only names this service made itself: the owner id, a random id, a picture ending. */
-const AVATAR_FILE = /^avatar-[a-f0-9]{24}-[0-9a-f-]{36}\.(jpg|png)$/;
+const AVATAR_FILE = /^avatar-[a-f0-9]{24}-[0-9a-f-]{36}\.(jpg|png|webp)$/;
 
 /** The author details every card and comment needs. */
 export interface AuthorView {
@@ -528,7 +528,7 @@ export class CommunityService {
       update['fullName'] = dto.fullName.trim();
     }
     if (dto.phone !== undefined) {
-      update['phone'] = dto.phone.trim() || null;
+      update['phone'] = normalizeVietnamesePhone(dto.phone) || null;
     }
     if (dto.avatarUrl !== undefined) {
       update['avatarUrl'] = dto.avatarUrl.trim() || null;
@@ -560,7 +560,8 @@ export class CommunityService {
       throw new BadRequestException('Anh dai dien vuot qua 5 MB');
     }
     const owner = this.toId(userId).toString();
-    const fileName = `avatar-${owner}-${randomUUID()}.${file.mimetype === 'image/png' ? 'png' : 'jpg'}`;
+    const extension = file.mimetype === 'image/png' ? 'png' : file.mimetype === 'image/webp' ? 'webp' : 'jpg';
+    const fileName = `avatar-${owner}-${randomUUID()}.${extension}`;
     await this.storage.save(StorageFolder.COMMUNITY, fileName, file.buffer, file.mimetype);
     return { fileName };
   }

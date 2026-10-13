@@ -6,7 +6,11 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { CommunityService } from '../../core/services/community.service';
 import { CommunityProfile } from '../../core/models/community.model';
 import { Icon } from '../../shared/icon/icon';
+import { map, switchMap } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
+import { avatarUploadErrorMessage } from '../../core/utils/avatar-upload-error';
 import { looksLikeImage, PICK_MAX_BYTES } from '../../core/utils/upload-image';
+import { normalizeVietnamesePhone, optionalVietnamesePhone } from '../../core/utils/vietnamese-phone';
 
 /** What the profile hands back once it has been saved. */
 export interface ProfileEditResult {
@@ -16,6 +20,7 @@ export interface ProfileEditResult {
 }
 
 type AvatarSource = 'DEVICE' | 'LINK';
+type Problem = { key?: string; message?: string };
 
 interface EditForm {
   fullName: FormControl<string>;
@@ -40,13 +45,15 @@ export class ProfileEditDialog {
   private readonly profile = inject<CommunityProfile>(MAT_DIALOG_DATA);
   private readonly ref = inject(MatDialogRef<ProfileEditDialog, ProfileEditResult>);
   private readonly service = inject(CommunityService);
+  private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly initial = this.profile.initial;
   readonly source = signal<AvatarSource>('DEVICE');
   readonly uploading = signal(false);
   readonly saving = signal(false);
-  readonly problem = signal<string | null>(null);
+  readonly problem = signal<Problem | null>(null);
+  private readonly persistedAvatarUrl = signal(this.profile.avatarUrl ?? '');
 
   readonly form = new FormGroup<EditForm>({
     fullName: new FormControl(this.profile.fullName, {
@@ -55,7 +62,7 @@ export class ProfileEditDialog {
     }),
     phone: new FormControl(this.profile.phone ?? '', {
       nonNullable: true,
-      validators: [Validators.maxLength(20)],
+      validators: [optionalVietnamesePhone],
     }),
     avatarUrl: new FormControl(this.profile.avatarUrl ?? '', {
       nonNullable: true,
@@ -81,35 +88,69 @@ export class ProfileEditDialog {
       return;
     }
     if (!looksLikeImage(file)) {
-      this.problem.set('COMMUNITY.PROFILE.AVATAR_TYPE_ERROR');
+      this.problem.set({ key: 'COMMUNITY.PROFILE.AVATAR_TYPE_ERROR' });
       return;
     }
     if (file.size > PICK_MAX_BYTES) {
-      this.problem.set('COMMUNITY.PROFILE.AVATAR_SIZE_ERROR');
+      this.problem.set({ key: 'COMMUNITY.PROFILE.AVATAR_SIZE_ERROR' });
       return;
     }
     this.problem.set(null);
     this.uploading.set(true);
     this.service
       .uploadAvatar(file)
+      .pipe(
+        switchMap((saved) => {
+          const avatarUrl = this.service.avatarUrl(this.profile.id, saved.fileName);
+          return this.service.updateProfile({ avatarUrl }).pipe(map(() => avatarUrl));
+        }),
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (saved) => {
+        next: (avatarUrl) => {
           this.uploading.set(false);
-          this.form.controls.avatarUrl.setValue(this.service.avatarUrl(this.profile.id, saved.fileName));
+          this.setPersistedAvatar(avatarUrl);
         },
-        error: () => {
+        error: (trouble: unknown) => {
           this.uploading.set(false);
-          this.problem.set('COMMUNITY.PROFILE.AVATAR_UPLOAD_FAILED');
+          const message = avatarUploadErrorMessage(trouble);
+          this.problem.set(message ? { message } : { key: 'COMMUNITY.PROFILE.AVATAR_UPLOAD_FAILED' });
         },
       });
   }
 
   clearAvatar(): void {
-    this.form.controls.avatarUrl.setValue('');
+    if (this.uploading() || this.saving() || !this.form.controls.avatarUrl.value) {
+      return;
+    }
+    this.problem.set(null);
+    this.uploading.set(true);
+    this.service
+      .updateProfile({ avatarUrl: '' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.uploading.set(false);
+          this.setPersistedAvatar('');
+        },
+        error: (trouble: unknown) => {
+          this.uploading.set(false);
+          const message = avatarUploadErrorMessage(trouble);
+          this.problem.set(message ? { message } : { key: 'COMMUNITY.PROFILE.AVATAR_UPLOAD_FAILED' });
+        },
+      });
+  }
+
+  normalizePhone(): void {
+    const control = this.form.controls.phone;
+    const normalized = normalizeVietnamesePhone(control.value);
+    if (normalized !== control.value) {
+      control.setValue(normalized);
+    }
   }
 
   save(): void {
+    this.normalizePhone();
     if (this.form.invalid || this.saving() || this.uploading()) {
       this.form.markAllAsTouched();
       return;
@@ -117,7 +158,7 @@ export class ProfileEditDialog {
     const value = this.form.getRawValue();
     const result: ProfileEditResult = {
       fullName: value.fullName.trim(),
-      phone: value.phone.trim(),
+      phone: value.phone,
       avatarUrl: value.avatarUrl.trim(),
     };
     this.saving.set(true);
@@ -126,14 +167,27 @@ export class ProfileEditDialog {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.ref.close(result),
-        error: () => {
+        error: (trouble: unknown) => {
           this.saving.set(false);
-          this.problem.set('COMMON.GENERIC_ERROR');
+          const message = avatarUploadErrorMessage(trouble);
+          this.problem.set(message ? { message } : { key: 'COMMON.GENERIC_ERROR' });
         },
       });
   }
 
   close(): void {
+    const avatarUrl = this.persistedAvatarUrl();
+    if (avatarUrl !== (this.profile.avatarUrl ?? '')) {
+      this.ref.close({ fullName: this.profile.fullName, phone: this.profile.phone ?? '', avatarUrl });
+      return;
+    }
     this.ref.close();
+  }
+
+  private setPersistedAvatar(avatarUrl: string): void {
+    this.persistedAvatarUrl.set(avatarUrl);
+    this.form.controls.avatarUrl.setValue(avatarUrl);
+    this.form.controls.avatarUrl.markAsPristine();
+    this.auth.patchUser({ avatarUrl: avatarUrl || null });
   }
 }

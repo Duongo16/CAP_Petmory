@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AdminService } from '../../core/services/admin.service';
 import { AuditEntry } from '../../core/models/api.model';
+import { vietnamDayEnd, vietnamDayStart } from '../../core/utils/date-only';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
@@ -92,8 +93,8 @@ export class AdminAuditPage implements OnInit {
       .auditLog({
         ...value,
         // Ngay den tinh tron ca ngay do.
-        from: value.from ? new Date(`${value.from}T00:00:00`).toISOString() : '',
-        to: value.to ? new Date(`${value.to}T23:59:59`).toISOString() : '',
+        from: value.from ? vietnamDayStart(value.from) : '',
+        to: value.to ? vietnamDayEnd(value.to) : '',
         page: this.page(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))

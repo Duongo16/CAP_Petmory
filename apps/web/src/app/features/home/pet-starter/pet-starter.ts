@@ -20,6 +20,7 @@ import { LABEL_GENDER, LABEL_KIND } from '../../../shared/pet-labels';
 import { Icon } from '../../../shared/icon/icon';
 import { PetArt, PetArtKind } from '../../../shared/pet-art/pet-art';
 import { looksLikeImage, PICK_MAX_BYTES } from '../../../core/utils/upload-image';
+import { vietnamToday } from '../../../core/utils/date-only';
 
 type Step = 1 | 2 | 3 | 4;
 type PhotoProblem = 'TYPE' | 'SIZE' | null;
@@ -74,7 +75,7 @@ export class PetStarter implements OnInit {
 
   readonly step = signal<Step>(1);
   readonly stepCount = STEP_COUNT;
-  readonly today = new Date().toISOString().slice(0, 10);
+  readonly today = vietnamToday();
 
   readonly kinds = KIND_ORDER.map((value) => ({
     value,

@@ -363,7 +363,7 @@ export const routes: Routes = [
     path: '**',
     redirectTo: () => {
       const auth = inject(AuthService);
-      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'home';
+      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'landing';
     },
   },
 ];

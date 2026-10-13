@@ -1,8 +1,6 @@
 import { Type } from 'class-transformer';
-import {
-  ArrayMaxSize, IsArray, IsBoolean, IsDateString, IsEnum, IsOptional, IsString,
-  MaxLength, MinLength, ValidateNested,
-} from 'class-validator';
+import { ArrayMaxSize, IsArray, IsBoolean, IsDateString, IsEnum, IsOptional, IsString,
+  MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { Gender, PetKind, PetStatus } from '../schemas/pet.schema';
 
 export class MilestoneDto {
@@ -38,13 +36,13 @@ export class CreatePetDto {
   gender?: Gender;
 
   @IsOptional() @IsDateString()
-  birthDate?: string;
+  birthDate?: string | null;
 
   @IsOptional() @IsEnum(PetStatus)
   status?: PetStatus;
 
   @IsOptional() @IsDateString()
-  passedAwayDate?: string;
+  passedAwayDate?: string | null;
 
   @IsOptional() @IsString() @MaxLength(500)
   avatarUrl?: string;
@@ -56,7 +54,7 @@ export class CreatePetDto {
   tagline?: string;
 
   @IsOptional() @IsDateString()
-  adoptionDate?: string;
+  adoptionDate?: string | null;
 
   @IsOptional() @IsString() @MaxLength(40)
   microchip?: string;
