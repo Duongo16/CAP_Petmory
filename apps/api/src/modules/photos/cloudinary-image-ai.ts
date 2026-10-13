@@ -26,6 +26,18 @@ const BREAK_MS = 60_000;
 export interface ImageAiAnswer {
   data: Buffer | null;
   problem: string;
+  /** Cloudinary da bao vuot han muc tai khoan/add-on, de hien canh bao tren UI. */
+  warning?: 'CLOUDINARY_QUOTA';
+}
+
+class CloudinaryError extends Error {
+  constructor(
+    message: string,
+    readonly status?: number,
+  ) {
+    super(message);
+    this.name = 'CloudinaryError';
+  }
 }
 
 /**
@@ -100,7 +112,11 @@ export class CloudinaryImageAi {
       }
       const why = trouble instanceof Error ? trouble.message.slice(0, 160) : 'Loi khong ro';
       this.log.warn(`Sua anh qua dich vu anh khong duoc: ${why}`);
-      return { data: null, problem: why };
+      return {
+        data: null,
+        problem: why,
+        ...(this.isQuotaFailure(trouble, why) ? { warning: 'CLOUDINARY_QUOTA' as const } : {}),
+      };
     } finally {
       if (publicId) {
         await this.remove(publicId);
@@ -118,7 +134,15 @@ export class CloudinaryImageAi {
           resource_type: 'image',
           timeout: this.timeoutMs,
         },
-        (trouble, result) => (trouble || !result ? reject(new Error(trouble?.message ?? 'Day anh len khong duoc')) : resolve(result)),
+        (trouble, result) => {
+          if (!trouble && result) {
+            resolve(result);
+            return;
+          }
+          const status =
+            trouble && typeof trouble === 'object' && 'http_code' in trouble ? Number(trouble.http_code) : undefined;
+          reject(new CloudinaryError(trouble?.message ?? 'Day anh len khong duoc', Number.isFinite(status) ? status : undefined));
+        },
       );
       stream.end(data);
     });
@@ -140,11 +164,22 @@ export class CloudinaryImageAi {
         return Buffer.from(await res.arrayBuffer());
       }
       if (res.status !== STILL_WORKING) {
-        throw new Error(`Dich vu anh tra ve ${res.status} ${res.headers.get('x-cld-error') ?? ''}`.trim());
+        throw new CloudinaryError(`Dich vu anh tra ve ${res.status} ${res.headers.get('x-cld-error') ?? ''}`.trim(), res.status);
       }
       await new Promise((done) => setTimeout(done, POLL_MS));
     }
     throw new Error('Dich vu anh xu ly qua lau');
+  }
+
+  /** Nhieu loi quota chi duoc tra ve bang thong bao chu, nen can kiem tra ca hai. */
+  private isQuotaFailure(trouble: unknown, reason: string): boolean {
+    const status = trouble instanceof CloudinaryError ? trouble.status : undefined;
+    if (status === 402 || status === 429) {
+      return true;
+    }
+    return /quota|credit|overage|usage\s*(?:limit|quota)|(?:plan|account).*limit|account.*(?:disabled|suspend)|rate[ -]?limit|upgrade.*plan|transformation.*(?:limit|quota)/i.test(
+      reason,
+    );
   }
 
   /** Xoa anh tam; xoa hong chi ghi nhat ky, khong lam hong luot phuc hoi. */

@@ -10,6 +10,8 @@ export const HEADER_RESEMBLANCE = 'X-Resemblance';
 /** Che do phuc hoi (LIVE la co dung AI that) va cac thao tac AI khong lam duoc. */
 export const HEADER_MODE = 'X-Restore-Mode';
 export const HEADER_SKIPPED = 'X-Restore-Skipped';
+/** Cloudinary vuot han muc, de frontend hien canh bao thay vi im lang fallback local. */
+export const HEADER_WARNING = 'X-Restore-Warning';
 
 @Controller('photo-restore')
 export class PhotoRestoreController {
@@ -36,6 +38,9 @@ export class PhotoRestoreController {
     res.setHeader(HEADER_RESEMBLANCE, String(outcome.resemblance));
     res.setHeader(HEADER_MODE, outcome.mode);
     res.setHeader(HEADER_SKIPPED, outcome.skipped.join(','));
+    if (outcome.warning) {
+      res.setHeader(HEADER_WARNING, outcome.warning);
+    }
     res.send(outcome.data);
   }
 }

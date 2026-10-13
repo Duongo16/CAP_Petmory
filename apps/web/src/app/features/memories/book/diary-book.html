@@ -15,6 +15,18 @@
           <div class="leaf single">
             <div class="face front">
               <pm-page-face [face]="face!" [sourceOf]="sourceOf()" />
+              @if (storyFor(face); as story) {
+                <button
+                  type="button"
+                  class="story-sticker"
+                  [attr.aria-label]="'MEMORY.STORY_READ' | translate"
+                  (pointerdown)="$event.stopPropagation()"
+                  (click)="readStory(face)"
+                >
+                  <span class="story-sticker-icon" aria-hidden="true"><pm-icon name="sparkle" [size]="14" /></span>
+                  <span>{{ 'MEMORY.STORY_READ' | translate }}</span>
+                </button>
+              }
             </div>
           </div>
         }
@@ -43,10 +55,34 @@
           >
             <div class="face front">
               <pm-page-face [face]="leaf.front" [sourceOf]="sourceOf()" />
+              @if (storyFor(leaf.front); as story) {
+                <button
+                  type="button"
+                  class="story-sticker"
+                  [attr.aria-label]="'MEMORY.STORY_READ' | translate"
+                  (pointerdown)="$event.stopPropagation()"
+                  (click)="readStory(leaf.front)"
+                >
+                  <span class="story-sticker-icon" aria-hidden="true"><pm-icon name="sparkle" [size]="14" /></span>
+                  <span>{{ 'MEMORY.STORY_READ' | translate }}</span>
+                </button>
+              }
             </div>
             <div class="face back">
               @if (leaf.back) {
                 <pm-page-face [face]="leaf.back" [sourceOf]="sourceOf()" />
+                @if (storyFor(leaf.back); as story) {
+                  <button
+                    type="button"
+                    class="story-sticker"
+                    [attr.aria-label]="'MEMORY.STORY_READ' | translate"
+                    (pointerdown)="$event.stopPropagation()"
+                    (click)="readStory(leaf.back)"
+                  >
+                    <span class="story-sticker-icon" aria-hidden="true"><pm-icon name="sparkle" [size]="14" /></span>
+                    <span>{{ 'MEMORY.STORY_READ' | translate }}</span>
+                  </button>
+                }
               }
             </div>
           </div>
@@ -92,34 +128,6 @@
       <pm-icon name="chevron" [size]="15" />
     </button>
   </nav>
-
-  @if (narrow()) {
-    @if (storyFor(onePage())) {
-      <div class="story-actions">
-        <button type="button" class="story-button tw-btn-secondary tw-btn-sm" (click)="readStory(onePage())">
-          <pm-icon name="book" [size]="14" />
-          {{ 'MEMORY.STORY_READ' | translate }}
-        </button>
-      </div>
-    }
-  } @else {
-    @if (storyFor(leftFace()) || storyFor(rightFace())) {
-      <div class="story-actions">
-        @if (storyFor(leftFace())) {
-          <button type="button" class="story-button tw-btn-secondary tw-btn-sm" (click)="readStory(leftFace())">
-            <pm-icon name="book" [size]="14" />
-            {{ 'MEMORY.STORY_READ' | translate }}
-          </button>
-        }
-        @if (storyFor(rightFace())) {
-          <button type="button" class="story-button tw-btn-secondary tw-btn-sm" (click)="readStory(rightFace())">
-            <pm-icon name="book" [size]="14" />
-            {{ 'MEMORY.STORY_READ' | translate }}
-          </button>
-        }
-      </div>
-    }
-  }
 
   @if (canEdit()) {
     <div class="decorate flex flex-wrap justify-center gap-2">

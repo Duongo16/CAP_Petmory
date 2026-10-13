@@ -13,6 +13,8 @@ export interface RestoredPicture {
   mode: 'LIVE' | 'LOCAL';
   /** Thao tac AI da chon nhung khong lam duoc. */
   skipped: string[];
+  /** Cloudinary da bao vuot han muc tai khoan/add-on. */
+  warning: 'CLOUDINARY_QUOTA' | null;
 }
 
 /** So luot phuc hoi con lai: han muc moi ngay va so luot con dung duoc, am la khong gioi han. */
@@ -55,6 +57,7 @@ export class PhotoRestoreService {
           resemblance: Number.isFinite(score) ? Math.round(score) : null,
           mode: answer.headers.get('X-Restore-Mode') === 'LIVE' ? 'LIVE' : 'LOCAL',
           skipped,
+          warning: answer.headers.get('X-Restore-Warning') === 'CLOUDINARY_QUOTA' ? 'CLOUDINARY_QUOTA' : null,
         };
       }),
     );

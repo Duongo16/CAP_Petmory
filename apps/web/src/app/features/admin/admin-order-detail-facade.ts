@@ -67,6 +67,21 @@ function statusKeyOf(value: unknown): string {
 /** Ly do va ghi chu toi thieu bay nhieu ky tu, giu bang phia may chu. */
 const REASON_MIN = 5;
 
+/**
+ * Don cu co the dang giu bo tieu chi mac dinh tu truoc khi bo sung dau tieng
+ * Viet. Chi chuyen dung cac cau mac dinh nay, khong sua noi dung tuy chinh
+ * ma Quan ly da tu nhap.
+ */
+const LEGACY_QUALITY_LABELS: Readonly<Record<string, string>> = {
+  'Dung phom dang da duyet': 'Đúng phom dáng đã duyệt',
+  'Dung mau tung vung': 'Đúng màu từng vùng',
+  'Chu khac dung chinh ta': 'Chữ khắc đúng chính tả',
+  'Du phu kien': 'Đủ phụ kiện',
+  'Dung loai de': 'Đúng loại đế',
+  'Khong sot kim trong san pham': 'Không sót kim trong sản phẩm',
+  'Dong goi du hop va thiep': 'Đóng gói đủ hộp và thiệp',
+};
+
 @Injectable()
 export class AdminOrderDetailFacade {
   private readonly service = inject(AdminService);
@@ -174,7 +189,12 @@ export class AdminOrderDetailFacade {
   }
 
   /** Cac muc tren phieu kiem tra chat luong cua don dang xem. */
-  readonly qualityCheck = computed(() => this.order()?.qualityCheck ?? []);
+  readonly qualityCheck = computed(() =>
+    (this.order()?.qualityCheck ?? []).map((one) => ({
+      ...one,
+      label: LEGACY_QUALITY_LABELS[one.label] ?? one.label,
+    })),
+  );
 
   /** Con bao nhieu muc chua tich. Bang khong thi moi roi duoc khau kiem dinh. */
   readonly qualityLeft = computed(

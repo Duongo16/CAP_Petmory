@@ -2033,6 +2033,7 @@
     "MODE_LIVE": "Đã dùng AI để phục hồi ảnh này.",
     "MODE_LOCAL": "Ảnh này được phục hồi bằng bộ lọc tại máy chủ, không dùng AI.",
     "SKIPPED": "Chưa làm được thao tác AI đã chọn (dịch vụ AI chưa sẵn sàng). Ảnh dưới đây chỉ qua bộ lọc tại máy chủ.",
+    "CLOUDINARY_QUOTA": "Cloudinary báo tài khoản đã chạm hoặc vượt hạn mức AI. Ảnh này chỉ được xử lý bằng bộ lọc tại máy chủ; hãy kiểm tra Cloudinary Console hoặc nâng cấp gói.",
     "SAVE_PET": "Lưu vào hồ sơ bé",
     "SAVE_TO_PET": "Lưu vào album của bé",
     "SAVED": "Đã lưu vào album",

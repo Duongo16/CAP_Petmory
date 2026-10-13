@@ -58,6 +58,8 @@ export class RestorePage {
   /** Ket qua da dung AI that hay chi bo loc, va thao tac AI nao khong lam duoc. */
   readonly mode = signal<'LIVE' | 'LOCAL' | null>(null);
   readonly skipped = signal<string[]>([]);
+  /** Canh bao tai khoan Cloudinary vuot han muc; ket qua local van duoc giu lai. */
+  readonly providerWarning = signal<'CLOUDINARY_QUOTA' | null>(null);
   readonly pets = signal<Pet[]>([]);
   readonly petChosen = signal('');
   readonly saveState = signal<'IDLE' | 'SAVING' | 'SAVED' | 'FAILED'>('IDLE');
@@ -168,6 +170,7 @@ export class RestorePage {
     this.dropUrls();
     this.chosen.set(null);
     this.error.set(null);
+    this.providerWarning.set(null);
   }
 
   run(): void {
@@ -181,12 +184,13 @@ export class RestorePage {
     }
     this.working.set(true);
     this.error.set(null);
+    this.providerWarning.set(null);
     this.saveState.set('IDLE');
     this.restorer
       .restore(file, this.operations())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ picture, resemblance, mode, skipped }) => {
+        next: ({ picture, resemblance, mode, skipped, warning }) => {
           this.working.set(false);
           this.afterBlob = picture;
           this.afterType.set(picture.type || 'image/png');
@@ -194,6 +198,7 @@ export class RestorePage {
           this.resemblance.set(resemblance);
           this.mode.set(mode);
           this.skipped.set(skipped);
+          this.providerWarning.set(warning);
           this.split.set(50);
           this.readQuota();
         },

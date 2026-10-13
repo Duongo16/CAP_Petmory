@@ -3,6 +3,17 @@ import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type BusinessConfigDocument = HydratedDocument<BusinessConfig>;
 
+/** Cac tieu chi mac dinh hien thi tren phieu kiem tra cua xuong. */
+export const DEFAULT_QC_CHECKLIST = [
+  'Đúng phom dáng đã duyệt',
+  'Đúng màu từng vùng',
+  'Chữ khắc đúng chính tả',
+  'Đủ phụ kiện',
+  'Đúng loại đế',
+  'Không sót kim trong sản phẩm',
+  'Đóng gói đủ hộp và thiệp',
+] as const;
+
 /**
  * Don gia mot luot cho tung chuc nang dung tri tue nhan tao.
  *
@@ -119,15 +130,7 @@ export class BusinessConfig {
    */
   @Prop({
     type: [String],
-    default: [
-      'Dung phom dang da duyet',
-      'Dung mau tung vung',
-      'Chu khac dung chinh ta',
-      'Du phu kien',
-      'Dung loai de',
-      'Khong sot kim trong san pham',
-      'Dong goi du hop va thiep',
-    ],
+    default: () => [...DEFAULT_QC_CHECKLIST],
   })
   qcChecklist!: string[];
 

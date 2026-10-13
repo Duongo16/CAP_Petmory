@@ -43,6 +43,9 @@
         @if (skipped().length > 0) {
           <p class="note note-bad" id="restore-skipped" role="status">{{ 'RESTORE.SKIPPED' | translate }}</p>
         }
+        @if (providerWarning() === 'CLOUDINARY_QUOTA') {
+          <p class="note note-bad" id="restore-provider-warning" role="alert">{{ 'RESTORE.CLOUDINARY_QUOTA' | translate }}</p>
+        }
 
         @if (pets().length > 0) {
           <div class="save-row">

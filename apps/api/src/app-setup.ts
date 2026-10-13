@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
-import { HEADER_RESEMBLANCE, HEADER_MODE, HEADER_SKIPPED } from './modules/photos/photo-restore.controller';
+import { HEADER_RESEMBLANCE, HEADER_MODE, HEADER_SKIPPED, HEADER_WARNING } from './modules/photos/photo-restore.controller';
 
 /**
  * Cau hinh chung cua ung dung.
@@ -18,7 +18,7 @@ export function configureApp(app: INestApplication): void {
   app.enableCors({
     origin: config.getOrThrow<string>('webOrigin'),
     credentials: true,
-    exposedHeaders: [HEADER_RESEMBLANCE, HEADER_MODE, HEADER_SKIPPED],
+    exposedHeaders: [HEADER_RESEMBLANCE, HEADER_MODE, HEADER_SKIPPED, HEADER_WARNING],
   });
 
   /**

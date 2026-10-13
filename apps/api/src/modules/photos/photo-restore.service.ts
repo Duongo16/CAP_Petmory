@@ -46,6 +46,8 @@ export interface RestoreOutcome {
   mode: AiMode;
   /** Cac thao tac AI da chon nhung khong lam duoc (chua co khoa, goi hong). */
   skipped: string[];
+  /** Cloudinary bao vuot han muc; anh local du phong van duoc tra ve. */
+  warning?: 'CLOUDINARY_QUOTA';
   /** Loai noi dung cua anh tra ve: PNG khi con gon, JPEG khi phai nen cho vua. */
   mimeType: string;
 }
@@ -108,6 +110,7 @@ export class PhotoRestoreService {
     let mode = AiMode.LOCAL;
     let skipped: string[] = [];
     let problem = '';
+    let warning: RestoreOutcome['warning'];
     if (aiWanted.length > 0) {
       const edited = this.useCloud
         ? await this.cloud.edit(data, aiWanted)
@@ -119,12 +122,13 @@ export class PhotoRestoreService {
         // Ghi ro thao tac AI nao khong lam duoc, khong lang le coi nhu da lam.
         skipped = aiWanted;
         problem = edited.problem;
+        warning = 'warning' in edited ? edited.warning : undefined;
       }
     }
     const resemblance = await measureResemblance(file.buffer, data);
     await this.usage.record(AiKind.RESTORE_PHOTO, owner, mode, undefined, problem);
     const fitted = await fitPicture(data);
-    return { data: fitted.data, resemblance, mode, skipped, mimeType: fitted.mimeType };
+    return { data: fitted.data, resemblance, mode, skipped, mimeType: fitted.mimeType, warning };
   }
 
   /**

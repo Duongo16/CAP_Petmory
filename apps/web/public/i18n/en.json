@@ -2033,6 +2033,7 @@
     "MODE_LIVE": "This photo was restored with AI.",
     "MODE_LOCAL": "This photo was restored with server filters, without AI.",
     "SKIPPED": "The AI options you chose could not run (the AI service is not available). The photo below only went through the server filters.",
+    "CLOUDINARY_QUOTA": "Cloudinary reports that the account has reached or exceeded its AI allowance. This photo only used server filters; check the Cloudinary Console or upgrade the plan.",
     "SAVE_PET": "Save to a pet profile",
     "SAVE_TO_PET": "Save to the pet album",
     "SAVED": "Saved to the album",
