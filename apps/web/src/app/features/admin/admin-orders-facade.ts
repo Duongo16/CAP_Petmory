@@ -10,6 +10,7 @@ import {
 
 const TILE_ICON: Record<OrderStatus, string> = {
   AWAITING_PAYMENT: 'tag',
+  TRANSFER_CONFIRMED: 'tag',
   PAID: 'check',
   IN_PRODUCTION: 'candle',
   SHIPPING: 'truck',
@@ -25,6 +26,7 @@ export type ScreenState = 'LOADING' | 'ERROR' | 'READY';
  */
 const TILE_NOTE: Record<OrderStatus, string> = {
   AWAITING_PAYMENT: 'ADMIN.TILE.AWAITING_PAYMENT',
+  TRANSFER_CONFIRMED: 'ADMIN.TILE.TRANSFER_CONFIRMED',
   PAID: 'ADMIN.TILE.PAID',
   IN_PRODUCTION: 'ADMIN.TILE.IN_PRODUCTION',
   SHIPPING: 'ADMIN.TILE.SHIPPING',

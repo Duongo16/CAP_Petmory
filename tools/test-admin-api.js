@@ -82,6 +82,9 @@ async function run() {
   check('Hai tai khoan noi bo deu dang nhap duoc', Boolean(managerToken && supportToken));
 
   const customer = await makeCustomerWithOrder('Nguyen Van Kiem Thu');
+  await call(`/orders/${customer.orderCode}/confirm-transfer`, {
+    method: 'POST', headers: authHeaders(customer.token), body: '{}',
+  });
   await confirmPayment(customer.orderCode, 250000, managerToken);
 
         // --- Dispatch board ---

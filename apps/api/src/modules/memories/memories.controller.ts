@@ -1,6 +1,7 @@
 import {
-  Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res,
+  Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { MemoriesService } from './memories.service';
 import { DiaryService } from './diary.service';
@@ -9,6 +10,8 @@ import { CreateMemoryDto, UpdateMemoryDto } from './dto/memory.dto';
 import {
   DiaryPrivacyDto,
   DiaryCoverDto,
+  DiaryYoutubeDto,
+  DiarySampleDto,
   ExportDiaryDto,
   MakeShareDto,
   SlideSettingDto,
@@ -91,6 +94,35 @@ export class MemoriesController {
     @CurrentUser() user: AuthUser,
   ) {
     return this.diary.setCoverColor(petId, user.userId, dto.color);
+  }
+
+  @Patch('pet/:petId/music/youtube')
+  setYoutubeMusic(@Param('petId') petId: string, @Body() dto: DiaryYoutubeDto, @CurrentUser() user: AuthUser) {
+    return this.diary.setYoutubeMusic(petId, user.userId, dto.url);
+  }
+
+  @Patch('pet/:petId/music/sample')
+  setSampleMusic(@Param('petId') petId: string, @Body() dto: DiarySampleDto, @CurrentUser() user: AuthUser) {
+    return this.diary.setSampleMusic(petId, user.userId, dto.sampleCode);
+  }
+
+  @Post('pet/:petId/music/upload')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 4 * 1024 * 1024 } }))
+  uploadMusic(@Param('petId') petId: string, @UploadedFile() file: Express.Multer.File, @CurrentUser() user: AuthUser) {
+    return this.diary.uploadMusic(petId, user.userId, file);
+  }
+
+  @Delete('pet/:petId/music')
+  clearMusic(@Param('petId') petId: string, @CurrentUser() user: AuthUser) {
+    return this.diary.clearMusic(petId, user.userId);
+  }
+
+  @Get('pet/:petId/music')
+  async musicFile(@Param('petId') petId: string, @CurrentUser() user: AuthUser, @Res() res: Response): Promise<void> {
+    const music = await this.diary.ownerMusic(petId, user.userId);
+    res.setHeader('Content-Type', music.mimeType);
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.send(music.data);
   }
 
   /**

@@ -12,7 +12,8 @@ const h = require('./harness');
 
 /** The edges the requirements declare. Anything not here must be refused. */
 const ALLOWED = {
-  AWAITING_PAYMENT: ['PAID', 'CANCELLED'],
+  AWAITING_PAYMENT: ['CANCELLED'],
+  TRANSFER_CONFIRMED: ['PAID', 'CANCELLED'],
   PAID: ['IN_PRODUCTION', 'CANCELLED'],
   IN_PRODUCTION: ['SHIPPING', 'CANCELLED'],
   SHIPPING: ['COMPLETED', 'CANCELLED'],
@@ -66,14 +67,22 @@ async function scenario(report) {
   report.check('Awaiting payment offers exactly the declared next steps',
     JSON.stringify(advertised) === JSON.stringify(expected),
     `${advertised.join(',')} vs ${expected.join(',')}`);
+  const earlyPaid = await move(manager, first.code, 'PAID');
+  report.check('Staff cannot mark payment successful before customer confirmation', earlyPaid.status === 400);
+  const declaration = await h.confirmTransferByCustomer(first.code, customer);
+  report.check('Customer confirmation records a pending transfer without receiving money',
+    declaration.body.status === 'TRANSFER_CONFIRMED' && declaration.body.paidAt === null);
+  const repeated = await h.confirmTransferByCustomer(first.code, customer);
+  report.check('A repeated customer confirmation is rejected', repeated.status === 400);
 
   // Every state is walked to, then what the server offers from there is compared
   // against the diagram in section 7.2 of the requirements.
   const walkTo = {
-    PAID: ['PAID'],
-    IN_PRODUCTION: ['PAID', 'IN_PRODUCTION'],
-    SHIPPING: ['PAID', 'IN_PRODUCTION', 'SHIPPING'],
-    COMPLETED: ['PAID', 'IN_PRODUCTION', 'SHIPPING', 'COMPLETED'],
+    TRANSFER_CONFIRMED: ['TRANSFER_CONFIRMED'],
+    PAID: ['TRANSFER_CONFIRMED', 'PAID'],
+    IN_PRODUCTION: ['TRANSFER_CONFIRMED', 'PAID', 'IN_PRODUCTION'],
+    SHIPPING: ['TRANSFER_CONFIRMED', 'PAID', 'IN_PRODUCTION', 'SHIPPING'],
+    COMPLETED: ['TRANSFER_CONFIRMED', 'PAID', 'IN_PRODUCTION', 'SHIPPING', 'COMPLETED'],
   };
   for (const [state, path] of Object.entries(walkTo)) {
     const probe = await placeOrder(customer, `probe-${state}`);
@@ -82,7 +91,11 @@ async function scenario(report) {
       if (step === 'SHIPPING') {
         await h.passQualityCheck(probe.code, manager);
       }
-      await move(manager, probe.code, step);
+      if (step === 'TRANSFER_CONFIRMED') {
+        await h.confirmTransferByCustomer(probe.code, customer);
+      } else {
+        await move(manager, probe.code, step);
+      }
     }
     const seen = await h.call(`/admin/orders/${probe.code}`, { headers: manager.auth });
     const offered = [...(seen.body.nextSteps ?? [])].sort();
@@ -95,6 +108,7 @@ async function scenario(report) {
   // --- Every declared edge from the long path ---
   report.step('The whole path from awaiting payment to completed is allowed');
   const journey = await placeOrder(customer, 'journey');
+  await h.confirmTransferByCustomer(journey.code, customer);
   await h.confirmPaymentByStaff(journey.code, Number(journey.total));
 
   const longPath = ['IN_PRODUCTION', 'SHIPPING', 'COMPLETED'];
@@ -115,6 +129,7 @@ async function scenario(report) {
   // --- Hang chua qua kiem dinh thi khong giao duoc ---
   report.step('An order still on the checklist cannot be shipped');
   const back = await placeOrder(customer, 'back');
+  await h.confirmTransferByCustomer(back.code, customer);
   await h.confirmPaymentByStaff(back.code, Number(back.total));
   await move(manager, back.code, 'IN_PRODUCTION');
   const tooSoon = await move(manager, back.code, 'SHIPPING');
@@ -158,6 +173,7 @@ async function scenario(report) {
   // --- Manual confirmation remains controlled ---
   report.step('A staff confirmation needs a reason and is recorded');
   const guarded = await placeOrder(customer, 'guard');
+  await h.confirmTransferByCustomer(guarded.code, customer);
   const noReason = await h.call(`/admin/orders/${guarded.code}/status`, {
     method: 'PATCH',
     headers: manager.auth,
@@ -181,10 +197,9 @@ async function scenario(report) {
   report.check('Moves made by a person name that person',
     entries.filter((e) => e.actor).every((e) => Boolean(e.actor.email)),
     `${entries.filter((e) => e.actor).length} by a person`);
-  // The move into paid is made by the payment notification, not by anybody, so
-  // it is recorded with no person against it. That is the honest record.
-  report.check('The automatic move into paid is recorded with no person',
-    entries.some((e) => !e.actor), `${entries.filter((e) => !e.actor).length} automatic`);
+  report.check('The customer declaration and staff payment confirmation are both recorded',
+    entries.some((e) => e.after?.status === 'TRANSFER_CONFIRMED') &&
+    entries.some((e) => e.after?.status === 'PAID'));
 }
 
 if (require.main === module) {

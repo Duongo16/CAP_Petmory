@@ -290,7 +290,10 @@ async function seedOrders(token, boss, designs) {
     const total = Number(String(order.total?.$numberDecimal ?? order.total).split('.')[0]);
     const move = async (status, reason = 'Du lieu trinh dien') =>
       must(await call(`/admin/orders/${code}/status`, asJson(boss, { status, reason }, 'PATCH')), `chuyen ${status}`);
-    const pay = async () => move('PAID', `Da doi chieu thanh toan ${total} dong`);
+    const pay = async () => {
+      must(await call(`/orders/${code}/confirm-transfer`, asJson(token, {})), 'khach xac nhan chuyen khoan');
+      return move('PAID', `Da doi chieu thanh toan ${total} dong`);
+    };
     const tick = async (count) => {
       const detail = must(await call(`/admin/orders/${code}`, { headers: auth(boss) }), 'doc don');
       const all = detail.order.qualityCheck.length;

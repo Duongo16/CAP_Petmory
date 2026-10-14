@@ -548,6 +548,7 @@ async function seedOrders(people, boss) {
     })), 'dat hang');
     const code = order.orderCode;
     if (plan.to !== 'AWAITING_PAYMENT') {
+      must(await call(`/orders/${code}/confirm-transfer`, asJson(who.token, {})), 'khach xac nhan chuyen khoan');
       must(await call(`/admin/orders/${code}/status`, asJson(boss, {
         status: 'PAID', reason: 'Da doi chieu thanh toan du lieu trinh dien',
       }, 'PATCH')), 'xac nhan thanh toan');

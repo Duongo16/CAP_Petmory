@@ -50,13 +50,16 @@ function isDuplicate(trouble: unknown): boolean {
  * The legal status transitions. A status is never set freely, and every move
  * must follow one of the edges declared here.
  *
- * Cancelling stays open all the way to delivery, because a piece can still be
+ * The customer declaration is deliberately separate from PAID: it records a
+ * claim that money was sent, while only staff verification enters PAID and
+ * triggers stock handling. Cancelling stays open all the way to delivery, because a piece can still be
  * dropped, damaged or refused while it is being checked or carried. Once it is
  * in the customer's hands the order is closed and only completion is left. A
  * refund after that is handled outside the system.
  */
 const TRANSITION_VALID: Record<OrderStatus, OrderStatus[]> = {
-  [OrderStatus.AWAITING_PAYMENT]: [OrderStatus.PAID, OrderStatus.CANCELLED],
+  [OrderStatus.AWAITING_PAYMENT]: [OrderStatus.TRANSFER_CONFIRMED, OrderStatus.CANCELLED],
+  [OrderStatus.TRANSFER_CONFIRMED]: [OrderStatus.PAID, OrderStatus.CANCELLED],
   [OrderStatus.PAID]: [OrderStatus.IN_PRODUCTION, OrderStatus.CANCELLED],
   [OrderStatus.IN_PRODUCTION]: [OrderStatus.SHIPPING, OrderStatus.CANCELLED],
   [OrderStatus.SHIPPING]: [OrderStatus.COMPLETED, OrderStatus.CANCELLED],
@@ -372,6 +375,15 @@ export class OrdersService {
       throw new BadRequestException('Chi huy duoc don dang cho thanh toan');
     }
     return this.transitionStatus(order, OrderStatus.CANCELLED, customer, 'Khach tu huy don');
+  }
+
+  /** Khach bao da chuyen tien; chi nhan vien moi co the xac nhan tien da ve. */
+  async confirmTransferMine(orderCode: string, customer: string): Promise<OrderDocument> {
+    const order = await this.findOwned(orderCode, customer);
+    if (order.status !== OrderStatus.AWAITING_PAYMENT) {
+      throw new BadRequestException('Chi xac nhan duoc don dang cho thanh toan');
+    }
+    return this.transitionStatus(order, OrderStatus.TRANSFER_CONFIRMED, customer, 'Khach xac nhan da chuyen khoan');
   }
 
   /** Bo co can xu ly sau khi nhan vien da xu ly xong, ghi lai ai bo va ghi chu gi. */

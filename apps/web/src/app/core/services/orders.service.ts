@@ -38,4 +38,8 @@ export class OrdersService {
   maQr(orderCode: string): Observable<PaymentQr> {
     return this.http.get<PaymentQr>(`${this.base}/payments/qr/${orderCode}`);
   }
+
+  confirmTransfer(orderCode: string): Observable<Order> {
+    return this.http.post<Order>(`${this.base}/orders/${orderCode}/confirm-transfer`, {});
+  }
 }

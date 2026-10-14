@@ -73,6 +73,16 @@
               <a class="tw-btn-secondary" routerLink="/shop">{{ 'PAYMENT.BACK_TO_SHOP' | translate }}</a>
             </div>
           </section>
+        } @else if (transferConfirmed()) {
+          <section class="done tw-card flex flex-col items-center gap-4 w-full max-w-[640px] mx-auto px-8 py-12 max-[600px]:px-5 max-[600px]:py-8 text-center" role="status">
+            <span class="done-mark grid place-items-center w-[72px] h-[72px] rounded-full bg-success-soft text-success" aria-hidden="true"><pm-icon name="check" [size]="34" /></span>
+            <h1 class="done-title pm-page-title tw-page-title">{{ 'PAYMENT.TRANSFER_CONFIRMED_TITLE' | translate }}</h1>
+            <p class="done-text m-0 text-base leading-[1.65] text-body">{{ 'PAYMENT.TRANSFER_CONFIRMED_TEXT' | translate: { orderCode: qr.orderCode } }}</p>
+            <div class="done-deeds flex flex-wrap justify-center gap-3">
+              <button type="button" class="tw-btn-secondary" (click)="refresh()">{{ 'PAYMENT.CHECK_STATUS' | translate }}</button>
+              <a class="tw-btn-primary" routerLink="/orders">{{ 'PAYMENT.SEE_MY_ORDERS' | translate }}</a>
+            </div>
+          </section>
         } @else {
           <!-- ---------- Cho nhan vien xac nhan thanh toan ---------- -->
           <header class="head flex flex-col gap-1">
@@ -163,7 +173,13 @@
               </div>
 
               <div class="manual-deeds tw-card flex flex-col gap-3 p-5">
+                @if (confirmationError(); as errorKey) {
+                  <p class="error m-0" role="alert">{{ errorKey | translate }}</p>
+                }
                 <p class="m-0 text-sm leading-[1.6] text-body">{{ 'PAYMENT.STAFF_CONFIRMATION' | translate }}</p>
+                <button type="button" class="tw-btn-primary tw-btn-block" [disabled]="confirming()" (click)="confirmTransfer()">
+                  {{ (confirming() ? 'PAYMENT.CONFIRMING_TRANSFER' : 'PAYMENT.CONFIRM_TRANSFER') | translate }}
+                </button>
                 <a class="deeds-back tw-btn-ghost tw-btn-block" routerLink="/orders">{{ 'PAYMENT.SEE_MY_ORDERS' | translate }}</a>
               </div>
             </section>

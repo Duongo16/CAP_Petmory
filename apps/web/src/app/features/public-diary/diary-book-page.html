@@ -49,6 +49,9 @@
           </div>
         </header>
 
+        <pm-diary-music [petId]="whole.pet.petId" [music]="whole.pet.music" [publicAccess]="true"
+          [shareCode]="shareCode" [active]="!showing()" />
+
         @if (showing()) {
           <pm-slideshow
             [moments]="moments()"

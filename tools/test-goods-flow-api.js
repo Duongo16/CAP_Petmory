@@ -140,6 +140,7 @@ async function run() {
   ok('Bam dat hang hai lan cung luc chi tao mot don', madeCount === 1,
     twice.map((one) => one.status).join(','));
   const firstCode = twice.find((one) => one.status === 201)?.body?.orderCode;
+  await call(`/orders/${firstCode}/confirm-transfer`, asJson(a, {}));
 
   // --- Nhieu khach dat cung luc van nhan ma don khac nhau ---
   const crowd = await Promise.all(['c1', 'c2', 'c3', 'c4', 'c5'].map((tag) => makeCustomer(tag)));
@@ -230,6 +231,7 @@ async function run() {
   // --- Khach khong huy duoc don da thanh toan ---
   await fillCart(a, 1);
   const paidOwn = await placeOrder(a);
+  await call(`/orders/${paidOwn.body.orderCode}/confirm-transfer`, asJson(a, {}));
   await payFor(paidOwn.body.orderCode, Number(money(paidOwn.body.total)));
   const cancelPaid = await call(`/orders/${paidOwn.body.orderCode}/cancel`, asJson(a, {}));
   ok('Khach khong tu huy duoc don da thanh toan', cancelPaid.status === 400, String(cancelPaid.status));

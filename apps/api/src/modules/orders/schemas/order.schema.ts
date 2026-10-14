@@ -19,6 +19,7 @@ export type OrderDocument = HydratedDocument<Order>;
 /** Order status. Only moves along the edges declared in the service. */
 export enum OrderStatus {
   AWAITING_PAYMENT = 'AWAITING_PAYMENT',
+  TRANSFER_CONFIRMED = 'TRANSFER_CONFIRMED',
   PAID = 'PAID',
   IN_PRODUCTION = 'IN_PRODUCTION',
   SHIPPING = 'SHIPPING',

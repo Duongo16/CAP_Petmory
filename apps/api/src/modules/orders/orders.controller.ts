@@ -23,6 +23,11 @@ export class OrdersController {
     return this.service.cancelMine(orderCode, user.userId);
   }
 
+  @Post(':orderCode/confirm-transfer')
+  confirmTransfer(@Param('orderCode') orderCode: string, @CurrentUser() user: AuthUser) {
+    return this.service.confirmTransferMine(orderCode, user.userId);
+  }
+
   @Post()
   create(@Body() dto: CreateOrderDto, @CurrentUser() user: AuthUser) {
     return this.service.createFromCart(user.userId, dto);

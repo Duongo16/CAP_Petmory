@@ -129,6 +129,8 @@ async function scenario(report) {
 
   // --- Staff confirmation keeps the financial snapshot unchanged ---
   report.step('A staff member confirms the transfer after checking it');
+  const declared = await h.confirmTransferByCustomer(orderCode, customer);
+  report.check('Customer declaration awaits staff review', declared.body.status === 'TRANSFER_CONFIRMED');
   const exact = await h.confirmPaymentByStaff(orderCode, Number(cartTotal));
   report.check('The staff confirmation is accepted', exact.status === 200, String(exact.status));
 

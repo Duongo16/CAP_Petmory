@@ -37,6 +37,7 @@ export interface HistoryRow {
 /** How far through the workshop an order is, counted from one. */
 const STAGE_OF_STATUS: Record<OrderStatus, number> = {
   AWAITING_PAYMENT: 1,
+  TRANSFER_CONFIRMED: 1,
   PAID: 2,
   IN_PRODUCTION: 3,
   SHIPPING: 4,
@@ -128,7 +129,9 @@ export class AdminOrderDetailFacade {
   readonly buttons = computed<TransitionButton[]>(() =>
     (this.data()?.nextSteps ?? []).map((code) => ({
       code,
-      key: KEY_STATUS_ORDER[code],
+      key: code === 'PAID' && this.order()?.status === 'TRANSFER_CONFIRMED'
+        ? 'ADMIN.ORDER.CONFIRM_PAYMENT'
+        : KEY_STATUS_ORDER[code],
       groupColor: GROUP_COLOR_STATUS[code],
     })),
   );

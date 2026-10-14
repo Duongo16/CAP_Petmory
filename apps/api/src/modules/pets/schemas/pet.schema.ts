@@ -84,6 +84,29 @@ export class SlideSetting {
 
 export const SlideSettingSchema = SchemaFactory.createForClass(SlideSetting);
 
+@Schema({ _id: false })
+export class DiaryMusic {
+  @Prop({ type: String, enum: ['NONE', 'SAMPLE', 'UPLOAD', 'YOUTUBE'], default: 'SAMPLE' })
+  source!: 'NONE' | 'SAMPLE' | 'UPLOAD' | 'YOUTUBE';
+
+  @Prop({ trim: true, default: 'Hộp nhạc dịu dàng', maxlength: 160 })
+  title!: string;
+
+  @Prop({ trim: true, default: '', match: /^$|^[a-zA-Z0-9_-]{11}$/ })
+  youtubeId!: string;
+
+  @Prop({ trim: true, default: 'HOP_NHAC_DIU_DANG', maxlength: 60 })
+  sampleCode!: string;
+
+  @Prop({ trim: true, default: '' })
+  fileName!: string;
+
+  @Prop({ trim: true, default: '' })
+  mimeType!: string;
+}
+
+export const DiaryMusicSchema = SchemaFactory.createForClass(DiaryMusic);
+
 @Schema({ timestamps: true, collection: 'pets' })
 export class Pet {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, index: true })
@@ -164,6 +187,10 @@ export class Pet {
   /** Cach trinh chieu quyen nhat ky cua be nay. */
   @Prop({ type: SlideSettingSchema, default: () => ({}) })
   slideSetting!: SlideSetting;
+
+  /** Mot bai nhac nen cho quyen nhat ky, doc lap voi nhac trinh chieu. */
+  @Prop({ type: DiaryMusicSchema, default: () => ({}) })
+  diaryMusic!: DiaryMusic;
 
   /** Mau bia cua quyen nhat ky, luu theo tung be de ca chu va nguoi doc thay cung mot mau. */
   @Prop({

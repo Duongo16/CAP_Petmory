@@ -36,6 +36,7 @@ async function run() {
     const order = await (await api.post(`${API}/orders`, {
       headers: auth, data: { fullName: 'Don Quan Tri', phone: '0901234567', address: '2 Duong Don', province: 'Hue' },
     })).json();
+    await api.post(`${API}/orders/${order.orderCode}/confirm-transfer`, { headers: auth });
     const noReason = await api.patch(`${API}/admin/orders/${order.orderCode}/status`, { headers: manager, data: { status: 'IN_PRODUCTION' } });
     res.push(check('Changing a status by hand without a reason is refused', noReason.status() === 400, String(noReason.status())));
 

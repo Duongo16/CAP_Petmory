@@ -132,6 +132,7 @@ async function run() {
   const paid = [];
   for (let i = 0; i < 3; i += 1) {
     const one = await orderGoods(mine, 'G-HOP-QUA', 'HOP-NHO', 1);
+    await call(`/orders/${one.code}/confirm-transfer`, asJson(mine, {}));
     await payFor(one.code, one.total, boss);
     paid.push(one);
   }

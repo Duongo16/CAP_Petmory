@@ -13,7 +13,7 @@ export type OrderGroup = 'ALL' | 'AWAITING' | 'MAKING' | 'SHIPPING' | 'FINISHED'
 
 /** Which statuses each pill gathers. The first pill gathers everything. */
 const GROUP_HOLDS: Record<Exclude<OrderGroup, 'ALL'>, OrderStatus[]> = {
-  AWAITING: ['AWAITING_PAYMENT'],
+  AWAITING: ['AWAITING_PAYMENT', 'TRANSFER_CONFIRMED'],
   MAKING: ['PAID', 'IN_PRODUCTION'],
   SHIPPING: ['SHIPPING'],
   FINISHED: ['COMPLETED'],
@@ -36,6 +36,7 @@ export const GROUP_ORDER: OrderGroup[] = ['ALL', 'AWAITING', 'MAKING', 'SHIPPING
  */
 const MINE_STATUS_KEY: Record<OrderStatus, string> = {
   AWAITING_PAYMENT: 'ORDER.MINE_STATUS.AWAITING_PAYMENT',
+  TRANSFER_CONFIRMED: 'ORDER.MINE_STATUS.TRANSFER_CONFIRMED',
   PAID: 'ORDER.MINE_STATUS.PAID',
   IN_PRODUCTION: 'ORDER.MINE_STATUS.IN_PRODUCTION',
   SHIPPING: 'ORDER.MINE_STATUS.SHIPPING',
@@ -49,6 +50,7 @@ const NEEDS_PAYMENT: OrderStatus[] = ['AWAITING_PAYMENT'];
 /** How far along the workshop is, counted from one, or zero when cancelled. */
 const STAGE_OF_STATUS: Record<OrderStatus, number> = {
   AWAITING_PAYMENT: 1,
+  TRANSFER_CONFIRMED: 1,
   PAID: 2,
   IN_PRODUCTION: 3,
   SHIPPING: 4,
@@ -73,6 +75,7 @@ const STAGE_KEYS_READY: string[] = [
 
 const STAGE_OF_STATUS_READY: Record<OrderStatus, number> = {
   AWAITING_PAYMENT: 1,
+  TRANSFER_CONFIRMED: 1,
   PAID: 2,
   IN_PRODUCTION: 2,
   SHIPPING: 3,

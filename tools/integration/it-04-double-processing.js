@@ -59,6 +59,7 @@ async function scenario(report) {
   // --- Two staff confirmations at the same instant ---
   report.step('Two staff confirmations at the same instant move the order once');
   const order = await placeOrder(customer);
+  await h.confirmTransferByCustomer(order.code, customer);
   const [firstSend, secondSend] = await Promise.all([
     h.confirmPaymentByStaff(order.code, Number(order.total)),
     h.confirmPaymentByStaff(order.code, Number(order.total)),
@@ -110,6 +111,7 @@ async function scenario(report) {
   // --- The same review sent twice ---
   report.step('The same review sent twice leaves one review');
   const journey = await placeOrder(customer);
+  await h.confirmTransferByCustomer(journey.code, customer);
   await h.confirmPaymentByStaff(journey.code, Number(journey.total));
   for (const status of ['IN_PRODUCTION', 'SHIPPING', 'COMPLETED']) {
     // Khong roi khau kiem dinh khi phieu con muc chua tich.

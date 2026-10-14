@@ -79,7 +79,8 @@ async function orderGoods(token, goodsCode, sku, quantity) {
 }
 
 /** Nhan vien xac nhan da doi chieu giao dich thuc te. */
-function payFor(orderCode, amount, managerToken) {
+async function payFor(orderCode, amount, managerToken, customerToken) {
+  await call(`/orders/${orderCode}/confirm-transfer`, asJson(customerToken, {}));
   return call(`/admin/orders/${orderCode}/status`, asJson(managerToken, {
     status: 'PAID', reason: `Da doi chieu chuyen khoan ${amount} dong`,
   }, 'PATCH'));
@@ -169,7 +170,7 @@ async function run() {
     (await stockOf('G-BAT-AN', 'BAT-300')) === before,
     `${before} -> ${await stockOf('G-BAT-AN', 'BAT-300')}`);
 
-  await payFor(placed.code, await amountOf(placed.code, mine), boss);
+  await payFor(placed.code, await amountOf(placed.code, mine), boss, mine);
   const afterPaid = await stockOf('G-BAT-AN', 'BAT-300');
   ok('Thanh toan xong thi ton kho giam dung mot', afterPaid === before - 1,
     `${before} -> ${afterPaid}`);
@@ -202,8 +203,8 @@ async function run() {
     amountOf(raceTwo.code, other),
   ]);
   await Promise.all([
-    payFor(raceOne.code, raceMoney[0], boss),
-    payFor(raceTwo.code, raceMoney[1], boss),
+    payFor(raceOne.code, raceMoney[0], boss, mine),
+    payFor(raceTwo.code, raceMoney[1], boss, other),
   ]);
 
   const leftAfter = await stockOf('G-THE-TEN', 'THE-XUONG');
@@ -242,7 +243,7 @@ async function run() {
     typeof mixedOrder.body.total === 'string' || typeof mixedOrder.body.total === 'object');
 
   // --- NT-23.8 Ho so san xuat chi liet ke dong tuy bien ---
-  await payFor(mixedOrder.body.orderCode, await amountOf(mixedOrder.body.orderCode, mine), boss);
+  await payFor(mixedOrder.body.orderCode, await amountOf(mixedOrder.body.orderCode, mine), boss, mine);
   const profile = await call(`/admin/orders/${mixedOrder.body.orderCode}/production-file`, withToken(boss));
   ok('Ho so san xuat chi liet ke dong hang tuy bien',
     profile.body.items.length === 1, String(profile.body?.items?.length));
@@ -251,7 +252,7 @@ async function run() {
 
   // --- NT-23.7 Don chi co hang co san thi khong co ho so san xuat ---
   const onlyGoods = await orderGoods(other, 'G-HOP-QUA', 'HOP-VUA', 1);
-  await payFor(onlyGoods.code, await amountOf(onlyGoods.code, other), boss);
+  await payFor(onlyGoods.code, await amountOf(onlyGoods.code, other), boss, other);
   const emptyProfile = await call(`/admin/orders/${onlyGoods.code}/production-file`, withToken(boss));
   ok('Don chi co hang co san thi ho so san xuat khong co dong nao',
     (emptyProfile.body.items ?? []).length === 0,

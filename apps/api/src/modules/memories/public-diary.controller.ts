@@ -62,6 +62,24 @@ export class PublicDiaryController {
   }
 
   @Public()
+  @Get('share/:code/music')
+  async sharedMusic(@Param('code') code: string, @Res() res: Response): Promise<void> {
+    const music = await this.service.sharedMusic(code);
+    res.setHeader('Content-Type', music.mimeType);
+    res.setHeader('Cache-Control', 'no-store');
+    res.send(music.data);
+  }
+
+  @Public()
+  @Get(':petId/music')
+  async publicMusic(@Param('petId') petId: string, @Res() res: Response): Promise<void> {
+    const music = await this.service.publicMusic(petId);
+    res.setHeader('Content-Type', music.mimeType);
+    res.setHeader('Cache-Control', 'no-store');
+    res.send(music.data);
+  }
+
+  @Public()
   @Get()
   list(@Query() query: PublicDiaryQueryDto) {
     return this.service.publicList(query.page ?? 1, query.topic, query.keyword);

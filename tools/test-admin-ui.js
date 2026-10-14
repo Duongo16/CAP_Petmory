@@ -73,6 +73,8 @@ async function makeCustomerWithOrder(page, fullName) {
   });
   const orderCode = (await order.json()).orderCode;
 
+  await page.request.post(`${API}/orders/${orderCode}/confirm-transfer`, { headers: label });
+
   const managerLogin = await page.request.post(`${API}/auth/login`, {
     data: { email: 'quanly@petmory.local', password: 'Petmory@2026' },
   });

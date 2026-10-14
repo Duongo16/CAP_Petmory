@@ -99,6 +99,18 @@ export class DiaryCoverDto {
   color!: string;
 }
 
+/** Link cua mot video YouTube duoc gan vao quyen nhat ky. */
+export class DiaryYoutubeDto {
+  @IsString()
+  @MaxLength(500)
+  url!: string;
+}
+
+export class DiarySampleDto {
+  @IsIn(['HOP_NHAC_DIU_DANG', 'HOP_NHAC_NANG_SOM'])
+  sampleCode!: string;
+}
+
 /** Khoang thoi gian muon xuat. De trong ca hai la lay ca quyen. */
 export class ExportDiaryDto {
   @IsOptional()

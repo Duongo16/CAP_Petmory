@@ -69,6 +69,7 @@ export interface Pet {
   carer: Carer[];
   /** Cach trinh chieu quyen nhat ky cua be nay. */
   slideSetting: { trackCode: string; effect: string; seconds: number };
+  diaryMusic: DiaryMusic;
   /** Mau bia tuy chon cua quyen nhat ky. */
   diaryCoverColor: string;
   /** Quyen nhat ky cua be nay co cho nguoi ngoai doc khong. */
@@ -416,6 +417,7 @@ export interface ApiError {
 
 export type OrderStatus =
   | 'AWAITING_PAYMENT'
+  | 'TRANSFER_CONFIRMED'
   | 'PAID'
   | 'IN_PRODUCTION'
   | 'SHIPPING'
@@ -472,6 +474,14 @@ export interface DiaryCard {
   ownerAvatarUrl: string;
   coverColor: string;
   slide: { trackCode: string; effect: string; seconds: number };
+  music: DiaryMusic;
+}
+
+export interface DiaryMusic {
+  source: 'NONE' | 'SAMPLE' | 'UPLOAD' | 'YOUTUBE';
+  title: string;
+  youtubeId: string;
+  sampleCode: string;
 }
 
 /** Giong van cua cau chuyen AI, trung danh sach phia may chu. */
@@ -563,6 +573,7 @@ export interface Order {
   _id: string;
   orderCode: string;
   reference: string;
+  payee?: { bankName: string; accountNumber: string; accountHolder: string } | null;
   rows: OrderLine[];
   delivery: DeliveryInfo;
   total: Money;

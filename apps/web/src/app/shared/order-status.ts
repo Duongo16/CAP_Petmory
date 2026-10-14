@@ -6,6 +6,7 @@ import { OrderStatus } from '../core/models/api.model';
  */
 export const KEY_STATUS_ORDER: Record<OrderStatus, string> = {
   AWAITING_PAYMENT: 'ORDER.STATUS.AWAITING_PAYMENT',
+  TRANSFER_CONFIRMED: 'ORDER.STATUS.TRANSFER_CONFIRMED',
   PAID: 'ORDER.STATUS.PAID',
   IN_PRODUCTION: 'ORDER.STATUS.IN_PRODUCTION',
   SHIPPING: 'ORDER.STATUS.SHIPPING',
@@ -16,6 +17,7 @@ export const KEY_STATUS_ORDER: Record<OrderStatus, string> = {
 /** Display order on the dispatch board, following an order's real life cycle. */
 export const SORT_ORDER_STATUS: OrderStatus[] = [
   'AWAITING_PAYMENT',
+  'TRANSFER_CONFIRMED',
   'PAID',
   'IN_PRODUCTION',
   'SHIPPING',
@@ -29,6 +31,7 @@ export const SORT_ORDER_STATUS: OrderStatus[] = [
  */
 export const GROUP_COLOR_STATUS: Record<OrderStatus, string> = {
   AWAITING_PAYMENT: 'awaiting',
+  TRANSFER_CONFIRMED: 'awaiting',
   PAID: 'good',
   IN_PRODUCTION: 'in-progress',
   SHIPPING: 'in-progress',

@@ -17,6 +17,8 @@ export const StorageFolder = {
   COMMUNITY: 'community',
   /** Tep nhat ky da xuat, chi chu so huu tai duoc va tu het han. */
   EXPORT: 'exports',
+  /** Nhac rieng cua tung quyen nhat ky. */
+  DIARY_MUSIC: 'diary-music',
 } as const;
 
 export type StorageFolderName = (typeof StorageFolder)[keyof typeof StorageFolder];

@@ -167,4 +167,31 @@ export class MemoriesService {
   publicPhotoLink(photoId: string): string {
     return `${this.base}/diaries/photo/${photoId}`;
   }
+
+  setYoutubeMusic(petId: string, url: string): Observable<Pet> {
+    return this.http.patch<Pet>(`${this.base}/memories/pet/${petId}/music/youtube`, { url });
+  }
+
+  setSampleMusic(petId: string, sampleCode: string): Observable<Pet> {
+    return this.http.patch<Pet>(`${this.base}/memories/pet/${petId}/music/sample`, { sampleCode });
+  }
+
+  uploadMusic(petId: string, file: File): Observable<Pet> {
+    const body = new FormData();
+    body.append('file', file);
+    return this.http.post<Pet>(`${this.base}/memories/pet/${petId}/music/upload`, body);
+  }
+
+  clearMusic(petId: string): Observable<Pet> {
+    return this.http.delete<Pet>(`${this.base}/memories/pet/${petId}/music`);
+  }
+
+  diaryMusicFile(petId: string, publicAccess = false, shareCode = ''): Observable<Blob> {
+    const path = shareCode
+      ? `${this.base}/diaries/share/${encodeURIComponent(shareCode)}/music`
+      : publicAccess
+        ? `${this.base}/diaries/${petId}/music`
+        : `${this.base}/memories/pet/${petId}/music`;
+    return this.http.get(path, { responseType: 'blob' });
+  }
 }

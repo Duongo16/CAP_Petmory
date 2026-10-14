@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { Memory, MemoryDocument, MemoryTopic } from './schemas/memory.schema';
 import { DiaryShare, DiaryShareDocument } from './schemas/diary-share.schema';
-import { Pet, PetDocument } from '../pets/schemas/pet.schema';
+import { DiaryMusic, Pet, PetDocument } from '../pets/schemas/pet.schema';
 import { PetPhoto, PetPhotoDocument } from '../photos/schemas/pet-photo.schema';
 import { PetsService } from '../pets/pets.service';
 import { StorageService, StorageFolder } from '../../common/storage/storage.service';
@@ -16,6 +16,52 @@ const PAGE_SIZE = 12;
 /** Do dai ma chia se, tinh bang byte truoc khi doi sang chu so muoi sau. */
 const CODE_BYTES = 32;
 const DEFAULT_COVER_COLOR = '#c4661a';
+// API chay tren Vercel: request va response deu phai nam duoi gioi han ~4.5 MB.
+const MUSIC_MAX_BYTES = 4 * 1024 * 1024;
+const MUSIC_SAMPLES = new Map([
+  ['HOP_NHAC_DIU_DANG', 'Hộp nhạc dịu dàng'],
+  ['HOP_NHAC_NANG_SOM', 'Hộp nhạc nắng sớm'],
+]);
+
+function youtubeIdOf(raw: string): string {
+  let url: URL;
+  try {
+    url = new URL(raw.trim());
+  } catch {
+    throw new BadRequestException('Link YouTube khong hop le');
+  }
+  if (url.protocol !== 'https:' || url.username || url.password || url.port) {
+    throw new BadRequestException('Link YouTube khong hop le');
+  }
+  const host = url.hostname.toLowerCase();
+  let id = '';
+  if (host === 'youtu.be' || host === 'www.youtu.be') {
+    id = url.pathname.slice(1);
+  } else if (['youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host)) {
+    id = url.pathname === '/watch' ? url.searchParams.get('v') ?? '' :
+      /^\/(shorts|embed|live)\/[a-zA-Z0-9_-]{11}$/.test(url.pathname) ? url.pathname.split('/')[2] : '';
+  }
+  if (!/^[a-zA-Z0-9_-]{11}$/.test(id)) {
+    throw new BadRequestException('Link YouTube phai tro den mot video hop le');
+  }
+  return id;
+}
+
+function audioKind(data: Buffer): { mimeType: string; extension: string } | null {
+  if (data.subarray(0, 3).toString() === 'ID3' || (data.length > 2 && data[0] === 0xff && (data[1] & 0xe0) === 0xe0)) {
+    return { mimeType: 'audio/mpeg', extension: 'mp3' };
+  }
+  if (data.subarray(0, 4).toString() === 'RIFF' && data.subarray(8, 12).toString() === 'WAVE') {
+    return { mimeType: 'audio/wav', extension: 'wav' };
+  }
+  if (data.subarray(0, 4).toString() === 'OggS') {
+    return { mimeType: 'audio/ogg', extension: 'ogg' };
+  }
+  if (data.subarray(4, 8).toString() === 'ftyp' && /^(M4A |mp42|isom)/.test(data.subarray(8, 12).toString())) {
+    return { mimeType: 'audio/mp4', extension: 'm4a' };
+  }
+  return null;
+}
 
 /** Mot quyen nhat ky nhin tu ben ngoai, da bo het du lieu dinh danh. */
 export interface DiaryCard {
@@ -32,6 +78,7 @@ export interface DiaryCard {
   ownerAvatarUrl: string;
   coverColor: string;
   slide: { trackCode: string; effect: string; seconds: number };
+  music: { source: DiaryMusic['source']; title: string; youtubeId: string; sampleCode: string };
 }
 
 /** Mot quyen tren man kiem duyet: the gioi thieu kem trang thai cong khai va ly do an. */
@@ -204,6 +251,88 @@ export class DiaryService {
     const pet = await this.pets.findOwned(petId, owner);
     pet.diaryCoverColor = color.toLowerCase();
     return pet.save();
+  }
+
+  /** Luu link YouTube da rut gon thanh ma video, thay bai nhac cu. */
+  async setYoutubeMusic(petId: string, owner: string, url: string): Promise<PetDocument> {
+    const pet = await this.pets.findOwned(petId, owner);
+    const id = youtubeIdOf(url);
+    const old = pet.diaryMusic?.fileName;
+    pet.diaryMusic = { source: 'YOUTUBE', title: 'YouTube', youtubeId: id, sampleCode: '', fileName: '', mimeType: '' };
+    await pet.save();
+    if (old) await this.store.remove(StorageFolder.DIARY_MUSIC, old).catch(() => undefined);
+    return pet;
+  }
+
+  async setSampleMusic(petId: string, owner: string, sampleCode: string): Promise<PetDocument> {
+    const title = MUSIC_SAMPLES.get(sampleCode);
+    if (!title) throw new BadRequestException('Bai nhac mau khong hop le');
+    const pet = await this.pets.findOwned(petId, owner);
+    const old = pet.diaryMusic?.fileName;
+    pet.diaryMusic = { source: 'SAMPLE', title, sampleCode, youtubeId: '', fileName: '', mimeType: '' };
+    await pet.save();
+    if (old) await this.store.remove(StorageFolder.DIARY_MUSIC, old).catch(() => undefined);
+    return pet;
+  }
+
+  /** Luu tep nhac va chi thay lua chon hien tai sau khi tep da duoc ghi thanh cong. */
+  async uploadMusic(petId: string, owner: string, file: Express.Multer.File): Promise<PetDocument> {
+    const pet = await this.pets.findOwned(petId, owner);
+    if (!file?.buffer?.length || file.size > MUSIC_MAX_BYTES) {
+      throw new BadRequestException('Chon tep nhac khong qua 4 MB');
+    }
+    const kind = audioKind(file.buffer);
+    if (!kind) {
+      throw new BadRequestException('Chi nhan tep MP3, M4A, OGG hoac WAV');
+    }
+    const name = `${randomUUID()}.${kind.extension}`;
+    await this.store.save(StorageFolder.DIARY_MUSIC, name, file.buffer, kind.mimeType);
+    const old = pet.diaryMusic?.fileName;
+    const title = file.originalname.replace(/\.[^.]+$/, '').trim().slice(0, 160) || 'Nhac nhat ky';
+    pet.diaryMusic = { source: 'UPLOAD', title, youtubeId: '', sampleCode: '', fileName: name, mimeType: kind.mimeType };
+    try {
+      await pet.save();
+    } catch (error) {
+      await this.store.remove(StorageFolder.DIARY_MUSIC, name).catch(() => undefined);
+      throw error;
+    }
+    if (old) await this.store.remove(StorageFolder.DIARY_MUSIC, old).catch(() => undefined);
+    return pet;
+  }
+
+  async clearMusic(petId: string, owner: string): Promise<PetDocument> {
+    const pet = await this.pets.findOwned(petId, owner);
+    const old = pet.diaryMusic?.fileName;
+    pet.diaryMusic = { source: 'NONE', title: '', youtubeId: '', sampleCode: '', fileName: '', mimeType: '' };
+    await pet.save();
+    if (old) await this.store.remove(StorageFolder.DIARY_MUSIC, old).catch(() => undefined);
+    return pet;
+  }
+
+  async ownerMusic(petId: string, owner: string): Promise<{ data: Buffer; mimeType: string }> {
+    return this.readMusic(await this.pets.findOwned(petId, owner));
+  }
+
+  async publicMusic(petId: string): Promise<{ data: Buffer; mimeType: string }> {
+    if (!Types.ObjectId.isValid(petId)) throw new NotFoundException(MSG.NOT_FOUND);
+    const pet = await this.petModel.findOne({ _id: petId, isHidden: false, diaryPublic: true, diaryBlocked: false }).exec();
+    if (!pet) throw new NotFoundException(MSG.NOT_FOUND);
+    return this.readMusic(pet);
+  }
+
+  async sharedMusic(code: string): Promise<{ data: Buffer; mimeType: string }> {
+    const share = await this.shareModel.findOne({
+      codeHash: hashOf(code), revokedAt: null,
+      $or: [{ expiresAt: null }, { expiresAt: { $gt: new Date() } }],
+    }).exec();
+    if (!share) throw new NotFoundException(MSG.NOT_FOUND);
+    return this.publicMusic(share.pet.toString());
+  }
+
+  private async readMusic(pet: PetDocument): Promise<{ data: Buffer; mimeType: string }> {
+    const music = pet.diaryMusic;
+    if (music?.source !== 'UPLOAD' || !music.fileName) throw new NotFoundException(MSG.NOT_FOUND);
+    return { data: await this.store.read(StorageFolder.DIARY_MUSIC, music.fileName), mimeType: music.mimeType };
   }
 
   /** Thu hoi toan bo duong dan chia se cua mot quyen. */
@@ -426,6 +555,12 @@ export class DiaryService {
       ownerId: owner.id,
       ownerAvatarUrl: owner.avatarUrl,
       coverColor: pet.diaryCoverColor || DEFAULT_COVER_COLOR,
+      music: {
+        source: pet.diaryMusic?.source ?? 'SAMPLE',
+        title: pet.diaryMusic?.title ?? 'Hộp nhạc dịu dàng',
+        youtubeId: pet.diaryMusic?.youtubeId ?? '',
+        sampleCode: pet.diaryMusic?.sampleCode ?? 'HOP_NHAC_DIU_DANG',
+      },
       slide: {
         trackCode: pet.slideSetting.trackCode,
         effect: pet.slideSetting.effect,

@@ -15,6 +15,7 @@ const REMOTE_FOLDER: Record<StorageFolderName, string> = {
   [StorageFolder.DESIGN]: 'petmory/designs',
   [StorageFolder.COMMUNITY]: 'petmory/community',
   [StorageFolder.EXPORT]: 'petmory/exports',
+  [StorageFolder.DIARY_MUSIC]: 'petmory/diary-music',
 };
 
 /**
@@ -23,8 +24,10 @@ const REMOTE_FOLDER: Record<StorageFolderName, string> = {
  * Tep nhat ky xuat ra la PDF. Goi mien phi chan phat PDF khi luu dang anh, nen
  * nhom nay luu dang tep tho; cac nhom con lai la anh.
  */
-function resourceOf(folder: StorageFolderName): 'image' | 'raw' {
-  return folder === StorageFolder.EXPORT ? 'raw' : 'image';
+function resourceOf(folder: StorageFolderName): 'image' | 'raw' | 'video' {
+  if (folder === StorageFolder.EXPORT) return 'raw';
+  if (folder === StorageFolder.DIARY_MUSIC) return 'video';
+  return 'image';
 }
 
 /**

@@ -246,6 +246,9 @@ async function run() {
 
   const managerToken = await login('quanly@petmory.local', PASSWORD_INTERNAL);
   const supportToken = await login('cskh@petmory.local', PASSWORD_INTERNAL);
+  await call(`/orders/${orderCode}/confirm-transfer`, {
+    method: 'POST', headers: authHeaders(customer.token), body: '{}',
+  });
   await call(`/admin/orders/${orderCode}/status`, {
     method: 'PATCH',
     headers: authHeaders(managerToken),

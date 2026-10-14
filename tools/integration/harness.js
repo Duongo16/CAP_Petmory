@@ -156,6 +156,14 @@ async function confirmPaymentByStaff(orderCode, amount) {
   });
 }
 
+async function confirmTransferByCustomer(orderCode, customer) {
+  return call(`/orders/${orderCode}/confirm-transfer`, {
+    method: 'POST',
+    headers: customer.auth,
+    body: JSON.stringify({}),
+  });
+}
+
 /** Whole dong, parsed from whichever shape the server used for the amount. */
 function dong(value) {
   if (value === null || value === undefined) {
@@ -222,6 +230,7 @@ module.exports = {
   makePhoto,
   uploadPhoto,
   confirmPaymentByStaff,
+  confirmTransferByCustomer,
   dong,
   runScenario,
 };

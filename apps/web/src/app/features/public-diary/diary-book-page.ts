@@ -17,6 +17,7 @@ import { DiaryBook, MusicTrack } from '../../core/models/api.model';
 import { topicKey, topicTone } from '../../shared/memory-topics';
 import { SlideSetting, Slideshow, SlideEffect } from '../memories/slideshow/slideshow';
 import { DiaryBookView } from '../memories/book/diary-book';
+import { DiaryMusicPlayer } from '../memories/diary-music/diary-music';
 import { PageFace } from '../memories/book/page-face';
 import { PaperKind } from '../../shared/diary-art';
 import { Icon } from '../../shared/icon/icon';
@@ -35,7 +36,7 @@ const PLAIN_SETTING: SlideSetting = { trackCode: '', effect: 'FADE', seconds: 5 
 @Component({
   selector: 'pm-diary-book-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, TranslatePipe, Slideshow, DiaryBookView, Icon],
+  imports: [DatePipe, RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon],
   templateUrl: './diary-book-page.html',
   styleUrl: './diary-book-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,6 +50,7 @@ export class DiaryBookPage implements OnInit {
   readonly book = signal<DiaryBook | null>(null);
   readonly tracks = signal<MusicTrack[]>([]);
   readonly showing = signal(false);
+  readonly shareCode = this.route.snapshot.paramMap.get('code') ?? '';
 
   /** Doc theo quyen so lat trang, hay theo danh sach doc. */
   readonly asBook = signal(true);

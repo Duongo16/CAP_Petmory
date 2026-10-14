@@ -152,6 +152,8 @@ async function scenario(report) {
     String(qr.body.transferMessage ?? '').includes(order.body.reference),
     qr.body.transferMessage);
 
+  const declared = await h.confirmTransferByCustomer(orderCode, customer);
+  report.check('Customer confirms the transfer for staff review', declared.body.status === 'TRANSFER_CONFIRMED');
   const transfer = await h.confirmPaymentByStaff(orderCode, Number(orderTotal));
   report.require('A staff confirmation moves the order to paid', transfer.status === 200, String(transfer.status));
 

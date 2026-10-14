@@ -125,6 +125,22 @@
           </section>
         </div>
 
+        @if (order.status === 'TRANSFER_CONFIRMED') {
+          <section class="card">
+            <h2>{{ 'ADMIN.ORDER.TRANSFER_REVIEW' | translate }}</h2>
+            <dl class="info-pair">
+              <dt>{{ 'ADMIN.ORDER.TRANSFER_REFERENCE' | translate }}</dt>
+              <dd>{{ order.reference }}</dd>
+              <dt>{{ 'ADMIN.ORDER.TRANSFER_AMOUNT' | translate }}</dt>
+              <dd>{{ order.total | amount: order.currency }}</dd>
+              @if (order.payee; as payee) {
+                <dt>{{ 'ADMIN.ORDER.TRANSFER_ACCOUNT' | translate }}</dt>
+                <dd>{{ payee.bankName }} · {{ payee.accountNumber }} · {{ payee.accountHolder }}</dd>
+              }
+            </dl>
+          </section>
+        }
+
         <section class="card">
           <div class="card-head">
             <h2>{{ 'ADMIN.ORDER.TRANSITION_STATUS' | translate }}</h2>
@@ -186,6 +202,9 @@
           } @else if (facade.buttons().length === 0) {
             <p class="note">{{ 'ADMIN.ORDER.NONE_STEP' | translate }}</p>
           } @else {
+            @if (order.status === 'TRANSFER_CONFIRMED') {
+              <p class="note">{{ 'ADMIN.ORDER.VERIFY_TRANSFER' | translate }}</p>
+            }
             <label class="field-label" for="reason-input">{{ 'ADMIN.ORDER.REASON' | translate }}</label>
             <input
               id="reason-input"

@@ -200,6 +200,7 @@ async function run() {
           String(typeof raw === 'object' && raw ? raw.$numberDecimal : raw).split('.')[0],
         );
         const manager = await call('/auth/login', asJson(null, MANAGER));
+        await call(`/orders/${code}/confirm-transfer`, asJson(token, {}));
         await call(`/admin/orders/${code}/status`, asJson(manager.body?.accessToken, {
           status: 'PAID', reason: `Da doi chieu thanh toan demo ${amount} dong`,
         }, 'PATCH'));

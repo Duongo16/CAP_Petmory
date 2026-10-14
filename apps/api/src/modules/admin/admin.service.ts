@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, QueryFilter, Types } from 'mongoose';
 import { Order, OrderDocument, OrderStatus } from '../orders/schemas/order.schema';
@@ -111,7 +111,7 @@ export class AdminService {
     return {
       order,
       customer: customer ? this.slimCustomer(customer) : null,
-      nextSteps: this.orders.nextSteps(order),
+      nextSteps: this.orders.nextSteps(order).filter((status) => status !== OrderStatus.TRANSFER_CONFIRMED),
       history,
     };
   }
@@ -122,6 +122,9 @@ export class AdminService {
     actor: string,
     reason: string,
   ) {
+    if (next === OrderStatus.TRANSFER_CONFIRMED) {
+      throw new BadRequestException('Chi khach hang duoc xac nhan da chuyen khoan');
+    }
     const order = await this.orderModel.findOne({ orderCode: orderCode.toUpperCase() }).exec();
     if (!order) {
       throw new NotFoundException(MSG.NOT_FOUND);

@@ -24,7 +24,8 @@ import { DiaryBookView } from './book/diary-book';
 import { PageFace } from './book/page-face';
 import { PageEditor, PageEditRequest, PageEditResult } from './book/page-editor';
 import { PaperKind } from '../../shared/diary-art';
-import { Memory, MemoryTopic, PetStory } from '../../core/models/api.model';
+import { DiaryMusic, Memory, MemoryTopic, PetStory } from '../../core/models/api.model';
+import { DiaryMusicPlayer } from './diary-music/diary-music';
 import { Icon } from '../../shared/icon/icon';
 import { PetPhotos } from './pet-photos/pet-photos';
 
@@ -49,7 +50,7 @@ function viewFrom(raw: string | null): DiaryView {
 @Component({
   selector: 'pm-memories-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, TranslatePipe, DiaryBookView, Icon, PetPhotos],
+  imports: [RouterLink, DatePipe, TranslatePipe, DiaryBookView, DiaryMusicPlayer, Icon, PetPhotos],
   providers: [MemoriesFacade],
   templateUrl: './memories-page.html',
   styleUrl: './memories-page.scss',
@@ -71,6 +72,9 @@ export class MemoriesPage implements OnInit {
 
   readonly tabs = DIARY_TABS;
   readonly coverColors = COVER_COLORS;
+  readonly music = computed<DiaryMusic>(() => this.facade.pet()?.diaryMusic ?? {
+    source: 'SAMPLE', title: 'Hộp nhạc dịu dàng', youtubeId: '', sampleCode: 'HOP_NHAC_DIU_DANG',
+  });
 
   /** Ma cua be dang mo, doc mot lan tu duong dan. */
   petId = '';

@@ -276,6 +276,10 @@ async function run() {
     const orderTotal = String(orderBody.total?.$numberDecimal ?? orderBody.total ?? '0').split('.')[0];
     res.push(check('The order total includes the stand price', orderTotal === '870000', orderTotal));
 
+    await page.request.post(`${API}/orders/${orderCode}/confirm-transfer`, {
+      headers: { Authorization: `Bearer ${await page.evaluate(() => localStorage.getItem('petmory.access'))}` },
+    });
+
     const managerLogin = await page.request.post(`${API}/auth/login`, {
       data: { email: 'quanly@petmory.local', password: 'Petmory@2026' },
     });

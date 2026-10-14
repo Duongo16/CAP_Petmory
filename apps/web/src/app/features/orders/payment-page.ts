@@ -30,6 +30,9 @@ export class PaymentPage implements OnInit, OnDestroy {
   readonly paidOrder = this.facade.paidOrder;
   readonly paid = this.facade.paid;
   readonly cancelled = this.facade.cancelled;
+  readonly transferConfirmed = this.facade.transferConfirmed;
+  readonly confirming = this.facade.confirming;
+  readonly confirmationError = this.facade.confirmationError;
   readonly copied = this.facade.copied;
 
   ngOnInit(): void {
@@ -54,6 +57,14 @@ export class PaymentPage implements OnInit, OnDestroy {
       clearTimeout(this.forgetCopied);
     }
     this.forgetCopied = setTimeout(() => this.facade.markCopied(null), COPIED_FOR_MS);
+  }
+
+  confirmTransfer(): void {
+    this.facade.confirmTransfer();
+  }
+
+  refresh(): void {
+    this.facade.start(this.orderCode());
   }
 
 }
