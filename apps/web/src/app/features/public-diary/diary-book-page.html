@@ -9,6 +9,14 @@
         <a class="back-link tw-btn-secondary" routerLink="/diaries">{{ 'DIARY.BACK_TO_LIST' | translate }}</a>
       </div>
     }
+    @case ('ERROR') {
+      <div class="middle tw-empty">
+        <p class="m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="tw-btn-secondary" (click)="retry()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
+    }
     @case ('DONE') {
       @if (book(); as whole) {
         <header class="top flex flex-col gap-4">

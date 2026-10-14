@@ -277,11 +277,16 @@ export class MemoriesFacade {
   }
 
   /** Writes a new moment, then shows the page it belongs on. */
-  write(input: Omit<WriteMemoryInput, 'pet'>): void {
+  write(
+    input: Omit<WriteMemoryInput, 'pet'>,
+    onDone?: () => void,
+    onError?: () => void,
+  ): void {
     if (this.saving()) {
       return;
     }
     this.saving.set(true);
+    this.pageProblem.set(null);
     this.service
       .write({ ...input, decor: input.decor?.map(tidyItem), pet: this.petId })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -292,8 +297,13 @@ export class MemoriesFacade {
           this.loadAlbum();
           this.topic.set(null);
           this.read(1);
+          onDone?.();
         },
-        error: () => this.saving.set(false),
+        error: () => {
+          this.saving.set(false);
+          this.pageProblem.set('BOOK.SAVE_FAILED');
+          onError?.();
+        },
       });
   }
 

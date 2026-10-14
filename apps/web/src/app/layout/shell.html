@@ -84,6 +84,7 @@
                    hover:border-accent"
             [attr.aria-expanded]="menuOpen()"
             aria-haspopup="true"
+            aria-controls="account-menu"
             (click)="toggleMenu()"
           >
             <pm-user-face [name]="u.fullName" [url]="u.avatarUrl" [size]="32" aria-hidden="true" />
@@ -96,6 +97,7 @@
             <div
               class="account-menu absolute top-[calc(100%+8px)] right-0 z-20 flex flex-col min-w-[200px] p-2 rounded-lg bg-card border border-edge shadow-elevated"
               role="menu"
+              id="account-menu"
             >
               <!-- Nav items shown only on mobile (narrow) for customer -->
               @if (!isInternal()) {
@@ -183,7 +185,7 @@
 <!-- ───── Footer (Chi hien cho khach hang) ───── -->
 @if (!isInternal()) {
   @if (!immersive()) {
-  <footer class="mt-16 bg-night text-on-night">
+  <footer class="mt-16 bg-night text-on-night max-nav:pb-[calc(84px+env(safe-area-inset-bottom))]">
     <div class="grid gap-10 max-w-[1180px] mx-auto px-6 pt-12 pb-8 box-border [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
 
       <!-- Brand column -->

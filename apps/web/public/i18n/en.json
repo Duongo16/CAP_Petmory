@@ -223,6 +223,7 @@
     "EMPTY": "You have no pet profiles yet. Add your first one.",
     "CONFIRM_REMOVE": "Hide {{name}}'s profile?",
     "QUOTA_REACHED": "This account has reached its pet profile limit",
+    "PHOTOS_UPLOAD_FAILED": "The profile was saved, but some photos could not be uploaded. You can add them later.",
     "ZONE": {
       "MAIN_FUR": "Main fur",
       "BELLY_FUR": "Belly and chest fur",
@@ -986,7 +987,8 @@
     "MUSIC_OPEN_YOUTUBE": "Open on YouTube",
     "MUSIC_PLAYER": "Diary music player",
     "MUSIC_PLAY": "Play music",
-    "MUSIC_AUTOPLAY_NOTE": "If the music has not started, press play in the YouTube player.",
+    "MUSIC_AUTOPLAY_NOTE": "YouTube autoplay may be blocked by the browser.",
+    "MUSIC_EDIT": "Change music",
     "MUSIC_BAD_FILE": "The audio file is invalid or exceeds 4 MB.",
     "MUSIC_SAVE_FAILED": "Music could not be saved. Check the file or link and try again.",
     "MUSIC_LOAD_FAILED": "This diary's music could not be loaded.",
@@ -1912,6 +1914,8 @@
     "OPEN": "Open {{name}} in a new tab"
   },
   "COMMUNITY": {
+    "PREVIOUS_PAGE": "Previous page",
+    "NEXT_PAGE": "Next page",
     "TITLE": "PETMORY community",
     "SUBTITLE": "Where pet lovers share, connect and pass on a little warmth",
     "EMPTY": "No posts here yet",

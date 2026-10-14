@@ -1533,7 +1533,7 @@
   .disabled\:opacity-40:disabled {
     opacity: 40%;
   }
-  @media (width < 900px) {
+  @media (width < 1024px) {
     .max-nav\:static {
       position: static;
     }
@@ -1597,7 +1597,7 @@
       font-size: 1.875rem;
     }
   }
-  @media (width >= 900px) {
+  @media (width >= 1024px) {
     .nav\:block {
       display: block;
     }

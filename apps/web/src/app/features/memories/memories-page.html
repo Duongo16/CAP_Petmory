@@ -98,7 +98,14 @@
       </div>
 
       @if (facade.pageProblem(); as trouble) {
-        <p class="note m-0 rounded-md bg-amber-soft px-4 py-3 text-sm text-on-amber" role="alert">{{ trouble | translate }}</p>
+        <div class="note flex items-center justify-between gap-3 flex-wrap rounded-md bg-amber-soft px-4 py-3 text-sm text-on-amber" role="alert">
+          <span>{{ trouble | translate }}</span>
+          @if (failedWrite()) {
+            <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="retryFailedWrite()" [disabled]="facade.pending()">
+              {{ 'COMMON.RETRY' | translate }}
+            </button>
+          }
+        </div>
       }
 
       <pm-diary-music [petId]="petId" [music]="music()" [canEdit]="true" (changed)="facade.applyPet($event)" />

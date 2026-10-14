@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
@@ -117,6 +117,21 @@ export class Shell implements OnInit {
 
   closeMenu(): void {
     this.menuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  closeMenuOnEscape(): void {
+    if (this.menuOpen()) {
+      this.closeMenu();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeMenuOnOutsideClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (this.menuOpen() && !target?.closest('.account-menu, .account-button')) {
+      this.closeMenu();
+    }
   }
 
   logout(): void {

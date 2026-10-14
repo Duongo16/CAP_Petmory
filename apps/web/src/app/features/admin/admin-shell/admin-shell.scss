@@ -170,7 +170,7 @@
   min-inline-size: 0;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1023px) {
   .desk {
     grid-template-columns: 1fr;
   }
@@ -178,18 +178,40 @@
   .rail-inner {
     position: static;
     block-size: auto;
+    gap: 8px;
+    padding: 12px;
   }
 
   .rail-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 6px;
   }
 
   .rail-group {
     inline-size: 100%;
+    grid-column: 1 / -1;
+    padding-block: 5px 2px;
+  }
+
+  .rail-link {
+    min-block-size: 36px;
+    min-inline-size: 0;
+    padding-inline: 9px;
+    gap: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .rail-foot {
     margin-block-start: 0;
+    padding: 9px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .rail-out {
+    grid-column: auto;
   }
 }

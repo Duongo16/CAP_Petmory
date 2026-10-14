@@ -3,3 +3,23 @@
   flex-direction: column;
   min-height: 100%;
 }
+
+@media (max-width: 480px) {
+  header > div {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  header pm-brand {
+    inline-size: 124px;
+    overflow: hidden;
+  }
+
+  header .ml-auto {
+    gap: 4px;
+  }
+
+  header pm-theme-toggle {
+    display: none;
+  }
+}

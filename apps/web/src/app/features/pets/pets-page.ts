@@ -11,7 +11,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { Pet } from '../../core/models/api.model';
 import { PetsService } from '../../core/services/pets.service';
 import { PhotosService } from '../../core/services/photos.service';
@@ -181,15 +181,16 @@ export class PetsPage implements OnInit {
     saved
       .pipe(
         switchMap((row) =>
-          this.sendPhotos(row, result.photos, result.photoLinks).pipe(map(() => row)),
+          this.sendPhotos(row, result.photos, result.photoLinks),
         ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: (row) => {
+        next: ({ pet: row, photosFailed }) => {
           this.working.set(false);
           // New photos may have changed which picture stands for this pet.
           this.faces.refresh(row._id);
+          this.error.set(photosFailed ? 'PET.PHOTOS_UPLOAD_FAILED' : null);
           this.reload();
         },
         error: (failure: { status?: number }) => {
@@ -203,11 +204,23 @@ export class PetsPage implements OnInit {
    * Sends the chosen pictures, whether they came off the owner's machine or from
    * a link they pasted. A pasted link is fetched by the server, not the browser.
    */
-  private sendPhotos(pet: Pet, files: File[], links: string[]): Observable<unknown> {
+  private sendPhotos(
+    pet: Pet,
+    files: File[],
+    links: string[],
+  ): Observable<{ pet: Pet; photosFailed: boolean }> {
     const sending: Observable<unknown>[] = [
       ...files.map((file) => this.photos.loadGeneral(pet._id, file)),
       ...links.map((link) => this.photos.loadByLink(pet._id, link)),
     ];
-    return sending.length === 0 ? of(pet) : forkJoin(sending);
+    if (sending.length === 0) {
+      return of({ pet, photosFailed: false });
+    }
+    return forkJoin(sending).pipe(
+      map(() => ({ pet, photosFailed: false })),
+      // The profile is already saved. Keep it visible and explain that only
+      // the optional pictures need another attempt.
+      catchError(() => of({ pet, photosFailed: true })),
+    );
   }
 }

@@ -57,6 +57,14 @@
             </button>
           </div>
         </section>
+        @if (failedPost()) {
+          <div class="flex items-center justify-between gap-3 flex-wrap rounded-md bg-danger-soft px-4 py-3 text-sm text-on-danger-soft" role="alert">
+            <span>{{ 'COMMON.GENERIC_ERROR' | translate }}</span>
+            <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="retryFailedPost()" [disabled]="sending()">
+              {{ 'COMMON.RETRY' | translate }}
+            </button>
+          </div>
+        }
       } @else {
         <p class="pm-empty tw-empty m-0">{{ 'COMMUNITY.SIGN_IN_TO_POST' | translate }}</p>
       }
@@ -166,6 +174,7 @@
                 <button
                   type="button"
                   class="pm-button-secondary"
+                  [attr.aria-label]="'COMMUNITY.PREVIOUS_PAGE' | translate"
                   [disabled]="facade.page() === 1"
                   (click)="facade.changePage(facade.page() - 1)"
                 >
@@ -175,6 +184,7 @@
                 <button
                   type="button"
                   class="pm-button-secondary"
+                  [attr.aria-label]="'COMMUNITY.NEXT_PAGE' | translate"
                   [disabled]="facade.page() === facade.pageCount()"
                   (click)="facade.changePage(facade.page() + 1)"
                 >

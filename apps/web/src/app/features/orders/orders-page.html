@@ -197,4 +197,10 @@
       </div>
     }
   }
+
+  @if (cancelProblem(); as trouble) {
+    <p class="m-0 rounded-md bg-danger-soft px-4 py-3 text-sm text-on-danger-soft" role="alert">
+      {{ trouble | translate }}
+    </p>
+  }
 </div>

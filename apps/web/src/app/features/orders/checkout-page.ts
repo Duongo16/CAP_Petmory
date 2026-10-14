@@ -70,11 +70,7 @@ export class CheckoutPage implements OnInit {
 
   private readonly products = signal<ProductType[]>([]);
 
-  readonly selectedItemIds = computed<string[]>(() => {
-    const raw = this.route.snapshot.queryParamMap.get('items');
-    if (!raw) return [];
-    return raw.split(',').filter(Boolean);
-  });
+  readonly selectedItemIds = signal<string[]>([]);
 
   readonly filteredItems = computed<CartLine[]>(() => {
     const all = this.cart().items;
@@ -83,8 +79,7 @@ export class CheckoutPage implements OnInit {
       return all;
     }
     const set = new Set(selected);
-    const filtered = all.filter((i) => set.has(i.id));
-    return filtered.length > 0 ? filtered : all;
+    return all.filter((i) => set.has(i.id));
   });
 
   readonly lines = computed<BillLine[]>(() => {
@@ -116,6 +111,13 @@ export class CheckoutPage implements OnInit {
   });
 
   ngOnInit(): void {
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const raw = params.get('items');
+        this.selectedItemIds.set(raw ? raw.split(',').filter(Boolean) : []);
+      });
+
     forkJoin({
       cart: this.cartService.reload(),
       products: this.catalog.product$.pipe(catchError(() => of<ProductType[]>([]))),
@@ -138,7 +140,9 @@ export class CheckoutPage implements OnInit {
     this.pendingSend.set(true);
     this.error.set(null);
 
-    const selected = this.selectedItemIds();
+    const selected = this.selectedItemIds().filter((id) =>
+      this.cart().items.some((item) => item.id === id),
+    );
     const itemIds = selected.length > 0 ? selected : undefined;
 
     this.orders

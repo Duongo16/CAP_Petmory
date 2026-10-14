@@ -49,7 +49,7 @@
   --shadow-elevated: var(--pm-shadow-lifted);
   --shadow-glow:     var(--pm-accent-glow);
 
-  --breakpoint-nav:  900px;
+  --breakpoint-nav:  1024px;
 }
 
 /*

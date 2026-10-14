@@ -194,7 +194,13 @@ export class CommunityFacade {
    * that matters, and losing it because one upload went wrong would be worse
    * than a post that is missing an image.
    */
-  write(input: WritePostInput, photos: File[], links: string[], onDone: () => void): void {
+  write(
+    input: WritePostInput,
+    photos: File[],
+    links: string[],
+    onDone: () => void,
+    onError: () => void,
+  ): void {
     this.service
       .write(input)
       .pipe(
@@ -211,7 +217,10 @@ export class CommunityFacade {
       )
       .subscribe({
         next: () => this.finishWrite(onDone),
-        error: () => this.status.set('ERROR'),
+        error: () => {
+          this.status.set('ERROR');
+          onError();
+        },
       });
   }
 

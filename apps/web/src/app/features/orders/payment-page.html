@@ -6,7 +6,12 @@
       <div class="pm-center"><p class="pm-empty">{{ 'COMMON.LOADING' | translate }}</p></div>
     }
     @case ('ERROR') {
-      <div class="pm-center"><p class="pm-empty">{{ 'COMMON.GENERIC_ERROR' | translate }}</p></div>
+      <div class="pm-center tw-empty">
+        <p class="pm-empty m-0">{{ 'COMMON.GENERIC_ERROR' | translate }}</p>
+        <button type="button" class="tw-btn-secondary" (click)="refresh()">
+          {{ 'COMMON.RETRY' | translate }}
+        </button>
+      </div>
     }
     @case ('READY') {
       @if (payment(); as qr) {

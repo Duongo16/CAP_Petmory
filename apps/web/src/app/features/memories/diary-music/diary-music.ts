@@ -27,6 +27,7 @@ export class DiaryMusicPlayer {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly destroyRef = inject(DestroyRef);
   private readonly player = viewChild<ElementRef<HTMLAudioElement>>('player');
+  private readonly youtubeFrame = viewChild<ElementRef<HTMLIFrameElement>>('youtubeFrame');
 
   readonly petId = input.required<string>();
   readonly music = input.required<DiaryMusic>();
@@ -51,7 +52,7 @@ export class DiaryMusicPlayer {
     const id = this.music().youtubeId;
     if (this.music().source !== 'YOUTUBE' || !/^[A-Za-z0-9_-]{11}$/.test(id)) return null;
     return this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&controls=1&loop=1&playlist=${id}`,
+      `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&controls=0&loop=1&playlist=${id}&enablejsapi=1&rel=0`,
     );
   });
   readonly youtubePage = computed(() => `https://www.youtube.com/watch?v=${this.music().youtubeId}`);
@@ -96,6 +97,15 @@ export class DiaryMusicPlayer {
   play(): void {
     const audio = this.player()?.nativeElement;
     if (audio) void audio.play().then(() => this.blocked.set(false)).catch(() => this.blocked.set(true));
+  }
+
+  onYoutubeLoad(): void {
+    this.playYoutube();
+  }
+
+  playYoutube(): void {
+    const frame = this.youtubeFrame()?.nativeElement;
+    frame?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), 'https://www.youtube.com');
   }
 
   saveSample(event: Event): void {

@@ -1,71 +1,83 @@
 <section class="diary-music tw-card" [attr.aria-label]="'BOOK.MUSIC_TITLE' | translate">
-  <div class="music-heading">
-    <div>
-      <h2>{{ 'BOOK.MUSIC_TITLE' | translate }}</h2>
-      <p>{{ 'BOOK.MUSIC_HINT' | translate }}</p>
+  <div class="music-bar">
+    <div class="music-heading">
+      <span class="music-glyph" aria-hidden="true">♫</span>
+      <div class="music-title">
+        <h2>{{ 'BOOK.MUSIC_TITLE' | translate }}</h2>
+        @if (music().source !== 'NONE') {
+          <p class="music-current">
+            <strong>{{ music().source === 'SAMPLE' ? (sampleTitleKey() | translate) : music().title }}</strong>
+          </p>
+        }
+      </div>
     </div>
-    @if (music().source !== 'NONE' && canEdit()) {
-      <button type="button" class="tw-btn-ghost tw-btn-sm" [disabled]="saving()" (click)="clear()">
-        {{ 'BOOK.MUSIC_REMOVE' | translate }}
-      </button>
-    }
+
+    <div class="music-actions">
+      @if (active() && music().source === 'YOUTUBE' && youtubeUrl(); as video) {
+        <!-- Keep YouTube available for autoplay without taking space from the diary. -->
+        <iframe #youtubeFrame class="youtube-player" [src]="video" width="1" height="1"
+          allow="autoplay; encrypted-media" aria-hidden="true" tabindex="-1"
+          referrerpolicy="strict-origin-when-cross-origin" [title]="'BOOK.MUSIC_YOUTUBE_PLAYER' | translate"
+          (load)="onYoutubeLoad()"></iframe>
+        <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="playYoutube()">
+          {{ 'BOOK.MUSIC_PLAY' | translate }}
+        </button>
+        <a class="youtube-link" [href]="youtubePage()" target="_blank" rel="noopener noreferrer">
+          {{ 'BOOK.MUSIC_OPEN_YOUTUBE' | translate }}
+        </a>
+      } @else if (active() && audioUrl()) {
+        <audio #player [src]="audioUrl()" controls loop preload="auto" [attr.aria-label]="'BOOK.MUSIC_PLAYER' | translate"></audio>
+        @if (blocked()) {
+          <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="play()">{{ 'BOOK.MUSIC_PLAY' | translate }}</button>
+        }
+      } @else if (loadFailed()) {
+        <p class="music-error" role="alert">{{ 'BOOK.MUSIC_LOAD_FAILED' | translate }}</p>
+      }
+
+      @if (music().source !== 'NONE' && canEdit()) {
+        <button type="button" class="tw-btn-ghost tw-btn-sm" [disabled]="saving()" (click)="clear()">
+          {{ 'BOOK.MUSIC_REMOVE' | translate }}
+        </button>
+      }
+    </div>
   </div>
-
-  @if (music().source !== 'NONE') {
-    <p class="music-current">{{ 'BOOK.MUSIC_CURRENT' | translate }}:
-      <strong>{{ music().source === 'SAMPLE' ? (sampleTitleKey() | translate) : music().title }}</strong>
-    </p>
-  }
-
-  @if (active() && music().source === 'YOUTUBE' && youtubeUrl(); as video) {
-    <div class="youtube-wrap">
-      <iframe [src]="video" width="360" height="203" allow="autoplay; encrypted-media; picture-in-picture"
-        referrerpolicy="strict-origin-when-cross-origin" [title]="'BOOK.MUSIC_YOUTUBE_PLAYER' | translate"
-        allowfullscreen></iframe>
-      <a [href]="youtubePage()" target="_blank" rel="noopener noreferrer">{{ 'BOOK.MUSIC_OPEN_YOUTUBE' | translate }}</a>
-    </div>
-  } @else if (active() && audioUrl()) {
-    <audio #player [src]="audioUrl()" controls loop preload="auto" [attr.aria-label]="'BOOK.MUSIC_PLAYER' | translate"></audio>
-    @if (blocked()) {
-      <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="play()">{{ 'BOOK.MUSIC_PLAY' | translate }}</button>
-    }
-  } @else if (loadFailed()) {
-    <p class="music-error" role="alert">{{ 'BOOK.MUSIC_LOAD_FAILED' | translate }}</p>
-  }
 
   @if (music().source === 'YOUTUBE') {
     <p class="music-note">{{ 'BOOK.MUSIC_AUTOPLAY_NOTE' | translate }}</p>
   }
 
   @if (canEdit()) {
-    <div class="music-edit">
-      <label class="tw-field">
-        <span class="tw-label">{{ 'BOOK.MUSIC_SAMPLES' | translate }}</span>
-        <select class="tw-select" [value]="music().source === 'SAMPLE' ? music().sampleCode : ''"
-          [disabled]="saving()" (change)="saveSample($event)">
-          <option value="">{{ 'BOOK.MUSIC_SELECT_SAMPLE' | translate }}</option>
-          @for (sample of samples; track sample.code) {
-            <option [value]="sample.code">{{ sample.key | translate }}</option>
-          }
-        </select>
-      </label>
-      <label class="tw-field">
-        <span class="tw-label">{{ 'BOOK.MUSIC_UPLOAD' | translate }}</span>
-        <input type="file" accept=".mp3,.m4a,.ogg,.wav,audio/*" [disabled]="saving()" (change)="upload($event)" />
-        <small>{{ 'BOOK.MUSIC_FILE_HINT' | translate }}</small>
-      </label>
-      <div class="tw-field">
-        <label class="tw-label" for="diary-youtube-link">{{ 'BOOK.MUSIC_YOUTUBE' | translate }}</label>
-        <div class="music-link-row">
-          <input id="diary-youtube-link" class="tw-input" type="url" maxlength="500" autocomplete="off"
-            [value]="link()" [disabled]="saving()" [placeholder]="'BOOK.MUSIC_YOUTUBE_HINT' | translate"
-            (input)="link.set($any($event.target).value)" />
-          <button type="button" class="tw-btn-secondary tw-btn-sm" [disabled]="saving() || !link().trim()" (click)="saveYoutube()">
-            {{ 'COMMON.SAVE' | translate }}
-          </button>
+    <details class="music-edit">
+      <summary>{{ 'BOOK.MUSIC_EDIT' | translate }}</summary>
+      <div class="music-edit-fields">
+        <label class="tw-field">
+          <span class="tw-label">{{ 'BOOK.MUSIC_SAMPLES' | translate }}</span>
+          <select class="tw-select" [value]="music().source === 'SAMPLE' ? music().sampleCode : ''"
+            [disabled]="saving()" (change)="saveSample($event)">
+            <option value="">{{ 'BOOK.MUSIC_SELECT_SAMPLE' | translate }}</option>
+            @for (sample of samples; track sample.code) {
+              <option [value]="sample.code">{{ sample.key | translate }}</option>
+            }
+          </select>
+        </label>
+        <label class="tw-field">
+          <span class="tw-label">{{ 'BOOK.MUSIC_UPLOAD' | translate }}</span>
+          <input type="file" accept=".mp3,.m4a,.ogg,.wav,audio/*" [disabled]="saving()" (change)="upload($event)" />
+          <small>{{ 'BOOK.MUSIC_FILE_HINT' | translate }}</small>
+        </label>
+        <div class="tw-field">
+          <label class="tw-label" for="diary-youtube-link">{{ 'BOOK.MUSIC_YOUTUBE' | translate }}</label>
+          <div class="music-link-row">
+            <input id="diary-youtube-link" class="tw-input" type="url" maxlength="500" autocomplete="off"
+              [value]="link()" [disabled]="saving()" [placeholder]="'BOOK.MUSIC_YOUTUBE_HINT' | translate"
+              (input)="link.set($any($event.target).value)" />
+            <button type="button" class="tw-btn-secondary tw-btn-sm" [disabled]="saving() || !link().trim()" (click)="saveYoutube()">
+              {{ 'COMMON.SAVE' | translate }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </details>
     @if (problem()) {
       <p class="music-error" role="alert">{{ problem() | translate }}</p>
     }

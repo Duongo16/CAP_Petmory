@@ -11,7 +11,7 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { MemoriesService } from '../../core/services/memories.service';
 import { DiaryBook, MusicTrack } from '../../core/models/api.model';
 import { topicKey, topicTone } from '../../shared/memory-topics';
@@ -22,7 +22,7 @@ import { PageFace } from '../memories/book/page-face';
 import { PaperKind } from '../../shared/diary-art';
 import { Icon } from '../../shared/icon/icon';
 
-type ScreenState = 'LOADING' | 'MISSING' | 'DONE';
+type ScreenState = 'LOADING' | 'MISSING' | 'ERROR' | 'DONE';
 
 /** Cach trinh chieu mac dinh khi quyen chua dat gi. */
 const PLAIN_SETTING: SlideSetting = { trackCode: '', effect: 'FADE', seconds: 5 };
@@ -96,12 +96,21 @@ export class DiaryBookPage implements OnInit {
   );
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  retry(): void {
+    this.load();
+  }
+
+  private load(): void {
+    this.status.set('LOADING');
     const code = this.route.snapshot.paramMap.get('code');
     const petId = this.route.snapshot.paramMap.get('petId');
     const reading = code ? this.service.diaryByShare(code) : this.service.publicDiary(petId ?? '');
     forkJoin({
       book: reading,
-      music: this.service.music(),
+      music: this.service.music().pipe(catchError(() => of([] as MusicTrack[]))),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -110,7 +119,8 @@ export class DiaryBookPage implements OnInit {
           this.tracks.set(both.music);
           this.status.set('DONE');
         },
-        error: () => this.status.set('MISSING'),
+        error: (failure: { status?: number }) =>
+          this.status.set(failure.status === 404 ? 'MISSING' : 'ERROR'),
       });
   }
 

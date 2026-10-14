@@ -223,6 +223,7 @@
     "EMPTY": "Bạn chưa có hồ sơ thú cưng nào. Hãy thêm bé đầu tiên.",
     "CONFIRM_REMOVE": "Ẩn hồ sơ của {{name}}?",
     "QUOTA_REACHED": "Đã đạt giới hạn số hồ sơ thú cưng của tài khoản",
+    "PHOTOS_UPLOAD_FAILED": "Hồ sơ đã được lưu nhưng một số ảnh chưa tải lên được. Bạn có thể thêm lại ảnh sau.",
     "ZONE": {
       "MAIN_FUR": "Lông chủ đạo",
       "BELLY_FUR": "Lông bụng và ngực",
@@ -986,7 +987,8 @@
     "MUSIC_OPEN_YOUTUBE": "Mở trên YouTube",
     "MUSIC_PLAYER": "Trình phát nhạc nhật ký",
     "MUSIC_PLAY": "Phát nhạc",
-    "MUSIC_AUTOPLAY_NOTE": "Nếu nhạc chưa phát, hãy bấm nút phát trong khung YouTube.",
+    "MUSIC_AUTOPLAY_NOTE": "Tự phát YouTube có thể bị trình duyệt chặn.",
+    "MUSIC_EDIT": "Đổi nhạc",
     "MUSIC_BAD_FILE": "Tệp nhạc không hợp lệ hoặc vượt quá 4 MB.",
     "MUSIC_SAVE_FAILED": "Chưa lưu được nhạc. Hãy kiểm tra tệp hoặc link và thử lại.",
     "MUSIC_LOAD_FAILED": "Không tải được nhạc của quyển này.",
@@ -1912,6 +1914,8 @@
     "OPEN": "Mở {{name}} trong tab mới"
   },
   "COMMUNITY": {
+    "PREVIOUS_PAGE": "Trang trước",
+    "NEXT_PAGE": "Trang sau",
     "TITLE": "Cộng đồng PETMORY",
     "SUBTITLE": "Nơi những người yêu thú cưng cùng chia sẻ, kết nối và lan tỏa yêu thương",
     "EMPTY": "Chưa có bài viết nào ở mục này",

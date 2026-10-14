@@ -8,6 +8,7 @@
   <div class="tw-card flex flex-col gap-4 p-4 nav:p-5">
     <form class="find flex flex-wrap gap-2" [formGroup]="form" (ngSubmit)="search()">
       <div class="tw-input-wrap min-w-0 flex-1 basis-60">
+        <label class="sr-only" for="diary-search">{{ 'DIARY.SEARCH' | translate }}</label>
         <input
           id="diary-search"
           type="search"

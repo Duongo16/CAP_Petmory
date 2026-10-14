@@ -70,6 +70,8 @@ export class CommunityPage implements OnInit {
   private open: { id: string; ref: MatDialogRef<PostDetailDialog, string> } | null = null;
 
   readonly sending = signal(false);
+  /** Last post kept in memory so a failed request can be retried without retyping. */
+  readonly failedPost = signal<PostComposerResult | null>(null);
 
   /** Precomputes the scope chips so the view calls no functions. */
   readonly scopeChips = computed(() =>
@@ -165,6 +167,7 @@ export class CommunityPage implements OnInit {
 
   private submit(result: PostComposerResult): void {
     this.sending.set(true);
+    this.failedPost.set(null);
     this.facade.write(
       {
         topic: result.topic,
@@ -174,7 +177,21 @@ export class CommunityPage implements OnInit {
       },
       result.photo,
       result.photoLink,
-      () => this.sending.set(false),
+      () => {
+        this.sending.set(false);
+        this.failedPost.set(null);
+      },
+      () => {
+        this.sending.set(false);
+        this.failedPost.set(result);
+      },
     );
+  }
+
+  retryFailedPost(): void {
+    const result = this.failedPost();
+    if (result) {
+      this.submit(result);
+    }
   }
 }

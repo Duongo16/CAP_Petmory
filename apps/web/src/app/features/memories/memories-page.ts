@@ -72,6 +72,7 @@ export class MemoriesPage implements OnInit {
 
   readonly tabs = DIARY_TABS;
   readonly coverColors = COVER_COLORS;
+  readonly failedWrite = signal<MomentResult | null>(null);
   readonly music = computed<DiaryMusic>(() => this.facade.pet()?.diaryMusic ?? {
     source: 'SAMPLE', title: 'Hộp nhạc dịu dàng', youtubeId: '', sampleCode: 'HOP_NHAC_DIU_DANG',
   });
@@ -233,9 +234,26 @@ export class MemoriesPage implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((written) => {
         if (written) {
-          this.facade.write(written);
+          this.failedWrite.set(null);
+          this.facade.write(
+            written,
+            () => this.failedWrite.set(null),
+            () => this.failedWrite.set(written),
+          );
         }
       });
+  }
+
+  retryFailedWrite(): void {
+    const written = this.failedWrite();
+    if (!written) {
+      return;
+    }
+    this.facade.write(
+      written,
+      () => this.failedWrite.set(null),
+      () => this.failedWrite.set(written),
+    );
   }
 
 
