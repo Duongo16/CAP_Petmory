@@ -19,8 +19,9 @@
   }
 
   header pm-brand {
-    inline-size: 124px;
-    overflow: hidden;
+    /* Keep the complete mark and wordmark visible on narrow screens. */
+    inline-size: max-content;
+    overflow: visible;
   }
 
   header .ml-auto {
