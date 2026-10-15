@@ -20,7 +20,7 @@
     border: 1.5px solid var(--pm-border);
     border-radius: 10px;
     background: var(--pm-bg-card);
-    color: var(--pm-ink);
+    color: var(--pm-text);
     font: inherit;
   }
 }
@@ -61,7 +61,7 @@
   padding: 10px 12px;
   border: 0;
   background: transparent;
-  color: var(--pm-ink);
+  color: var(--pm-text);
   font: inherit;
   font-size: 0.875rem;
   text-align: start;

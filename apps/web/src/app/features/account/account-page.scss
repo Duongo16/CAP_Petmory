@@ -33,7 +33,7 @@
   overflow: hidden;
   border-radius: 50%;
   background: var(--pm-accent-soft);
-  color: var(--pm-ink);
+  color: var(--pm-text);
   font-size: 1.5rem;
   font-weight: 700;
 
@@ -49,7 +49,7 @@
   padding: 8px 12px;
   border-radius: 10px;
   background: var(--pm-accent-soft);
-  color: var(--pm-ink);
+  color: var(--pm-text);
   font-size: 0.875rem;
 
   &.bad {

@@ -71,8 +71,8 @@
   }
 
   &.on {
-    border-color: var(--pm-ink);
-    box-shadow: 0 0 0 2px var(--pm-bg-card), 0 0 0 4px var(--pm-ink);
+    border-color: var(--pm-text);
+    box-shadow: 0 0 0 2px var(--pm-bg-card), 0 0 0 4px var(--pm-text);
   }
 
   &:disabled {

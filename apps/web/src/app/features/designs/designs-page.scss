@@ -45,7 +45,7 @@
 .empty-title {
   margin: 0;
   font-weight: 700;
-  color: var(--pm-ink);
+  color: var(--pm-text);
 }
 
 .grid {
@@ -109,7 +109,7 @@
   margin: 0;
   font-size: var(--pm-text-lg);
   font-weight: 700;
-  color: var(--pm-ink);
+  color: var(--pm-text);
   overflow-wrap: anywhere;
 }
 
@@ -136,7 +136,7 @@
 
   dd {
     margin: 0;
-    color: var(--pm-ink);
+    color: var(--pm-text);
     overflow-wrap: anywhere;
   }
 }
@@ -160,7 +160,7 @@
   flex-basis: 100%;
   font-size: var(--pm-text-sm);
   font-weight: 600;
-  color: var(--pm-ink);
+  color: var(--pm-text);
 }
 
 .small {
@@ -184,7 +184,7 @@
   border: 0;
   border-radius: 50%;
   background: var(--pm-bg-muted);
-  color: var(--pm-ink);
+  color: var(--pm-text);
   cursor: pointer;
 
   &:hover {

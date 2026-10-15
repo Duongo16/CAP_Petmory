@@ -57,7 +57,7 @@
 .mod-name {
   margin: 0;
   font-weight: 700;
-  color: var(--pm-ink);
+  color: var(--pm-text);
 }
 
 .mod-meta {
@@ -86,7 +86,7 @@
     border: 1px solid var(--pm-border);
     border-radius: 10px;
     background: var(--pm-bg-card);
-    color: var(--pm-ink);
+    color: var(--pm-text);
     font: inherit;
   }
 }

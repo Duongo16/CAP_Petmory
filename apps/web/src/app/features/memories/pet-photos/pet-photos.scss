@@ -175,7 +175,7 @@
   h3 {
     margin: 0;
     font-size: 1rem;
-    color: var(--pm-ink);
+    color: var(--pm-text);
   }
 
   &.over {
@@ -207,7 +207,7 @@
 
   &.ok {
     background: var(--pm-accent-soft);
-    color: var(--pm-ink);
+    color: var(--pm-text);
   }
 }
 
@@ -257,7 +257,7 @@
   gap: 4px;
   font-size: var(--pm-text-sm);
   font-weight: 700;
-  color: var(--pm-ink);
+  color: var(--pm-text);
 }
 
 .slot-optional {

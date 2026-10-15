@@ -37,7 +37,7 @@
     border: 1.5px solid var(--pm-border);
     border-radius: 10px;
     background: var(--pm-bg-card);
-    color: var(--pm-ink);
+    color: var(--pm-text);
     font: inherit;
 
     &:disabled {
@@ -53,7 +53,7 @@
   gap: 8px;
   min-block-size: 40px;
   font-size: 0.875rem;
-  color: var(--pm-ink);
+  color: var(--pm-text);
 }
 
 .cat-error {
