@@ -14,6 +14,7 @@ import { MemoriesFacade } from './memories-facade';
 import { MemoriesService } from '../../core/services/memories.service';
 import { Icon } from '../../shared/icon/icon';
 import { vietnamDayEnd, vietnamDayStart } from '../../core/utils/date-only';
+import { DateInput } from '../../shared/date-input/date-input';
 
 /** Cai hop nay lam viec thang tren kho cua man hinh nhat ky dang mo. */
 export interface ExportRequest {
@@ -31,7 +32,7 @@ export interface ExportRequest {
 @Component({
   selector: 'pm-export-dialog',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, Icon],
+  imports: [ReactiveFormsModule, TranslatePipe, Icon, DateInput],
   templateUrl: './export-dialog.html',
   styleUrl: './export-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

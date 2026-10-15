@@ -25,6 +25,7 @@ import { OrderStatus } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { Icon } from '../../shared/icon/icon';
 import { vietnamDayEnd, vietnamDayStart, vietnamToday } from '../../core/utils/date-only';
+import { DateInput } from '../../shared/date-input/date-input';
 
 Chart.register(...registerables);
 
@@ -55,7 +56,7 @@ const DAY_MS = 86_400_000;
 @Component({
   selector: 'pm-admin-reports-page',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, MoneyPipe, DatePipe, Icon],
+  imports: [ReactiveFormsModule, TranslatePipe, MoneyPipe, DatePipe, Icon, DateInput],
   templateUrl: './admin-reports-page.html',
   styleUrls: ['./admin-shared.scss', './admin-reports-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

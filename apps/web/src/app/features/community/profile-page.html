@@ -34,11 +34,7 @@
                 <p class="m-0 text-sm text-ink-muted">{{ p.phone }}</p>
               }
             </div>
-            @if (p.mine) {
-              <button type="button" class="pm-chip" (click)="openEdit()">
-                {{ 'COMMUNITY.PROFILE.EDIT' | translate }}
-              </button>
-            } @else if (user() && !p.mine) {
+            @if (!p.mine && user()) {
               <button
                 type="button"
                 class="pm-chip"
@@ -99,6 +95,25 @@
                   </li>
                 }
               </ul>
+            }
+          </section>
+
+          <section class="pm-card p-5 lg:col-span-2">
+            <h2 class="pm-section-title">{{ 'COMMUNITY.PROFILE.DIARIES' | translate }}</h2>
+            @if (diaries().length === 0) {
+              <p class="pm-empty m-0">{{ 'COMMUNITY.PROFILE.NO_DIARY' | translate }}</p>
+            } @else {
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                @for (diary of diaries(); track diary.petId) {
+                  <a class="pm-card pm-card-interactive flex items-center gap-3 p-3 no-underline text-inherit" [routerLink]="['/diaries', diary.petId]">
+                    <pm-pet-face [petId]="diary.petId" [avatarUrl]="diary.avatarUrl" [kind]="diary.kind" [name]="diary.name" [size]="48" [album]="false" />
+                    <span class="flex min-w-0 flex-col gap-1">
+                      <strong class="truncate text-ink">{{ diary.name }}</strong>
+                      <span class="text-xs text-ink-muted">{{ 'SHELF.PAGES' | translate: { count: diary.momentCount } }}</span>
+                    </span>
+                  </a>
+                }
+              </div>
             }
           </section>
 

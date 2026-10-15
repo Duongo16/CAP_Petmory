@@ -65,7 +65,7 @@
     <div class="pair">
       <div class="field">
         <label class="field-name" for="pet-birth">{{ 'PET.BIRTH_DATE' | translate }}</label>
-        <input id="pet-birth" type="date" formControlName="birthDate" [max]="today" />
+        <pm-date-input id="pet-birth" formControlName="birthDate" />
       </div>
 
       <div class="field">
@@ -95,7 +95,7 @@
     <div class="pair">
       <div class="field">
         <label class="field-name" for="pet-home">{{ 'PET.CAME_HOME' | translate }}</label>
-        <input id="pet-home" type="date" formControlName="adoptionDate" [max]="today" />
+        <pm-date-input id="pet-home" formControlName="adoptionDate" />
       </div>
 
       <div class="field">
@@ -146,7 +146,7 @@
     @if (memorial()) {
       <div class="field memorial">
         <label class="field-name" for="pet-gone">{{ 'PET.PASSED_DATE' | translate }} *</label>
-        <input id="pet-gone" type="date" formControlName="passedAwayDate" [max]="today" />
+        <pm-date-input id="pet-gone" formControlName="passedAwayDate" />
         <p class="field-note">{{ 'PET.PASSED_DATE_WHY' | translate }}</p>
       </div>
     }

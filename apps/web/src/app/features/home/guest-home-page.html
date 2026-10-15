@@ -5,12 +5,13 @@
         <pm-brand size="md" />
       </a>
       <nav class="lp-nav" [attr.aria-label]="'NAV.MAIN' | translate">
-        <a href="#features">{{ 'LANDING.NAV_DIARY' | translate }}</a>
-        <a href="#features">{{ 'LANDING.NAV_MEMORY' | translate }}</a>
+        <button type="button" (click)="openAuthPrompt()">{{ 'LANDING.NAV_DIARY' | translate }}</button>
+        <button type="button" (click)="openAuthPrompt()">{{ 'LANDING.NAV_MEMORY' | translate }}</button>
         <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
       </nav>
       <div class="lp-bar-actions">
         <pm-language-toggle />
+        <pm-theme-toggle />
         <a class="lp-link-btn" routerLink="/login">{{ 'AUTH.SIGN_IN' | translate }}</a>
         <button type="button" class="lp-btn lp-btn-sm" (click)="openOnboarding()">{{ 'LANDING.START_FREE' | translate }}</button>
       </div>
@@ -149,6 +150,23 @@
     </div>
   </footer>
 </div>
+
+@if (authPromptOpen()) {
+  <div class="auth-prompt" role="dialog" aria-modal="true" [attr.aria-label]="'LANDING.AUTH_PROMPT_TITLE' | translate">
+    <div class="auth-prompt-box">
+      <button type="button" class="auth-prompt-close" (click)="closeAuthPrompt()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+        <pm-icon name="close" [size]="17" />
+      </button>
+      <pm-icon name="lock" [size]="24" />
+      <h2>{{ 'LANDING.AUTH_PROMPT_TITLE' | translate }}</h2>
+      <p>{{ 'LANDING.AUTH_PROMPT_TEXT' | translate }}</p>
+      <div class="auth-prompt-actions">
+        <a class="lp-btn" routerLink="/register" (click)="closeAuthPrompt()">{{ 'LANDING.AUTH_PROMPT_REGISTER' | translate }}</a>
+        <a class="lp-btn-ghost" routerLink="/login" (click)="closeAuthPrompt()">{{ 'LANDING.AUTH_PROMPT_LOGIN' | translate }}</a>
+      </div>
+    </div>
+  </div>
+}
 
 @if (starterOpen()) {
   <pm-pet-starter (closed)="closeOnboarding()" />

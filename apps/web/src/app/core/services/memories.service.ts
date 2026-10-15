@@ -131,13 +131,16 @@ export class MemoriesService {
   }
 
   /** Danh sach cac quyen dang de cong khai, doc duoc khi chua dang nhap. */
-  publicDiaries(page = 1, topic?: MemoryTopic, keyword?: string): Observable<DiaryList> {
+  publicDiaries(page = 1, topic?: MemoryTopic, keyword?: string, ownerId?: string): Observable<DiaryList> {
     let params = new HttpParams().set('page', page);
     if (topic) {
       params = params.set('topic', topic);
     }
     if (keyword) {
       params = params.set('keyword', keyword);
+    }
+    if (ownerId) {
+      params = params.set('ownerId', ownerId);
     }
     return this.http.get<DiaryList>(`${this.base}/diaries`, { params });
   }

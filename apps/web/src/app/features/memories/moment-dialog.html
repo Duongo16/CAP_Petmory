@@ -153,7 +153,7 @@
           <div class="pair">
             <div class="field">
               <label class="field-name" for="moment-when">{{ 'MEMORY.WHEN' | translate }} *</label>
-              <input id="moment-when" type="datetime-local" formControlName="happenedAt" />
+              <pm-date-input id="moment-when" [dateTime]="true" formControlName="happenedAt" />
               @if (form.controls.happenedAt.touched && form.controls.happenedAt.invalid) {
                 <p class="field-error">{{ 'MEMORY.WHEN_ERROR' | translate }}</p>
               }

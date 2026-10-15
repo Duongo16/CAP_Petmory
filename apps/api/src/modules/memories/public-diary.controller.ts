@@ -82,7 +82,7 @@ export class PublicDiaryController {
   @Public()
   @Get()
   list(@Query() query: PublicDiaryQueryDto) {
-    return this.service.publicList(query.page ?? 1, query.topic, query.keyword);
+    return this.service.publicList(query.page ?? 1, query.topic, query.keyword, query.ownerId);
   }
 
   /** Doc bang duong dan chia se. Dat truoc duong co tham so de khong bi nuot. */

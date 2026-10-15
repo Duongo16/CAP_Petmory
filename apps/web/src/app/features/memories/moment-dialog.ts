@@ -10,6 +10,7 @@ import { DIARY_LAYOUTS, DiaryLayout, LayoutCode, buildPage, layoutOf } from '../
 import { Icon } from '../../shared/icon/icon';
 import { PageFace, PageFaceView } from './book/page-face';
 import { looksLikeImage } from '../../core/utils/upload-image';
+import { DateInput } from '../../shared/date-input/date-input';
 
 /** Album cua be, truyen vao de nguoi dung chon anh gan vao khoanh khac. */
 export interface MomentRequest {
@@ -64,7 +65,7 @@ function rightNow(): string {
 @Component({
   selector: 'pm-moment-dialog',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, Icon, PageFaceView],
+  imports: [ReactiveFormsModule, TranslatePipe, Icon, PageFaceView, DateInput],
   templateUrl: './moment-dialog.html',
   styleUrl: './moment-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

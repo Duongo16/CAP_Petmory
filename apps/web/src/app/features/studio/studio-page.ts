@@ -21,6 +21,7 @@ import { MoneyPipe } from '../../shared/money.pipe';
 import { StudioFacade } from './studio-facade';
 import { ANCHOR_NODE, AccessoryMount, StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
 import { PaintMode } from '../../shared/viewer-3d/painter';
+import { DateInput } from '../../shared/date-input/date-input';
 import { CatalogService } from '../../core/services/catalog.service';
 import { AccessoryAnchor, PackagingKind, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
 import { BaseModel, ModelLibrary, DeclaredZone, ZoneName, currentModelCode } from './model-manifest';
@@ -113,7 +114,7 @@ import { PetPhotos } from '../memories/pet-photos/pet-photos';
 @Component({
   selector: 'pm-studio-page',
   standalone: true,
-  imports: [Icon, Viewer3d, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe, PetPhotos],
+  imports: [Icon, Viewer3d, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe, PetPhotos, DateInput],
   providers: [StudioFacade],
   templateUrl: './studio-page.html',
   styleUrl: './studio-page.scss',

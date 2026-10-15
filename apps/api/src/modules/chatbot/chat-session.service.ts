@@ -156,6 +156,19 @@ export class ChatSessionService {
     return one.save();
   }
 
+  /** Khach chu dong quay lai tro chuyen voi AI sau khi da chuyen cho nguoi. */
+  async resumeBot(code: string, owner: string | null): Promise<ChatSessionDocument> {
+    const one = await this.findFor(code, owner);
+    if (one.state === ChatState.BOT) {
+      return one;
+    }
+    this.moveTo(one, ChatState.BOT);
+    one.staff = null;
+    this.push(one, { side: ChatSide.BOT, text: 'Mình đã chuyển cuộc trò chuyện lại cho trợ lý AI. Bạn có thể hỏi tiếp nhé.' });
+    one.lastAt = new Date();
+    return one.save();
+  }
+
   /** Cac phien dang cho hoac dang duoc tra loi, cho trang truc. */
   waitingList() {
     return this.model

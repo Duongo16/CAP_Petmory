@@ -32,7 +32,7 @@ export enum ChatState {
 export const CHAT_NEXT: Record<ChatState, ChatState[]> = {
   [ChatState.BOT]: [ChatState.WAITING, ChatState.CLOSED],
   [ChatState.WAITING]: [ChatState.WITH_STAFF, ChatState.BOT, ChatState.CLOSED],
-  [ChatState.WITH_STAFF]: [ChatState.CLOSED],
+  [ChatState.WITH_STAFF]: [ChatState.BOT, ChatState.CLOSED],
   [ChatState.CLOSED]: [],
 };
 

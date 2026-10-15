@@ -47,4 +47,10 @@ export class ChatSessionController {
   handover(@Param('code') code: string, @Body() dto: HandoverDto, @CurrentUser() user: AuthUser) {
     return this.service.handover(code, user.userId, dto.note ?? '');
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Post(':code/resume')
+  resume(@Param('code') code: string, @CurrentUser() user: AuthUser) {
+    return this.service.resumeBot(code, user.userId);
+  }
 }

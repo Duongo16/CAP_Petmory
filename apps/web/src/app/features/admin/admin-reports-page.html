@@ -71,11 +71,11 @@
     <form class="period-inline-form" [formGroup]="form" (ngSubmit)="read()">
       <label>
         <span>{{ 'ADMIN.REPORT.FROM' | translate }}</span>
-        <input id="report-from" type="date" formControlName="from" />
+        <pm-date-input id="report-from" formControlName="from" />
       </label>
       <label>
         <span>{{ 'ADMIN.REPORT.TO' | translate }}</span>
-        <input id="report-to" type="date" formControlName="to" />
+        <pm-date-input id="report-to" formControlName="to" />
       </label>
       <button class="pm-button-primary" type="submit">{{ 'ADMIN.REPORT.SHOW' | translate }}</button>
     </form>

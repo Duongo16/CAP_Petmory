@@ -19,6 +19,7 @@ import { PetDraft, PetDraftService } from '../../../core/services/pet-draft.serv
 import { LABEL_GENDER, LABEL_KIND } from '../../../shared/pet-labels';
 import { Icon } from '../../../shared/icon/icon';
 import { PetArt, PetArtKind } from '../../../shared/pet-art/pet-art';
+import { DateInput } from '../../../shared/date-input/date-input';
 import { looksLikeImage, PICK_MAX_BYTES } from '../../../core/utils/upload-image';
 import { vietnamToday } from '../../../core/utils/date-only';
 
@@ -46,7 +47,7 @@ const STEP_COUNT = 4;
 @Component({
   selector: 'pm-pet-starter',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, DatePipe, A11yModule, TranslatePipe, Icon, PetArt],
+  imports: [ReactiveFormsModule, RouterLink, DatePipe, A11yModule, TranslatePipe, Icon, PetArt, DateInput],
   templateUrl: './pet-starter.html',
   styleUrl: './pet-starter.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

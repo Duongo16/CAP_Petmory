@@ -6,6 +6,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AdminService } from '../../core/services/admin.service';
 import { AuditEntry } from '../../core/models/api.model';
 import { vietnamDayEnd, vietnamDayStart } from '../../core/utils/date-only';
+import { DateInput } from '../../shared/date-input/date-input';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
@@ -16,7 +17,7 @@ type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 @Component({
   selector: 'pm-admin-audit-page',
   standalone: true,
-  imports: [DatePipe, ReactiveFormsModule, TranslatePipe],
+  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, DateInput],
   templateUrl: './admin-audit-page.html',
   styleUrls: ['./admin-shared.scss', './admin-audit-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

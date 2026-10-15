@@ -20,6 +20,10 @@
     @case ('DONE') {
       @if (book(); as whole) {
         <header class="top flex flex-col gap-4">
+          <a class="back-link tw-back m-0 self-start" routerLink="/landing">
+            <pm-icon name="back" [size]="13" />
+            {{ 'AUTH.BACK_HOME' | translate }}
+          </a>
           <a class="back-link tw-back m-0 self-start" routerLink="/diaries">
             <pm-icon name="chevron" [size]="13" />
             {{ 'DIARY.BACK_TO_LIST' | translate }}

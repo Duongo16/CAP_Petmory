@@ -129,7 +129,6 @@ function lastSuggestions(one: ChatSession): string[] {
   templateUrl: './chat-widget.html',
   styleUrl: './chat-widget.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:keydown.escape)': 'closeOnEscape()' },
 })
 export class ChatWidget implements OnInit {
   private readonly service = inject(ChatbotService);
@@ -267,12 +266,6 @@ export class ChatWidget implements OnInit {
     }
   }
 
-  closeOnEscape(): void {
-    if (this.pendingOpen()) {
-      this.pendingOpen.set(false);
-    }
-  }
-
   selectSuggestion(text: string): void {
     this.outbox.next(text);
   }
@@ -315,6 +308,17 @@ export class ChatWidget implements OnInit {
         },
         error: () => this.waiting.set(false),
       });
+  }
+
+  /** Chuyen phien da nhan vien tiep nhan ve lai tro ly AI. */
+  resumeBot(): void {
+    const code = this.session()?.code;
+    if (!code || this.waiting() || this.state() === 'BOT') return;
+    this.waiting.set(true);
+    this.service.resumeBot(code).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (got) => { this.waiting.set(false); this.session.set(got); },
+      error: () => this.waiting.set(false),
+    });
   }
 
   /** Bat dau mot cuoc moi. */

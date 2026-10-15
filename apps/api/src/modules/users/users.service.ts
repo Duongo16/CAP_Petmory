@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from './schemas/user.schema';
 import { Role } from '../../common/constants/roles';
 import { MSG } from '../../common/constants/messages';
+import { normalizeVietnamesePhone, VIETNAMESE_PHONE } from '../../common/validation/vietnamese-phone';
 
 const HASH_ROUNDS = 12;
 
@@ -23,18 +24,25 @@ export class UsersService {
     if (alreadyExists) {
       throw new ConflictException(MSG.EMAIL_TAKEN);
     }
+    const phone = input.phone ? normalizeVietnamesePhone(input.phone) : '';
+    if (phone && (await this.model.exists({ phone }))) {
+      throw new ConflictException(MSG.PHONE_TAKEN);
+    }
     const passwordHash = await bcrypt.hash(input.password, HASH_ROUNDS);
     return this.model.create({
       email: input.email.toLowerCase(),
       fullName: input.fullName,
-      phone: input.phone ?? null,
+      phone: phone || null,
       passwordHash,
       roles: input.roles ?? [Role.CUSTOMER],
     });
   }
 
-  findByEmailWithPassword(email: string) {
-    return this.model.findOne({ email: email.toLowerCase() }).select('+passwordHash').exec();
+  findByIdentifierWithPassword(identifier: string) {
+    const value = identifier.trim();
+    const phone = normalizeVietnamesePhone(value);
+    const query = VIETNAMESE_PHONE.test(phone) ? { phone } : { email: value.toLowerCase() };
+    return this.model.findOne(query).select('+passwordHash').exec();
   }
 
   findByIdWithPassword(id: string) {

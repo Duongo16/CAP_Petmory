@@ -13,11 +13,11 @@
     <div class="window-row grid gap-3 sm:grid-cols-2">
       <label class="tw-field">
         <span class="field-name tw-label">{{ 'MEMORY.EXPORT_FROM' | translate }}</span>
-        <input class="tw-input" type="date" formControlName="fromDate" />
+        <pm-date-input formControlName="fromDate" />
       </label>
       <label class="tw-field">
         <span class="field-name tw-label">{{ 'MEMORY.EXPORT_TO' | translate }}</span>
-        <input class="tw-input" type="date" formControlName="toDate" />
+        <pm-date-input formControlName="toDate" />
       </label>
     </div>
     <p class="field-hint tw-hint">{{ 'MEMORY.EXPORT_WHOLE' | translate }}</p>

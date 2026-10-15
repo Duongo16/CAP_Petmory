@@ -44,6 +44,11 @@ export class PublicDiaryQueryDto {
   @IsString()
   @MaxLength(80)
   keyword?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  ownerId?: string;
 }
 
 /** Ly do quan tri vien an mot quyen khoi cong dong. Bat buoc phai co. */

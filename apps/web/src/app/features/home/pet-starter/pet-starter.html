@@ -1,4 +1,4 @@
-<div class="backdrop" (click)="close()" (keydown.escape)="close()">
+<div class="backdrop">
   <form
     class="sheet-box"
     role="dialog"
@@ -104,7 +104,7 @@
 
           <div class="tw-field">
             <label class="tw-label" for="starter-birth">{{ 'LANDING.STARTER.BIRTH' | translate }}</label>
-            <input id="starter-birth" class="tw-input" type="date" formControlName="birthDate" [max]="today" />
+            <pm-date-input id="starter-birth" formControlName="birthDate" />
             @if (birthInFuture()) {
               <p class="tw-error">{{ 'LANDING.STARTER.BIRTH_ERROR' | translate }}</p>
             } @else {

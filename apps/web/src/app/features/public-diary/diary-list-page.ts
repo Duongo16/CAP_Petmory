@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MemoriesService } from '../../core/services/memories.service';
@@ -52,7 +52,7 @@ interface Flight {
 @Component({
   selector: 'pm-diary-list-page',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, Icon, PetFace, UserFace],
+  imports: [ReactiveFormsModule, TranslatePipe, Icon, PetFace, UserFace, RouterLink],
   templateUrl: './diary-list-page.html',
   styleUrl: './diary-list-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

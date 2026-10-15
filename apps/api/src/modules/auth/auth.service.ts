@@ -172,7 +172,7 @@ export class AuthService {
   }
 
   async login(dto: LoginDto): Promise<LoginResult> {
-    const user = await this.users.findByEmailWithPassword(dto.email);
+    const user = await this.users.findByIdentifierWithPassword(dto.email);
     if (!user || !user.active) {
       throw new UnauthorizedException(MSG.BAD_CREDENTIALS);
     }

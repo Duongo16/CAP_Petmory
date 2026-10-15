@@ -10,6 +10,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { PetDraftService } from '../../core/services/pet-draft.service';
 import { Icon } from '../../shared/icon/icon';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
+import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
 import { normalizeVietnamesePhone, optionalVietnamesePhone } from '../../core/utils/vietnamese-phone';
 
@@ -57,7 +58,7 @@ import { Brand } from '../../shared/brand/brand';
 @Component({
   selector: 'pm-register',
   standalone: true,
-  imports: [LanguageToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [LanguageToggle, ThemeToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './register.html',
   styleUrls: ['./auth-shared.scss', './register.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

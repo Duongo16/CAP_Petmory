@@ -143,6 +143,12 @@
                 {{ 'ASSISTANT.ASK_PERSON' | translate }}
               </button>
             }
+            @if (state() === 'WAITING' || state() === 'WITH_STAFF') {
+              <button type="button" class="handover-link" [disabled]="waiting()" (click)="resumeBot()">
+                <pm-icon name="sparkle" [size]="13" />
+                {{ 'ASSISTANT.BACK_TO_AI' | translate }}
+              </button>
+            }
           </div>
         }
       </footer>

@@ -44,7 +44,7 @@
       content: '';
       width: 5px;
       height: 9px;
-      border: solid #ffffff;
+      border: solid var(--pm-on-accent);
       border-width: 0 2px 2px 0;
       transform: rotate(45deg) translate(-0.5px, -1px);
     }
@@ -58,7 +58,7 @@
       content: '';
       width: 8px;
       height: 2px;
-      background-color: #ffffff;
+      background-color: var(--pm-on-accent);
       border-radius: 1px;
     }
   }
@@ -107,7 +107,7 @@
 
     &:hover {
       background: var(--pm-danger);
-      color: #ffffff;
+      color: var(--pm-on-accent);
       border-color: var(--pm-danger);
     }
   }

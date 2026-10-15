@@ -41,7 +41,11 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-  @IsEmail({}, { message: 'Email khong dung dinh dang' })
+  @IsString()
+  @MinLength(1, { message: 'Hay nhap email hoac so dien thoai' })
+  @Matches(/^(?:[^@\s]+@[^@\s]+\.[^@\s]+|\+?84\d{9}|0\d{9})$/, {
+    message: 'Email hoac so dien thoai khong dung dinh dang',
+  })
   email!: string;
 
   @IsString()

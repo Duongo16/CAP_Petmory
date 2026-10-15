@@ -4,6 +4,14 @@
   min-height: 100%;
 }
 
+.pm-shell-header nav a,
+.pm-shell-header .account-button,
+.pm-shell-header .account-menu,
+.pm-shell-header pm-theme-toggle,
+.pm-shell-header pm-language-toggle {
+  font-family: var(--pm-font-soft);
+}
+
 @media (max-width: 480px) {
   header > div {
     gap: 8px;

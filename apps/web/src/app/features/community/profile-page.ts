@@ -10,19 +10,17 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommunityService } from '../../core/services/community.service';
 import { AuthService } from '../../core/services/auth.service';
-import { TokenStore } from '../../core/services/token-store';
 import { CommunityPost, CommunityProfile } from '../../core/models/community.model';
 import { topicKey } from './community-topics';
 import { Icon } from '../../shared/icon/icon';
-import { ProfileEditDialog, ProfileEditResult } from './profile-edit-dialog';
 import { UserFace } from '../../shared/user-face/user-face';
 import { PetFace } from '../../shared/pet-face/pet-face';
+import { MemoriesService } from '../../core/services/memories.service';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -37,9 +35,8 @@ type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 export class CommunityProfilePage implements OnInit {
   private readonly service = inject(CommunityService);
   private readonly auth = inject(AuthService);
-  private readonly store = inject(TokenStore);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly dialog = inject(MatDialog);
+  private readonly memories = inject(MemoriesService);
 
   readonly id = input.required<string>();
 
@@ -47,6 +44,7 @@ export class CommunityProfilePage implements OnInit {
   readonly status = signal<ScreenState>('LOADING');
   readonly profile = signal<CommunityProfile | null>(null);
   private readonly posts = signal<CommunityPost[]>([]);
+  readonly diaries = signal<import('../../core/models/api.model').DiaryCard[]>([]);
 
 
   readonly cards = computed(() =>
@@ -71,6 +69,7 @@ export class CommunityProfilePage implements OnInit {
       .subscribe({
         next: (p) => {
           this.profile.set(p);
+          this.diaries.set(p.diaries ?? []);
           this.status.set('DONE');
         },
         error: () => this.status.set('ERROR'),
@@ -80,41 +79,10 @@ export class CommunityProfilePage implements OnInit {
       .postsOf(this.id())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: (list) => this.posts.set(list), error: () => undefined });
-  }
 
-  /** Opens the profile editor as a popup and shows the change once it is saved. */
-  openEdit(): void {
-    const p = this.profile();
-    if (!p) {
-      return;
-    }
-    this.dialog
-      .open<ProfileEditDialog, CommunityProfile, ProfileEditResult>(ProfileEditDialog, {
-        data: p,
-        width: 'min(620px, 96vw)',
-        maxHeight: '92vh',
-        panelClass: ['pm-dialog', 'pm-dialog-wide'],
-        autoFocus: 'first-tabbable',
-      })
-      .afterClosed()
+    this.memories.publicDiaries(1, undefined, undefined, this.id())
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((saved) => {
-        if (!saved) {
-          return;
-        }
-        this.profile.update((now) =>
-          now
-            ? {
-                ...now,
-                fullName: saved.fullName,
-                initial: saved.fullName.charAt(0).toUpperCase() || '?',
-                phone: saved.phone || null,
-                avatarUrl: saved.avatarUrl || null,
-              }
-            : now,
-        );
-        this.store.patchUser({ fullName: saved.fullName, avatarUrl: saved.avatarUrl || null });
-      });
+      .subscribe({ next: (list) => this.diaries.set(list.rows), error: () => this.diaries.set([]) });
   }
 
   toggleFollow(): void {

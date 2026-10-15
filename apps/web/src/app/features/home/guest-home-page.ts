@@ -24,17 +24,19 @@ import { DiaryScene } from '../../shared/diary-scene/diary-scene';
 import { Brand } from '../../shared/brand/brand';
 
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
+import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'pm-guest-home-page',
   standalone: true,
-  imports: [Brand, DiaryScene, RouterLink, TranslatePipe, Icon, PetArt, PetStarter, LanguageToggle],
+  imports: [Brand, DiaryScene, RouterLink, TranslatePipe, Icon, PetArt, PetStarter, LanguageToggle, ThemeToggle],
   templateUrl: './guest-home-page.html',
   styleUrl: './guest-home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GuestHomePage {
   readonly starterOpen = signal(false);
+  readonly authPromptOpen = signal(false);
 
   readonly trust = ['LANDING.TRUST_FREE', 'LANDING.TRUST_PRIVATE', 'LANDING.TRUST_CARD'];
 
@@ -58,4 +60,7 @@ export class GuestHomePage {
   closeOnboarding(): void {
     this.starterOpen.set(false);
   }
+
+  openAuthPrompt(): void { this.authPromptOpen.set(true); }
+  closeAuthPrompt(): void { this.authPromptOpen.set(false); }
 }

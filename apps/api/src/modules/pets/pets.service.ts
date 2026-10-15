@@ -58,7 +58,7 @@ export class PetsService {
     // it null here also prevents stale form values from being stored on create.
     const passedAwayDate =
       status === PetStatus.PASSED_AWAY ? dto.passedAwayDate : null;
-    checkDates(status, dto.birthDate, passedAwayDate, kind);
+    checkDates(status, dto.birthDate, passedAwayDate);
     checkCameHome(dto.adoptionDate, dto.birthDate);
     return this.model.create({
       ...dto,
@@ -94,7 +94,7 @@ export class PetsService {
           ? pet.passedAwayDate?.toISOString()
           : dto.passedAwayDate
         : null;
-    checkDates(status, birthDate, passedAwayDate, kind);
+    checkDates(status, birthDate, passedAwayDate);
     checkCameHome(adoptionDate, birthDate);
     pet.set({ ...dto, kind, status, passedAwayDate });
     return pet.save();
@@ -138,13 +138,8 @@ export class PetsService {
  * The day a pet came home cannot be in days to come, and cannot be before the
  * day it was born.
  */
-/**
- * A profile for a dog needs a plausible birth date. This is a data-entry rule
- * requested for this species only; it does not claim that 30 years is a dog's
- * average or maximum lifespan, and it is deliberately not applied to birds or
- * other long-lived pets.
- */
-const MAX_DOG_PROFILE_AGE_YEARS = 30;
+/** Maximum age accepted when entering a pet birth date. */
+const MAX_PROFILE_AGE_YEARS = 30;
 const BUSINESS_TIME_ZONE = 'Asia/Ho_Chi_Minh';
 
 type DateInput = string | null | undefined;
@@ -172,7 +167,6 @@ function checkDates(
   status: PetStatus,
   birthDate: DateInput,
   passedAwayDate: DateInput,
-  kind: PetKind,
 ): void {
   const today = todayCalendarDay();
   const born = birthDate ? calendarDay(birthDate, 'Ngay sinh') : null;
@@ -184,12 +178,10 @@ function checkDates(
     throw new BadRequestException('Ngay sinh khong duoc o tuong lai');
   }
   if (
-    kind === PetKind.DOG &&
-    born &&
-    born.value < calendarDayYearsAgo(MAX_DOG_PROFILE_AGE_YEARS)
+    born && born.value < calendarDayYearsAgo(MAX_PROFILE_AGE_YEARS)
   ) {
     throw new BadRequestException(
-      `Ngay sinh cua cho khong duoc qua ${MAX_DOG_PROFILE_AGE_YEARS} nam truoc`,
+      `Ngay sinh khong duoc qua ${MAX_PROFILE_AGE_YEARS} nam truoc`,
     );
   }
   if (status !== PetStatus.PASSED_AWAY) {

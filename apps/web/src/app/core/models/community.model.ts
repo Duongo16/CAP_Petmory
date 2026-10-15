@@ -61,6 +61,7 @@ export interface CommunityProfile {
   followedByMe: boolean;
   mine: boolean;
   pets: { id: string; name: string; kind: string; breed: string; avatarUrl: string | null }[];
+  diaries: import('./api.model').DiaryCard[];
 }
 
 export interface WritePostInput {

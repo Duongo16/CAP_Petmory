@@ -442,12 +442,19 @@ export class DiaryService {
     page: number,
     topic?: MemoryTopic,
     keyword?: string,
+    ownerId?: string,
   ): Promise<{ rows: DiaryCard[]; total: number; page: number; pageCount: number }> {
     const where: Record<string, unknown> = {
       isHidden: false,
       diaryPublic: true,
       diaryBlocked: false,
     };
+    if (ownerId) {
+      if (!Types.ObjectId.isValid(ownerId)) {
+        throw new BadRequestException('Ma chu khong hop le');
+      }
+      where.owner = new Types.ObjectId(ownerId);
+    }
     const word = keyword?.trim();
     if (word) {
       where.name = new RegExp(escapeWord(word), 'i');

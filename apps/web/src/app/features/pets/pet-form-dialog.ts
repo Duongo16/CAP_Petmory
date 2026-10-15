@@ -14,6 +14,7 @@ import { ImageLink } from '../../shared/image-link/image-link';
 import { PhotoPreviews } from '../../shared/photo-previews/photo-previews';
 import { looksLikeImage } from '../../core/utils/upload-image';
 import { vietnamToday } from '../../core/utils/date-only';
+import { DateInput } from '../../shared/date-input/date-input';
 
 /** What the dialog is opened with. A missing pet means it is adding a new one. */
 export interface PetFormInput {
@@ -73,8 +74,8 @@ const LINE_BREAK = String.fromCharCode(10);
 
 const PHOTO_MAX = 8;
 
-/** Data-entry cap for dogs only; it is not a lifespan claim. */
-const DOG_PROFILE_MAX_AGE_YEARS = 30;
+/** Data-entry cap for birth dates; it is not a lifespan claim. */
+const PROFILE_MAX_AGE_YEARS = 30;
 
 /**
  * Checks the dates against each other and against the status.
@@ -84,7 +85,6 @@ const DOG_PROFILE_MAX_AGE_YEARS = 30;
  */
 function checkDates(group: AbstractControl): ValidationErrors | null {
   const status = group.get('status')?.value as PetStatus;
-  const kind = group.get('kind')?.value as PetKind;
   const birth = group.get('birthDate')?.value as string;
   const gone = group.get('passedAwayDate')?.value as string;
   const today = vietnamToday();
@@ -92,7 +92,7 @@ function checkDates(group: AbstractControl): ValidationErrors | null {
   if (birth && birth > today) {
     return { birthAhead: true };
   }
-  if (kind === 'DOG' && birth && birth < dateYearsAgo(DOG_PROFILE_MAX_AGE_YEARS)) {
+  if (birth && birth < dateYearsAgo(PROFILE_MAX_AGE_YEARS)) {
     return { birthTooOld: true };
   }
   if (status !== 'PASSED_AWAY') {
@@ -152,7 +152,7 @@ function asCarers(typed: string): Carer[] {
 @Component({
   selector: 'pm-pet-form-dialog',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, Icon, ImageLink, PhotoPreviews],
+  imports: [ReactiveFormsModule, TranslatePipe, Icon, ImageLink, PhotoPreviews, DateInput],
   templateUrl: './pet-form-dialog.html',
   styleUrl: './pet-form-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

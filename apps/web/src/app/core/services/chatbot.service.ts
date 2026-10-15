@@ -41,6 +41,10 @@ export class ChatbotService {
     return this.http.post<ChatSession>(`${this.base}/assistant/sessions/${code}/handover`, { note }, this.quiet);
   }
 
+  resumeBot(code: string): Observable<ChatSession> {
+    return this.http.post<ChatSession>(`${this.base}/assistant/sessions/${code}/resume`, {}, this.quiet);
+  }
+
   // --- Phia nhan vien truc ---
 
   waitingChats(): Observable<ChatSession[]> {

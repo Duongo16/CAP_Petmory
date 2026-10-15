@@ -7,6 +7,7 @@
       <div class="ap-top-row">
         <a class="ap-back" routerLink="/landing"><pm-icon name="back" [size]="16" />{{ 'AUTH.BACK_HOME' | translate }}</a>
         <pm-language-toggle />
+        <pm-theme-toggle />
       </div>
 
       <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" /></a>
@@ -30,22 +31,22 @@
 
         <div class="ap-field">
           <div class="ap-field-row">
-            <label class="ap-label" for="login-email">{{ 'AUTH.EMAIL' | translate }}</label>
+            <label class="ap-label" for="login-email">{{ 'AUTH.EMAIL_OR_PHONE' | translate }}</label>
             <span class="ap-field-hint">{{ 'AUTH.SSL' | translate }}</span>
           </div>
           <div class="ap-input-wrap">
             <input
               class="ap-input"
               id="login-email"
-              type="email"
+              type="text"
               formControlName="email"
-              autocomplete="email"
+              autocomplete="username"
               [placeholder]="'AUTH.EMAIL_HINT' | translate"
             />
             <span class="ap-input-icon" aria-hidden="true"><pm-icon name="user" [size]="15" /></span>
           </div>
           @if (form.controls.email.touched && form.controls.email.invalid) {
-            <p class="ap-error-msg">{{ 'AUTH.EMAIL_ERROR' | translate }}</p>
+            <p class="ap-error-msg">{{ 'AUTH.EMAIL_OR_PHONE_ERROR' | translate }}</p>
           }
         </div>
 

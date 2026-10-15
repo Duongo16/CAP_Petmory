@@ -6,6 +6,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { MemoriesFacade } from './memories-facade';
 import { Icon } from '../../shared/icon/icon';
 import { vietnamDayEnd } from '../../core/utils/date-only';
+import { DateInput } from '../../shared/date-input/date-input';
 
 /** Cai hop nay lam viec thang tren kho cua man hinh nhat ky dang mo. */
 export interface ShareRequest {
@@ -22,7 +23,7 @@ export interface ShareRequest {
 @Component({
   selector: 'pm-share-dialog',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe, TranslatePipe, Icon],
+  imports: [ReactiveFormsModule, DatePipe, TranslatePipe, Icon, DateInput],
   templateUrl: './share-dialog.html',
   styleUrl: './share-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

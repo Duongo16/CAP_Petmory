@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
@@ -17,14 +17,22 @@ import { PetDraftService } from '../../core/services/pet-draft.service';
 import { DemoAccount } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
+import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
 import { DiaryScene } from '../../shared/diary-scene/diary-scene';
 import { Brand } from '../../shared/brand/brand';
+import { isVietnamesePhone } from '../../core/utils/vietnamese-phone';
+
+const loginIdentifier = (control: AbstractControl): ValidationErrors | null => {
+  const value = String(control.value ?? '').trim();
+  return value.includes('@') ? Validators.email(control) :
+    (isVietnamesePhone(value) && value.length > 0 ? null : { identifier: true });
+};
 
 @Component({
   selector: 'pm-login',
   standalone: true,
-  imports: [LanguageToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [LanguageToggle, ThemeToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './login.html',
   styleUrls: ['./auth-shared.scss', './login.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,7 +60,7 @@ export class LoginPage implements OnInit {
   readonly peeking = signal(false);
 
   readonly form = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, loginIdentifier]],
     password: ['', [Validators.required, Validators.minLength(8)]],
     remember: [true],
   });

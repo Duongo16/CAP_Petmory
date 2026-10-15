@@ -54,6 +54,42 @@
   }
 }
 
+.lp-nav button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.auth-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(30, 20, 12, .55);
+}
+
+.auth-prompt-box {
+  position: relative;
+  width: min(420px, 100%);
+  padding: 32px;
+  border: 1px solid var(--pm-border);
+  border-radius: 24px;
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  text-align: center;
+  box-shadow: var(--pm-shadow-lifted);
+}
+
+.auth-prompt-box h2 { margin: 14px 0 8px; font-family: var(--pm-font-display); }
+.auth-prompt-box p { margin: 0; color: var(--pm-text-muted); }
+.auth-prompt-close { position: absolute; top: 12px; right: 12px; border: 0; background: transparent; color: var(--pm-text-muted); cursor: pointer; }
+.auth-prompt-actions { display: flex; justify-content: center; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+
 .lp-bar-actions {
   display: flex;
   align-items: center;

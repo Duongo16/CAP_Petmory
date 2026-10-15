@@ -69,7 +69,7 @@ Biến môi trường dùng chung cho mọi service trong project. Nhóm bắt b
 | `MONGODB_URI` | Chuỗi kết nối từ Bước 1 |
 | `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Hai chuỗi ngẫu nhiên khác nhau, mỗi chuỗi ≥ 32 ký tự. Tạo bằng `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` |
 | `JWT_ACCESS_TTL` / `JWT_REFRESH_TTL` | Giữ như `.env` |
-| `WEB_ORIGIN` | `https://<tên-miền>`, ví dụ `https://cap-petmory.vercel.app` |
+| `WEB_ORIGIN` | `https://<tên-miền>`, ví dụ `https://petmory.vercel.app` |
 | `STORAGE_DRIVER` | `cloudinary` |
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` / `CLOUDINARY_SIGNED_URL_TTL` | Như `.env` |
 | `UPLOAD_DIR` | `/tmp/uploads` |
