@@ -1,0 +1,46 @@
+:host {
+  display: inline;
+}
+
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.word {
+  display: inline-block;
+}
+
+// Chi an khi directive da nhan viec; tu bat len tu duoi, hoi xoay, noi duoi nhau.
+:host([data-reveal]) .word {
+  opacity: 0;
+  translate: 0 0.6em;
+  rotate: -6deg;
+}
+
+:host([data-reveal].is-shown) .word {
+  animation: hop 620ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--reveal-delay, 0ms) + var(--i) * 70ms);
+}
+
+@keyframes hop {
+  0% {
+    opacity: 0;
+    translate: 0 0.6em;
+    rotate: -6deg;
+  }
+  60% {
+    opacity: 1;
+    translate: 0 -0.12em;
+    rotate: 2deg;
+  }
+  100% {
+    opacity: 1;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+}

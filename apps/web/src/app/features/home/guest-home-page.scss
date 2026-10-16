@@ -184,12 +184,12 @@
   min-height: 50px;
 }
 
-/* ---------- Anh nen dung yen ---------- */
+/* ---------- Man dau: buc tuong treo tranh len ---------- */
 
 /*
- * Anh san pham len choc that phu kin man hinh dau tien, khong lam mo. Anh dinh
- * yen o day khung nhin (sticky), con lop noi dung .lp-front ngay sau truot len
- * va che dan anh khi cuon, nhu mot tam man keo len.
+ * Man dau dinh yen o day khung nhin (sticky); lop .lp-front ngay sau truot len
+ * che dan, nhu keo mot tam man. Tuong mau giay kem co soc giay dan tuong mo,
+ * giu sang ca o che do toi de tranh len noi bat; chu dung mau muc giay co dinh.
  */
 .lp-cover {
   position: sticky;
@@ -197,123 +197,764 @@
   z-index: 0;
   display: grid;
   align-items: center;
-  block-size: 100svh;
-  min-block-size: 520px;
-  // Nam duoi thanh dinh trong mo, anh trai tu mep tren. --lp-bar-h do tu chieu cao that cua thanh.
+  min-block-size: max(560px, 100svh);
   margin-block-start: calc(-1 * var(--lp-bar-h, 73px));
+  padding-block: calc(var(--lp-bar-h, 73px) + 24px) 48px;
   overflow: hidden;
-  background: var(--pm-paper-kraft);
+  background:
+    radial-gradient(circle at 72% 34%, var(--pm-paper-bloom) 0 22%, transparent 58%),
+    repeating-linear-gradient(90deg, transparent 0 56px, var(--pm-paper-mark) 56px 57px),
+    var(--pm-paper-cream);
 }
 
-.lp-cover picture,
-.lp-cover-photo {
-  position: absolute;
-  inset: 0;
-  inline-size: 100%;
-  block-size: 100%;
-}
-
-.lp-cover-photo {
-  object-fit: cover;
-  object-position: 70% 40%;
+.lp-cover-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: 40px;
+  inline-size: min(100% - 48px, 1200px);
+  margin-inline: auto;
 }
 
 .lp-cover-text {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
-  inline-size: min(100% - 48px, 1200px);
-  margin-inline: auto;
-  padding-block-start: var(--lp-bar-h, 73px);
-
-  > * {
-    max-inline-size: 30rem;
-  }
+  gap: 18px;
+  min-inline-size: 0;
 }
 
-// Chu dat len vung nen sang cua anh: dung mau muc giay co dinh, khong doi theo che do toi.
 .lp-cover-eyebrow {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent-soft);
   color: var(--pm-book-cover);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .lp-cover-title {
   margin: 0;
   font-family: var(--pm-font-display);
-  font-size: clamp(36px, 5.2vw, 64px);
+  font-size: clamp(40px, 5.6vw, 72px);
   font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -0.015em;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   color: var(--pm-ink);
-  text-wrap: balance;
 }
 
 .lp-cover-sub {
   margin: 0;
-  font-size: clamp(16px, 1.4vw, 18px);
+  max-inline-size: 32rem;
+  font-size: clamp(16px, 1.4vw, 19px);
   line-height: 1.6;
   color: var(--pm-ink);
+}
+
+.lp-cover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
 }
 
 .lp-cover-go {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-block-start: 6px;
   min-block-size: 48px;
-  padding: 0 24px;
-  border-radius: var(--pm-radius-pill);
-  background: var(--pm-ink);
-  color: var(--pm-paper-cream);
+  padding: 0 6px;
+  color: var(--pm-ink);
   font-weight: 700;
-  text-decoration: none;
-  transition: transform 160ms ease;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+  text-decoration-color: var(--pm-accent);
 
   pm-icon {
     rotate: 90deg;
   }
 
-  &:hover {
-    transform: translateY(-2px);
-  }
-
   &:focus-visible {
     outline: 3px solid var(--pm-accent-ring);
     outline-offset: 3px;
+    border-radius: 8px;
   }
 }
 
-/* Lop noi dung phia truoc: nen dac, bo goc tren, truot len che anh nen. */
+/* Ba khung treo dinh: moi khung dung dua mot nhip rieng quanh dinh treo. */
+.lp-cover-wall {
+  position: relative;
+  aspect-ratio: 1 / 0.92;
+  max-inline-size: 600px;
+  justify-self: center;
+  inline-size: 100%;
+}
+
+.lp-hang {
+  position: absolute;
+  transform-origin: 50% -36px;
+  rotate: var(--base);
+  animation: lp-swing var(--beat) ease-in-out infinite alternate;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    border-radius: 10px;
+    box-shadow: var(--pm-shadow-lifted);
+  }
+}
+
+// Dinh dong va soi day treo.
+.lp-hang::before {
+  content: '';
+  position: absolute;
+  inset-block-start: -42px;
+  inset-inline-start: 50%;
+  inline-size: 12px;
+  block-size: 12px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--pm-hoop-brass);
+  box-shadow: inset -2px -2px 0 var(--pm-hoop-brass-dark);
+}
+
+.lp-hang-string {
+  position: absolute;
+  inset-block-start: -34px;
+  inset-inline-start: 50%;
+  inline-size: 2px;
+  block-size: 36px;
+  translate: -50% 0;
+  background: var(--pm-hoop-twine);
+}
+
+.lp-hang-a {
+  --base: -5deg;
+  --beat: 4.2s;
+  inset-block-start: 18%;
+  inset-inline-start: 0;
+  inline-size: 36%;
+}
+
+.lp-hang-b {
+  --base: 2deg;
+  --beat: 5.4s;
+  z-index: 2;
+  inset-block-start: 6%;
+  inset-inline-start: 32%;
+  inline-size: 40%;
+}
+
+.lp-hang-c {
+  --base: 6deg;
+  --beat: 3.6s;
+  inset-block-start: 30%;
+  inset-inline-end: 0;
+  inline-size: 26%;
+}
+
+@keyframes lp-swing {
+  from {
+    rotate: calc(var(--base) - 3deg);
+  }
+  to {
+    rotate: calc(var(--base) + 3deg);
+  }
+}
+
+/* Cuon len lan lung tren tuong. */
+.lp-yarn {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(48deg, transparent 0 6px, var(--pm-paper-mark) 6px 8px),
+    var(--yarn);
+  box-shadow: var(--pm-shadow);
+  animation: lp-bob 6s ease-in-out infinite;
+}
+
+.lp-yarn-a {
+  --yarn: var(--pm-amber-soft);
+  inline-size: 90px;
+  block-size: 90px;
+  inset-block-end: 8%;
+  inset-inline-start: 4%;
+}
+
+.lp-yarn-b {
+  --yarn: var(--pm-accent-soft);
+  inline-size: 56px;
+  block-size: 56px;
+  inset-block-start: 22%;
+  inset-inline-start: 44%;
+  animation-delay: 1.4s;
+}
+
+.lp-yarn-c {
+  --yarn: var(--pm-success-soft);
+  inline-size: 70px;
+  block-size: 70px;
+  inset-block-end: 10%;
+  inset-inline-end: 6%;
+  animation-delay: 2.6s;
+}
+
+/* Lop noi dung phia truoc: nen dac, bo goc tren, truot len che man dau. */
 .lp-front {
   position: relative;
   z-index: 1;
+  overflow: hidden;
   border-radius: 32px 32px 0 0;
   background: var(--pm-bg);
   box-shadow: 0 -18px 40px var(--pm-book-edge);
 }
 
-/* Dien thoai dung: anh doc, cun o nua tren; chu nam trong the giay o day anh. */
-@media (max-aspect-ratio: 4/5) {
-  .lp-cover {
-    align-items: end;
-  }
+/* ---------- Dai chu chay ---------- */
 
-  .lp-cover-photo {
-    object-position: 60% 20%;
-  }
+.lp-marquee {
+  margin: 28px -20px 0;
+  padding-block: 14px;
+  overflow: hidden;
+  rotate: -1.5deg;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  box-shadow: var(--pm-shadow);
+}
 
-  .lp-cover-text {
-    inline-size: auto;
-    margin: 0 16px 24px;
-    padding: 20px;
-    border-radius: 22px;
-    background: color-mix(in srgb, var(--pm-paper-cream) 92%, transparent);
+.lp-marquee-track {
+  display: flex;
+  inline-size: max-content;
+  animation: lp-marquee 32s linear infinite;
+}
+
+.lp-marquee:hover .lp-marquee-track {
+  animation-play-state: paused;
+}
+
+.lp-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding-inline: 28px;
+  font-family: var(--pm-font-display);
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@keyframes lp-marquee {
+  to {
+    translate: -50% 0;
+  }
+}
+
+/* ---------- Buc tuong ky niem ---------- */
+
+// Cot kieu masonry: moi khung giu dung ti le anh, khong cat anh.
+.lp-wall {
+  columns: 3 240px;
+  column-gap: 40px;
+  padding-block-start: 40px;
+}
+
+.lp-frame {
+  position: relative;
+  display: inline-block;
+  inline-size: 100%;
+  margin: 0 0 64px;
+  break-inside: avoid;
+  rotate: var(--tilt, 0deg);
+}
+
+// Dinh treo phia tren moi khung.
+.lp-frame-nail {
+  position: absolute;
+  inset-block-start: -26px;
+  inset-inline-start: 50%;
+  z-index: 1;
+  inline-size: 10px;
+  block-size: 10px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--pm-hoop-brass);
+  box-shadow: inset -2px -2px 0 var(--pm-hoop-brass-dark);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-start: 50%;
+    inline-size: 2px;
+    block-size: 22px;
+    translate: -50% 0;
+    background: var(--pm-hoop-twine);
+  }
+}
+
+.lp-frame-swing {
+  display: block;
+  transform-origin: 50% -20px;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    border-radius: 10px;
     box-shadow: var(--pm-shadow-lifted);
+  }
+}
+
+.lp-frame:hover .lp-frame-swing {
+  animation: lp-wiggle 1.3s ease-in-out;
+}
+
+// Nhan kieu khung: dan nghieng o goc, nay len khi re chuot.
+.lp-frame-tag {
+  position: absolute;
+  inset-block-end: 14px;
+  inset-inline-start: -8px;
+  padding: 6px 12px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: var(--pm-shadow);
+  rotate: -4deg;
+  transition: translate 220ms ease, rotate 220ms ease;
+}
+
+.lp-frame:hover .lp-frame-tag {
+  translate: 0 -6px;
+  rotate: 2deg;
+}
+
+// Khung roi tu tren xuong, dung dua roi dung lai o goc treo lech cua no.
+.lp-frame[data-reveal] {
+  opacity: 0;
+}
+
+.lp-frame[data-reveal].is-shown {
+  animation: lp-hang-drop 1100ms cubic-bezier(0.3, 1.4, 0.5, 1) var(--reveal-delay, 0ms) both;
+}
+
+@keyframes lp-hang-drop {
+  0% {
+    opacity: 0;
+    translate: 0 -80px;
+    rotate: calc(var(--tilt, 0deg) - 14deg);
+  }
+  45% {
+    opacity: 1;
+    translate: 0 6px;
+    rotate: calc(var(--tilt, 0deg) + 9deg);
+  }
+  70% {
+    translate: 0 0;
+    rotate: calc(var(--tilt, 0deg) - 4deg);
+  }
+  100% {
+    opacity: 1;
+    translate: 0 0;
+    rotate: var(--tilt, 0deg);
+  }
+}
+
+@keyframes lp-wiggle {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  20% {
+    rotate: 6deg;
+  }
+  45% {
+    rotate: -5deg;
+  }
+  70% {
+    rotate: 2.5deg;
+  }
+  85% {
+    rotate: -1deg;
+  }
+}
+
+/* ---------- Quy trinh ---------- */
+
+.lp-process {
+  position: relative;
+  display: grid;
+  gap: 72px;
+  margin: 48px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Soi len uon luon noi cac buoc; tu ve dan theo luc cuon o trinh duyet ho tro.
+.lp-thread {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 50%;
+  inline-size: 120px;
+  block-size: 100%;
+  translate: -50% 0;
+  overflow: visible;
+  pointer-events: none;
+
+  path {
+    fill: none;
+    stroke: var(--pm-accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.55;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .lp-thread path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: lp-draw linear both;
+    animation-timeline: view();
+    animation-range: entry 10% exit 70%;
+  }
+}
+
+@keyframes lp-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.lp-process-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 72px;
+
+  &.flip .lp-process-photo {
+    order: 2;
+  }
+}
+
+.lp-process-photo {
+  position: relative;
+  justify-self: center;
+  inline-size: min(100%, 340px);
+  rotate: -3deg;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border: 10px solid var(--pm-bg-card);
+    border-radius: 14px;
+    box-shadow: var(--pm-shadow-lifted);
+  }
+}
+
+.flip .lp-process-photo {
+  rotate: 3deg;
+}
+
+// So thu tu la mot cuon len tron.
+.lp-process-num {
+  position: absolute;
+  inset-block-start: -22px;
+  inset-inline-end: -18px;
+  display: grid;
+  place-items: center;
+  inline-size: 64px;
+  block-size: 64px;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(48deg, transparent 0 6px, var(--pm-paper-mark) 6px 8px),
+    var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+  font-family: var(--pm-font-display);
+  font-size: 28px;
+  font-weight: 800;
+  box-shadow: var(--pm-shadow);
+}
+
+.lp-process-text {
+  min-inline-size: 0;
+
+  h3 {
+    margin: 0 0 10px;
+    font-family: var(--pm-font-display);
+    font-size: clamp(22px, 2.4vw, 30px);
+    font-weight: 800;
+    color: var(--pm-text);
+  }
+
+  p {
+    margin: 0;
+    max-inline-size: 30rem;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--pm-text-body);
+  }
+}
+
+// Anh truot vao tu canh, chu noi len, so cuon len bat ra.
+.lp-process-step[data-reveal] {
+  .lp-process-photo,
+  .lp-process-text,
+  .lp-process-num {
+    opacity: 0;
+  }
+}
+
+.lp-process-step[data-reveal].is-shown {
+  .lp-process-photo {
+    animation: lp-slide-in 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .lp-process-text {
+    animation: lp-rise 700ms ease-out 180ms both;
+  }
+
+  .lp-process-num {
+    animation: lp-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) 450ms both;
+  }
+}
+
+.lp-process-step.flip[data-reveal].is-shown .lp-process-photo {
+  animation-name: lp-slide-in-right;
+}
+
+@keyframes lp-slide-in {
+  from {
+    opacity: 0;
+    translate: -60px 0;
+    rotate: -12deg;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    rotate: -3deg;
+  }
+}
+
+@keyframes lp-slide-in-right {
+  from {
+    opacity: 0;
+    translate: 60px 0;
+    rotate: 12deg;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    rotate: 3deg;
+  }
+}
+
+@keyframes lp-pop {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+  }
+  70% {
+    opacity: 1;
+    scale: 1.15;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* ---------- Chon dang khung ---------- */
+
+.lp-styles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  margin-block-start: 40px;
+  perspective: 900px;
+}
+
+.lp-style {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 20px;
+  border: 1px solid var(--pm-border);
+  border-radius: 24px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 180ms ease-out, box-shadow 180ms ease;
+
+  &:hover {
+    box-shadow: var(--pm-shadow-lifted);
+  }
+
+  h3 {
+    margin: 6px 4px 0;
+    font-family: var(--pm-font-display);
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--pm-text);
+  }
+
+  p {
+    margin: 0 4px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--pm-text-body);
+  }
+}
+
+.lp-style-photo {
+  overflow: hidden;
+  border-radius: 16px;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    transition: scale 400ms ease;
+  }
+}
+
+.lp-style:hover .lp-style-photo img {
+  scale: 1.06;
+}
+
+.lp-style[data-reveal] {
+  opacity: 0;
+}
+
+.lp-style[data-reveal].is-shown {
+  animation: lp-card-up 700ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--reveal-delay, 0ms) both;
+}
+
+@keyframes lp-card-up {
+  from {
+    opacity: 0;
+    translate: 0 50px;
+    rotate: 4deg;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+}
+
+.lp-styles-cta {
+  margin-block-start: 40px;
+}
+
+.lp-footer-credit {
+  font-size: 12px;
+  color: var(--pm-on-night-muted);
+}
+
+/* ---------- Man vua va nho ---------- */
+
+@media (max-width: 960px) {
+  .lp-cover-inner {
+    grid-template-columns: 1fr;
+    gap: 56px;
+  }
+
+  .lp-cover-wall {
+    max-inline-size: 460px;
+  }
+
+  .lp-styles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lp-process-step {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .lp-cover {
+    padding-block-end: 32px;
+  }
+
+  .lp-cover-inner {
+    inline-size: calc(100% - 32px);
+  }
+
+  .lp-wall {
+    columns: 2;
+    column-gap: 20px;
+  }
+
+  .lp-frame {
+    margin-block-end: 52px;
+  }
+
+  // Dien thoai: thu nho cum khung de ca man dau vua mot man hinh.
+  .lp-cover-inner {
+    gap: 40px;
+  }
+
+  .lp-cover-wall {
+    max-inline-size: 300px;
+  }
+
+  .lp-yarn {
+    display: none;
+  }
+
+  .lp-frame-tag {
+    font-size: 11px;
+    padding: 4px 9px;
+  }
+
+  // Mot cot: soi len chay doc ben trai, anh tren chu duoi.
+  .lp-thread {
+    inset-inline-start: 22px;
+    inline-size: 40px;
+  }
+
+  .lp-process {
+    gap: 56px;
+  }
+
+  .lp-process-step {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding-inline-start: 36px;
+
+    &.flip .lp-process-photo {
+      order: 0;
+    }
+  }
+
+  .lp-styles {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-hang,
+  .lp-yarn,
+  .lp-marquee-track,
+  .lp-frame:hover .lp-frame-swing {
+    animation: none;
+  }
+
+  .lp-style {
+    transform: none;
   }
 }
 

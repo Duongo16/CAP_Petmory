@@ -18,66 +18,123 @@
     </div>
   </header>
 
-  <!-- Lop nen: anh san pham len choc that, dung yen phia sau; noi dung ben duoi truot len che dan. -->
+  <!-- Man dau: buc tuong treo tranh len, dung yen phia sau; noi dung ben duoi truot len che dan. -->
   <section class="lp-cover" [attr.aria-label]="'LANDING.COVER_LABEL' | translate">
-    <picture>
-      <source media="(max-aspect-ratio: 4/5)" srcset="/img/landing/cover-tall.webp" />
-      <img class="lp-cover-photo" src="/img/landing/cover-wide.webp" width="2400" height="1350" alt="" fetchpriority="high" />
-    </picture>
-    <div class="lp-cover-text">
-      <span class="lp-cover-eyebrow">{{ 'LANDING.COVER_EYEBROW' | translate }}</span>
-      <p class="lp-cover-title">{{ 'LANDING.COVER_TITLE' | translate }}</p>
-      <p class="lp-cover-sub">{{ 'LANDING.COVER_SUB' | translate }}</p>
-      <a class="lp-cover-go" href="#start" (click)="scrollToStart($event)">
-        {{ 'LANDING.COVER_GO' | translate }}
-        <pm-icon name="chevron" [size]="14" />
-      </a>
+    <span class="lp-yarn lp-yarn-a" aria-hidden="true"></span>
+    <span class="lp-yarn lp-yarn-b" aria-hidden="true"></span>
+    <span class="lp-yarn lp-yarn-c" aria-hidden="true"></span>
+
+    <div class="lp-cover-inner">
+      <div class="lp-cover-text">
+        <span class="lp-cover-eyebrow">{{ 'LANDING.FELT.COVER_EYEBROW' | translate }}</span>
+        <h1 class="lp-cover-title"><pm-bounce-text [text]="'LANDING.FELT.TITLE' | translate" /></h1>
+        <p class="lp-cover-sub">{{ 'LANDING.FELT.SUB' | translate }}</p>
+        <div class="lp-cover-actions">
+          <button type="button" class="lp-btn lp-btn-lg" (click)="openOnboarding()">
+            {{ 'LANDING.FELT.CTA' | translate }}
+            <pm-icon name="arrow" [size]="18" />
+          </button>
+          <a class="lp-cover-go" href="#start" (click)="scrollToStart($event)">
+            {{ 'LANDING.FELT.CTA_WALL' | translate }}
+            <pm-icon name="chevron" [size]="14" />
+          </a>
+        </div>
+      </div>
+
+      <div class="lp-cover-wall" aria-hidden="true">
+        @for (one of coverFrames; track one.file) {
+          <div class="lp-hang" [class]="'lp-hang lp-hang-' + one.slot">
+            <span class="lp-hang-string"></span>
+            <img [src]="'/img/landing/felt/' + one.file + '.webp'" [attr.width]="one.width" [attr.height]="one.height" alt="" fetchpriority="high" />
+          </div>
+        }
+      </div>
     </div>
   </section>
 
   <div class="lp-front" id="start">
-  <section class="lp-hero">
-    <span class="lp-glow lp-glow-a" aria-hidden="true"></span>
-    <span class="lp-glow lp-glow-b" aria-hidden="true"></span>
-    <div class="lp-hero-inner">
-      <div class="lp-hero-text">
-        <span class="lp-pill">
-          <pm-icon name="sparkle" [size]="14" />
-          {{ 'LANDING.BADGE' | translate }}
-        </span>
-        <h1 class="lp-title">
-          {{ 'LANDING.TITLE_LEAD' | translate }}<br />
-          <em>{{ 'LANDING.TITLE_ACCENT' | translate }}</em>
-        </h1>
-        <p class="lp-lead">{{ 'LANDING.LEAD' | translate }}</p>
-        <div class="lp-cta-row">
-          <button type="button" class="lp-btn lp-btn-lg" (click)="openOnboarding()">
-            {{ 'LANDING.CREATE_PET' | translate }}
-            <pm-icon name="arrow" [size]="18" />
-          </button>
-          <a class="lp-btn-ghost lp-btn-lg" href="#how">{{ 'LANDING.HOW_IT_WORKS' | translate }}</a>
-        </div>
-        <ul class="lp-trust">
-          @for (key of trust; track key) {
-            <li><pm-icon name="check" [size]="16" />{{ key | translate }}</li>
-          }
-        </ul>
-      </div>
 
-      <div class="lp-art" aria-hidden="true">
-        <pm-pet-hero class="lp-scene" />
-        <div class="lp-chip lp-chip-memory">
-          <span class="lp-chip-icon"><pm-icon name="calendar" [size]="20" /></span>
-          <span class="lp-chip-text">
-            <small>{{ 'LANDING.ART_CHIP_EYEBROW' | translate }}</small>
-            <strong>{{ 'LANDING.ART_CHIP_TITLE' | translate }}</strong>
+  <!-- Dai chu chay nghieng, nhu dai ruy bang len. -->
+  <div class="lp-marquee" aria-hidden="true">
+    <div class="lp-marquee-track">
+      @for (round of [0, 1]; track round) {
+        @for (key of marquee; track key) {
+          <span class="lp-marquee-item"><pm-icon name="paw" [size]="18" />{{ key | translate }}</span>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Buc tuong ky niem: khung roi xuong roi dung dua khi cuon toi. -->
+  <section class="lp-section lp-wall-section" id="wall">
+    <header class="lp-head">
+      <span class="lp-eyebrow">{{ 'LANDING.FELT.WALL_EYEBROW' | translate }}</span>
+      <h2 class="lp-h2"><pm-bounce-text [text]="'LANDING.FELT.WALL_TITLE' | translate" /></h2>
+      <p class="lp-sub">{{ 'LANDING.FELT.WALL_SUB' | translate }}</p>
+    </header>
+    <div class="lp-wall">
+      @for (one of wallFrames; track one.file; let i = $index) {
+        <figure class="lp-frame" pmReveal [pmRevealDelay]="i * 110" [style.--tilt]="one.tilt + 'deg'" [style.--span]="one.span">
+          <span class="lp-frame-nail" aria-hidden="true"></span>
+          <span class="lp-frame-swing">
+            <img [src]="'/img/landing/felt/' + one.file + '.webp'" [attr.width]="one.width" [attr.height]="one.height" [alt]="one.altKey | translate" loading="lazy" decoding="async" />
           </span>
-        </div>
-        <div class="lp-chip lp-chip-status">
-          <span class="lp-dot"></span>
-          {{ 'LANDING.ART_STATUS' | translate }}
-        </div>
-      </div>
+          <figcaption class="lp-frame-tag">{{ one.styleKey | translate }}</figcaption>
+        </figure>
+      }
+    </div>
+  </section>
+
+  <!-- Quy trinh: soi len tu ve dan theo luc cuon, noi bon buoc. -->
+  <section class="lp-band lp-process-band" id="how">
+    <div class="lp-section">
+      <header class="lp-head">
+        <span class="lp-eyebrow">{{ 'LANDING.FELT.HOW_EYEBROW' | translate }}</span>
+        <h2 class="lp-h2"><pm-bounce-text [text]="'LANDING.FELT.HOW_TITLE' | translate" /></h2>
+      </header>
+      <ol class="lp-process">
+        <svg class="lp-thread" viewBox="0 0 100 1000" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M50 0 C 90 120, 10 230, 50 340 S 90 560, 50 670 S 10 880, 50 1000" />
+        </svg>
+        @for (step of processSteps; track step.number; let i = $index) {
+          <li class="lp-process-step" pmReveal [class.flip]="i % 2 === 1">
+            <div class="lp-process-photo">
+              <img [src]="'/img/landing/felt/' + step.file + '.webp'" [attr.width]="step.width" [attr.height]="step.height" [alt]="step.altKey | translate" loading="lazy" decoding="async" />
+              <span class="lp-process-num" aria-hidden="true">{{ step.number }}</span>
+            </div>
+            <div class="lp-process-text">
+              <h3>{{ step.nameKey | translate }}</h3>
+              <p>{{ step.textKey | translate }}</p>
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Chon dang khung: the nghieng theo con tro. -->
+  <section class="lp-section" id="styles">
+    <header class="lp-head">
+      <span class="lp-eyebrow">{{ 'LANDING.FELT.STYLES_EYEBROW' | translate }}</span>
+      <h2 class="lp-h2"><pm-bounce-text [text]="'LANDING.FELT.STYLES_TITLE' | translate" /></h2>
+      <p class="lp-sub">{{ 'LANDING.FELT.STYLES_SUB' | translate }}</p>
+    </header>
+    <div class="lp-styles">
+      @for (one of frameStyles; track one.file; let i = $index) {
+        <article class="lp-style" pmReveal [pmRevealDelay]="i * 90" pmTilt>
+          <div class="lp-style-photo">
+            <img [src]="'/img/landing/felt/' + one.file + '.webp'" [attr.width]="one.width" [attr.height]="one.height" [alt]="one.altKey | translate" loading="lazy" decoding="async" />
+          </div>
+          <h3>{{ one.nameKey | translate }}</h3>
+          <p>{{ one.textKey | translate }}</p>
+        </article>
+      }
+    </div>
+    <div class="lp-cta-row lp-center lp-styles-cta">
+      <button type="button" class="lp-btn lp-btn-lg" (click)="openOnboarding()">
+        {{ 'LANDING.FELT.CTA' | translate }}
+        <pm-icon name="arrow" [size]="18" />
+      </button>
     </div>
   </section>
 
@@ -95,24 +152,6 @@
           <p>{{ feat.textKey | translate }}</p>
         </article>
       }
-    </div>
-  </section>
-
-  <section class="lp-band" id="how">
-    <div class="lp-section">
-      <header class="lp-head">
-        <span class="lp-eyebrow">{{ 'LANDING.STEPS_EYEBROW' | translate }}</span>
-        <h2 class="lp-h2">{{ 'LANDING.STEPS_TITLE' | translate }}</h2>
-      </header>
-      <ol class="lp-steps">
-        @for (step of steps; track step.number) {
-          <li class="lp-step">
-            <span class="lp-step-num" [attr.data-tone]="step.tone">{{ step.number }}</span>
-            <h3>{{ step.nameKey | translate }}</h3>
-            <p>{{ step.textKey | translate }}</p>
-          </li>
-        }
-      </ol>
     </div>
   </section>
 
@@ -169,6 +208,7 @@
         </nav>
       </div>
       <span class="lp-footer-copy">{{ 'LANDING.FOOTER_COPY' | translate }}</span>
+      <span class="lp-footer-credit">{{ 'LANDING.FELT.CREDIT' | translate }}</span>
     </div>
   </footer>
   </div>
