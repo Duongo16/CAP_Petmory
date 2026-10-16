@@ -173,7 +173,7 @@
               </button>
             </div>
 
-            <a class="tw-btn-secondary tw-btn-block" routerLink="/studio">
+            <a class="tw-btn-secondary tw-btn-block" routerLink="/studio" [queryParams]="studioQuery()">
               <pm-icon name="star" [size]="15" />
               {{ 'PRODUCT.OPEN_STUDIO' | translate }}
             </a>

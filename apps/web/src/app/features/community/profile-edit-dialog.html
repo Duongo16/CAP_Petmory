@@ -1,4 +1,4 @@
-<form class="sheet" [formGroup]="form" novalidate (ngSubmit)="save()">
+<div class="sheet">
   <header class="sheet-head">
     <div>
       <p class="eyebrow">{{ 'COMMUNITY.PROFILE.EDIT_EYEBROW' | translate }}</p>
@@ -10,6 +10,7 @@
   </header>
 
   <div class="sheet-body">
+    <form id="profile-edit-form" [formGroup]="form" novalidate (ngSubmit)="save()">
     <div class="avatar-row">
       <span class="avatar" aria-hidden="true">
         @if (preview() && form.controls.avatarUrl.valid) {
@@ -85,13 +86,41 @@
         }
       </div>
     </div>
+    </form>
+
+    <form class="password-section" [formGroup]="password" novalidate (ngSubmit)="changePassword()">
+      <div>
+        <h3 class="section-title">{{ 'ACCOUNT.PASSWORD' | translate }}</h3>
+        <p class="field-note">{{ 'ACCOUNT.PASSWORD_SUB' | translate }}</p>
+      </div>
+      <div class="password-fields">
+        <div class="field">
+          <label class="field-name" for="profile-current-password">{{ 'ACCOUNT.CURRENT_PASSWORD' | translate }}</label>
+          <input id="profile-current-password" type="password" autocomplete="current-password" formControlName="current" />
+        </div>
+        <div class="field">
+          <label class="field-name" for="profile-new-password">{{ 'ACCOUNT.NEW_PASSWORD' | translate }}</label>
+          <input id="profile-new-password" type="password" autocomplete="new-password" maxlength="72" formControlName="password" />
+        </div>
+        <div class="field">
+          <label class="field-name" for="profile-confirm-password">{{ 'ACCOUNT.CONFIRM_PASSWORD' | translate }}</label>
+          <input id="profile-confirm-password" type="password" autocomplete="new-password" maxlength="72" formControlName="confirm" />
+        </div>
+      </div>
+      @if (passwordNote(); as note) {
+        <p class="field-error" [class.success-note]="!note.bad" [attr.role]="note.bad ? 'alert' : 'status'">{{ note.key | translate }}</p>
+      }
+      <button type="submit" class="strong password-submit" [disabled]="passwordBusy()">
+        {{ 'ACCOUNT.CHANGE_PASSWORD' | translate }}
+      </button>
+    </form>
   </div>
 
   <footer class="sheet-foot">
     <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
-    <button type="submit" class="strong" [disabled]="saving() || uploading()">
+    <button type="submit" form="profile-edit-form" class="strong" [disabled]="saving() || uploading()">
       {{ 'COMMUNITY.PROFILE.SAVE' | translate }}
       <pm-icon name="check" [size]="15" />
     </button>
   </footer>
-</form>
+</div>

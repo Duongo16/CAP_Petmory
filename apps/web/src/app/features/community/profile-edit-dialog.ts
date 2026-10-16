@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -11,6 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { avatarUploadErrorMessage } from '../../core/utils/avatar-upload-error';
 import { looksLikeImage, PICK_MAX_BYTES } from '../../core/utils/upload-image';
 import { normalizeVietnamesePhone, optionalVietnamesePhone } from '../../core/utils/vietnamese-phone';
+import { samePassword } from '../auth/password-match';
 
 /** What the profile hands back once it has been saved. */
 export interface ProfileEditResult {
@@ -30,6 +32,12 @@ interface EditForm {
   fullName: FormControl<string>;
   phone: FormControl<string>;
   avatarUrl: FormControl<string>;
+}
+
+interface PasswordForm {
+  current: FormControl<string>;
+  password: FormControl<string>;
+  confirm: FormControl<string>;
 }
 
 
@@ -56,6 +64,8 @@ export class ProfileEditDialog {
   readonly source = signal<AvatarSource>('DEVICE');
   readonly uploading = signal(false);
   readonly saving = signal(false);
+  readonly passwordBusy = signal(false);
+  readonly passwordNote = signal<{ key: string; bad: boolean } | null>(null);
   readonly problem = signal<Problem | null>(null);
   private readonly persistedAvatarUrl = signal(this.profile.avatarUrl ?? '');
 
@@ -73,6 +83,18 @@ export class ProfileEditDialog {
       validators: [Validators.maxLength(500), Validators.pattern(AVATAR_URL)],
     }),
   });
+
+  readonly password = new FormGroup<PasswordForm>(
+    {
+      current: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+      password: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(8), Validators.maxLength(72)],
+      }),
+      confirm: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    },
+    { validators: samePassword },
+  );
 
   /** The picture as it will look, following both the upload and a typed link. */
   readonly preview = toSignal(this.form.controls.avatarUrl.valueChanges, {
@@ -170,11 +192,45 @@ export class ProfileEditDialog {
       .updateProfile(result)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.ref.close(result),
+        next: () => {
+          this.auth.patchUser({ fullName: result.fullName, avatarUrl: result.avatarUrl || null });
+          this.ref.close(result);
+        },
         error: (trouble: unknown) => {
           this.saving.set(false);
           const message = avatarUploadErrorMessage(trouble);
           this.problem.set(message ? { message } : { key: 'COMMON.GENERIC_ERROR' });
+        },
+      });
+  }
+
+  changePassword(): void {
+    this.password.markAllAsTouched();
+    if (this.password.invalid || this.passwordBusy()) {
+      this.passwordNote.set({
+        key: this.password.hasError('mismatch') ? 'ACCOUNT.PASSWORD_MISMATCH' : 'ACCOUNT.PASSWORD_INVALID',
+        bad: true,
+      });
+      return;
+    }
+    const value = this.password.getRawValue();
+    this.passwordBusy.set(true);
+    this.passwordNote.set(null);
+    this.auth
+      .changePassword(value.current, value.password)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.passwordBusy.set(false);
+          this.password.reset();
+          this.passwordNote.set({ key: 'ACCOUNT.PASSWORD_CHANGED', bad: false });
+        },
+        error: (trouble: HttpErrorResponse) => {
+          this.passwordBusy.set(false);
+          this.passwordNote.set({
+            key: trouble.status === 400 ? 'ACCOUNT.PASSWORD_WRONG' : 'COMMON.GENERIC_ERROR',
+            bad: true,
+          });
         },
       });
   }

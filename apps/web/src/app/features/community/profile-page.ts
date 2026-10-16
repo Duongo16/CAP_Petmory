@@ -11,6 +11,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommunityService } from '../../core/services/community.service';
@@ -21,6 +22,7 @@ import { Icon } from '../../shared/icon/icon';
 import { UserFace } from '../../shared/user-face/user-face';
 import { PetFace } from '../../shared/pet-face/pet-face';
 import { MemoriesService } from '../../core/services/memories.service';
+import { ProfileEditDialog, ProfileEditResult } from './profile-edit-dialog';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -37,6 +39,7 @@ export class CommunityProfilePage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly memories = inject(MemoriesService);
+  private readonly dialog = inject(MatDialog);
 
   readonly id = input.required<string>();
 
@@ -105,6 +108,36 @@ export class CommunityProfilePage implements OnInit {
               : p,
           ),
         error: () => undefined,
+      });
+  }
+
+  openEdit(profile: CommunityProfile): void {
+    this.dialog
+      .open(ProfileEditDialog, {
+        data: profile,
+        width: 'min(760px, 96vw)',
+        maxHeight: '94vh',
+        panelClass: ['pm-dialog', 'pm-dialog-wide'],
+      })
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result?: ProfileEditResult) => {
+        if (!result) {
+          return;
+        }
+        const avatarUrl = result.avatarUrl || null;
+        this.auth.patchUser({ fullName: result.fullName, avatarUrl });
+        this.profile.update((current) =>
+          current
+            ? {
+                ...current,
+                fullName: result.fullName,
+                initial: result.fullName.trim().charAt(0).toUpperCase() || '?',
+                phone: result.phone || null,
+                avatarUrl,
+              }
+            : current,
+        );
       });
   }
 }

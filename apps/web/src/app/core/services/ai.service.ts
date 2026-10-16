@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE } from './api-base';
@@ -44,8 +44,11 @@ export class AiService {
   }
 
   /** Dung san mot mau gan giong be nhat tu anh cua be. */
-  matchFromPhoto(petId: string): Observable<PhotoMatch> {
-    return this.http.post<PhotoMatch>(`${this.base}/design-suggestions/from-photo`, { petId });
+  matchFromPhoto(petId: string, pose?: 'HEAD'): Observable<PhotoMatch> {
+    // Studio đã có spinner cục bộ; không phủ overlay lên toàn bộ trang trong
+    // lúc dịch vụ AI xử lý ảnh.
+    const quiet = { headers: new HttpHeaders({ 'X-Skip-Loading': '1' }) };
+    return this.http.post<PhotoMatch>(`${this.base}/design-suggestions/from-photo`, { petId, pose }, quiet);
   }
 
   /** Chon mot phuong an va nhan ve ban thiet ke de mo sang buoc tuy bien. */

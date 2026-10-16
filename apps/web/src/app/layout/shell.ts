@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
 import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../core/services/auth.service';
@@ -63,10 +63,9 @@ function isQuietChat(root: ActivatedRouteSnapshot): boolean {
   styleUrl: './shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Shell implements OnInit {
+export class Shell {
   private readonly auth = inject(AuthService);
   private readonly cart = inject(CartService);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
   /** Man hinh tran khung, nhu ban len 3D, thi khong hien chan trang. */
@@ -128,12 +127,6 @@ export class Shell implements OnInit {
     { path: '/admin/settings', key: 'NAV.SETTINGS' },
     { path: '/admin/accounts', key: 'NAV.ACCOUNTS' },
   ];
-
-  ngOnInit(): void {
-    if (!this.isInternal()) {
-      this.cart.reload().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({ error: () => undefined });
-    }
-  }
 
   toggleMenu(): void {
     this.menuOpen.update((open) => !open);
