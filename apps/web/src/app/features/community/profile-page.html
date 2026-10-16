@@ -47,6 +47,12 @@
                 }}
               </button>
             }
+            @if (p.mine && user()) {
+              <button type="button" class="pm-chip" (click)="openEdit(p)">
+                <pm-icon name="pencil" [size]="14" />
+                {{ 'COMMUNITY.PROFILE.EDIT' | translate }}
+              </button>
+            }
           </div>
 
           <dl class="stats flex flex-wrap gap-3 mt-5 m-0">
