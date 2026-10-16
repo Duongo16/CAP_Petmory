@@ -18,6 +18,24 @@
     </div>
   </header>
 
+  <!-- Lop nen: anh san pham len choc that, dung yen phia sau; noi dung ben duoi truot len che dan. -->
+  <section class="lp-cover" [attr.aria-label]="'LANDING.COVER_LABEL' | translate">
+    <picture>
+      <source media="(max-aspect-ratio: 4/5)" srcset="/img/landing/cover-tall.webp" />
+      <img class="lp-cover-photo" src="/img/landing/cover-wide.webp" width="2400" height="1350" alt="" fetchpriority="high" />
+    </picture>
+    <div class="lp-cover-text">
+      <span class="lp-cover-eyebrow">{{ 'LANDING.COVER_EYEBROW' | translate }}</span>
+      <p class="lp-cover-title">{{ 'LANDING.COVER_TITLE' | translate }}</p>
+      <p class="lp-cover-sub">{{ 'LANDING.COVER_SUB' | translate }}</p>
+      <a class="lp-cover-go" href="#start" (click)="scrollToStart($event)">
+        {{ 'LANDING.COVER_GO' | translate }}
+        <pm-icon name="chevron" [size]="14" />
+      </a>
+    </div>
+  </section>
+
+  <div class="lp-front" id="start">
   <section class="lp-hero">
     <span class="lp-glow lp-glow-a" aria-hidden="true"></span>
     <span class="lp-glow lp-glow-b" aria-hidden="true"></span>
@@ -153,6 +171,7 @@
       <span class="lp-footer-copy">{{ 'LANDING.FOOTER_COPY' | translate }}</span>
     </div>
   </footer>
+  </div>
 </div>
 
 @if (authPromptOpen()) {
