@@ -20,6 +20,9 @@
 
   // Thu nho ca logo theo ti le thay vi cat mat chu.
   header pm-brand {
+    /* Keep the complete mark and wordmark visible on narrow screens. */
+    inline-size: max-content;
+    overflow: visible;
     --pm-brand-scale: 0.8;
   }
 

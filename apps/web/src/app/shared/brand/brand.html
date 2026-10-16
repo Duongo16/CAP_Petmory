@@ -9,7 +9,7 @@
   @if (!markOnly()) {
     <img
       class="brand-word"
-      src="img/logo-word-clear.png"
+      [src]="referenceWord() ? 'img/logo-word-reference.png' : 'img/logo-word-clear.png'"
       alt="Petmory"
       [attr.width]="wordWidth()"
       [attr.height]="wordPx()"
