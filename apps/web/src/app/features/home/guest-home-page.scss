@@ -2,6 +2,8 @@
   display: block;
   background: var(--pm-bg);
   color: var(--pm-text);
+  // Trang gioi thieu dung tieu de khong chan; cac trang ben trong van giu chu co chan.
+  --pm-font-display: var(--pm-font-rounded);
 }
 
 .lp {
@@ -85,7 +87,7 @@
   box-shadow: var(--pm-shadow-lifted);
 }
 
-.auth-prompt-box h2 { margin: 14px 0 8px; font-family: var(--pm-font-display); }
+.auth-prompt-box h2 { margin: 14px 0 8px; font-family: var(--pm-font-display); font-weight: 800; }
 .auth-prompt-box p { margin: 0; color: var(--pm-text-muted); }
 .auth-prompt-close { position: absolute; top: 12px; right: 12px; border: 0; background: transparent; color: var(--pm-text-muted); cursor: pointer; }
 .auth-prompt-actions { display: flex; justify-content: center; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
@@ -251,12 +253,21 @@
 .lp-title {
   margin: 0;
   font-family: var(--pm-font-display);
-  font-weight: 500;
+  font-weight: 800;
   font-size: clamp(38px, 5vw, 60px);
   line-height: 1.12;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  // Chu khong chan rong hon, chia dong deu de khong rot mot chu le xuong dong cuoi.
+  text-wrap: balance;
 
-  em { color: var(--pm-accent); }
+  // Chu khong chan nghieng gia trong xau, nen ve nhan chi doi mau.
+  // Ve nhan sau <br> khong duoc trinh duyet chia deu cung ca khoi, nen tach thanh khoi rieng de tu chia.
+  em {
+    display: inline-block;
+    font-style: normal;
+    color: var(--pm-accent);
+    text-wrap: balance;
+  }
 }
 
 .lp-lead {
@@ -407,7 +418,8 @@
 .lp-h2 {
   margin: 0;
   font-family: var(--pm-font-display);
-  font-weight: 500;
+  font-weight: 800;
+  text-wrap: balance;
   font-size: clamp(28px, 3.4vw, 40px);
   line-height: 1.2;
 }
@@ -513,7 +525,7 @@
 .lp-step-num {
   font-family: var(--pm-font-display);
   font-size: 40px;
-  font-weight: 600;
+  font-weight: 800;
   line-height: 1;
 
   &[data-tone='accent'] { color: var(--pm-accent); }
@@ -631,7 +643,7 @@
     max-width: 640px;
     margin: 0;
     font-family: var(--pm-font-display);
-    font-weight: 500;
+    font-weight: 800;
     font-size: clamp(28px, 3.6vw, 42px);
     line-height: 1.2;
   }
@@ -706,7 +718,7 @@
   strong {
     font-family: var(--pm-font-display);
     font-size: 22px;
-    font-weight: 600;
+    font-weight: 800;
   }
 
   span {

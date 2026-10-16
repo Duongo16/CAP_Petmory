@@ -7,7 +7,7 @@
   }
   @case ('READY') {
     <div class="workbench">
-      <section class="stage" [attr.aria-label]="'STUDIO.STAGE' | translate">
+      <section class="stage" [class.split]="showHoop()" [attr.aria-label]="'STUDIO.STAGE' | translate">
         <span class="yarn yarn-a" aria-hidden="true"></span>
         <span class="yarn yarn-b" aria-hidden="true"></span>
         <span class="stitch-ring" aria-hidden="true"></span>
@@ -28,7 +28,44 @@
             (zoneDetected)="labelZoneDetected($event)"
             (capturedSixAngles)="onSixAnglesCaptured($event)"
             (painted)="recordPainted($event)"
+            (isReady)="onViewerReady()"
           />
+        }
+
+        @if (showHoop()) {
+          <div class="hoop-wall" [class.open]="hoopOpen()">
+            <pm-hoop-preview class="hoop" [photo]="portrait()" [shape]="frameShape()" [finish]="frameFinish()" />
+
+            <div class="frame-picker">
+              <div class="picker-row" role="radiogroup" [attr.aria-label]="'STUDIO.HOOP.SHAPE_LABEL' | translate">
+                <span class="picker-label" aria-hidden="true">{{ 'STUDIO.HOOP.SHAPE_LABEL' | translate }}</span>
+                @for (one of frameShapes; track one.shape) {
+                  <button type="button" role="radio" class="shape-chip" [class.on]="frameShape() === one.shape"
+                    [attr.aria-checked]="frameShape() === one.shape" (click)="pickFrameShape(one.shape)">
+                    <span class="shape-glyph" [attr.data-shape]="one.shape" aria-hidden="true"></span>
+                    {{ one.key | translate }}
+                  </button>
+                }
+              </div>
+              <div class="picker-row" role="radiogroup" [attr.aria-label]="'STUDIO.HOOP.FINISH_LABEL' | translate">
+                <span class="picker-label" aria-hidden="true">{{ 'STUDIO.HOOP.FINISH_LABEL' | translate }}</span>
+                @for (one of frameFinishes; track one.finish) {
+                  <button type="button" role="radio" class="finish-dot" [class.on]="frameFinish() === one.finish"
+                    [style.--dot]="one.swatch" [attr.aria-checked]="frameFinish() === one.finish"
+                    [attr.aria-label]="one.key | translate" [attr.title]="one.key | translate"
+                    (click)="pickFrameFinish(one.finish)"></button>
+                }
+              </div>
+            </div>
+
+            <button type="button" class="hoop-expand" (click)="hoopOpen.set(!hoopOpen())"
+              [attr.aria-expanded]="hoopOpen()"
+              [attr.aria-label]="(hoopOpen() ? 'STUDIO.HOOP.SHRINK' : 'STUDIO.HOOP.EXPAND') | translate">
+              @if (hoopOpen()) {
+                <pm-icon name="close" [size]="16" />
+              }
+            </button>
+          </div>
         }
 
         <div class="stage-top">
@@ -48,6 +85,14 @@
             [attr.title]="(rotating() ? 'VIEWER.STOP_ROTATE' : 'VIEWER.AUTO_ROTATE') | translate">
             <pm-icon name="sparkle" [size]="18" />
           </button>
+          @if (hoopAvailable()) {
+            <button type="button" class="round-button" [class.on]="hoopShown()" (click)="toggleHoop()"
+              [attr.aria-pressed]="hoopShown()"
+              [attr.aria-label]="(hoopShown() ? 'STUDIO.HOOP.HIDE' : 'STUDIO.HOOP.SHOW') | translate"
+              [attr.title]="(hoopShown() ? 'STUDIO.HOOP.HIDE' : 'STUDIO.HOOP.SHOW') | translate">
+              <pm-icon name="image" [size]="18" />
+            </button>
+          }
           @if (step() === 'COLOR') {
             <button type="button" class="round-button" (click)="undo()"
               [attr.aria-label]="'VIEWER.UNDO' | translate" [attr.title]="'VIEWER.UNDO' | translate">

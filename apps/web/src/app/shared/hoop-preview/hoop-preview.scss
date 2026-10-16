@@ -1,0 +1,196 @@
+:host {
+  display: block;
+  container-type: inline-size;
+  --frame-light: var(--pm-frame-walnut-light);
+  --frame: var(--pm-frame-walnut);
+  --frame-dark: var(--pm-frame-walnut-dark);
+}
+
+:host([data-finish='OAK']) {
+  --frame-light: var(--pm-frame-oak-light);
+  --frame: var(--pm-frame-oak);
+  --frame-dark: var(--pm-frame-oak-dark);
+}
+
+:host([data-finish='WHITE']) {
+  --frame-light: var(--pm-frame-white-light);
+  --frame: var(--pm-frame-white);
+  --frame-dark: var(--pm-frame-white-dark);
+}
+
+:host([data-finish='BLACK']) {
+  --frame-light: var(--pm-frame-black-light);
+  --frame: var(--pm-frame-black);
+  --frame-dark: var(--pm-frame-black-dark);
+}
+
+:host([data-finish='ROSE']) {
+  --frame-light: var(--pm-frame-rose-light);
+  --frame: var(--pm-frame-rose);
+  --frame-dark: var(--pm-frame-rose-dark);
+}
+
+.hoop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pm-space-3);
+  margin: 0;
+  inline-size: 100%;
+}
+
+// Khung treo tren tuong: bong do xuong duoi nhu anh chup that.
+.art {
+  display: block;
+  inline-size: 100%;
+  max-block-size: 52vh;
+  overflow: visible;
+  filter: drop-shadow(0 16px 18px var(--pm-hoop-shadow));
+}
+
+.wood-light {
+  stop-color: var(--frame-light);
+}
+
+.wood {
+  stop-color: var(--frame);
+}
+
+.wood-dark {
+  stop-color: var(--frame-dark);
+}
+
+.brass-light {
+  stop-color: var(--pm-hoop-brass-light);
+}
+
+.brass {
+  stop-color: var(--pm-hoop-brass);
+}
+
+.brass-dark {
+  stop-color: var(--pm-hoop-brass-dark);
+}
+
+.felt-shadow {
+  flood-color: var(--pm-hoop-shadow);
+}
+
+.linen {
+  fill: var(--pm-hoop-linen);
+}
+
+// Bong vai lun o sat vien: net day mo, bi cat trong lo khung nen chi con phia trong.
+.dip {
+  fill: none;
+  stroke: var(--pm-hoop-shadow);
+  stroke-width: 14;
+}
+
+// Vien sang mep ngoai, vien toi mep trong: khung co do day thay vi phang.
+.edge-out {
+  fill: none;
+  stroke: var(--frame-light);
+  stroke-width: 1.5;
+  stroke-opacity: 0.8;
+}
+
+.edge-in {
+  fill: none;
+  stroke: var(--frame-dark);
+  stroke-width: 2;
+}
+
+.mitre {
+  fill: none;
+  stroke: var(--frame-dark);
+  stroke-width: 1;
+  stroke-opacity: 0.55;
+}
+
+.loop {
+  fill: none;
+  stroke-width: 3.5;
+}
+
+.screw {
+  stroke: var(--pm-hoop-brass-dark);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 2 2.5;
+}
+
+.twine {
+  fill: none;
+  stroke: var(--pm-hoop-twine);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.nail {
+  fill: var(--pm-hoop-brass-dark);
+}
+
+.nail-gleam {
+  fill: var(--pm-hoop-brass-light);
+}
+
+// Cho anh: mot vong khau cho tren vai, nhip cham.
+.waiting {
+  fill: none;
+  stroke: var(--pm-hoop-linen-thread);
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: stitch 2.4s linear infinite;
+}
+
+@keyframes stitch {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-inline-size: 30ch;
+  text-align: center;
+}
+
+.caption-title {
+  font-family: var(--pm-font-hand);
+  font-size: var(--pm-text-xl);
+  line-height: 1.2;
+  color: var(--pm-text);
+}
+
+.caption-note {
+  font-size: var(--pm-text-sm);
+  line-height: 1.45;
+  color: var(--pm-text-muted);
+}
+
+// Khung bi thu nho (goc san khau tren dien thoai): bo chu, bong ngan lai.
+@container (max-width: 200px) {
+  .hoop {
+    gap: 0;
+  }
+
+  .caption {
+    display: none;
+  }
+
+  .art {
+    filter: drop-shadow(0 5px 7px var(--pm-hoop-shadow));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waiting {
+    animation: none;
+  }
+}

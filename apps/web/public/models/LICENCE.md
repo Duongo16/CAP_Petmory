@@ -31,6 +31,25 @@ bốn điểm neo phụ kiện (`PM_ANCHOR_HEAD`, `PM_ANCHOR_FACE`, `PM_ANCHOR_N
 | `base-cat-lying.glb` / `-full.glb` | Mèo nằm |
 | `acc-knit-hat.glb`, `acc-bow.glb`, `acc-collar-tag.glb`, `acc-scarf.glb`, `acc-round-glasses.glb`, `acc-cape.glb` | Sáu phụ kiện dùng chung |
 
+## Tám mẫu "chỉ đầu" cho len chọc (tự dựng, CC0 1.0)
+
+Petmory tự dựng bằng `node tools/build-head-models.mjs` (three.js), nên thuộc miền
+công cộng và không cần ghi nguồn. Mỗi mẫu chia năm vùng vật liệu (`PM_FUR_MAIN`,
+`PM_FUR_SECONDARY`, `PM_EARS`, `PM_EYES`, `PM_NOSE`); mèo có thêm `Eyes_Pupil` cho
+đồng tử. Không có đuôi nên không có vùng `PM_TAIL` và điểm neo lưng; có ba điểm neo
+`PM_ANCHOR_HEAD`, `PM_ANCHOR_FACE`, `PM_ANCHOR_NECK`, và hai bản nhẹ / `-full`.
+
+| Tệp | Mẫu |
+|---|---|
+| `head-cat-exotic.glb` / `-full.glb` | Đầu mèo Exotic |
+| `head-cat-british.glb` / `-full.glb` | Đầu mèo Anh lông ngắn |
+| `head-cat-siamese.glb` / `-full.glb` | Đầu mèo Xiêm |
+| `head-cat-tabby.glb` / `-full.glb` | Đầu mèo mướp vàng |
+| `head-dog-shiba.glb` / `-full.glb` | Đầu chó Shiba |
+| `head-dog-corgi.glb` / `-full.glb` | Đầu chó Corgi |
+| `head-dog-pug.glb` / `-full.glb` | Đầu chó Pug |
+| `head-dog-poodle.glb` / `-full.glb` | Đầu chó Poodle |
+
 ## Chó
 
 | Tệp | Mẫu | Tác giả | Giấy phép | Nguồn |

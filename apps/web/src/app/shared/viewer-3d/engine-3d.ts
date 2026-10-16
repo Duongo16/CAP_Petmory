@@ -304,6 +304,83 @@ export class Engine3d {
   }
 
   /**
+   * Chup be nhin thang, nen trong suot, khong de va khong thuoc do.
+   *
+   * Dung cho anh xem truoc thanh pham trong khung theu. Ve vao mot bo dem rieng
+   * bang camera rieng, nen khung nhin nguoi dung dang xoay khong giat va khong
+   * doi goc. Canvas chinh khong co kenh trong suot, vi vay khong doc tu canvas.
+   */
+  capturePortrait(edge = 640): string | null {
+    if (!this.angle) {
+      return null;
+    }
+    const sphere = new THREE.Box3().setFromObject(this.angle).getBoundingSphere(new THREE.Sphere());
+    if (sphere.isEmpty()) {
+      return null;
+    }
+    const halfView = THREE.MathUtils.degToRad(14);
+    const portrait = new THREE.PerspectiveCamera(28, 1, sphere.radius / 50, sphere.radius * 50);
+    portrait.position
+      .copy(sphere.center)
+      // Khoi cau bao rong hon hinh that, keo camera lai gan de be chiem gan het anh.
+      .addScaledVector(new THREE.Vector3(0, 0.06, 1).normalize(), (sphere.radius / Math.sin(halfView)) * 0.86);
+    portrait.lookAt(sphere.center);
+
+    const target = new THREE.WebGLRenderTarget(edge, edge, { samples: 4 });
+    target.texture.colorSpace = THREE.SRGBColorSpace;
+    const background = this.scene.background;
+    const standShown = this.stand.group.visible;
+    const measureShown = this.measureGroup.visible;
+    const clearColor = this.renderer.getClearColor(new THREE.Color());
+    const clearAlpha = this.renderer.getClearAlpha();
+    const pixels = new Uint8Array(edge * edge * 4);
+
+    this.scene.background = null;
+    this.stand.group.visible = false;
+    this.measureGroup.visible = false;
+    try {
+      this.renderer.setRenderTarget(target);
+      this.renderer.setClearColor(0x000000, 0);
+      this.renderer.clear();
+      this.renderer.render(this.scene, portrait);
+      this.renderer.readRenderTargetPixels(target, 0, 0, edge, edge, pixels);
+    } finally {
+      this.renderer.setRenderTarget(null);
+      this.renderer.setClearColor(clearColor, clearAlpha);
+      this.scene.background = background;
+      this.stand.group.visible = standShown;
+      this.measureGroup.visible = measureShown;
+      target.dispose();
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = edge;
+    canvas.height = edge;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      return null;
+    }
+    const image = context.createImageData(edge, edge);
+    const row = edge * 4;
+    for (let y = 0; y < edge; y += 1) {
+      // Bo dem doc tu duoi len, anh thi ve tu tren xuong.
+      const from = (edge - 1 - y) * row;
+      for (let x = 0; x < row; x += 4) {
+        const alpha = pixels[from + x + 3];
+        // Vien khu rang cua mau da nhan san do trong, chia lai de mep khong bi vien toi.
+        const lift = alpha > 0 ? 255 / alpha : 0;
+        const at = y * row + x;
+        image.data[at] = Math.min(255, pixels[from + x] * lift);
+        image.data[at + 1] = Math.min(255, pixels[from + x + 1] * lift);
+        image.data[at + 2] = Math.min(255, pixels[from + x + 2] * lift);
+        image.data[at + 3] = alpha;
+      }
+    }
+    context.putImageData(image, 0, 0);
+    return canvas.toDataURL('image/png');
+  }
+
+  /**
    * Paints at a point on the canvas. Coordinates are ratios from 0 to 1 relative to
    * the canvas size, so they do not depend on screen resolution.
    */

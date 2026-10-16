@@ -500,7 +500,33 @@
     "POSE": {
       "STANDING": "Đứng",
       "SITTING": "Ngồi",
-      "LYING": "Nằm"
+      "LYING": "Nằm",
+      "HEAD": "Chỉ đầu"
+    },
+    "HOOP": {
+      "ALT": "Ảnh minh họa đầu len của bé đính trên vải, đã đóng khung",
+      "TITLE": "Khi lên khung",
+      "NOTE": "Ảnh minh họa từ mẫu bạn đang tô. Len thật có thể đậm nhạt khác một chút.",
+      "PREPARING": "Đang ghim bé lên vải…",
+      "SHOW": "Hiện khung xem trước",
+      "HIDE": "Ẩn khung xem trước",
+      "EXPAND": "Mở to khung xem trước",
+      "SHRINK": "Thu nhỏ khung xem trước",
+      "SHAPE_LABEL": "Kiểu khung",
+      "FINISH_LABEL": "Màu khung",
+      "SHAPE": {
+        "ROUND": "Tròn",
+        "SQUARE": "Vuông",
+        "LANDSCAPE": "Ngang",
+        "PORTRAIT": "Đứng"
+      },
+      "FINISH": {
+        "WALNUT": "Gỗ óc chó",
+        "OAK": "Gỗ sồi sáng",
+        "WHITE": "Trắng",
+        "BLACK": "Đen",
+        "ROSE": "Hồng phấn"
+      }
     },
     "PREVIEW_HINT": "Xoay mô hình rồi bấm chụp để lưu đủ các góc.",
     "ANGLE_COUNT": "Đã chụp {{count}} góc",

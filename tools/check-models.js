@@ -135,10 +135,12 @@ function checkModel(entry, declaredZones, zoneByFile, zoneName) {
    */
   const zoneMap = zoneByFile[entry.file] ?? {};
   const covered = new Set(zones.map((one) => zoneMap[one]).filter(Boolean));
-  const missingZones = zoneName.filter((one) => !covered.has(one));
+  // Mau chi dau khong co duoi, nen khong doi vung TAIL.
+  const wanted = entry.pose === 'HEAD' ? zoneName.filter((one) => one !== 'TAIL') : zoneName;
+  const missingZones = wanted.filter((one) => !covered.has(one));
   const unmapped = zones.filter((one) => !zoneMap[one]);
   if (missingZones.length === 0) {
-    pass(`du ${zoneName.length} vung co ten`);
+    pass(`du ${wanted.length} vung co ten`);
   } else {
     fail(`thieu ${missingZones.length} vung co ten: ${missingZones.join(', ')}`);
   }

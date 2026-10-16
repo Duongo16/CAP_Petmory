@@ -267,6 +267,11 @@ export class Viewer3d {
     }
   }
 
+  /** Anh be nhin thang, nen trong suot, cho phan xem truoc thanh pham. Rong neu chua nap xong. */
+  capturePortrait(): string | null {
+    return this.status() === READY ? (this.engine?.capturePortrait() ?? null) : null;
+  }
+
   keyAngle(angle: StandardAngle): string {
     return `VIEWER.ANGLE.${angle}`;
   }

@@ -71,6 +71,32 @@ html {
   --pm-book-cover: #c4661a;
   --pm-book-edge: rgba(60, 40, 25, 0.18);
 
+  /* Khung theu trong anh xem truoc thanh pham. La vat that nen giu mau o ca che do toi, tru buc tuong phia sau. */
+  --pm-hoop-wall: #ebe2d4;
+  /* Mau khung: moi loai ba sac (sang, chinh, toi) de do khoi. */
+  --pm-frame-walnut-light: #8c5d38;
+  --pm-frame-walnut: #6a4327;
+  --pm-frame-walnut-dark: #3e2615;
+  --pm-frame-oak-light: #e6c89a;
+  --pm-frame-oak: #c9a26b;
+  --pm-frame-oak-dark: #96703f;
+  --pm-frame-white-light: #ffffff;
+  --pm-frame-white: #f1ede6;
+  --pm-frame-white-dark: #cdc5b8;
+  --pm-frame-black-light: #4b4643;
+  --pm-frame-black: #2a2624;
+  --pm-frame-black-dark: #131110;
+  --pm-frame-rose-light: #f6d6d3;
+  --pm-frame-rose: #e3afab;
+  --pm-frame-rose-dark: #b67f7a;
+  --pm-hoop-twine: #a88a5e;
+  --pm-hoop-brass-light: #f0d897;
+  --pm-hoop-brass: #b8913f;
+  --pm-hoop-brass-dark: #6f521c;
+  --pm-hoop-linen: #f4eee3;
+  --pm-hoop-linen-thread: #d9cbb4;
+  --pm-hoop-shadow: rgba(60, 40, 22, 0.32);
+
   /* Chu va vien */
   --pm-text: #2c1d10;
   --pm-text-body: #4a3726;
@@ -140,6 +166,8 @@ html {
    */
   --pm-font-hand: 'Patrick Hand', 'Quicksand', 'Be Vietnam Pro', cursive;
   --pm-font-display: 'Noto Serif', Georgia, serif;
+  /* Chu khong chan, dau net bo tron, cho tieu de trang gioi thieu. */
+  --pm-font-rounded: 'Nunito', 'Be Vietnam Pro', 'Segoe UI', sans-serif;
   --pm-shadow: 0 1px 2px rgba(74, 48, 24, 0.06), 0 10px 28px rgba(74, 48, 24, 0.08);
   --pm-shadow-lifted: 0 2px 4px rgba(74, 48, 24, 0.07), 0 18px 40px rgba(74, 48, 24, 0.14);
   --pm-accent-glow: 0 10px 24px rgba(168, 80, 12, 0.28);
@@ -223,6 +251,8 @@ html {
   --pm-paper-petal: rgba(186, 138, 102, 0.38);
   --pm-book-cover: #96491a;
   --pm-book-edge: rgba(0, 0, 0, 0.4);
+  --pm-hoop-wall: #2f251b;
+  --pm-hoop-shadow: rgba(0, 0, 0, 0.55);
 
   --pm-text: #f4e8da;
   --pm-text-body: #ddcdb8;

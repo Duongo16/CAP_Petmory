@@ -500,7 +500,33 @@
     "POSE": {
       "STANDING": "Standing",
       "SITTING": "Sitting",
-      "LYING": "Lying"
+      "LYING": "Lying",
+      "HEAD": "Head only"
+    },
+    "HOOP": {
+      "ALT": "Illustration of your pet's felted head on linen, framed",
+      "TITLE": "Once framed",
+      "NOTE": "Drawn from the model you are colouring. Real wool may look slightly lighter or darker.",
+      "PREPARING": "Pinning your pet onto the linen…",
+      "SHOW": "Show frame preview",
+      "HIDE": "Hide frame preview",
+      "EXPAND": "Enlarge frame preview",
+      "SHRINK": "Shrink frame preview",
+      "SHAPE_LABEL": "Frame shape",
+      "FINISH_LABEL": "Frame colour",
+      "SHAPE": {
+        "ROUND": "Round",
+        "SQUARE": "Square",
+        "LANDSCAPE": "Landscape",
+        "PORTRAIT": "Portrait"
+      },
+      "FINISH": {
+        "WALNUT": "Walnut",
+        "OAK": "Light oak",
+        "WHITE": "White",
+        "BLACK": "Black",
+        "ROSE": "Blush pink"
+      }
     },
     "PREVIEW_HINT": "Turn the model, then press capture to keep every angle.",
     "ANGLE_COUNT": "{{count}} angles captured",

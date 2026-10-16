@@ -12,6 +12,7 @@ import { User, UserDocument } from '../modules/users/schemas/user.schema';
 import { BusinessConfig, BusinessConfigDocument } from '../modules/business-config/schemas/business-config.schema';
 import { Role } from '../common/constants/roles';
 import { DISPLAY_BASE_LIST, LIST_COLOR, PACKAGING_LIST, PRODUCT_LIST } from './seed-data';
+import { useWorkingDns } from '../config/dns';
 
 const log = new Logger('Seed');
 
@@ -158,7 +159,8 @@ async function loadConfig(model: Model<BusinessConfigDocument>): Promise<void> {
 }
 
 async function run(): Promise<void> {
-  const app = await NestFactory.createApplicationContext(AppModule, { logger: ['log', 'warn', 'error'] });
+  useWorkingDns();
+  const app =await NestFactory.createApplicationContext(AppModule, { logger: ['log', 'warn', 'error'] });
   try {
     await loadColor(app.get<Model<ColorCodeDocument>>(getModelToken(ColorCode.name)));
     await loadDisplayBase(app.get<Model<DisplayBaseDocument>>(getModelToken(DisplayBase.name)));

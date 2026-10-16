@@ -1,0 +1,124 @@
+@let f = frame();
+<figure class="hoop">
+  <svg class="art" [attr.viewBox]="f.viewBox" role="img" [attr.aria-label]="'STUDIO.HOOP.ALT' | translate">
+    <defs>
+      <linearGradient [attr.id]="id + '-wood'" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" class="wood-light" />
+        <stop offset="0.5" class="wood" />
+        <stop offset="1" class="wood-dark" />
+      </linearGradient>
+      <linearGradient [attr.id]="id + '-brass'" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" class="brass-dark" />
+        <stop offset="0.45" class="brass-light" />
+        <stop offset="1" class="brass" />
+      </linearGradient>
+      <clipPath [attr.id]="id + '-cloth'">
+        <path [attr.d]="f.opening" />
+      </clipPath>
+
+      <!-- Van go: soi nhieu keo dai, nhan len mau go thanh vet sam. Vung loc phu ca khung ve de vien khong bi cat. -->
+      <filter [attr.id]="id + '-grain'" filterUnits="userSpaceOnUse" x="0" y="0" [attr.width]="f.width" [attr.height]="f.height">
+        <feTurbulence type="fractalNoise" baseFrequency="0.016 0.3" numOctaves="3" seed="4" result="noise" />
+        <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.9 0 0 0 0.55" result="streak" />
+        <feComposite in="streak" in2="SourceGraphic" operator="in" result="inside" />
+        <feBlend in="SourceGraphic" in2="inside" mode="multiply" />
+      </filter>
+
+      <!-- Vai lanh: hai lop soi ngang doc dan vao nhau. -->
+      <filter [attr.id]="id + '-linen'" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="1.1 0.035" numOctaves="2" seed="2" result="weft" />
+        <feTurbulence type="fractalNoise" baseFrequency="0.035 1.1" numOctaves="2" seed="7" result="warp" />
+        <feBlend in="weft" in2="warp" mode="multiply" result="weave" />
+        <feColorMatrix in="weave" type="matrix" values="0 0 0 0 0.42  0 0 0 0 0.33  0 0 0 0 0.22  -1.25 0 0 0 0.78" />
+      </filter>
+
+      <!-- Vai lun xuong sat vien nen toi hon o mep. -->
+      <filter [attr.id]="id + '-dip'" filterUnits="userSpaceOnUse" x="0" y="0" [attr.width]="f.width" [attr.height]="f.height">
+        <feGaussianBlur stdDeviation="6" />
+      </filter>
+
+      <!-- Len chọc: mep xo, mat lam tam soi mem, xo len lo tho quanh vien, bong do nhe tren vai. -->
+      <filter [attr.id]="id + '-felt'" x="-14%" y="-14%" width="128%" height="128%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="2" seed="3" result="wobble" />
+        <feDisplacementMap in="SourceGraphic" in2="wobble" scale="6" xChannelSelector="R" yChannelSelector="G" result="fuzzy" />
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="9" result="fibre" />
+        <feColorMatrix in="fibre" type="saturate" values="0" result="fibreGrey" />
+        <feComposite in="fuzzy" in2="fibreGrey" operator="arithmetic" k1="0.32" k2="0.86" k3="0" k4="0" result="tufted" />
+        <feGaussianBlur in="tufted" stdDeviation="0.45" result="soft" />
+        <feComposite in="soft" in2="fuzzy" operator="in" result="wool" />
+        <feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="1" seed="12" result="hair" />
+        <feDisplacementMap in="SourceGraphic" in2="hair" scale="15" xChannelSelector="G" yChannelSelector="R" result="loose" />
+        <feComponentTransfer in="loose" result="halo">
+          <feFuncA type="linear" slope="0.38" />
+        </feComponentTransfer>
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3.2" result="blur" />
+        <feOffset in="blur" dx="0" dy="3.5" result="drop" />
+        <feFlood class="felt-shadow" result="tint" />
+        <feComposite in="tint" in2="drop" operator="in" result="shadow" />
+        <feMerge>
+          <feMergeNode in="shadow" />
+          <feMergeNode in="halo" />
+          <feMergeNode in="wool" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    @if (f.round) {
+      <!-- Vong theu: khoa vit dong ngoi ngay dinh vong, moc treo phia tren. -->
+      <ellipse class="loop" [attr.cx]="f.centerX" [attr.cy]="f.top - 38" rx="9" ry="11" [attr.stroke]="url('brass')" />
+      <rect [attr.x]="f.centerX - 6" [attr.y]="f.top - 28" width="12" height="18" rx="3" [attr.fill]="url('brass')" />
+    } @else {
+      <!-- Khung tranh: day gai buoc sau khung, vat len mot chiec dinh. -->
+      <polyline class="twine" [attr.points]="f.twine" />
+      <circle class="nail" [attr.cx]="f.centerX" [attr.cy]="f.top - 43" r="4.5" />
+      <circle class="nail-gleam" [attr.cx]="f.centerX - 1.2" [attr.cy]="f.top - 44.2" r="1.4" />
+    }
+
+    <!-- Vai lanh cang trong khung. -->
+    <g [attr.clip-path]="url('cloth')">
+      <rect class="linen" [attr.x]="f.cloth.x" [attr.y]="f.cloth.y" [attr.width]="f.cloth.width" [attr.height]="f.cloth.height" />
+      <rect [attr.x]="f.cloth.x" [attr.y]="f.cloth.y" [attr.width]="f.cloth.width" [attr.height]="f.cloth.height" [attr.filter]="url('linen')" />
+      <path class="dip" [attr.d]="f.opening" [attr.filter]="url('dip')" />
+    </g>
+
+    @if (photo(); as src) {
+      <image
+        class="wool"
+        [attr.href]="src"
+        [attr.x]="f.pet.x"
+        [attr.y]="f.pet.y"
+        [attr.width]="f.pet.width"
+        [attr.height]="f.pet.height"
+        preserveAspectRatio="xMidYMid meet"
+        [attr.filter]="url('felt')"
+      />
+    } @else {
+      <circle
+        class="waiting"
+        [attr.cx]="f.pet.x + f.pet.width / 2"
+        [attr.cy]="f.pet.y + f.pet.height / 2"
+        [attr.r]="f.pet.width * 0.3"
+      />
+    }
+
+    <!-- Vien khung: mot dai lien, to kin. -->
+    <path class="band" fill-rule="evenodd" [attr.d]="f.band" [attr.fill]="url('wood')" [attr.filter]="grained() ? url('grain') : null" />
+    @if (f.mitres) {
+      <path class="mitre" [attr.d]="f.mitres" />
+    }
+    <path class="edge-in" [attr.d]="f.opening" />
+    <path class="edge-out" [attr.d]="f.outline" />
+
+    @if (f.round) {
+      <rect [attr.x]="f.centerX - 17" [attr.y]="f.top - 12" width="34" height="24" rx="6" [attr.fill]="url('brass')" />
+      <line class="screw" [attr.x1]="f.centerX - 12" [attr.y1]="f.top" [attr.x2]="f.centerX + 12" [attr.y2]="f.top" />
+    }
+  </svg>
+
+  <figcaption class="caption">
+    <span class="caption-title">{{ 'STUDIO.HOOP.TITLE' | translate }}</span>
+    <span class="caption-note">
+      {{ (photo() ? 'STUDIO.HOOP.NOTE' : 'STUDIO.HOOP.PREPARING') | translate }}
+    </span>
+  </figcaption>
+</figure>

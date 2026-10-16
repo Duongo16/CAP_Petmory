@@ -4,8 +4,10 @@ import {
   DestroyRef,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -17,6 +19,7 @@ import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Icon } from '../../shared/icon/icon';
 import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
+import { FRAME_FINISHES, FRAME_SHAPES, FrameFinish, FrameShape, HoopPreview } from '../../shared/hoop-preview/hoop-preview';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { StudioFacade } from './studio-facade';
 import { ANCHOR_NODE, AccessoryMount, StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
@@ -82,7 +85,29 @@ const KEY_POSE: Record<string, string> = {
   SITTING: 'STUDIO.POSE.SITTING',
   STANDING: 'STUDIO.POSE.STANDING',
   LYING: 'STUDIO.POSE.LYING',
+  HEAD: 'STUDIO.POSE.HEAD',
 };
+
+/**
+ * Doc mot lua chon xem truoc da luu tren may nay, chi nhan gia tri nam trong danh sach.
+ * Bo nho trinh duyet co the bi chan (che do an danh), khi do dung mac dinh.
+ */
+function readPreference<T extends string>(name: string, allowed: readonly T[]): T | null {
+  try {
+    const value = localStorage.getItem(`pm-studio-${name}`);
+    return allowed.includes(value as T) ? (value as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writePreference(name: string, value: string): void {
+  try {
+    localStorage.setItem(`pm-studio-${name}`, value);
+  } catch {
+    // Khong luu duoc thi lan sau dung lai mac dinh, khong anh huong gi khac.
+  }
+}
 
 const KEY_ANCHOR: Record<AccessoryAnchor, string> = {
   HEAD: 'STUDIO.ACC.ANCHOR.HEAD',
@@ -114,7 +139,7 @@ import { PetPhotos } from '../memories/pet-photos/pet-photos';
 @Component({
   selector: 'pm-studio-page',
   standalone: true,
-  imports: [Icon, Viewer3d, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe, PetPhotos, DateInput],
+  imports: [Icon, Viewer3d, HoopPreview, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe, PetPhotos, DateInput],
   providers: [StudioFacade],
   templateUrl: './studio-page.html',
   styleUrl: './studio-page.scss',
@@ -128,6 +153,40 @@ export class StudioPage implements OnInit {
   readonly facade = inject(StudioFacade);
 
   private readonly viewer = viewChild(Viewer3d);
+
+  /** Anh be nhin thang, nen trong suot, dat vao khung theu xem truoc thanh pham. */
+  readonly portrait = signal<string | null>(null);
+  private portraitTimers: ReturnType<typeof setTimeout>[] = [];
+
+  /** Mau "chi dau" la san pham dinh len vai dong khung, nen moi co phan xem truoc khung. */
+  readonly hoopAvailable = computed(() => this.baseModelSelected()?.pose === 'HEAD');
+  /** Nguoi dung tu an hoac hien khung xem truoc; nho lai cho lan sau tren may nay. */
+  readonly hoopShown = signal(readPreference('hoop-shown', ['1', '0']) !== '0');
+  readonly showHoop = computed(() => this.hoopAvailable() && this.hoopShown());
+  /** Tren man hep khung thu nho o goc; cham vao thi mo to kem bo chon khung. */
+  readonly hoopOpen = signal(false);
+  readonly frameShape = signal<FrameShape>(readPreference('frame-shape', FRAME_SHAPES) ?? 'ROUND');
+  readonly frameFinish = signal<FrameFinish>(readPreference('frame-finish', FRAME_FINISHES) ?? 'WALNUT');
+  readonly frameShapes = FRAME_SHAPES.map((shape) => ({ shape, key: `STUDIO.HOOP.SHAPE.${shape}` }));
+  readonly frameFinishes = FRAME_FINISHES.map((finish) => ({
+    finish,
+    key: `STUDIO.HOOP.FINISH.${finish}`,
+    swatch: `var(--pm-frame-${finish.toLowerCase()})`,
+  }));
+
+  /** Doi phu kien hay mau theo vung thi chup lai; tep phu kien nap cham nen chup them mot lan sau. */
+  protected readonly hoopOnChange = effect(() => {
+    this.accessoryMounts();
+    this.colorByZone();
+    this.showHoop();
+    untracked(() => this.schedulePortrait([400, 1500]));
+  });
+
+  private readonly stopPortraitTimers = this.destroyRef.onDestroy(() => {
+    for (const timer of this.portraitTimers) {
+      clearTimeout(timer);
+    }
+  });
 
   /** Cac ma mau nguoi dung da tha len mau, theo thu tu da dung. */
   private readonly colorCodesUsed = signal<string[]>([]);
@@ -522,6 +581,7 @@ export class StudioPage implements OnInit {
     this.colorCodesUsed.update((ds) => (ds.includes(code) ? ds : [...ds, code]));
     // Mau da doi thi bo anh cu, lan sang ngan hoan tat se chup lai.
     this.preview.set([]);
+    this.schedulePortrait();
   }
 
   pickPaintColor(color: ColorCode): void {
@@ -555,6 +615,49 @@ export class StudioPage implements OnInit {
 
   undo(): void {
     this.viewer()?.undo();
+    this.schedulePortrait();
+  }
+
+  toggleHoop(): void {
+    const shown = !this.hoopShown();
+    this.hoopShown.set(shown);
+    this.hoopOpen.set(false);
+    writePreference('hoop-shown', shown ? '1' : '0');
+  }
+
+  pickFrameShape(shape: FrameShape): void {
+    this.frameShape.set(shape);
+    writePreference('frame-shape', shape);
+  }
+
+  pickFrameFinish(finish: FrameFinish): void {
+    this.frameFinish.set(finish);
+    writePreference('frame-finish', finish);
+  }
+
+  /** Mau vua nap xong (ca mau da to cua ban nhap), chup anh cho khung theu. */
+  onViewerReady(): void {
+    this.portrait.set(null);
+    this.schedulePortrait([150]);
+  }
+
+  /**
+   * Hen chup lai anh cho khung theu.
+   *
+   * Keo co to thi moi cham ban mot lan, nen gom lai: lan hen sau xoa lan truoc,
+   * chi chup khi tay da dung. Khong phai mau dau thi khong chup.
+   */
+  private schedulePortrait(delays = [350]): void {
+    for (const timer of this.portraitTimers) {
+      clearTimeout(timer);
+    }
+    this.portraitTimers = delays.map((delay) =>
+      setTimeout(() => {
+        if (this.showHoop()) {
+          this.portrait.set(this.viewer()?.capturePortrait() ?? null);
+        }
+      }, delay),
+    );
   }
 
   capture(): void {

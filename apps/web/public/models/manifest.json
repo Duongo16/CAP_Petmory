@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "description": "Declares the base models and their material zones. The viewer reads the zones straight from the model file; this file only attaches a display label and the colour group each zone may use.",
   "zoneMaterial": [
     {
@@ -399,6 +399,126 @@
         "licence": "CC0 1.0",
         "source": "https://kenney.nl/assets/cube-pets"
       }
+    },
+    {
+      "code": "HEAD-CAT-EXOTIC",
+      "name": "Đầu mèo Exotic",
+      "kind": "CAT",
+      "pose": "HEAD",
+      "file": "head-cat-exotic.glb",
+      "fileFull": "head-cat-exotic-full.glb",
+      "ready": true,
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK"
+      ]
+    },
+    {
+      "code": "HEAD-CAT-BRITISH",
+      "name": "Đầu mèo Anh lông ngắn",
+      "kind": "CAT",
+      "pose": "HEAD",
+      "file": "head-cat-british.glb",
+      "fileFull": "head-cat-british-full.glb",
+      "ready": true,
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK"
+      ]
+    },
+    {
+      "code": "HEAD-CAT-SIAMESE",
+      "name": "Đầu mèo Xiêm",
+      "kind": "CAT",
+      "pose": "HEAD",
+      "file": "head-cat-siamese.glb",
+      "fileFull": "head-cat-siamese-full.glb",
+      "ready": true,
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK"
+      ]
+    },
+    {
+      "code": "HEAD-CAT-TABBY",
+      "name": "Đầu mèo mướp vàng",
+      "kind": "CAT",
+      "pose": "HEAD",
+      "file": "head-cat-tabby.glb",
+      "fileFull": "head-cat-tabby-full.glb",
+      "ready": true,
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK"
+      ]
+    },
+    {
+      "code": "HEAD-DOG-SHIBA",
+      "name": "Đầu chó Shiba",
+      "kind": "DOG",
+      "pose": "HEAD",
+      "file": "head-dog-shiba.glb",
+      "fileFull": "head-dog-shiba-full.glb",
+      "ready": true,
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK"
+      ]
+    },
+    {
+      "code": "HEAD-DOG-CORGI",
+      "name": "Đầu chó Corgi",
+      "kind": "DOG",
+      "pose": "HEAD",
+      "file": "head-dog-corgi.glb",
+      "fileFull": "head-dog-corgi-full.glb",
+      "ready": true,
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK"
+      ]
+    },
+    {
+      "code": "HEAD-DOG-PUG",
+      "name": "Đầu chó Pug",
+      "kind": "DOG",
+      "pose": "HEAD",
+      "file": "head-dog-pug.glb",
+      "fileFull": "head-dog-pug-full.glb",
+      "ready": true,
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK"
+      ]
+    },
+    {
+      "code": "HEAD-DOG-POODLE",
+      "name": "Đầu chó Poodle",
+      "kind": "DOG",
+      "pose": "HEAD",
+      "file": "head-dog-poodle.glb",
+      "fileFull": "head-dog-poodle-full.glb",
+      "ready": true,
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK"
+      ]
     }
   ],
   "source": {
@@ -527,6 +647,134 @@
       "PM_TAIL": "TAIL",
       "PM_EYES": "EYE",
       "PM_NOSE": "NOSE"
+    },
+    "head-cat-exotic.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-cat-exotic-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-cat-british.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-cat-british-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-cat-siamese.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-cat-siamese-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-cat-tabby.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-cat-tabby-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-dog-shiba.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-dog-shiba-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-dog-corgi.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-dog-corgi-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-dog-pug.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-dog-pug-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-dog-poodle.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
+    },
+    "head-dog-poodle-full.glb": {
+      "PM_FUR_MAIN": "MAIN_FUR",
+      "PM_FUR_SECONDARY": "BELLY_FUR",
+      "PM_EARS": "EAR",
+      "PM_EYES": "EYE",
+      "Eyes_Pupil": "EYE",
+      "PM_NOSE": "NOSE"
     }
   },
   "retired": {
@@ -541,5 +789,6 @@
     "TEMP-FOX": "Q-FOX",
     "TEMP-DOG": "DOG-GOLDEN"
   },
-  "coreNote": "Bon mau co core la thu vien mau nen theo muc 6: du sau vung vat lieu, co diem neo phu kien, co ban nhe (file) va ban day du cho xuong (fileFull)."
+  "coreNote": "Bon mau co core la thu vien mau nen theo muc 6: du sau vung vat lieu, co diem neo phu kien, co ban nhe (file) va ban day du cho xuong (fileFull).",
+  "headNote": "Mau co pose HEAD chi co phan dau cho san pham len chọc: khong co vung duoi va diem neo lung, nen khong thuoc nhom core. Dung bang node tools/build-head-models.mjs, giay phep CC0."
 }
