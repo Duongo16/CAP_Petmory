@@ -694,3 +694,56 @@ h1.pm-page-title,
   }
 }
 
+
+/*
+ * Nen tang responsive dung chung cho moi trang.
+ *
+ * - Chu tieu de tu chia dong deu, tu ngat chu dai (ten, ma) thay vi tran ra ngoai.
+ * - Tren man hep: le trang hep lai, nut cho phep xuong dong va gon lai, khong tran.
+ * - Dien thoai xoay ngang khong tu phong to chu.
+ */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+p,
+li,
+dd,
+td {
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 600px) {
+  .tw-page {
+    padding-inline: 1rem;
+    padding-block-start: 1.25rem;
+  }
+
+  .tw-btn-primary,
+  .tw-btn-secondary,
+  .tw-btn-ghost,
+  .tw-btn-danger {
+    max-inline-size: 100%;
+    padding-block: 0.5rem;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+  }
+
+  .tw-btn-lg {
+    padding-inline: 1.25rem;
+    font-size: 0.9375rem;
+  }
+
+  .tw-card-pad {
+    padding: 1rem;
+  }
+}

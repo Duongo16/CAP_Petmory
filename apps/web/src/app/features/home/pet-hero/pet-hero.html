@@ -1,0 +1,23 @@
+<div class="scene">
+  <!-- Lop sau: anh cac be thay nhau hien len, mo va nhat. -->
+  <div class="ambient">
+    @for (one of ambient; track one.src) {
+      <img class="ambient-shot" [src]="one.src" [style.--i]="one.index" alt="" width="900" height="900" decoding="async" />
+    }
+  </div>
+
+  <!-- Hai tam anh dan bang keo giay. -->
+  <figure class="snap snap-cat">
+    <span class="tape" aria-hidden="true"></span>
+    <img src="/img/landing/photo-cat.webp" alt="" width="560" height="560" decoding="async" />
+  </figure>
+  <figure class="snap snap-beach">
+    <span class="tape" aria-hidden="true"></span>
+    <img src="/img/landing/photo-beach.webp" alt="" width="560" height="560" decoding="async" />
+  </figure>
+
+  <!-- Lop truoc: cun ngoi sau cuon so, meo con ngoi truoc goc so. -->
+  <img class="pet pet-dog" src="/img/landing/dog.webp" alt="" width="486" height="820" decoding="async" />
+  <img class="book" src="/img/landing/book.webp" alt="" width="1000" height="599" fetchpriority="high" />
+  <img class="pet pet-cat" src="/img/landing/cat.webp" alt="" width="560" height="620" decoding="async" />
+</div>

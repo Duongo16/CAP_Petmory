@@ -52,3 +52,11 @@
     background: var(--pm-bg-muted);
   }
 }
+
+// O moi viet bai bo tron: chu nam tren mot dong, dai qua thi cat bang dau ba cham.
+.composer-prompt {
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

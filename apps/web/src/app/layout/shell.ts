@@ -19,13 +19,28 @@ interface MenuItem {
 import { Brand } from '../shared/brand/brand';
 import { UserFace } from '../shared/user-face/user-face';
 
-/** Doc co danh dau man hinh tran khung o tuyen sau nhat dang mo. */
-function isImmersive(root: ActivatedRouteSnapshot): boolean {
+/** Tuyen sau nhat dang mo. */
+function deepest(root: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
   let route = root;
   while (route.firstChild) {
     route = route.firstChild;
   }
-  return route.data['immersive'] === true;
+  return route;
+}
+
+/** Doc co danh dau man hinh tran khung o tuyen sau nhat dang mo. */
+function isImmersive(root: ActivatedRouteSnapshot): boolean {
+  return deepest(root).data['immersive'] === true;
+}
+
+/**
+ * Man co nut hanh dong chinh sat day man hinh (gio hang, thanh toan, ban len 3D).
+ * Tren dien thoai nut tro ly se an o cac man nay de khong che nut do.
+ */
+const QUIET_CHAT_PATHS = ['cart', 'checkout', 'studio'];
+
+function isQuietChat(root: ActivatedRouteSnapshot): boolean {
+  return QUIET_CHAT_PATHS.includes(deepest(root).routeConfig?.path ?? '');
 }
 
 @Component({
@@ -61,6 +76,15 @@ export class Shell implements OnInit {
       map(() => isImmersive(this.router.routerState.snapshot.root)),
     ),
     { initialValue: isImmersive(this.router.routerState.snapshot.root) },
+  );
+
+  /** Man co nut chinh o day man hinh: an nut tro ly tren dien thoai. */
+  readonly quietChat = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map(() => isQuietChat(this.router.routerState.snapshot.root)),
+    ),
+    { initialValue: isQuietChat(this.router.routerState.snapshot.root) },
   );
 
   readonly user = this.auth.user;

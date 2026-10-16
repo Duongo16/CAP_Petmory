@@ -52,8 +52,9 @@ async function signIn(page, who) {
   await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await page.fill('#login-email', who.email);
   await page.fill('#login-password', who.password);
-  await page.click('.submit');
-  await page.waitForURL('**/home', { timeout: 40000 });
+  await page.click('.ap-submit');
+  // Khach vao /home, nhan vien vao /admin: chi can roi khoi trang dang nhap.
+  await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 40000 });
 }
 
 /**

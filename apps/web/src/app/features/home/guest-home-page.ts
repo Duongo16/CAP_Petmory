@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Icon } from '../../shared/icon/icon';
-import { PetArt } from '../../shared/pet-art/pet-art';
 import { PetStarter } from './pet-starter/pet-starter';
 
 /** A card in the features grid, with its keys written out in full. */
@@ -20,7 +19,7 @@ interface Step {
   nameKey: string;
   textKey: string;
 }
-import { DiaryScene } from '../../shared/diary-scene/diary-scene';
+import { PetHero } from './pet-hero/pet-hero';
 import { Brand } from '../../shared/brand/brand';
 
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
@@ -29,7 +28,7 @@ import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 @Component({
   selector: 'pm-guest-home-page',
   standalone: true,
-  imports: [Brand, DiaryScene, RouterLink, TranslatePipe, Icon, PetArt, PetStarter, LanguageToggle, ThemeToggle],
+  imports: [Brand, PetHero, RouterLink, TranslatePipe, Icon, PetStarter, LanguageToggle, ThemeToggle],
   templateUrl: './guest-home-page.html',
   styleUrl: './guest-home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

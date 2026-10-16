@@ -7,7 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { Icon } from '../../shared/icon/icon';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { Brand } from '../../shared/brand/brand';
-import { DiaryScene } from '../../shared/diary-scene/diary-scene';
+import { AuthPhotos } from './auth-photos/auth-photos';
 
 /**
  * Quen mat khau: nhap email de nhan thu dat lai.
@@ -18,7 +18,7 @@ import { DiaryScene } from '../../shared/diary-scene/diary-scene';
 @Component({
   selector: 'pm-forgot-password',
   standalone: true,
-  imports: [LanguageToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
+  imports: [LanguageToggle, Brand, AuthPhotos, ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
   templateUrl: './forgot-password.html',
   styleUrls: ['./auth-shared.scss', './login.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

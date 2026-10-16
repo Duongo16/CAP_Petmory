@@ -624,10 +624,14 @@
 
 /* ---------- Dien thoai: khung chiem tron man hinh ---------- */
 
-@media (max-width: 600px) {
+/*
+ * Tu 900px tro xuong co thanh dieu huong noi o day (bottom-nav), nen nut tro ly
+ * thu gon thanh nut tron va dung ngay tren thanh do. Moc nay phai trung voi bottom-nav.
+ */
+@media (max-width: 900px) {
   :host {
     right: 14px;
-    bottom: calc(84px + env(safe-area-inset-bottom));
+    bottom: calc(88px + env(safe-area-inset-bottom));
   }
 
   .launcher-text {
@@ -635,9 +639,19 @@
   }
 
   .launcher {
-    width: 56px;
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
     padding: 0;
   }
+
+  // Man co nut chinh sat day (gio hang, thanh toan, ban len 3D): an han nut tro ly.
+  :host(.quiet-on-phone) {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
 
   .panel {
     position: fixed;
@@ -651,6 +665,7 @@
   .launcher.open {
     display: none;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -48,3 +48,22 @@
     display: block;
   }
 }
+
+/*
+ * Man rat hep (duoi 400px): nam muc chia deu be ngang, nhan giu tren mot dong
+ * va nho lai mot chut thay vi gay doi "Trang / chu".
+ */
+@media (max-width: 400px) {
+  .bar {
+    inset-inline: 8px;
+    padding: 4px;
+  }
+
+  .stop {
+    flex: 1 1 0;
+    min-inline-size: 0;
+    padding: 6px 2px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+}

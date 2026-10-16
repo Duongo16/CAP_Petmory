@@ -1,0 +1,82 @@
+:host {
+  display: block;
+  inline-size: min(420px, 100%);
+}
+
+// Ba tam anh xoe quat: hai tam nghieng hai ben, tam giua noi len tren.
+.stack {
+  position: relative;
+  // Moi tam anh deu dat tuyet doi, nen khung phai tu giu be rong.
+  inline-size: 100%;
+  aspect-ratio: 7 / 5;
+  max-inline-size: 100%;
+}
+
+.snap {
+  position: absolute;
+  inline-size: 46%;
+  margin: 0;
+  padding: 8px 8px 30px;
+  background: var(--pm-paper-cream);
+  border-radius: 3px;
+  box-shadow: var(--pm-shadow-lifted);
+
+  img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+}
+
+.snap-left {
+  inset-block-start: 10%;
+  inset-inline-start: 2%;
+  rotate: -9deg;
+  animation: float 7s ease-in-out infinite;
+}
+
+.snap-right {
+  inset-block-start: 6%;
+  inset-inline-end: 2%;
+  rotate: 8deg;
+  animation: float 8s ease-in-out infinite 1.2s;
+}
+
+.snap-center {
+  z-index: 1;
+  inset-block-start: 18%;
+  inset-inline-start: 27%;
+  inline-size: 48%;
+  rotate: -1.5deg;
+  animation: float 6s ease-in-out infinite 0.6s;
+}
+
+.tape {
+  position: absolute;
+  inset-block-start: -10px;
+  inset-inline-start: 50%;
+  inline-size: 34%;
+  block-size: 20px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: var(--pm-tape);
+
+}
+
+@keyframes float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snap {
+    animation: none;
+  }
+}

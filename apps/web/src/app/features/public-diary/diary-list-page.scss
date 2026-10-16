@@ -12,6 +12,18 @@
   color: var(--pm-text);
 }
 
+// Xep cot: link quay lai, nhan, tieu de moi thu mot dong, khong dinh vao nhau.
+.wall-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+
+  .tw-back {
+    margin-bottom: 6px;
+  }
+}
+
 .wall-head h1 {
   margin: 0;
 }

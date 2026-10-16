@@ -92,9 +92,9 @@ async function signIn(page, who) {
   await page.goto(`${WEB}/login`, { waitUntil: 'networkidle' });
   await page.fill('#login-email', who.email);
   await page.fill('#login-password', who.password);
-  await page.click('.submit');
+  await page.click('.ap-submit');
   await page.waitForURL('**/home', { timeout: 40000 }).catch(async () => {
-    await page.click('.submit');
+    await page.click('.ap-submit');
     await page.waitForURL('**/home', { timeout: 40000 });
   });
 }

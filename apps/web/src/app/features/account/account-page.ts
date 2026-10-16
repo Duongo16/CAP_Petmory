@@ -35,6 +35,8 @@ export class AccountPage implements OnInit {
   readonly initial = computed(() => (this.user()?.fullName ?? '?').trim().charAt(0).toUpperCase() || '?');
   readonly status = signal<ScreenState>('LOADING');
   readonly avatar = signal<string | null>(null);
+  /** Anh dai dien khong tai duoc (tep da mat): hien chu cai dau thay vi o trong. */
+  readonly avatarBroken = signal(false);
   readonly profileBusy = signal(false);
   readonly profileNote = signal<Note | null>(null);
   readonly passwordBusy = signal(false);
@@ -104,6 +106,7 @@ export class AccountPage implements OnInit {
       .subscribe({
         next: (avatarUrl) => {
           this.profileBusy.set(false);
+          this.avatarBroken.set(false);
           this.avatar.set(avatarUrl);
           this.auth.patchUser({ avatarUrl });
           this.profileNote.set({ key: 'ACCOUNT.PROFILE_SAVED', bad: false });

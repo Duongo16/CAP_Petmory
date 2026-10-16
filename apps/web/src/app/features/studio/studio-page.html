@@ -154,6 +154,34 @@
           @switch (step()) {
             @case ('MODEL') {
               <h2 class="panel-title">{{ 'STUDIO.PANEL.MODEL' | translate }}</h2>
+              <div class="chips" role="group" [attr.aria-label]="'STUDIO.KIND_LABEL' | translate">
+                @for (one of kindTabs(); track one.kind) {
+                  <button type="button" class="chip" [class.on]="kindSelected() === one.kind"
+                    [attr.aria-pressed]="kindSelected() === one.kind" (click)="selectKind(one.kind)">
+                    {{ one.key | translate }}
+                  </button>
+                }
+              </div>
+              <div class="chips pose-chips" role="group" [attr.aria-label]="'STUDIO.POSE_LABEL' | translate">
+                @for (one of poseTabs(); track one.pose) {
+                  <button type="button" class="chip" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-pose]="one.pose"
+                    (click)="selectPose(one.pose)">
+                    {{ one.key | translate }}
+                  </button>
+                }
+              </div>
+              <ul class="models">
+                @for (card of modelCards(); track card.raw.code) {
+                  <li>
+                    <button type="button" class="model" [class.on]="card.on" [attr.aria-pressed]="card.on" [attr.data-model]="card.raw.code"
+                      (click)="selectBaseModel(card.raw)">
+                      <img class="model-thumb" [src]="card.thumb" alt="" loading="lazy" width="96" height="96" />
+                      <span class="model-name">{{ card.raw.name }}</span>
+                      <span class="model-tag" [class.sitting]="card.sitting">{{ card.tagKey | translate }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
               <div class="match-box" id="studio-match-box">
                 <h3 class="group-title first">{{ 'STUDIO.MATCH.TITLE' | translate }}</h3>
                 <p class="hint">{{ 'STUDIO.MATCH.SUB' | translate }}</p>
@@ -217,34 +245,6 @@
                 }
               </div>
 
-              <div class="chips" role="group" [attr.aria-label]="'STUDIO.KIND_LABEL' | translate">
-                @for (one of kindTabs(); track one.kind) {
-                  <button type="button" class="chip" [class.on]="kindSelected() === one.kind"
-                    [attr.aria-pressed]="kindSelected() === one.kind" (click)="selectKind(one.kind)">
-                    {{ one.key | translate }}
-                  </button>
-                }
-              </div>
-              <div class="chips pose-chips" role="group" [attr.aria-label]="'STUDIO.POSE_LABEL' | translate">
-                @for (one of poseTabs(); track one.pose) {
-                  <button type="button" class="chip" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-pose]="one.pose"
-                    (click)="selectPose(one.pose)">
-                    {{ one.key | translate }}
-                  </button>
-                }
-              </div>
-              <ul class="models">
-                @for (card of modelCards(); track card.raw.code) {
-                  <li>
-                    <button type="button" class="model" [class.on]="card.on" [attr.aria-pressed]="card.on" [attr.data-model]="card.raw.code"
-                      (click)="selectBaseModel(card.raw)">
-                      <img class="model-thumb" [src]="card.thumb" alt="" loading="lazy" width="96" height="96" />
-                      <span class="model-name">{{ card.raw.name }}</span>
-                      <span class="model-tag" [class.sitting]="card.sitting">{{ card.tagKey | translate }}</span>
-                    </button>
-                  </li>
-                }
-              </ul>
               @if (credit(); as one) {
                 <p class="credit">
                   {{ 'STUDIO.CREDIT' | translate: { author: one.author, licence: one.licence } }}

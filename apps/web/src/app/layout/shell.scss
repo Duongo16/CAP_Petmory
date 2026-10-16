@@ -18,9 +18,9 @@
     padding-inline: 12px;
   }
 
+  // Thu nho ca logo theo ti le thay vi cat mat chu.
   header pm-brand {
-    inline-size: 124px;
-    overflow: hidden;
+    --pm-brand-scale: 0.8;
   }
 
   header .ml-auto {
@@ -29,5 +29,11 @@
 
   header pm-theme-toggle {
     display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  header pm-brand {
+    --pm-brand-scale: 0.7;
   }
 }

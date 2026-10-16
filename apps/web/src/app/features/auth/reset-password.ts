@@ -7,7 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { Icon } from '../../shared/icon/icon';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { Brand } from '../../shared/brand/brand';
-import { DiaryScene } from '../../shared/diary-scene/diary-scene';
+import { AuthPhotos } from './auth-photos/auth-photos';
 import { samePassword } from './password-match';
 
 /** Trang thai cua trang: chua co ma, dang nhap mat khau, da doi xong, hay ma het han. */
@@ -22,7 +22,7 @@ type ResetState = 'NO_TOKEN' | 'FORM' | 'DONE' | 'EXPIRED';
 @Component({
   selector: 'pm-reset-password',
   standalone: true,
-  imports: [LanguageToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
+  imports: [LanguageToggle, Brand, AuthPhotos, ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
   templateUrl: './reset-password.html',
   styleUrls: ['./auth-shared.scss', './login.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -185,7 +185,7 @@
 <!-- ───── Footer (Chi hien cho khach hang) ───── -->
 @if (!isInternal()) {
   @if (!immersive()) {
-  <footer class="mt-16 bg-night text-on-night max-nav:pb-[calc(84px+env(safe-area-inset-bottom))]">
+  <footer class="mt-16 bg-night text-on-night max-nav:pb-[calc(140px+env(safe-area-inset-bottom))]">
     <div class="grid gap-10 max-w-[1180px] mx-auto px-6 pt-12 pb-8 box-border [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
 
       <!-- Brand column -->
@@ -224,6 +224,6 @@
   </footer>
   }
 
-  <pm-chat-widget />
+  <pm-chat-widget [class.quiet-on-phone]="quietChat()" />
   <pm-bottom-nav />
 }

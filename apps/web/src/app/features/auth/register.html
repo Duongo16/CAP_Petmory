@@ -2,10 +2,11 @@
 
   <!-- ===== VISUAL PANEL (left) ===== -->
   <div class="ap-visual-panel ap-grad-register" aria-hidden="true">
+    <img class="ap-visual-photo" src="/img/landing/ambient-1.webp" alt="" width="900" height="900" decoding="async" />
     <span class="ap-blob ap-blob-a"></span>
     <span class="ap-blob ap-blob-b"></span>
 
-    <div class="ap-illustration"><pm-diary-scene [width]="420" [onColor]="true" /></div>
+    <pm-auth-photos class="ap-illustration" />
 
     <h2 class="ap-visual-title">{{ 'AUTH.SIDE_UP_TITLE' | translate }}</h2>
     <p class="ap-visual-sub">{{ 'AUTH.SIDE_UP_TEXT' | translate }}</p>
@@ -31,8 +32,10 @@
 
       <div class="ap-top-row">
         <a class="ap-back" routerLink="/landing"><pm-icon name="back" [size]="16" />{{ 'AUTH.BACK_HOME' | translate }}</a>
-        <pm-language-toggle />
-        <pm-theme-toggle />
+        <div class="ap-top-tools">
+          <pm-language-toggle />
+          <pm-theme-toggle />
+        </div>
       </div>
 
       <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" /></a>
@@ -135,7 +138,7 @@
               [attr.aria-label]="'AUTH.SHOW_PASSWORD' | translate"
               [attr.aria-pressed]="peeking()"
             >
-              <pm-icon name="image" [size]="15" />
+              <pm-icon name="eye" [size]="15" />
             </button>
           </div>
           <div class="flex items-center gap-2 mt-1 text-xs text-ink-muted">
@@ -167,7 +170,7 @@
               [attr.aria-label]="'AUTH.SHOW_PASSWORD' | translate"
               [attr.aria-pressed]="peekingConfirm()"
             >
-              <pm-icon name="image" [size]="15" />
+              <pm-icon name="eye" [size]="15" />
             </button>
           </div>
           @if (form.controls.confirm.touched && form.hasError('mismatch')) {

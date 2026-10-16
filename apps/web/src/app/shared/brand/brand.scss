@@ -2,14 +2,18 @@
   display: inline-flex;
 }
 
+// Noi dat logo hep (thanh tren dien thoai) dat --pm-brand-scale de thu nho ca logo theo ti le, khong cat chu.
 .brand {
+  --scale: var(--pm-brand-scale, 1);
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: calc(10px * var(--scale));
 }
 
 .brand-mark {
   flex-shrink: 0;
+  inline-size: calc(var(--mark) * var(--scale));
+  block-size: calc(var(--mark) * var(--scale));
   border-radius: 30%;
   object-fit: cover;
   background: var(--pm-paper-cream);
@@ -18,6 +22,8 @@
 
 .brand-word {
   display: block;
+  inline-size: calc(var(--word-w) * var(--scale));
+  block-size: calc(var(--word-h) * var(--scale));
   object-fit: contain;
 }
 

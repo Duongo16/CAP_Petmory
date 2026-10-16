@@ -52,13 +52,13 @@ function scorePassword(value: string): number {
   }
   return Math.min(score, 4);
 }
-import { DiaryScene } from '../../shared/diary-scene/diary-scene';
+import { AuthPhotos } from './auth-photos/auth-photos';
 import { Brand } from '../../shared/brand/brand';
 
 @Component({
   selector: 'pm-register',
   standalone: true,
-  imports: [LanguageToggle, ThemeToggle, Brand, DiaryScene, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [LanguageToggle, ThemeToggle, Brand, AuthPhotos, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
   templateUrl: './register.html',
   styleUrls: ['./auth-shared.scss', './register.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

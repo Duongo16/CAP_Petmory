@@ -19,8 +19,8 @@
           <h2 class="tw-card-title">{{ 'ACCOUNT.PROFILE' | translate }}</h2>
           <div class="avatar-row">
             <span class="avatar">
-              @if (avatar(); as src) {
-                <img [src]="src" alt="" />
+              @if (avatar() && !avatarBroken() ? avatar() : null; as src) {
+                <img [src]="src" alt="" (error)="avatarBroken.set(true)" />
               } @else {
                 <span aria-hidden="true">{{ initial() }}</span>
               }

@@ -335,8 +335,10 @@
   box-shadow: var(--pm-shadow-lifted);
 }
 
+// Goc trai duoi la cho meo con ngoi, nen the ky niem nam ben phai.
 .lp-chip-memory {
-  left: 0;
+  z-index: 6;
+  right: 0;
   bottom: 6px;
   gap: 12px;
   padding: 12px 16px 12px 12px;
@@ -372,9 +374,11 @@
   }
 }
 
+// Nam o khoang trong ben trai, giua tam anh meo va meo con, khong che anh nao.
 .lp-chip-status {
+  z-index: 6;
   left: 0;
-  top: 56px;
+  top: 44%;
   padding: 10px 14px;
   border-radius: var(--pm-radius-pill);
   font-size: 13px;
@@ -562,61 +566,93 @@
   &:hover { color: var(--pm-accent-dark); }
 }
 
+// Anh chup that cuon so lo xo mo tren ban go; chu va anh cun dat len dung hai trang giay.
+// Moi kich thuoc tinh theo be rong khung (cqi) de chu luon nam gon trong trang khi co gian.
 .lp-book {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding: 14px;
+  position: relative;
+  container-type: inline-size;
+  overflow: hidden;
   border-radius: 18px;
-  background: var(--pm-book-cover);
   box-shadow: var(--pm-shadow-lifted);
 }
 
+.lp-book-photo {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  // Ham giay lanh trong anh goc ve tong am cua trang.
+  filter: sepia(0.14) saturate(1.12) brightness(1.03);
+}
+
+// Toa do hai trang giay do tren anh diary-desk.webp (1200x783).
 .lp-page {
+  position: absolute;
+  inset-block: 9.2% 10%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-height: 300px;
-  padding: 26px 22px;
-  background: var(--pm-paper-cream);
 }
 
 .lp-page-left {
-  border-radius: 10px 2px 2px 10px;
-  border-right: 1px solid var(--pm-book-edge);
+  inset-inline: 12% 57.5%;
+  gap: 2.4cqi;
+  padding-block-start: 3.5cqi;
+  // Muc in tham vao giay thay vi noi tren mat anh.
+  mix-blend-mode: multiply;
 }
 
 .lp-page-right {
+  inset-inline: 53.3% 9%;
+  align-items: center;
   justify-content: center;
-  border-radius: 2px 10px 10px 2px;
 }
 
 .lp-page-date {
-  font-size: 11px;
+  font-size: 1.9cqi;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--pm-amber);
 }
 
 .lp-page-title {
-  font-size: 26px;
+  font-size: 4.4cqi;
   line-height: 1.2;
+  text-wrap: balance;
 }
 
 .lp-page-body {
-  font-size: 18px;
+  font-size: 3.1cqi;
   line-height: 1.45;
-  color: var(--pm-text-body);
+  opacity: 0.68;
 }
 
 .lp-polaroid {
-  display: grid;
-  place-items: center;
-  padding: 18px 10px;
-  border: 6px solid var(--pm-bg-card);
-  border-radius: 8px;
-  background: var(--pm-paper-bloom);
-  box-shadow: var(--pm-shadow);
-  transform: rotate(2deg);
+  position: relative;
+  inline-size: 74%;
+  padding: 4% 4% 14%;
+  background: var(--pm-frame-white-light);
+  box-shadow: 0 1.2cqi 2.4cqi var(--pm-hoop-shadow);
+  rotate: 3deg;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+}
+
+.lp-polaroid-tape {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: -5%;
+  inset-inline-start: 50%;
+  inline-size: 40%;
+  block-size: 9%;
+  translate: -50% 0;
+  rotate: -5deg;
+  background: var(--pm-tape);
+  box-shadow: 0 1px 2px var(--pm-book-edge);
 }
 
 /* ---------- Loi moi cuoi trang ---------- */

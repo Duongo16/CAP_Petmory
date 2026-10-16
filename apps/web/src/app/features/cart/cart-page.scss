@@ -378,3 +378,25 @@
 .line-design-name {
   color: var(--pm-text);
 }
+
+// Nut sua thiet ke chi la mot cay but nho: noi vung cham ra du rong de bam bang ngon tay.
+.line-design .line-link {
+  justify-content: center;
+  min-inline-size: 36px;
+  min-block-size: 36px;
+  margin-block: -10px;
+  border-radius: 50%;
+
+  &:hover {
+    background: var(--pm-accent-soft);
+    text-decoration: none;
+  }
+}
+
+// Man cham (dien thoai, may tinh bang): nut tang giam so luong du rong de bam bang ngon tay.
+@media (pointer: coarse), (max-width: 768px) {
+  .line-stepper button {
+    width: 36px;
+    height: 36px;
+  }
+}

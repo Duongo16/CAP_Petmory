@@ -47,7 +47,7 @@
       </div>
 
       <div class="lp-art" aria-hidden="true">
-        <pm-diary-scene class="lp-scene" [width]="540" />
+        <pm-pet-hero class="lp-scene" />
         <div class="lp-chip lp-chip-memory">
           <span class="lp-chip-icon"><pm-icon name="calendar" [size]="20" /></span>
           <span class="lp-chip-text">
@@ -109,13 +109,17 @@
       </a>
     </div>
     <div class="lp-book" aria-hidden="true">
+      <img class="lp-book-photo" src="/img/landing/diary-desk.webp" width="1200" height="783" alt="" loading="lazy" decoding="async" />
       <div class="lp-page lp-page-left">
         <span class="lp-page-date">{{ 'LANDING.BOOK_DATE' | translate }}</span>
         <span class="lp-hand lp-page-title">{{ 'LANDING.BOOK_PAGE_TITLE' | translate }}</span>
         <span class="lp-hand lp-page-body">{{ 'LANDING.BOOK_PAGE_BODY' | translate }}</span>
       </div>
       <div class="lp-page lp-page-right">
-        <div class="lp-polaroid"><pm-pet-art kind="dog" [width]="150" /></div>
+        <div class="lp-polaroid">
+          <span class="lp-polaroid-tape"></span>
+          <img src="/img/landing/diary-dog.webp" width="520" height="520" alt="" loading="lazy" decoding="async" />
+        </div>
       </div>
     </div>
   </section>

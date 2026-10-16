@@ -1,0 +1,169 @@
+:host {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 560px;
+}
+
+// Moi vi tri tinh theo phan tram cua khung, nen canh co gian deu theo be rong cot.
+.scene {
+  position: relative;
+  inline-size: 100%;
+  aspect-ratio: 1 / 0.94;
+}
+
+/* ---------- Lop sau: doan "phim" cac be ---------- */
+
+.ambient {
+  position: absolute;
+  inset-block-start: 2%;
+  inset-inline-start: 6%;
+  inline-size: 88%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0.62;
+  // Mep vong anh tan dan vao nen trang thay vi cat goc.
+  mask-image: radial-gradient(circle, #000 58%, transparent 72%);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, transparent 48%, var(--pm-bg) 80%);
+  }
+}
+
+.ambient-shot {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  opacity: 0;
+  filter: blur(7px) saturate(1.08);
+  // Bon anh, moi anh hien sau giay; tre am de anh dau da hien ngay khi trang mo.
+  animation: ambient 24s linear infinite;
+  animation-delay: calc(var(--i) * 6s - 1.5s);
+}
+
+@keyframes ambient {
+  0% { opacity: 0; transform: scale(1.06); }
+  7% { opacity: 1; }
+  25% { opacity: 1; }
+  32% { opacity: 0; transform: scale(1.16); }
+  100% { opacity: 0; transform: scale(1.16); }
+}
+
+/* ---------- Anh dan bang keo ---------- */
+
+.snap {
+  position: absolute;
+  z-index: 2;
+  inline-size: 30%;
+  margin: 0;
+  padding: 2.2% 2.2% 7%;
+  background: var(--pm-frame-white-light);
+  box-shadow: var(--pm-shadow-lifted);
+
+  img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+}
+
+.snap-cat {
+  inset-block-start: 7%;
+  inset-inline-start: 3%;
+  rotate: -8deg;
+  animation: drift 7s ease-in-out infinite;
+}
+
+.snap-beach {
+  inset-block-start: -1%;
+  inset-inline-end: 1%;
+  inline-size: 27%;
+  rotate: 7deg;
+  animation: drift 8s ease-in-out -3s infinite;
+}
+
+.tape {
+  position: absolute;
+  inset-block-start: -7%;
+  inset-inline-start: 50%;
+  inline-size: 42%;
+  block-size: 11%;
+  translate: -50% 0;
+  rotate: -4deg;
+  background: var(--pm-tape);
+  box-shadow: 0 1px 2px var(--pm-book-edge);
+}
+
+@keyframes drift {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -9px; }
+}
+
+/* ---------- Lop truoc: so va hai be ---------- */
+
+.book {
+  position: absolute;
+  z-index: 4;
+  inset-block-end: 3%;
+  inset-inline-start: 50%;
+  inline-size: 84%;
+  block-size: auto;
+  translate: -50% 0;
+  filter: drop-shadow(0 18px 16px var(--pm-hoop-shadow));
+}
+
+.pet {
+  position: absolute;
+  block-size: auto;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 10px 12px var(--pm-hoop-shadow));
+}
+
+// Cun ngoi sau cuon so va sau tam anh dan, nua duoi bi trang so che, nhu dang lo ra xem.
+.pet-dog {
+  z-index: 1;
+  inset-block-end: 19%;
+  inset-inline-end: 11%;
+  inline-size: 28%;
+  animation: breathe-dog 4.8s ease-in-out infinite;
+}
+
+// Meo con ngoi truoc goc trai cuon so.
+.pet-cat {
+  z-index: 5;
+  inset-block-end: 1%;
+  inset-inline-start: 1%;
+  inline-size: 29%;
+  animation: breathe-cat 5.6s ease-in-out -2s infinite;
+}
+
+@keyframes breathe-dog {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  45% { transform: rotate(-1.6deg) scale(1.014); }
+}
+
+@keyframes breathe-cat {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(1.8deg) scale(1.012); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-shot,
+  .snap,
+  .pet {
+    animation: none;
+  }
+
+  // Khong chuyen canh: chi giu anh dau.
+  .ambient-shot:first-child {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
