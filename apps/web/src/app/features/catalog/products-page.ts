@@ -74,6 +74,7 @@ export class ProductsPage implements OnInit {
   readonly ordering = signal<Ordering>('POPULAR');
   readonly orderings = ORDERINGS;
   readonly portraitProductCode = PORTRAIT_PRODUCT_CODE;
+  readonly studioProductCodes = CUSTOM_KEEPSAKE_CODES;
 
   private readonly list = signal<ProductType[]>([]);
   private readonly favourites = signal<string[]>([]);
