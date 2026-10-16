@@ -26,7 +26,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+        : (clientErrorStatus(exception) ?? HttpStatus.INTERNAL_SERVER_ERROR);
 
     const message = this.readMessage(exception, status);
     const code = this.readCode(exception);
@@ -68,6 +68,22 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const detail = (body as Record<string, unknown>).message;
       return (detail as string | string[]) ?? exception.message;
     }
+    if (status === HttpStatus.PAYLOAD_TOO_LARGE) {
+      return 'Du lieu gui len qua lon';
+    }
     return 'Yeu cau khong hop le';
   }
+}
+
+/**
+ * Ma loi 4xx cua cac loi HTTP ngoai Nest, nhu bo doc than yeu cau bao du lieu qua
+ * lon (413) hoac JSON hong (400). Cac loi nay mang san truong status va duoc danh
+ * dau expose; giu nguyen ma do thay vi quy thanh loi he thong 500.
+ */
+function clientErrorStatus(exception: unknown): number | null {
+  if (typeof exception !== 'object' || exception === null) {
+    return null;
+  }
+  const { status, expose } = exception as { status?: unknown; expose?: unknown };
+  return typeof status === 'number' && status >= 400 && status < 500 && expose === true ? status : null;
 }

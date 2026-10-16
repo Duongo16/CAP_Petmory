@@ -2264,6 +2264,73 @@
       "PHOTO_TYPE_ERROR": "Only JPG, PNG or WEBP photos are accepted.",
       "PHOTO_SIZE_ERROR": "The photo is over 10 MB, please pick a smaller one.",
       "SKIP": "Skip"
+    },
+    "FELT": {
+      "COVER_EYEBROW": "Framed needle-felted portraits",
+      "TITLE": "Your pet, the star of your wall",
+      "SUB": "From a single photo, an artisan needles wool fibre by fibre into a raised portrait of your pet, framed and ready to hang or stand.",
+      "CTA": "Order a wool portrait",
+      "CTA_WALL": "See the gallery wall",
+      "MARQUEE": {
+        "1": "Hand-needled fibre by fibre",
+        "2": "Framed and ready to hang",
+        "3": "Made from your own photo",
+        "4": "Soft fur, shining eyes",
+        "5": "A gift nobody else has"
+      },
+      "WALL_EYEBROW": "The memory wall",
+      "WALL_TITLE": "Every frame, a familiar face",
+      "WALL_SUB": "Hover over a frame and it will swing hello.",
+      "HOW_EYEBROW": "How we make it",
+      "HOW_TITLE": "From one photo to a wool portrait",
+      "STEP": {
+        "1": {
+          "NAME": "Send a photo",
+          "TEXT": "Pick a few clear, well-lit photos. The artisan studies every patch of fur, eye colour and floppy ear."
+        },
+        "2": {
+          "NAME": "Pick a frame",
+          "TEXT": "A raised wooden frame, a bowed embroidery hoop or a set of mini hoops — choose what suits your home."
+        },
+        "3": {
+          "NAME": "Needle every fibre",
+          "TEXT": "Thousands of tiny needle pokes firm the wool and build the fur layer by layer until your pet appears."
+        },
+        "4": {
+          "NAME": "Hang it and keep it",
+          "TEXT": "The portrait is framed, packed with care and delivered to your door, ready for the wall or a shelf."
+        }
+      },
+      "STYLES_EYEBROW": "Pick a frame",
+      "STYLES_TITLE": "Which frame suits your pet?",
+      "STYLES_SUB": "Move your cursor over a style to see it from every angle.",
+      "STYLE": {
+        "WOOD": "Raised 3D wooden frame",
+        "OVAL": "Oval hoop with a bow",
+        "HOOPS": "Set of mini hoops",
+        "BLACK": "Minimal black frame",
+        "PANEL": "Flat wool panel"
+      },
+      "STYLE_TEXT": {
+        "WOOD": "Your pet leans out of the frame, perfect for a desk or bookshelf.",
+        "OVAL": "A wooden hoop with a silk bow and your pet's name, lovely on any wall.",
+        "HOOPS": "One hoop per pet, hung as a cluster for homes with several four-legged members.",
+        "BLACK": "A slim black border on light linen, so the fur is the star."
+      },
+      "ALT": {
+        "BULLDOG": "Needle-felted bulldog portrait in an oval hoop with a bow",
+        "SCOTTISH": "Grey Scottish Fold cat in wool leaning out of a wooden frame",
+        "CALICO": "Needle-felted calico cat in a black frame",
+        "COLLIE": "Needle-felted Border Collie portrait on a flat wool panel",
+        "CHIHUAHUA": "Needle-felted chihuahua with its tongue out in a bowed hoop",
+        "GINGER": "Ginger cat with a bell in wool inside a wooden frame",
+        "DOODLE": "Needle-felted curly dog portrait beside a photo of the real dog",
+        "HOOPS": "Four mini hoops, each with a needle-felted cat or dog portrait",
+        "NEEDLE": "An artisan needling the fur of a wool dog portrait",
+        "STAND": "Framed wool portrait of a Scottish Fold cat on a wooden stand",
+        "SHEPHERD": "Needle-felted German Shepherd leaning out of a name-carved wooden frame"
+      },
+      "CREDIT": "Sample photos: works by @thevo.sculptor, Kim Karanikolaou and other needle-felting artists."
     }
   },
   "SHELF": {

@@ -2264,6 +2264,73 @@
       "PHOTO_TYPE_ERROR": "Chỉ nhận ảnh JPG, PNG hoặc WEBP.",
       "PHOTO_SIZE_ERROR": "Ảnh lớn hơn 10 MB, bạn chọn ảnh nhỏ hơn nhé.",
       "SKIP": "Bỏ qua"
+    },
+    "FELT": {
+      "COVER_EYEBROW": "Tranh len chọc đóng khung",
+      "TITLE": "Bé nhà bạn, nổi bật trên tường",
+      "SUB": "Từ một tấm ảnh, nghệ nhân chọc từng sợi len thành chân dung nổi của bé, đóng khung sẵn để treo tường hay đặt bàn.",
+      "CTA": "Đặt tranh len cho bé",
+      "CTA_WALL": "Xem bức tường tranh",
+      "MARQUEE": {
+        "1": "Chọc tay từng sợi len",
+        "2": "Đóng khung sẵn để treo",
+        "3": "Làm từ chính ảnh của bé",
+        "4": "Lông mềm, mắt long lanh",
+        "5": "Món quà không đụng hàng"
+      },
+      "WALL_EYEBROW": "Bức tường kỷ niệm",
+      "WALL_TITLE": "Mỗi khung là một gương mặt quen",
+      "WALL_SUB": "Rê chuột vào từng khung, các bé sẽ đung đưa chào bạn.",
+      "HOW_EYEBROW": "Cách tụi mình làm",
+      "HOW_TITLE": "Từ một tấm ảnh đến bức tranh len",
+      "STEP": {
+        "1": {
+          "NAME": "Gửi ảnh của bé",
+          "TEXT": "Chọn vài tấm ảnh rõ mặt, đủ ánh sáng. Nghệ nhân nhìn kỹ từng mảng lông, màu mắt và cái tai cụp."
+        },
+        "2": {
+          "NAME": "Chọn dáng khung",
+          "TEXT": "Khung gỗ nổi, vòng thêu có nơ hay bộ vòng tròn mini — chọn kiểu hợp với góc nhà bạn."
+        },
+        "3": {
+          "NAME": "Chọc từng sợi len",
+          "TEXT": "Hàng nghìn mũi kim nhỏ ép len thành khối, dựng từng lớp lông cho đến khi bé hiện ra thật nhất."
+        },
+        "4": {
+          "NAME": "Treo lên và giữ mãi",
+          "TEXT": "Tranh được đóng khung, gói cẩn thận và gửi tới tận nhà, sẵn sàng treo tường hay đặt bàn."
+        }
+      },
+      "STYLES_EYEBROW": "Chọn dáng khung",
+      "STYLES_TITLE": "Khung nào hợp với bé?",
+      "STYLES_SUB": "Đưa chuột lên từng mẫu để ngắm từ nhiều góc.",
+      "STYLE": {
+        "WOOD": "Khung gỗ nổi 3D",
+        "OVAL": "Vòng thêu oval có nơ",
+        "HOOPS": "Bộ vòng tròn mini",
+        "BLACK": "Khung đen tối giản",
+        "PANEL": "Tấm len phẳng"
+      },
+      "STYLE_TEXT": {
+        "WOOD": "Bé như đang nhoài người ra khỏi khung, hợp đặt bàn làm việc hay kệ sách.",
+        "OVAL": "Vòng gỗ thêu kèm nơ lụa và tên bé, treo tường xinh như một món đồ trang trí.",
+        "HOOPS": "Mỗi vòng một bé, treo thành chùm cho nhà có nhiều thành viên bốn chân.",
+        "BLACK": "Viền đen gọn, nền vải sáng, để bộ lông của bé là thứ nổi bật nhất."
+      },
+      "ALT": {
+        "BULLDOG": "Chân dung chó bulldog bằng len chọc trong vòng thêu oval có nơ",
+        "SCOTTISH": "Mèo tai cụp xám bằng len chọc nhô ra khỏi khung gỗ",
+        "CALICO": "Mèo tam thể bằng len chọc trong khung đen",
+        "COLLIE": "Chân dung chó Border Collie bằng len chọc trên tấm len phẳng",
+        "CHIHUAHUA": "Chó chihuahua lè lưỡi bằng len chọc trong vòng thêu có nơ",
+        "GINGER": "Mèo lông vàng đeo chuông bằng len chọc trong khung gỗ",
+        "DOODLE": "Chân dung chó lông xoăn bằng len chọc đặt cạnh ảnh thật của bé",
+        "HOOPS": "Bộ bốn vòng tròn mini, mỗi vòng một chân dung mèo và chó bằng len chọc",
+        "NEEDLE": "Nghệ nhân đang chọc kim tạo lông cho chân dung chó bằng len",
+        "STAND": "Tranh len mèo tai cụp đóng khung đặt trên kệ gỗ",
+        "SHEPHERD": "Chó becgie bằng len chọc nhô ra khỏi khung gỗ khắc tên"
+      },
+      "CREDIT": "Ảnh minh họa: tác phẩm của @thevo.sculptor, Kim Karanikolaou và các nghệ nhân len chọc khác."
     }
   },
   "SHELF": {

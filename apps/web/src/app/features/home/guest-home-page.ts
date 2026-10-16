@@ -12,14 +12,44 @@ interface Feature {
   textKey: string;
 }
 
-/** One numbered step, with its keys written out in full. */
-interface Step {
+/** Mot tam anh tranh len trong thu muc anh trang gioi thieu, kem kich thuoc that de khong nhay bo cuc. */
+interface FeltPhoto {
+  file: string;
+  width: number;
+  height: number;
+}
+
+/** Khung treo tren buc tuong o man dau; slot quyet dinh vi tri va nhip dung dua. */
+interface CoverFrame extends FeltPhoto {
+  slot: 'a' | 'b' | 'c';
+}
+
+/** Mot khung tren buc tuong ky niem: goc treo lech, so cot chiem, nhan kieu khung. */
+interface WallFrame extends FeltPhoto {
+  tilt: number;
+  span: number;
+  styleKey: string;
+  altKey: string;
+}
+
+/** Mot buoc trong quy trinh lam tranh len, co thu tu that nen danh so. */
+interface ProcessStep extends FeltPhoto {
   number: string;
-  tone: 'accent' | 'amber' | 'success';
   nameKey: string;
   textKey: string;
+  altKey: string;
 }
-import { PetHero } from './pet-hero/pet-hero';
+
+/** Mot dang khung de khach chon. */
+interface FrameStyle extends FeltPhoto {
+  nameKey: string;
+  textKey: string;
+  altKey: string;
+}
+
+import { BounceText } from './landing-fx/bounce-text';
+import { RevealDirective } from './landing-fx/reveal.directive';
+import { TiltDirective } from './landing-fx/tilt.directive';
 import { Brand } from '../../shared/brand/brand';
 
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
@@ -28,7 +58,7 @@ import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 @Component({
   selector: 'pm-guest-home-page',
   standalone: true,
-  imports: [Brand, PetHero, RouterLink, TranslatePipe, Icon, PetStarter, LanguageToggle, ThemeToggle],
+  imports: [Brand, BounceText, RevealDirective, TiltDirective, RouterLink, TranslatePipe, Icon, PetStarter, LanguageToggle, ThemeToggle],
   templateUrl: './guest-home-page.html',
   styleUrl: './guest-home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,8 +87,6 @@ export class GuestHomePage {
     });
   }
 
-  readonly trust = ['LANDING.TRUST_FREE', 'LANDING.TRUST_PRIVATE', 'LANDING.TRUST_CARD'];
-
   readonly features: Feature[] = [
     { icon: 'book', tone: 'amber', nameKey: 'LANDING.FEATURE.DIARY.NAME', textKey: 'LANDING.FEATURE.DIARY.TEXT' },
     { icon: 'sparkle', tone: 'accent', nameKey: 'LANDING.FEATURE.MEMORY.NAME', textKey: 'LANDING.FEATURE.MEMORY.TEXT' },
@@ -66,11 +94,43 @@ export class GuestHomePage {
     { icon: 'users', tone: 'memorial', nameKey: 'LANDING.FEATURE.COMMUNITY.NAME', textKey: 'LANDING.FEATURE.COMMUNITY.TEXT' },
   ];
 
-  readonly steps: Step[] = [
-    { number: '01', tone: 'accent', nameKey: 'LANDING.STEP.1.NAME', textKey: 'LANDING.STEP.1.TEXT' },
-    { number: '02', tone: 'amber', nameKey: 'LANDING.STEP.2.NAME', textKey: 'LANDING.STEP.2.TEXT' },
-    { number: '03', tone: 'success', nameKey: 'LANDING.STEP.3.NAME', textKey: 'LANDING.STEP.3.TEXT' },
+  readonly coverFrames: CoverFrame[] = [
+    { slot: 'a', file: 'chihuahua-oval', width: 675, height: 900 },
+    { slot: 'b', file: 'shepherd-frame', width: 600, height: 900 },
+    { slot: 'c', file: 'ginger-frame', width: 389, height: 589 },
   ];
+
+  readonly marquee = [
+    'LANDING.FELT.MARQUEE.1',
+    'LANDING.FELT.MARQUEE.2',
+    'LANDING.FELT.MARQUEE.3',
+    'LANDING.FELT.MARQUEE.4',
+    'LANDING.FELT.MARQUEE.5',
+  ];
+
+  readonly wallFrames: WallFrame[] = [
+    { file: 'bulldog-oval', width: 600, height: 900, tilt: -3, span: 2, styleKey: 'LANDING.FELT.STYLE.OVAL', altKey: 'LANDING.FELT.ALT.BULLDOG' },
+    { file: 'scottish-frame', width: 341, height: 480, tilt: 2, span: 1, styleKey: 'LANDING.FELT.STYLE.WOOD', altKey: 'LANDING.FELT.ALT.SCOTTISH' },
+    { file: 'calico-frame', width: 342, height: 479, tilt: -2, span: 1, styleKey: 'LANDING.FELT.STYLE.BLACK', altKey: 'LANDING.FELT.ALT.CALICO' },
+    { file: 'collie-panel', width: 736, height: 789, tilt: 3, span: 2, styleKey: 'LANDING.FELT.STYLE.PANEL', altKey: 'LANDING.FELT.ALT.COLLIE' },
+    { file: 'chihuahua-oval', width: 675, height: 900, tilt: -2, span: 1, styleKey: 'LANDING.FELT.STYLE.OVAL', altKey: 'LANDING.FELT.ALT.CHIHUAHUA' },
+    { file: 'ginger-frame', width: 389, height: 589, tilt: 2, span: 1, styleKey: 'LANDING.FELT.STYLE.WOOD', altKey: 'LANDING.FELT.ALT.GINGER' },
+  ];
+
+  readonly processSteps: ProcessStep[] = [
+    { number: '1', file: 'doodle-hoop', width: 600, height: 900, nameKey: 'LANDING.FELT.STEP.1.NAME', textKey: 'LANDING.FELT.STEP.1.TEXT', altKey: 'LANDING.FELT.ALT.DOODLE' },
+    { number: '2', file: 'hoop-set', width: 675, height: 900, nameKey: 'LANDING.FELT.STEP.2.NAME', textKey: 'LANDING.FELT.STEP.2.TEXT', altKey: 'LANDING.FELT.ALT.HOOPS' },
+    { number: '3', file: 'needle-work', width: 676, height: 900, nameKey: 'LANDING.FELT.STEP.3.NAME', textKey: 'LANDING.FELT.STEP.3.TEXT', altKey: 'LANDING.FELT.ALT.NEEDLE' },
+    { number: '4', file: 'scottish-stand', width: 342, height: 479, nameKey: 'LANDING.FELT.STEP.4.NAME', textKey: 'LANDING.FELT.STEP.4.TEXT', altKey: 'LANDING.FELT.ALT.STAND' },
+  ];
+
+  readonly frameStyles: FrameStyle[] = [
+    { file: 'shepherd-frame', width: 600, height: 900, nameKey: 'LANDING.FELT.STYLE.WOOD', textKey: 'LANDING.FELT.STYLE_TEXT.WOOD', altKey: 'LANDING.FELT.ALT.SHEPHERD' },
+    { file: 'bulldog-oval', width: 600, height: 900, nameKey: 'LANDING.FELT.STYLE.OVAL', textKey: 'LANDING.FELT.STYLE_TEXT.OVAL', altKey: 'LANDING.FELT.ALT.BULLDOG' },
+    { file: 'hoop-set', width: 675, height: 900, nameKey: 'LANDING.FELT.STYLE.HOOPS', textKey: 'LANDING.FELT.STYLE_TEXT.HOOPS', altKey: 'LANDING.FELT.ALT.HOOPS' },
+    { file: 'calico-frame', width: 342, height: 479, nameKey: 'LANDING.FELT.STYLE.BLACK', textKey: 'LANDING.FELT.STYLE_TEXT.BLACK', altKey: 'LANDING.FELT.ALT.CALICO' },
+  ];
+
 
   /** Nut "Kham pha" tren anh nen: cuon toi lop noi dung, chua cho thanh dinh dang dinh. */
   scrollToStart(event: Event): void {
