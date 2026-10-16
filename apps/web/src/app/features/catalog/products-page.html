@@ -68,7 +68,7 @@
         <ul class="relative grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-6 m-0 p-0 list-none">
           @for (card of cards(); track card.raw.code) {
             <li class="card tw-card-interactive relative flex flex-col gap-4 p-4">
-              <a class="card-link flex flex-col gap-4 no-underline text-[inherit]" routerLink="/shop" [queryParams]="{ tab: 'custom', product: card.raw.code }">
+              <a class="card-link flex flex-col gap-4 no-underline text-[inherit]" [routerLink]="card.raw.code === portraitProductCode ? '/studio' : '/shop'" [queryParams]="card.raw.code === portraitProductCode ? { product: card.raw.code } : { tab: 'custom', product: card.raw.code }">
                 <div class="relative grid place-items-center overflow-hidden aspect-[4/3] rounded-lg bg-muted text-edge-strong">
                   @if (card.raw.imageUrl) {
                     <img class="absolute inset-0 w-full h-full object-cover" [src]="card.raw.imageUrl" [alt]="card.raw.name" />
@@ -119,7 +119,7 @@
                     <strong class="inline-flex items-center px-3 py-1 rounded-full bg-amber-soft text-on-amber text-base font-bold">{{ 'PRODUCT.PRICE_FROM' | translate }} {{ price | amount }}</strong>
                   }
                 </span>
-                <a class="tw-btn-primary tw-btn-sm flex-none rounded-full" routerLink="/shop" [queryParams]="{ tab: 'custom', product: card.raw.code }">
+                <a class="tw-btn-primary tw-btn-sm flex-none rounded-full" [routerLink]="card.raw.code === portraitProductCode ? '/studio' : '/shop'" [queryParams]="card.raw.code === portraitProductCode ? { product: card.raw.code } : { tab: 'custom', product: card.raw.code }">
                   {{ 'PRODUCT.CUSTOMISE' | translate }}
                   <pm-icon name="chevron" [size]="13" />
                 </a>

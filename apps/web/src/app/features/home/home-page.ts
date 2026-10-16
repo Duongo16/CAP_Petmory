@@ -7,6 +7,7 @@ import { CatalogService } from '../../core/services/catalog.service';
 import { ProductType } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { Icon } from '../../shared/icon/icon';
+import { CUSTOM_KEEPSAKE_CODES, PORTRAIT_PRODUCT_CODE } from '../catalog/custom-keepsakes';
 
 /**
  * A selling point under the hero. Both keys are written out in full, because a
@@ -51,10 +52,12 @@ export class HomePage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly products = signal<ProductType[]>([]);
+  readonly portraitProductCode = PORTRAIT_PRODUCT_CODE;
 
   /** The first few products, shown as a taster under the selling points. */
   readonly featured = computed(() =>
     this.products()
+      .filter((product) => CUSTOM_KEEPSAKE_CODES.has(product.code))
       .slice(0, FEATURED_MAX)
       .map((raw, index) => ({
         raw,

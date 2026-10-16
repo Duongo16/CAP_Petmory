@@ -112,6 +112,7 @@ export class ProductDetailPage implements OnInit {
   );
 
   readonly canReview = computed(() => this.reviewable() !== null && !this.reviewSent());
+  readonly studioQuery = computed(() => ({ product: this.product()?.code ?? this.code() }));
 
   ngOnInit(): void {
     this.loadProduct();

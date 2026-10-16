@@ -633,6 +633,7 @@
       "MODE_AI": "Recognised by AI from your photos.",
       "MODE_LOCAL": "AI was unavailable, so colours were estimated from the photo.",
       "FAILED": "Could not build a model from the photos. Please try again.",
+      "TIMEOUT": "The image service took too long to respond. Try again in a few minutes.",
       "QUOTA": "You have used all AI model builds for today.",
       "NEED_PHOTO": "This pet has no photos yet.",
       "TO_PHOTOS": "Upload pet photos",

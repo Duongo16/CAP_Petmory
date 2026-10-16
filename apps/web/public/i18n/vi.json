@@ -633,6 +633,7 @@
       "MODE_AI": "Nhận diện bằng AI từ ảnh của bé.",
       "MODE_LOCAL": "Chưa gọi được AI nên màu được ước lượng trực tiếp từ ảnh.",
       "FAILED": "Chưa dựng được mẫu từ ảnh. Hãy thử lại.",
+      "TIMEOUT": "Dịch vụ nhận diện đang trả lời quá lâu. Hãy thử lại sau ít phút.",
       "QUOTA": "Bạn đã dùng hết lượt dựng mẫu bằng AI hôm nay.",
       "NEED_PHOTO": "Bé chưa có ảnh nào.",
       "TO_PHOTOS": "Tải ảnh của bé",

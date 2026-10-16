@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { TimeoutError, forkJoin, map, of, switchMap, timeout } from 'rxjs';
 import { DesignsService } from '../../core/services/designs.service';
 import { CatalogService } from '../../core/services/catalog.service';
 import { CartService } from '../../core/services/cart.service';
@@ -38,6 +38,9 @@ export interface StandChoice {
 }
 
 export type SaveState = 'UNSAVED' | 'SAVING' | 'SAVED' | 'ERROR';
+
+/** AI nhận diện ảnh không được giữ nút ở trạng thái chờ vô hạn. */
+const MATCH_TIMEOUT_MS = 30_000;
 
 /** Converts the data URL the browser produced into a binary blob for upload. */
 function dataUrlToBlob(str: string): Blob {
@@ -106,7 +109,7 @@ export class StudioFacade {
    * May chu tao san mot ban thiet ke voi mau nen va mau tung vung; man hinh mo
    * ban do len nhu mo mot ban nhap de khach tuy bien tiep.
    */
-  matchFromPhoto(onDesign: (designId: string) => void): void {
+  matchFromPhoto(onDesign: (designId: string) => void, pose?: 'HEAD'): void {
     const pet = this.petChosen();
     if (!this.canMatch()) {
       return;
@@ -114,8 +117,8 @@ export class StudioFacade {
     this.matching.set(true);
     this.matchError.set('');
     this.ai
-      .matchFromPhoto(pet)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .matchFromPhoto(pet, pose)
+      .pipe(timeout({ each: MATCH_TIMEOUT_MS }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (got) => {
           this.matching.set(false);
@@ -124,7 +127,13 @@ export class StudioFacade {
         },
         error: (trouble: { status?: number }) => {
           this.matching.set(false);
-          this.matchError.set(trouble?.status === 429 ? 'STUDIO.MATCH.QUOTA' : 'STUDIO.MATCH.FAILED');
+          this.matchError.set(
+            trouble instanceof TimeoutError
+              ? 'STUDIO.MATCH.TIMEOUT'
+              : trouble?.status === 429
+                ? 'STUDIO.MATCH.QUOTA'
+                : 'STUDIO.MATCH.FAILED',
+          );
         },
       });
   }

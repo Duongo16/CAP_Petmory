@@ -1,10 +1,14 @@
-import { IsEnum, IsMongoId, IsString, Matches, MaxLength } from 'class-validator';
+import { Equals, IsEnum, IsMongoId, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import { SuggestStyle } from '../schemas/design-suggestion.schema';
 
 /** Dung san mot mau tu anh cua mot be. */
 export class MatchFromPhotoDto {
   @IsMongoId()
   petId!: string;
+
+  @IsOptional()
+  @Equals('HEAD')
+  pose?: 'HEAD';
 }
 
 /** Xin mot bo phuong an thiet ke cho mot be. */

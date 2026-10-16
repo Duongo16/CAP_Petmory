@@ -16,6 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ProductType } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { Icon } from '../../shared/icon/icon';
+import { CUSTOM_KEEPSAKE_CODES, FIGURE_PRODUCT_CODE, PORTRAIT_PRODUCT_CODE } from './custom-keepsakes';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -34,20 +35,16 @@ interface ProductCard {
 }
 
 /**
- * The badge each card carries, in the order the cards appear.
+ * The badge each offered product carries.
  *
  * The design gives every product a short marketing badge. They belong to the
  * presentation rather than the catalogue, so they live here beside the tone
  * that colours them, with every key written out in full.
  */
-const BADGES: { key: string; tone: string }[] = [
-  { key: 'PRODUCT.BADGE.FLAGSHIP', tone: 'purple' },
-  { key: 'PRODUCT.BADGE.POCKET', tone: 'green' },
-  { key: 'PRODUCT.BADGE.DESK', tone: 'amber' },
-  { key: 'PRODUCT.BADGE.FAMILY', tone: 'soft' },
-  { key: 'PRODUCT.BADGE.KEEPSAKE', tone: 'purple' },
-  { key: 'PRODUCT.BADGE.WEARABLE', tone: 'amber' },
-];
+const BADGES: Record<string, { key: string; tone: string }> = {
+  [FIGURE_PRODUCT_CODE]: { key: 'PRODUCT.BADGE.FLAGSHIP', tone: 'purple' },
+  [PORTRAIT_PRODUCT_CODE]: { key: 'PRODUCT.BADGE.DESK', tone: 'amber' },
+};
 
 /** The orderings offered, with their labels written out. */
 const ORDERINGS: { value: Ordering; key: string }[] = [
@@ -76,6 +73,7 @@ export class ProductsPage implements OnInit {
   readonly keyword = signal('');
   readonly ordering = signal<Ordering>('POPULAR');
   readonly orderings = ORDERINGS;
+  readonly portraitProductCode = PORTRAIT_PRODUCT_CODE;
 
   private readonly list = signal<ProductType[]>([]);
   private readonly favourites = signal<string[]>([]);
@@ -83,8 +81,8 @@ export class ProductsPage implements OnInit {
   /** Each card carries its own figures, so the view calls no functions. */
   readonly cards = computed<ProductCard[]>(() => {
     const marked = this.favourites();
-    const rows = this.list().map((raw, index) => {
-      const badge = BADGES[index % BADGES.length];
+    const rows = this.list().map((raw) => {
+      const badge = BADGES[raw.code];
       const cheapest = lowestPrice(raw);
       return {
         raw,
@@ -139,7 +137,7 @@ export class ProductsPage implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (list) => {
-          this.list.set(list);
+          this.list.set(list.filter((product) => CUSTOM_KEEPSAKE_CODES.has(product.code)));
           this.status.set('DONE');
         },
         error: () => this.status.set('ERROR'),

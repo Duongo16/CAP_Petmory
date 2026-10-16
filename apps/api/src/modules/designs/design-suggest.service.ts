@@ -172,7 +172,7 @@ export class DesignSuggestService {
    * co mau cho loai do thi dung mau mac dinh. Ket qua la mot ban thiet ke moi
    * de khach mo len tuy bien tiep. Luot nay tinh vao han muc goi y thiet ke.
    */
-  async fromPhoto(owner: string, petId: string): Promise<PhotoMatch> {
+  async fromPhoto(owner: string, petId: string, pose?: 'HEAD'): Promise<PhotoMatch> {
     const pet = await this.pets.findOwned(petId, owner);
     const picture = await this.readPhotos(owner, petId);
     if (picture.length === 0) {
@@ -203,7 +203,8 @@ export class DesignSuggestService {
         reading.kind = pet.kind;
       }
 
-      const picked = pickModel(this.library.ready(), reading.kind, reading.pose);
+      const models = this.library.ready().filter((model) => !pose || model.pose === pose);
+      const picked = pickModel(models, reading.kind, pose ?? reading.pose);
       if (!picked) {
         throw new BadRequestException('Thư viện mô hình đang trống, chưa dựng được mẫu');
       }
@@ -232,7 +233,7 @@ export class DesignSuggestService {
         match: {
           mode,
           kind: reading.kind,
-          pose: reading.pose,
+          pose: pose ?? reading.pose,
           breed: reading.breed,
           modelCode: picked.model.code,
           modelName: picked.model.name,
@@ -365,10 +366,21 @@ export class DesignSuggestService {
     try {
       const all = await this.photos.listByPet(petId, owner);
       const pick = all.filter((one) => !one.isRestored).slice(0, PHOTO_MAX);
-      for (const one of pick) {
-        const read = await this.photos.readContent(one._id.toString(), owner);
-        if (read.data.length <= PHOTO_BYTES_MAX) {
-          out.push({ data: read.data.toString('base64'), kind: read.fileType });
+      const reads = await Promise.all(
+        pick.map(async (one) => {
+          try {
+            const read = await this.photos.readContent(one._id.toString(), owner);
+            return read.data.length <= PHOTO_BYTES_MAX
+              ? { data: read.data.toString('base64'), kind: read.fileType }
+              : null;
+          } catch {
+            return null;
+          }
+        }),
+      );
+      for (const read of reads) {
+        if (read) {
+          out.push(read);
         }
       }
     } catch (trouble) {

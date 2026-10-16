@@ -469,7 +469,7 @@
                 @for (card of productCards(); track card.raw.code) {
                   <li>
                     <button type="button" class="product" [class.on]="card.on" [attr.aria-pressed]="card.on"
-                      (click)="facade.selectKind(card.raw.code)">
+                      (click)="selectProduct(card.raw.code)">
                       @if (card.raw.imageUrl) {
                         <img [src]="card.raw.imageUrl" alt="" loading="lazy" />
                       } @else {

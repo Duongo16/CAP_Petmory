@@ -135,6 +135,7 @@ export interface ZoneView {
 }
 
 import { PetPhotos } from '../memories/pet-photos/pet-photos';
+import { CUSTOM_KEEPSAKE_CODES, FIGURE_PRODUCT_CODE, PORTRAIT_PRODUCT_CODE } from '../catalog/custom-keepsakes';
 
 @Component({
   selector: 'pm-studio-page',
@@ -206,6 +207,17 @@ export class StudioPage implements OnInit {
 
   readonly kindSelected = signal<string | null>(null);
   readonly poseSelected = signal<string | null>(null);
+  readonly portraitSelected = computed(() => this.facade.codeKindSelected() === PORTRAIT_PRODUCT_CODE);
+  readonly availableModels = computed(() => {
+    const product = this.facade.codeKindSelected();
+    return this.baseModel().filter((model) =>
+      product === PORTRAIT_PRODUCT_CODE
+        ? model.pose === 'HEAD'
+        : product === FIGURE_PRODUCT_CODE
+          ? model.pose !== 'HEAD'
+          : true,
+    );
+  });
 
   private declaredZones: DeclaredZone[] = [];
   private library: ModelLibrary | null = null;
@@ -284,13 +296,13 @@ export class StudioPage implements OnInit {
   readonly credit = computed(() => this.baseModelSelected()?.credit ?? null);
 
   readonly kindTabs = computed(() => {
-    const kinds = [...new Set(this.baseModel().map((m) => m.kind))];
+    const kinds = [...new Set(this.availableModels().map((m) => m.kind))];
     return kinds.map((kind) => ({ kind, key: KEY_KIND[kind] ?? 'STUDIO.KIND.OTHER' }));
   });
 
   /** Cac dang co trong thu vien, de loc theo dang (ngoi, dung, nam). */
   readonly poseTabs = computed(() => {
-    const poses = [...new Set(this.baseModel().map((m) => m.pose))].filter((pose) => KEY_POSE[pose]);
+    const poses = [...new Set(this.availableModels().map((m) => m.pose))].filter((pose) => KEY_POSE[pose]);
     return poses.map((pose) => ({ pose, key: KEY_POSE[pose], on: this.poseSelected() === pose }));
   });
 
@@ -299,7 +311,7 @@ export class StudioPage implements OnInit {
     const kind = this.kindSelected();
     const pose = this.poseSelected();
     const chosen = this.baseModelSelected()?.code;
-    return this.baseModel()
+    return this.availableModels()
       .filter((m) => (!kind || m.kind === kind) && (!pose || m.pose === pose))
       .map((m) => ({
         raw: m,
@@ -436,7 +448,7 @@ export class StudioPage implements OnInit {
   });
 
   readonly productCards = computed(() =>
-    this.facade.types().map((kind) => ({
+    this.facade.types().filter((kind) => CUSTOM_KEEPSAKE_CODES.has(kind.code)).map((kind) => ({
       raw: kind,
       on: this.facade.codeKindSelected() === kind.code,
     })),
@@ -483,7 +495,9 @@ export class StudioPage implements OnInit {
             this.openDesign(codeDraft);
             return;
           }
-          const first = ready.find((m) => m.pose === 'SITTING') ?? ready[0] ?? null;
+          const first = this.portraitSelected()
+            ? this.availableModels()[0] ?? null
+            : ready.find((m) => m.pose === 'SITTING') ?? ready[0] ?? null;
           this.baseModelSelected.set(first);
           this.nameDraftFor(first);
         },
@@ -497,24 +511,40 @@ export class StudioPage implements OnInit {
   }
 
   /** Mo mot ban thiet ke len san khau: chon dung mau nen va nap mau tung vung. */
-  private openDesign(code: string, onOpened?: () => void): void {
+  private openDesign(code: string, selection?: { product: string; size: string; base: string }): void {
     const library = this.library;
     if (!library) {
       return;
     }
     const ready = this.baseModel();
     this.facade.openDraft(code, (tk) => {
+      if (selection?.product && !tk.productTypeCode) {
+        this.facade.selectKind(selection.product);
+        if (selection.size) {
+          this.facade.selectSize(selection.size);
+        }
+        if (selection.base && selection.base !== this.facade.stand().baseCode) {
+          this.facade.selectBase(selection.base);
+        }
+      }
       const modelCode = currentModelCode(tk.modelCode, library);
       this.baseModelSelected.set(ready.find((m) => m.code === modelCode) ?? ready[0] ?? null);
       this.colorCodesUsed.set([...tk.colorCodesUsed]);
       this.zonePaintOpened.set(tk.paint.length === 0 ? (tk.zonePaint ?? []) : []);
-      onOpened?.();
     });
   }
 
   /** Dung san mau tu anh cua be va mo mau do len ngay trong buoc chon mau. */
   matchFromPhoto(): void {
-    this.facade.matchFromPhoto((designId) => this.openDesign(designId));
+    const selection = {
+      product: this.facade.codeKindSelected(),
+      size: this.facade.sizeCodeSelected(),
+      base: this.facade.stand().baseCode,
+    };
+    this.facade.matchFromPhoto(
+      (designId) => this.openDesign(designId, selection),
+      selection.product === PORTRAIT_PRODUCT_CODE ? 'HEAD' : undefined,
+    );
   }
 
   go(step: Step): void {
@@ -546,6 +576,19 @@ export class StudioPage implements OnInit {
 
   selectKind(kind: string): void {
     this.kindSelected.set(this.kindSelected() === kind ? null : kind);
+  }
+
+  selectProduct(code: string): void {
+    this.facade.selectKind(code);
+    this.kindSelected.set(null);
+    this.poseSelected.set(null);
+    const selected = this.baseModelSelected();
+    if (selected && !this.availableModels().some((model) => model.code === selected.code)) {
+      const first = this.availableModels()[0];
+      if (first) {
+        this.selectBaseModel(first);
+      }
+    }
   }
 
   selectBaseModel(model: BaseModel): void {

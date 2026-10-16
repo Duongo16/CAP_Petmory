@@ -34,7 +34,7 @@ export class DesignSuggestController {
   @HttpCode(HttpStatus.CREATED)
   @Post('from-photo')
   fromPhoto(@Body() dto: MatchFromPhotoDto, @CurrentUser() user: AuthUser) {
-    return this.service.fromPhoto(user.userId, dto.petId);
+    return this.service.fromPhoto(user.userId, dto.petId, dto.pose);
   }
 
   @Get()
