@@ -1,9 +1,22 @@
 <div class="wall tw-page flex flex-col gap-5">
   <header class="wall-head">
     <a class="tw-back self-start" routerLink="/landing"><pm-icon name="back" [size]="14" /> {{ 'AUTH.BACK_HOME' | translate }}</a>
-    <span class="tw-eyebrow">{{ 'SHELF.EYEBROW' | translate }}</span>
-    <h1 class="pm-page-title">{{ 'DIARY.LIST_TITLE' | translate }}</h1>
-    <p class="sub tw-page-sub">{{ 'DIARY.LIST_SUB' | translate }}</p>
+    <div class="wall-hero">
+      <div class="wall-copy">
+        <span class="tw-eyebrow">{{ 'SHELF.EYEBROW' | translate }}</span>
+        <h1 class="pm-page-title">{{ 'DIARY.LIST_TITLE' | translate }}</h1>
+        <p class="sub tw-page-sub">{{ 'DIARY.LIST_SUB' | translate }}</p>
+        <div class="hero-stats" aria-live="polite">
+          <span class="hero-stat"><pm-icon name="book" [size]="15" /> {{ 'DIARY.SHARED_COUNT' | translate: { count: answer().total } }}</span>
+          <span class="hero-stat"><pm-icon name="sparkle" [size]="15" /> {{ 'DIARY.MOMENTS_COUNT' | translate: { count: momentCount() } }}</span>
+        </div>
+      </div>
+      <div class="hero-doodles" aria-hidden="true">
+        <span class="doodle doodle-paw"><pm-icon name="paw" [size]="28" /></span>
+        <span class="doodle doodle-star"><pm-icon name="star" [size]="20" /></span>
+        <span class="doodle doodle-heart"><pm-icon name="heart" [size]="22" /></span>
+      </div>
+    </div>
   </header>
 
   <div class="tw-card flex flex-col gap-4 p-4 nav:p-5">
@@ -49,6 +62,10 @@
         <p class="middle tw-empty m-0">{{ 'DIARY.LIST_EMPTY' | translate }}</p>
       } @else {
         <div class="cabinet">
+          <div class="cabinet-heading">
+            <span><pm-icon name="book" [size]="15" /> {{ 'SHELF.LABEL' | translate }}</span>
+            <span>{{ 'SHELF.COUNT' | translate: { count: answer().total } }}</span>
+          </div>
           <ul class="shelf" [attr.aria-label]="'DIARY.LIST_TITLE' | translate">
             @for (book of books(); track book.card.petId) {
               <li class="slot">
@@ -57,6 +74,7 @@
                   class="book"
                   [attr.data-tone]="book.tone"
                   [style.--book]="book.coverColor"
+                  [style.--tilt.deg]="book.tilt"
                   [class.taken]="flight()?.book?.card?.petId === book.card.petId"
                   [attr.aria-label]="'DIARY.BOOK_OF' | translate: { pet: book.card.name, owner: book.card.ownerName }"
                   (click)="pick(book, $event)"

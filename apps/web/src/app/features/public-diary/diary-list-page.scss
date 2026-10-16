@@ -24,6 +24,70 @@
   }
 }
 
+.wall-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+  min-height: 150px;
+  padding: 8px 22px 10px;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 86% 30%, var(--pm-amber-soft) 0 12%, transparent 13%),
+    linear-gradient(135deg, var(--pm-paper-cream), var(--pm-bg-card));
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--pm-art-shadow) 12%, transparent);
+}
+
+.wall-copy { position: relative; z-index: 1; }
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hero-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-pill);
+  background: color-mix(in srgb, var(--pm-bg-card) 82%, transparent);
+  color: var(--pm-text-body);
+  font-size: var(--pm-text-xs);
+  font-weight: 700;
+}
+
+.hero-stat:first-child { color: var(--pm-accent-dark); }
+
+.hero-doodles {
+  position: relative;
+  flex: 0 0 180px;
+  align-self: stretch;
+}
+
+.doodle {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  color: var(--pm-accent);
+  animation: diary-float 4s ease-in-out infinite;
+}
+
+.doodle-paw { top: 20px; right: 34px; transform: rotate(18deg); }
+.doodle-star { right: 112px; bottom: 20px; color: var(--pm-amber); animation-delay: -1.2s; }
+.doodle-heart { top: 74px; right: 2px; color: var(--pm-memorial); animation-delay: -2.4s; }
+
+@keyframes diary-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -7px; }
+}
+
 .wall-head h1 {
   margin: 0;
 }
@@ -89,7 +153,19 @@
 }
 
 @media (max-width: 600px) {
+  .wall-hero { min-height: 0; padding-inline: 16px; }
+  .hero-doodles { flex-basis: 80px; opacity: 0.7; }
+  .doodle-paw { right: 10px; }
+  .doodle-star { right: 48px; }
+  .doodle-heart { right: -2px; }
+
   .shelf {
     --row: 246px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doodle {
+    animation: none;
   }
 }

@@ -33,6 +33,7 @@ interface Book {
   card: DiaryCard;
   tone: Tone;
   coverColor: string;
+  tilt: number;
 }
 
 /** Mot quyen dang bay tu gia ra giua man hinh. */
@@ -80,8 +81,10 @@ export class DiaryListPage implements OnInit {
       card,
       tone: TONES[at % TONES.length],
       coverColor: card.coverColor || '#c4661a',
+      tilt: [-2.5, 1.5, -1, 2][at % 4],
     })),
   );
+  readonly momentCount = computed(() => this.books().reduce((total, book) => total + book.card.momentCount, 0));
   readonly page = computed(() => this.answer().page);
   readonly pageCount = computed(() => this.answer().pageCount);
 
