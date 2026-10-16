@@ -184,6 +184,139 @@
   min-height: 50px;
 }
 
+/* ---------- Anh nen dung yen ---------- */
+
+/*
+ * Anh san pham len choc that phu kin man hinh dau tien, khong lam mo. Anh dinh
+ * yen o day khung nhin (sticky), con lop noi dung .lp-front ngay sau truot len
+ * va che dan anh khi cuon, nhu mot tam man keo len.
+ */
+.lp-cover {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  display: grid;
+  align-items: center;
+  block-size: 100svh;
+  min-block-size: 520px;
+  // Nam duoi thanh dinh trong mo, anh trai tu mep tren. --lp-bar-h do tu chieu cao that cua thanh.
+  margin-block-start: calc(-1 * var(--lp-bar-h, 73px));
+  overflow: hidden;
+  background: var(--pm-paper-kraft);
+}
+
+.lp-cover picture,
+.lp-cover-photo {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.lp-cover-photo {
+  object-fit: cover;
+  object-position: 70% 40%;
+}
+
+.lp-cover-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  inline-size: min(100% - 48px, 1200px);
+  margin-inline: auto;
+  padding-block-start: var(--lp-bar-h, 73px);
+
+  > * {
+    max-inline-size: 30rem;
+  }
+}
+
+// Chu dat len vung nen sang cua anh: dung mau muc giay co dinh, khong doi theo che do toi.
+.lp-cover-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pm-book-cover);
+}
+
+.lp-cover-title {
+  margin: 0;
+  font-family: var(--pm-font-display);
+  font-size: clamp(36px, 5.2vw, 64px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: var(--pm-ink);
+  text-wrap: balance;
+}
+
+.lp-cover-sub {
+  margin: 0;
+  font-size: clamp(16px, 1.4vw, 18px);
+  line-height: 1.6;
+  color: var(--pm-ink);
+}
+
+.lp-cover-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 6px;
+  min-block-size: 48px;
+  padding: 0 24px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-ink);
+  color: var(--pm-paper-cream);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 160ms ease;
+
+  pm-icon {
+    rotate: 90deg;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pm-accent-ring);
+    outline-offset: 3px;
+  }
+}
+
+/* Lop noi dung phia truoc: nen dac, bo goc tren, truot len che anh nen. */
+.lp-front {
+  position: relative;
+  z-index: 1;
+  border-radius: 32px 32px 0 0;
+  background: var(--pm-bg);
+  box-shadow: 0 -18px 40px var(--pm-book-edge);
+}
+
+/* Dien thoai dung: anh doc, cun o nua tren; chu nam trong the giay o day anh. */
+@media (max-aspect-ratio: 4/5) {
+  .lp-cover {
+    align-items: end;
+  }
+
+  .lp-cover-photo {
+    object-position: 60% 20%;
+  }
+
+  .lp-cover-text {
+    inline-size: auto;
+    margin: 0 16px 24px;
+    padding: 20px;
+    border-radius: 22px;
+    background: color-mix(in srgb, var(--pm-paper-cream) 92%, transparent);
+    box-shadow: var(--pm-shadow-lifted);
+  }
+}
+
 /* ---------- Hero ---------- */
 
 .lp-hero {

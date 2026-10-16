@@ -22,3 +22,4 @@ https://unsplash.com/license
 | `ambient-4.webp` | Cún corgi trên nền cam | Alvan Nee | https://unsplash.com/photos/brFsZ7qszSY |
 | `diary-desk.webp` | Sổ lò xo mở trên bàn gỗ (đã cắt khung, chỉnh tông ấm) | Kelly Sikkema | https://unsplash.com/photos/D6AlacFwS_Q |
 | `diary-dog.webp` | Cún golden nằm cạnh chăn ngày đầu về nhà | Viktoria Lavrynenko | https://unsplash.com/photos/ZvspET7SMhw |
+| `cover-wide.webp`, `cover-tall.webp` | Chú beagle len chọc trên hoa ly (ảnh nền đầu trang, hai bản cắt ngang/dọc, không làm mờ) | zhangliubin (Pexels) | https://www.pexels.com/photo/adorable-felt-dog-figurine-on-pink-lilies-33818736/ — giấy phép Pexels, dùng thương mại miễn phí |
