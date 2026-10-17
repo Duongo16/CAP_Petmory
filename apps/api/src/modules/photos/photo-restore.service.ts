@@ -1,17 +1,35 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+﻿import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { AI_OPERATIONS, RestoreOperation } from './dto/photo.dto';
 import sharp from 'sharp';
 import { ConfigService } from '@nestjs/config';
 import { AiClientService } from '../ai/ai-client.service';
 import { CloudinaryImageAi } from './cloudinary-image-ai';
-import { fitPicture, measureResemblance, restorePhoto, scorePhoto } from './image-tool';
+import { HuggingFaceImageAi } from './huggingface-image-ai';
+import { HuggingFaceSpaceImageAi } from './huggingface-space-image-ai';
+import {
+  fitPicture,
+  measureResemblance,
+  restorePhoto,
+  scorePhoto,
+} from './image-tool';
 import { BusinessConfigService } from '../business-config/business-config.service';
 import { AiUsageService } from '../ai/ai-usage.service';
 import { AiKind, AiMode } from '../ai/schemas/ai-usage.schema';
 import { MSG } from '../../common/constants/messages';
 
 /** Bo thao tac mac dinh khi khach khong chon gi. */
-const OPERATIONS: RestoreOperation[] = ['UPSCALE', 'SHARPEN', 'DENOISE', 'EXPOSURE', 'FACE_DETAIL'];
+const OPERATIONS: RestoreOperation[] = [
+  'UPSCALE',
+  'SHARPEN',
+  'DENOISE',
+  'EXPOSURE',
+  'FACE_DETAIL',
+];
 
 /** Loi dan cho tung thao tac AI; luon nhac giu nguyen dac diem cua be. */
 const AI_INSTRUCTION: Record<string, string> = {
@@ -60,8 +78,8 @@ export interface RestoreOutcome {
  * khi doc ket qua. Chi so luot dung duoc ghi lai, vi han muc va bao cao chi
  * phi doc tu so do.
  *
- * Dich vu sua anh mac dinh la Cloudinary, chay duoc tren goi mien phi. Dat
- * bien moi truong chon nha cung cap anh la gemini de quay ve mo hinh Gemini.
+ * Dich vu sua anh mac dinh uu tien Cloudinary neu da cau hinh. Dat bien moi
+ * truong chon nha cung cap anh la huggingface hoac gemini de doi provider.
  */
 @Injectable()
 export class PhotoRestoreService {
@@ -70,16 +88,50 @@ export class PhotoRestoreService {
     private readonly usage: AiUsageService,
     private readonly ai: AiClientService,
     private readonly cloud: CloudinaryImageAi,
+    private readonly huggingface: HuggingFaceImageAi,
+    private readonly huggingfaceSpace: HuggingFaceSpaceImageAi,
     private readonly config: ConfigService,
   ) {}
 
   /** Lua chon Cloudinary ro rang khong duoc tu chuyen sang Gemini. */
   private get useCloud(): boolean {
     const wanted = this.config.get<string>('ai.imageProvider') ?? '';
-    return wanted === 'cloudinary' || (wanted !== 'gemini' && this.cloud.ready);
+    return (
+      wanted === 'cloudinary' ||
+      (wanted !== 'gemini' &&
+        wanted !== 'huggingface' &&
+        wanted !== 'huggingface-space' &&
+        this.cloud.ready)
+    );
   }
 
-  async run(owner: string, file: Express.Multer.File | undefined, chosen: RestoreOperation[] = []): Promise<RestoreOutcome> {
+  private get useHuggingFaceSpace(): boolean {
+    const wanted = this.config.get<string>('ai.imageProvider') ?? '';
+    return (
+      wanted === 'huggingface-space' ||
+      (wanted === '' &&
+        !this.cloud.ready &&
+        !this.huggingface.ready &&
+        this.huggingfaceSpace.ready)
+    );
+  }
+
+  private get useHuggingFace(): boolean {
+    const wanted = this.config.get<string>('ai.imageProvider') ?? '';
+    return (
+      wanted === 'huggingface' ||
+      (wanted === '' &&
+        !this.cloud.ready &&
+        !this.useHuggingFaceSpace &&
+        this.huggingface.ready)
+    );
+  }
+
+  async run(
+    owner: string,
+    file: Express.Multer.File | undefined,
+    chosen: RestoreOperation[] = [],
+  ): Promise<RestoreOutcome> {
     if (!file?.buffer?.length) {
       throw new BadRequestException('Chua chon tep anh nao');
     }
@@ -106,15 +158,26 @@ export class PhotoRestoreService {
     const aiWanted = wanted.filter((one) => AI_OPERATIONS.includes(one));
 
     // Bo loc tai may chay truoc, roi moi gui ket qua cho mo hinh sua anh.
-    let data = local.length > 0 ? await restorePhoto(file.buffer, local) : await sharp(file.buffer).rotate().png().toBuffer();
+    let data =
+      local.length > 0
+        ? await restorePhoto(file.buffer, local)
+        : await sharp(file.buffer).rotate().png().toBuffer();
     let mode = AiMode.LOCAL;
     let skipped: string[] = [];
     let problem = '';
     let warning: RestoreOutcome['warning'];
     if (aiWanted.length > 0) {
-      const edited = this.useCloud
-        ? await this.cloud.edit(data, aiWanted)
-        : await this.ai.editImage(data, 'image/png', aiWanted.map((one) => AI_INSTRUCTION[one]).join(' '));
+      const edited = this.useHuggingFaceSpace
+        ? await this.huggingfaceSpace.edit(data, aiWanted)
+        : this.useHuggingFace
+          ? await this.huggingface.edit(data, aiWanted)
+          : this.useCloud
+            ? await this.cloud.edit(data, aiWanted)
+            : await this.ai.editImage(
+                data,
+                'image/png',
+                aiWanted.map((one) => AI_INSTRUCTION[one]).join(' '),
+              );
       if (edited.data) {
         data = await sharp(edited.data).png({ compressionLevel: 8 }).toBuffer();
         mode = AiMode.LIVE;
@@ -122,13 +185,29 @@ export class PhotoRestoreService {
         // Ghi ro thao tac AI nao khong lam duoc, khong lang le coi nhu da lam.
         skipped = aiWanted;
         problem = edited.problem;
-        warning = 'warning' in edited ? edited.warning : undefined;
+        warning =
+          'warning' in edited && edited.warning === 'CLOUDINARY_QUOTA'
+            ? edited.warning
+            : undefined;
       }
     }
     const resemblance = await measureResemblance(file.buffer, data);
-    await this.usage.record(AiKind.RESTORE_PHOTO, owner, mode, undefined, problem);
+    await this.usage.record(
+      AiKind.RESTORE_PHOTO,
+      owner,
+      mode,
+      undefined,
+      problem,
+    );
     const fitted = await fitPicture(data);
-    return { data: fitted.data, resemblance, mode, skipped, mimeType: fitted.mimeType, warning };
+    return {
+      data: fitted.data,
+      resemblance,
+      mode,
+      skipped,
+      mimeType: fitted.mimeType,
+      warning,
+    };
   }
 
   /**
@@ -147,7 +226,11 @@ export class PhotoRestoreService {
         continue;
       }
       const since = new Date(Date.now() - window.hours * 60 * 60 * 1000);
-      const used = await this.usage.countFor(owner, AiKind.RESTORE_PHOTO, since);
+      const used = await this.usage.countFor(
+        owner,
+        AiKind.RESTORE_PHOTO,
+        since,
+      );
       const here = Math.max(0, cap - used);
       left = left < 0 ? here : Math.min(left, here);
     }
@@ -168,8 +251,13 @@ export class PhotoRestoreService {
         continue;
       }
       const since = new Date(Date.now() - window.hours * 60 * 60 * 1000);
-      if ((await this.usage.countFor(owner, AiKind.RESTORE_PHOTO, since)) >= cap) {
-        throw new HttpException(MSG.RESTORE_QUOTA_REACHED, HttpStatus.TOO_MANY_REQUESTS);
+      if (
+        (await this.usage.countFor(owner, AiKind.RESTORE_PHOTO, since)) >= cap
+      ) {
+        throw new HttpException(
+          MSG.RESTORE_QUOTA_REACHED,
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
       }
     }
   }

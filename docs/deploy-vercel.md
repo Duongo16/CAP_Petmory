@@ -1,4 +1,4 @@
-# Deploy PETMORY lên Vercel
+﻿# Deploy PETMORY lên Vercel
 
 PETMORY deploy thành **một project Vercel ở chế độ Services** (https://vercel.com/docs/services), gồm hai service build riêng và dùng chung một tên miền:
 
@@ -83,6 +83,9 @@ Nhóm tuỳ chọn:
 | Biến | Khi nào cần |
 |---|---|
 | `AI_MODEL`, `AI_IMAGE_PROVIDER`, `AI_IMAGE_MODEL` | Đổi model AI. Để trống thì dùng mặc định. |
+| `HF_TOKEN` | Token Hugging Face co quyen Inference Providers khi dat `AI_IMAGE_PROVIDER=huggingface`; khong can khi dung Space cong khai. |
+| `HF_IMAGE_MODEL` / `HF_IMAGE_PROVIDER` / `HF_IMAGE_ENDPOINT_URL` | Model, provider (`auto`) va endpoint rieng cho Inference Providers. |
+| `HF_SPACE_URL` / `HF_SPACE_API_NAME` / `HF_SPACE_SCALE` | Space Gradio, ten API va he so upscale khi dat `AI_IMAGE_PROVIDER=huggingface-space`. |
 | `SMTP_*` | Chức năng "Quên mật khẩu" khi `NODE_ENV=production` |
 | `CHROMIUM_PACK_URL` | Chỉ khai khi muốn tải gói Chromium từ nơi khác |
 
