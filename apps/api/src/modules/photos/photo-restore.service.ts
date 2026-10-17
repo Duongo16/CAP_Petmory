@@ -93,17 +93,18 @@ export class PhotoRestoreService {
     private readonly config: ConfigService,
   ) {}
 
-  /** Cloudinary chi duoc dung khi duoc chon ro rang trong env. */
+  /** Cloudinary legacy khong con duoc phep chay trong luong /restore. */
   private get useCloud(): boolean {
-    const wanted = this.config.get<string>('ai.imageProvider') ?? '';
-    return wanted === 'cloudinary';
+    return false;
   }
 
   private get useHuggingFaceSpace(): boolean {
     const wanted = this.config.get<string>('ai.imageProvider') ?? '';
     return (
-      wanted === 'huggingface-space' ||
-      (wanted === '' && this.huggingfaceSpace.ready)
+      wanted !== 'gemini' &&
+      wanted !== 'huggingface' &&
+      wanted !== 'cloudinary-legacy' &&
+      this.huggingfaceSpace.ready
     );
   }
 
