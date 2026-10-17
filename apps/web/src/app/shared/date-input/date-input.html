@@ -1,0 +1,92 @@
+<div class="date-field" [class.with-calendar]="calendar() && !dateTime()">
+  <input
+    class="tw-input w-full date-text"
+    [id]="id"
+    type="text"
+    [value]="display"
+    [placeholder]="dateTime() ? 'dd/mm/yyyy HH:mm' : 'dd/mm/yyyy'"
+    inputmode="numeric"
+    autocomplete="off"
+    [disabled]="disabled"
+    [attr.aria-invalid]="invalid"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+  />
+  @if (calendar() && !dateTime()) {
+    <button
+      type="button"
+      class="cal-toggle"
+      [class.on]="open()"
+      [disabled]="disabled"
+      [attr.aria-expanded]="open()"
+      [attr.aria-label]="'COMMON.PICK_DATE' | translate"
+      [attr.title]="'COMMON.PICK_DATE' | translate"
+      (click)="toggle()"
+    >
+      <pm-icon name="calendar" [size]="17" />
+    </button>
+  }
+</div>
+
+@if (open()) {
+  <div
+    class="cal"
+    [class.up]="panelPos().up"
+    role="dialog"
+    [attr.aria-label]="'COMMON.PICK_DATE' | translate"
+    [style.top.px]="panelPos().top"
+    [style.left.px]="panelPos().left"
+  >
+    <header class="cal-head">
+      <button type="button" class="cal-nav" [disabled]="!canPrev()" (click)="shiftMonth(-1)" aria-label="‹">
+        <pm-icon name="back" [size]="15" />
+      </button>
+      <div class="cal-pick">
+        <select class="cal-select" [value]="viewMonth()" (change)="setMonth($event)" [attr.aria-label]="'COMMON.MONTH' | translate">
+          @for (name of monthNames(); track $index) {
+            <option [value]="$index" [selected]="$index === viewMonth()">{{ name }}</option>
+          }
+        </select>
+        <select class="cal-select" [value]="viewYear()" (change)="setYear($event)" [attr.aria-label]="'COMMON.YEAR' | translate">
+          @for (year of years(); track year) {
+            <option [value]="year" [selected]="year === viewYear()">{{ year }}</option>
+          }
+        </select>
+      </div>
+      <button type="button" class="cal-nav cal-nav-next" [disabled]="!canNext()" (click)="shiftMonth(1)" aria-label="›">
+        <pm-icon name="back" [size]="15" />
+      </button>
+    </header>
+
+    <div class="cal-week" aria-hidden="true">
+      @for (name of weekdays(); track $index) {
+        <span>{{ name }}</span>
+      }
+    </div>
+
+    <div class="cal-grid" role="grid" (keydown)="onGridKey($event)">
+      @for (cell of cells(); track cell.iso) {
+        <button
+          type="button"
+          class="cal-day"
+          role="gridcell"
+          [attr.data-iso]="cell.iso"
+          [class.out]="!cell.inMonth"
+          [class.today]="cell.today"
+          [class.chosen]="cell.chosen"
+          [disabled]="cell.blocked"
+          [attr.aria-selected]="cell.chosen"
+          [attr.tabindex]="cell.iso === focusIso() ? 0 : -1"
+          (click)="choose(cell)"
+        >
+          {{ cell.day }}
+        </button>
+      }
+    </div>
+
+    <footer class="cal-foot">
+      <button type="button" class="cal-link" (click)="clear()">{{ 'COMMON.CLEAR' | translate }}</button>
+      <button type="button" class="cal-today" (click)="pickToday()">{{ 'COMMON.TODAY' | translate }}</button>
+    </footer>
+  </div>
+}

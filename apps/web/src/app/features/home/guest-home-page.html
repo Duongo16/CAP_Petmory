@@ -141,13 +141,78 @@
   <section class="lp-section" id="features">
     <header class="lp-head">
       <span class="lp-eyebrow">{{ 'LANDING.FEATURES_EYEBROW' | translate }}</span>
-      <h2 class="lp-h2">{{ 'LANDING.FEATURES_TITLE' | translate }}</h2>
+      <h2 class="lp-h2"><pm-bounce-text [text]="'LANDING.FEATURES_TITLE' | translate" /></h2>
       <p class="lp-sub">{{ 'LANDING.FEATURES_SUB' | translate }}</p>
     </header>
     <div class="lp-features">
-      @for (feat of features; track feat.nameKey) {
-        <article class="lp-feature">
-          <span class="lp-feature-icon" [attr.data-tone]="feat.tone"><pm-icon [name]="feat.icon" [size]="24" /></span>
+      @for (feat of features; track feat.nameKey; let i = $index) {
+        <article class="lp-feature" [attr.data-tone]="feat.tone" pmReveal [pmRevealDelay]="i * 110" pmTilt>
+          <!-- Mot canh nho dung bang giao dien that cua Petmory, tu chay; khong dung anh. -->
+          <div class="fx-stage" aria-hidden="true">
+            @switch (feat.icon) {
+              @case ('book') {
+                <div class="fx-page">
+                  <span class="fx-page-date">{{ 'LANDING.FX.DIARY_DATE' | translate }}</span>
+                  <span class="fx-page-title">{{ 'LANDING.FX.DIARY_TITLE' | translate }}</span>
+                  <span class="fx-line fx-line-1"></span>
+                  <span class="fx-line fx-line-2"></span>
+                  <span class="fx-line fx-line-3"></span>
+                  <span class="fx-snap"><img src="/img/landing/beachmochi.jfif" alt="" loading="lazy" /></span>
+                  <span class="fx-stamp"><pm-icon name="paw" [size]="14" /></span>
+                  <span class="fx-pen"><pm-icon name="pencil" [size]="16" /></span>
+                </div>
+              }
+              @case ('sparkle') {
+                <div class="fx-notes">
+                  <div class="fx-note fx-note-back"></div>
+                  <div class="fx-note">
+                    <img class="fx-note-photo" src="/img/landing/photo-beach.webp" alt="" loading="lazy" />
+                    <span class="fx-note-text">
+                      <small>{{ 'LANDING.FX.MEMORY_EYEBROW' | translate }}</small>
+                      <strong>{{ 'LANDING.FX.MEMORY_TITLE' | translate }}</strong>
+                    </span>
+                  </div>
+                  <span class="fx-confetti fx-confetti-a"></span>
+                  <span class="fx-confetti fx-confetti-b"></span>
+                  <span class="fx-confetti fx-confetti-c"></span>
+                </div>
+              }
+              @case ('gift') {
+                <div class="fx-frame">
+                  <div class="fx-frame-in">
+                    <img class="fx-felt" src="/img/landing/felt/ginger-frame-cut.webp" alt="" loading="lazy" />
+                    <span class="fx-shine"></span>
+                  </div>
+                  <div class="fx-swatches">
+                    <span style="--c: var(--pm-art-fur)"></span>
+                    <span style="--c: var(--pm-art-cream)"></span>
+                    <span style="--c: var(--pm-art-tan)"></span>
+                    <span style="--c: var(--pm-art-collar)"></span>
+                  </div>
+                </div>
+              }
+              @default {
+                <div class="fx-post">
+                  <div class="fx-post-head">
+                    <img class="fx-avatar" src="/img/landing/Uplifting Pictures And Memes Of Cute Corgis To___.jfif" alt="" loading="lazy" />
+                    <span class="fx-post-who">
+                      <strong>{{ 'LANDING.FX.POST_WHO' | translate }}</strong>
+                      <small>{{ 'LANDING.FX.POST_WHEN' | translate }}</small>
+                    </span>
+                  </div>
+                  <img class="fx-post-photo" src="/img/landing/ambient-4.webp" alt="" loading="lazy" />
+                  <div class="fx-post-actions">
+                    <span class="fx-like"><pm-icon name="heart" [size]="14" [filled]="true" /> <b class="fx-count"></b></span>
+                    <span class="fx-comment"><pm-icon name="comment" [size]="14" /> 12</span>
+                  </div>
+                  <span class="fx-heart fx-heart-a"><pm-icon name="heart" [size]="14" [filled]="true" /></span>
+                  <span class="fx-heart fx-heart-b"><pm-icon name="heart" [size]="11" [filled]="true" /></span>
+                  <span class="fx-heart fx-heart-c"><pm-icon name="heart" [size]="12" [filled]="true" /></span>
+                </div>
+              }
+            }
+            <span class="lp-feature-icon" [attr.data-tone]="feat.tone"><pm-icon [name]="feat.icon" [size]="22" /></span>
+          </div>
           <h3>{{ feat.nameKey | translate }}</h3>
           <p>{{ feat.textKey | translate }}</p>
         </article>

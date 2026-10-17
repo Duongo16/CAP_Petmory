@@ -135,7 +135,7 @@ export interface ZoneView {
 }
 
 import { PetPhotos } from '../memories/pet-photos/pet-photos';
-import { CUSTOM_KEEPSAKE_CODES, FIGURE_PRODUCT_CODE, PORTRAIT_PRODUCT_CODE } from '../catalog/custom-keepsakes';
+import { CUSTOM_KEEPSAKE_CODES, FIGURE_PRODUCT_CODE, PORTRAIT_PRODUCT_CODE, packagingFits } from '../catalog/custom-keepsakes';
 
 @Component({
   selector: 'pm-studio-page',
@@ -208,8 +208,15 @@ export class StudioPage implements OnInit {
   readonly kindSelected = signal<string | null>(null);
   readonly poseSelected = signal<string | null>(null);
   readonly portraitSelected = computed(() => this.facade.codeKindSelected() === PORTRAIT_PRODUCT_CODE);
+  /**
+   * San pham do khach chu dong chon (tu trang san pham sang, hoac bam chon) thi gioi
+   * han danh sach mau theo san pham do. San pham tu chon theo mau thi khong gioi han,
+   * neu khong khach se khong doi duoc tu mau nguyen con sang mau chi dau.
+   */
+  private readonly productPinned = signal(false);
+
   readonly availableModels = computed(() => {
-    const product = this.facade.codeKindSelected();
+    const product = this.productPinned() ? this.facade.codeKindSelected() : '';
     return this.baseModel().filter((model) =>
       product === PORTRAIT_PRODUCT_CODE
         ? model.pose === 'HEAD'
@@ -419,12 +426,14 @@ export class StudioPage implements OnInit {
   /** Hai nhom hop va khung, moi nhom kem lua chon khong lay. Nhom chua co mau nao thi an. */
   readonly packGroups = computed(() => {
     const picked = this.facade.packagingPicked();
+    const product = this.facade.codeKindSelected();
     return PACK_GROUPS.map((group) => ({
       ...group,
       none: !picked[group.kind],
+      // Chi hien bao bi hop voi san pham dang chon: long mica cho tuong, khung treo tuong cho tranh.
       options: this.facade
         .packagingCatalog()
-        .filter((one) => one.kind === group.kind)
+        .filter((one) => one.kind === group.kind && packagingFits(one.code, product))
         .map((raw) => ({ raw, on: picked[group.kind] === raw.code, free: isZero(raw.priceDelta.$numberDecimal) })),
     })).filter((group) => group.options.length > 0);
   });
@@ -447,12 +456,53 @@ export class StudioPage implements OnInit {
     return { name: base.displayName, price: base.priceDelta, currency: base.currency, free: isZero(base.priceDelta.$numberDecimal) };
   });
 
-  readonly productCards = computed(() =>
-    this.facade.types().filter((kind) => CUSTOM_KEEPSAKE_CODES.has(kind.code)).map((kind) => ({
-      raw: kind,
-      on: this.facade.codeKindSelected() === kind.code,
-    })),
-  );
+  /**
+   * San pham hop voi mau dang chon: mau chi dau lam tranh len choc noi, mau nguyen
+   * con lam tuong. Chua chon mau thi rong, de khach tu chon san pham truoc.
+   */
+  readonly productForModel = computed(() => {
+    const model = this.baseModelSelected();
+    if (!model) {
+      return null;
+    }
+    return model.pose === 'HEAD' ? PORTRAIT_PRODUCT_CODE : FIGURE_PRODUCT_CODE;
+  });
+
+  /** Chi hien san pham hop voi mau dang chon, nen kich co va tuy chon cung dung loai. */
+  readonly productCards = computed(() => {
+    const only = this.productForModel();
+    return this.facade
+      .types()
+      .filter((kind) => CUSTOM_KEEPSAKE_CODES.has(kind.code) && (!only || kind.code === only))
+      .map((kind) => ({
+        raw: kind,
+        on: this.facade.codeKindSelected() === kind.code,
+      }));
+  });
+
+  /**
+   * Doi mau thi tu chon san pham tuong ung. Da dung loai san (nhu mo lai ban thiet
+   * ke da luu) thi khong cham, de khong mat kich co da chon.
+   */
+  /** Doi san pham thi bo bao bi khong con hop (vi du long mica khi chuyen sang tranh). */
+  protected readonly packagingFollowsProduct = effect(() => {
+    const product = this.facade.codeKindSelected();
+    const picked = this.facade.packagingPicked();
+    for (const [kind, code] of Object.entries(picked)) {
+      if (code && !packagingFits(code, product)) {
+        untracked(() => this.facade.selectPackaging(kind as PackagingKind, ''));
+      }
+    }
+  });
+
+  protected readonly productFollowsModel = effect(() => {
+    const want = this.productForModel();
+    const loaded = this.facade.types().some((kind) => kind.code === want);
+    if (!want || !loaded || this.facade.codeKindSelected() === want) {
+      return;
+    }
+    untracked(() => this.facade.selectKind(want));
+  });
 
   readonly sizeCards = computed(() =>
     this.facade.sizes().map((size) => ({ raw: size, on: this.facade.sizeCodeSelected() === size.code })),
@@ -471,6 +521,7 @@ export class StudioPage implements OnInit {
     const product = query.get('product');
     if (!codeDraft && product) {
       this.facade.selectKind(product);
+      this.productPinned.set(true);
       const size = query.get('size');
       if (size) {
         this.facade.selectSize(size);
@@ -580,6 +631,7 @@ export class StudioPage implements OnInit {
 
   selectProduct(code: string): void {
     this.facade.selectKind(code);
+    this.productPinned.set(true);
     this.kindSelected.set(null);
     this.poseSelected.set(null);
     const selected = this.baseModelSelected();

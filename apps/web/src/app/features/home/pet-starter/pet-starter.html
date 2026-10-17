@@ -104,7 +104,7 @@
 
           <div class="tw-field">
             <label class="tw-label" for="starter-birth">{{ 'LANDING.STARTER.BIRTH' | translate }}</label>
-            <pm-date-input id="starter-birth" formControlName="birthDate" />
+            <pm-date-input id="starter-birth" formControlName="birthDate" [calendar]="true" [max]="today" />
             @if (birthInFuture()) {
               <p class="tw-error">{{ 'LANDING.STARTER.BIRTH_ERROR' | translate }}</p>
             } @else {

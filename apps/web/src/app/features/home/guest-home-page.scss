@@ -1,6 +1,6 @@
 :host {
   display: block;
-  background: var(--pm-bg);
+  background: var(--pm-wallpaper);
   color: var(--pm-text);
   // Trang gioi thieu dung tieu de khong chan; cac trang ben trong van giu chu co chan.
   --pm-font-display: var(--pm-font-rounded);
@@ -411,7 +411,7 @@
   z-index: 1;
   overflow: hidden;
   border-radius: 32px 32px 0 0;
-  background: var(--pm-bg);
+  background: var(--pm-wallpaper);
   box-shadow: 0 -18px 40px var(--pm-book-edge);
 }
 
@@ -1263,9 +1263,9 @@
 
 /* ---------- Ba buoc ---------- */
 
+// Trong suot va khong vien: dung chung nen giay dan tuong cua lop .lp-front, soc doc lien mach.
 .lp-band {
-  background: var(--pm-bg-muted);
-  border-block: 1px solid var(--pm-border);
+  background: transparent;
 }
 
 .lp-steps {
@@ -1590,4 +1590,561 @@
   .lp-art { display: none; }
   .lp-link-btn { display: none; }
   .lp-cta { padding: 48px 20px; }
+}
+
+/* ---------- Khong chi la album anh: canh giao dien tu chay ---------- */
+
+.lp-features {
+  perspective: 1000px;
+}
+
+.lp-feature {
+  padding: 14px 14px 24px;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+
+  &:hover {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, -6px, 0);
+  }
+
+  h3 {
+    margin: 14px 8px 0;
+    font-family: var(--pm-font-display);
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0 8px;
+  }
+}
+
+.lp-feature[data-reveal] {
+  opacity: 0;
+}
+
+.lp-feature[data-reveal].is-shown {
+  animation: lp-card-up 700ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--reveal-delay, 0ms) both;
+}
+
+// San khau: nen mau theo the, cham bi mo nhu mat ban.
+.fx-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  block-size: 190px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle, var(--pm-paper-mark) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    var(--stage, var(--pm-amber-soft));
+}
+
+.lp-feature[data-tone='accent'] { --stage: var(--pm-accent-soft); }
+.lp-feature[data-tone='success'] { --stage: var(--pm-success-soft); }
+.lp-feature[data-tone='memorial'] { --stage: var(--pm-memorial-soft); }
+
+.fx-stage .lp-feature-icon {
+  position: absolute;
+  inset-block-end: -18px;
+  inset-inline-start: 16px;
+  z-index: 5;
+  inline-size: 46px;
+  block-size: 46px;
+  border: 3px solid var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+}
+
+.lp-feature:hover .fx-stage .lp-feature-icon {
+  animation: fx-hop 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+// Dong chu gia lap.
+.fx-line {
+  display: block;
+  block-size: 7px;
+  border-radius: 4px;
+  background: var(--pm-border);
+}
+
+/* -- Nhat ky: trang so co chu dang viet dan, dong dau chan meo -- */
+.fx-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  inline-size: 76%;
+  padding: 16px 16px 22px 26px;
+  border-radius: 6px 12px 12px 6px;
+  background:
+    linear-gradient(90deg, transparent 14px, var(--pm-accent-soft) 14px 16px, transparent 16px),
+    var(--pm-paper-cream);
+  box-shadow: var(--pm-shadow-lifted);
+  rotate: -3deg;
+  color: var(--pm-ink);
+}
+
+.fx-page-date {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--pm-book-cover);
+}
+
+.fx-page-title {
+  font-family: var(--pm-font-hand);
+  font-size: 17px;
+  line-height: 1.15;
+}
+
+.fx-page .fx-line {
+  background: var(--pm-paper-kraft);
+  transform-origin: left;
+  animation: fx-write 5s ease-in-out infinite;
+}
+
+.fx-page .fx-line-1 { inline-size: 92%; }
+.fx-page .fx-line-2 { inline-size: 78%; animation-delay: 0.5s; }
+.fx-page .fx-line-3 { inline-size: 55%; animation-delay: 1s; }
+
+.fx-stamp {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-end: 12px;
+  display: grid;
+  place-items: center;
+  inline-size: 30px;
+  block-size: 30px;
+  border: 2px dashed var(--pm-accent);
+  border-radius: 50%;
+  color: var(--pm-accent);
+  rotate: 12deg;
+  animation: fx-stamp 5s ease-in-out infinite;
+}
+
+.fx-pen {
+  position: absolute;
+  inset-block-end: 4px;
+  inset-inline-start: 26px;
+  color: var(--pm-ink);
+  animation: fx-pen 5s ease-in-out infinite;
+}
+
+/* -- Ky niem: thong bao "1 nam truoc" bat len, phao giay -- */
+.fx-notes {
+  position: relative;
+  inline-size: 84%;
+}
+
+.fx-note {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow-lifted);
+  animation: fx-notify 4.5s cubic-bezier(0.34, 1.5, 0.64, 1) infinite;
+}
+
+.fx-note-back {
+  position: absolute;
+  inset: 12px 12px -12px;
+  z-index: 0;
+  opacity: 0.55;
+  animation: none;
+}
+
+.fx-note-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 34px;
+  block-size: 34px;
+  border-radius: 10px;
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent);
+}
+
+.fx-note-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+
+  small {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--pm-amber);
+  }
+
+  strong {
+    font-size: 13px;
+    color: var(--pm-text);
+  }
+}
+
+.fx-confetti {
+  position: absolute;
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 2px;
+  background: var(--pm-amber-bright);
+  animation: fx-pop 4.5s ease-out infinite;
+}
+
+.fx-confetti-a { inset-block-start: -12px; inset-inline-start: 20%; }
+.fx-confetti-b { inset-block-start: -16px; inset-inline-end: 22%; background: var(--pm-accent); animation-delay: 0.1s; }
+.fx-confetti-c { inset-block-end: -14px; inset-inline-end: 40%; background: var(--pm-success); animation-delay: 0.2s; }
+
+/* -- Studio: khung tranh len, mat be duoc to dan bang tung cuon len -- */
+.fx-frame {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fx-frame-in {
+  display: grid;
+  place-items: center;
+  inline-size: 112px;
+  block-size: 124px;
+  border: 10px solid var(--pm-book-cover);
+  border-radius: 6px;
+  background: var(--pm-hoop-linen);
+  box-shadow: var(--pm-shadow-lifted), inset 0 0 12px var(--pm-book-edge);
+}
+
+.fx-head {
+  position: relative;
+  inline-size: 62px;
+  block-size: 56px;
+  border-radius: 46% 46% 50% 50%;
+  background: var(--pm-paper-kraft);
+  animation: fx-paint 6s steps(1) infinite;
+}
+
+.fx-ear {
+  position: absolute;
+  inset-block-start: -10px;
+  inline-size: 20px;
+  block-size: 22px;
+  background: inherit;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.fx-ear-l { inset-inline-start: 4px; rotate: -12deg; }
+.fx-ear-r { inset-inline-end: 4px; rotate: 12deg; }
+
+.fx-eye {
+  position: absolute;
+  inset-block-start: 22px;
+  inline-size: 7px;
+  block-size: 9px;
+  border-radius: 50%;
+  background: var(--pm-ink);
+  animation: fx-blink 4s ease-in-out infinite;
+}
+
+.fx-eye-l { inset-inline-start: 16px; }
+.fx-eye-r { inset-inline-end: 16px; }
+
+.fx-nose {
+  position: absolute;
+  inset-block-start: 34px;
+  inset-inline-start: 50%;
+  inline-size: 9px;
+  block-size: 6px;
+  translate: -50% 0;
+  border-radius: 50% 50% 60% 60%;
+  background: var(--pm-art-collar);
+}
+
+.fx-swatches {
+  display: grid;
+  gap: 8px;
+
+  span {
+    inline-size: 20px;
+    block-size: 20px;
+    border: 2px solid var(--pm-bg-card);
+    border-radius: 50%;
+    background:
+      repeating-linear-gradient(48deg, transparent 0 3px, var(--pm-paper-mark) 3px 4px),
+      var(--c);
+    box-shadow: var(--pm-shadow);
+    animation: fx-swatch 6s ease-in-out infinite;
+  }
+
+  span:nth-child(2) { animation-delay: 1.5s; }
+  span:nth-child(3) { animation-delay: 3s; }
+  span:nth-child(4) { animation-delay: 4.5s; }
+}
+
+/* -- Cong dong: bai dang, tim bay len -- */
+.fx-post {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  inline-size: 80%;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow-lifted);
+  rotate: 2deg;
+}
+
+.fx-post-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fx-avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 50%;
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.fx-post-who {
+  display: flex;
+  flex-direction: column;
+
+  strong { font-size: 12px; color: var(--pm-text); }
+  small { font-size: 10px; color: var(--pm-text-muted); }
+}
+
+.fx-post .fx-line-1 { inline-size: 95%; }
+.fx-post .fx-line-2 { inline-size: 70%; }
+
+.fx-post-actions {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pm-text-muted);
+
+  span { display: inline-flex; align-items: center; gap: 4px; }
+}
+
+.fx-like {
+  color: var(--pm-danger);
+
+  pm-icon {
+    animation: fx-beat 1.4s ease-in-out infinite;
+  }
+}
+
+.fx-heart {
+  position: absolute;
+  inset-block-end: 30px;
+  inset-inline-start: 18px;
+  color: var(--pm-danger);
+  opacity: 0;
+  animation: fx-float-up 4s ease-out infinite;
+}
+
+.fx-heart-b { inset-inline-start: 32px; animation-delay: 1.3s; }
+.fx-heart-c { inset-inline-start: 8px; animation-delay: 2.6s; }
+
+/* -- Khung hinh chuyen dong -- */
+
+@keyframes fx-write {
+  0%, 10% { scale: 0 1; }
+  45%, 85% { scale: 1 1; }
+  100% { scale: 0 1; }
+}
+
+@keyframes fx-pen {
+  0%, 10% { translate: 0 0; opacity: 1; }
+  45%, 85% { translate: 110px -4px; opacity: 1; }
+  100% { translate: 0 0; opacity: 0; }
+}
+
+@keyframes fx-stamp {
+  0%, 50% { scale: 0; opacity: 0; }
+  58% { scale: 1.3; opacity: 1; }
+  66%, 90% { scale: 1; opacity: 1; }
+  100% { scale: 1; opacity: 0; }
+}
+
+@keyframes fx-notify {
+  0% { translate: 0 30px; opacity: 0; scale: 0.9; }
+  15%, 80% { translate: 0 0; opacity: 1; scale: 1; }
+  100% { translate: 0 -10px; opacity: 0; scale: 1; }
+}
+
+@keyframes fx-pop {
+  0%, 12% { scale: 0; opacity: 0; rotate: 0deg; translate: 0 0; }
+  25% { scale: 1.2; opacity: 1; rotate: 90deg; }
+  60%, 100% { scale: 0.6; opacity: 0; rotate: 200deg; translate: 0 -10px; }
+}
+
+@keyframes fx-paint {
+  0% { background: var(--pm-paper-kraft); }
+  25% { background: var(--pm-art-fur); }
+  50% { background: var(--pm-art-cream); }
+  75% { background: var(--pm-art-tan); }
+}
+
+@keyframes fx-swatch {
+  0%, 20%, 100% { translate: 0 0; scale: 1; }
+  8% { translate: -6px 0; scale: 1.25; }
+}
+
+@keyframes fx-blink {
+  0%, 46%, 50%, 100% { scale: 1 1; }
+  48% { scale: 1 0.1; }
+}
+
+@keyframes fx-beat {
+  0%, 100% { scale: 1; }
+  20% { scale: 1.35; }
+  40% { scale: 1; }
+}
+
+@keyframes fx-float-up {
+  0% { opacity: 0; translate: 0 0; scale: 0.6; }
+  15% { opacity: 1; scale: 1.1; }
+  100% { opacity: 0; translate: 10px -90px; scale: 0.8; rotate: 18deg; }
+}
+
+@keyframes fx-hop {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  40% { translate: 0 -10px; rotate: -12deg; }
+  70% { translate: 0 2px; rotate: 6deg; }
+}
+
+/* -- Anh that trong cac canh: giu bo cuc va chuyen dong, thay phan ve -- */
+
+// Nhat ky: polaroid anh that dan len goc trang so.
+.fx-page {
+  padding-inline-end: 84px;
+}
+
+.fx-snap {
+  position: absolute;
+  inset-block-start: 34px;
+  inset-inline-end: 10px;
+  inline-size: 68px;
+  padding: 4px 4px 12px;
+  background: var(--pm-bg-card);
+  box-shadow: var(--pm-shadow);
+  rotate: 7deg;
+  animation: fx-snap 5s ease-in-out infinite;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block-start: -6px;
+    inset-inline-start: 50%;
+    inline-size: 28px;
+    block-size: 10px;
+    translate: -50% 0;
+    rotate: -4deg;
+    background: var(--pm-tape);
+  }
+}
+
+// Dau chan dong o cuoi trang, khong de len dong ngay.
+.fx-stamp {
+  inset-block: auto 10px;
+  inset-inline-end: 96px;
+}
+
+// Ky niem: anh thu nho thay cho icon lich.
+.fx-note-photo {
+  flex: none;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: var(--pm-shadow);
+}
+
+// Studio: tranh len that (da co khung go), bo khung ve bang CSS.
+.fx-frame-in {
+  position: relative;
+  inline-size: 118px;
+  block-size: auto;
+  overflow: hidden;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  box-shadow: var(--pm-shadow-lifted);
+  rotate: -2deg;
+  animation: fx-sway 5s ease-in-out infinite;
+}
+
+.fx-felt {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+// Vet sang quet qua mat kinh.
+.fx-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.35) 48%, transparent 60%);
+  translate: -120% 0;
+  animation: fx-shine 4s ease-in-out infinite;
+}
+
+// Cong dong: anh dai dien va anh bai dang that.
+.fx-avatar {
+  object-fit: cover;
+}
+
+.fx-post-photo {
+  display: block;
+  inline-size: 100%;
+  block-size: 62px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+@keyframes fx-snap {
+  0%, 100% { rotate: 7deg; translate: 0 0; }
+  50% { rotate: 3deg; translate: 0 -3px; }
+}
+
+@keyframes fx-sway {
+  0%, 100% { rotate: -2deg; }
+  50% { rotate: 2deg; }
+}
+
+@keyframes fx-shine {
+  0%, 40% { translate: -120% 0; }
+  70%, 100% { translate: 120% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-feature,
+  .lp-feature:hover {
+    transform: none;
+  }
+
+  .fx-stage * {
+    animation: none !important;
+  }
+
+  .fx-head {
+    background: var(--pm-art-fur);
+  }
 }

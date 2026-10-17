@@ -43,7 +43,7 @@ const GOODS = [
   },
   {
     code: 'G-BAT-AN',
-    name: 'Bát ăn gốm men tím',
+    name: 'Bát ăn gốm đốm bò sữa',
     category: 'DO-DUNG',
     description: 'Bát gốm nung ở nhiệt độ cao, đế chống trượt, rửa máy được.',
     images: [PICTURE('bowl')],

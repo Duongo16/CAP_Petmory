@@ -7,7 +7,7 @@ const shop = {
     { code: 'PT-02', name: 'Móc khóa len' },
   ],
   goods: [
-    { code: 'G-BAT-AN', name: 'Bát ăn gốm men tím' },
+    { code: 'G-BAT-AN', name: 'Bát ăn gốm đốm bò sữa' },
     { code: 'G-VONG-LEN', name: 'Vòng cổ len chọc thủ công' },
   ],
 };
@@ -24,7 +24,7 @@ describe('the product cards sent with a basic answer', () => {
   });
 
   it('offers ready-made goods named in the question or answer', () => {
-    const got = cardsFor('shop có bán bát ăn gốm men tím không', '', shop);
+    const got = cardsFor('shop có bán bát ăn gốm đốm bò sữa không', '', shop);
     expect(got.goodsCode).toEqual(['G-BAT-AN']);
   });
 

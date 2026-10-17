@@ -47,9 +47,9 @@ interface FrameStyle extends FeltPhoto {
   altKey: string;
 }
 
-import { BounceText } from './landing-fx/bounce-text';
-import { RevealDirective } from './landing-fx/reveal.directive';
-import { TiltDirective } from './landing-fx/tilt.directive';
+import { BounceText } from '../../shared/fx/bounce-text';
+import { RevealDirective } from '../../shared/fx/reveal.directive';
+import { TiltDirective } from '../../shared/fx/tilt.directive';
 import { Brand } from '../../shared/brand/brand';
 
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';

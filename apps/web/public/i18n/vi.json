@@ -19,7 +19,11 @@
     "IMAGE_LINK": "Liên kết ảnh",
     "IMAGE_LINK_HINT": "Dán liên kết ảnh trên mạng…",
     "IMAGE_LINK_ADD": "Thêm liên kết",
-    "IMAGE_LINK_BAD": "Liên kết chưa đúng. Cần bắt đầu bằng http:// hoặc https://"
+    "IMAGE_LINK_BAD": "Liên kết chưa đúng. Cần bắt đầu bằng http:// hoặc https://",
+    "PICK_DATE": "Chọn ngày trên lịch",
+    "MONTH": "Tháng",
+    "YEAR": "Năm",
+    "TODAY": "Hôm nay"
   },
   "NAV": {
     "REPORT": "Báo cáo",
@@ -985,8 +989,8 @@
     "LIST_EMPTY": "Chưa có quyển nhật ký nào được đặt công khai.",
     "SEARCH": "Tìm",
     "SEARCH_HINT": "Tìm theo tên bé…",
-     "SHARED_COUNT": "{{count}} quyển đang mở",
-     "MOMENTS_COUNT": "{{count}} khoảnh khắc được kể",
+    "SHARED_COUNT": "{{count}} quyển đang mở",
+    "MOMENTS_COUNT": "{{count}} khoảnh khắc được kể",
     "KEPT_BY": "Nhật ký của {{name}}",
     "READ_ONLY": "Chỉ xem",
     "BACK_TO_LIST": "Về danh sách",
@@ -1271,7 +1275,8 @@
     "STUDIO_PROMO": "Biến ảnh của bé thành kỷ vật cầm tay",
     "STUDIO_OPEN": "Mở Studio",
     "ORDERS": "Đơn hàng của bạn",
-    "ORDERS_SUB": "Theo dõi kỷ vật đang chế tác"
+    "ORDERS_SUB": "Theo dõi kỷ vật đang chế tác",
+    "FLASH_ALBUM": "Album của {{name}}"
   },
   "PHOTO": {
     "EDIT": {
@@ -2334,6 +2339,14 @@
         "SHEPHERD": "Chó becgie bằng len chọc nhô ra khỏi khung gỗ khắc tên"
       },
       "CREDIT": "Ảnh minh họa: tác phẩm của @thevo.sculptor, Kim Karanikolaou và các nghệ nhân len chọc khác."
+    },
+    "FX": {
+      "DIARY_DATE": "CHỦ NHẬT · 12.05",
+      "DIARY_TITLE": "Hôm nay Mochi tắm biển",
+      "MEMORY_EYEBROW": "HÔM NAY, 1 NĂM TRƯỚC",
+      "MEMORY_TITLE": "Lần đầu ra biển",
+      "POST_WHO": "Cậu zàng",
+      "POST_WHEN": "2 phút trước"
     }
   },
   "SHELF": {
@@ -2343,7 +2356,7 @@
     "EMPTY": "Chưa có cuốn sổ nào. Tạo hồ sơ cho bé để bắt đầu cuốn đầu tiên.",
     "LABEL": "NHẬT KÝ",
     "PAGES": "{{count}} trang",
-     "COUNT": "{{count}} quyển",
+    "COUNT": "{{count}} quyển",
     "HINT": "Bấm vào một cuốn sổ để lấy xuống và mở ra.",
     "OPENING": "Đang mở cuốn nhật ký của {{name}}",
     "BACK": "Về tủ sách",

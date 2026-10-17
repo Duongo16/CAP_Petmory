@@ -640,3 +640,375 @@
   .day { padding: 24px 16px 48px; }
   .flash-text { padding: 24px; }
 }
+
+/* =====================================================================
+   Hieu ung dong: hien ra khi cuon toi, nghieng theo chuot, tranh len troi.
+   Lop [data-reveal] chi co khi directive chay, nen khong co JavaScript van hien du.
+   ===================================================================== */
+
+/* The thu cung: nghieng theo con tro, va nay vao khi cuon toi. */
+.pet:not(.pet-add) {
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+
+  &:hover,
+  &:focus-visible {
+    transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, -4px, 0);
+  }
+}
+
+.pet[data-reveal] {
+  opacity: 0;
+}
+
+.pet[data-reveal].is-shown {
+  animation: today-pop 700ms cubic-bezier(0.34, 1.45, 0.64, 1) var(--reveal-delay, 0ms) both;
+}
+
+// Tim "ngay ben nhau" dap nhe nhu nhip tim.
+.tag-accent pm-icon {
+  animation: today-beat 1.6s ease-in-out infinite;
+}
+
+/* Nhat ky moi nhat: truot vao tu trai, noi duoi nhau. */
+.entries li[data-reveal] {
+  opacity: 0;
+}
+
+.entries li[data-reveal].is-shown {
+  animation: today-slide-left 600ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms) both;
+}
+
+/* O ben phai: truot vao tu phai. */
+.side-tile[data-reveal] {
+  opacity: 0;
+}
+
+.side-tile[data-reveal].is-shown {
+  animation: today-slide-right 600ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms) both;
+}
+
+/* Ngay nay nam xua: ba o anh xoe ra lan luot, quang sang tho nhe. */
+.flash[data-reveal] .flash-tile {
+  opacity: 0;
+}
+
+.flash[data-reveal].is-shown {
+  .flash-tile {
+    animation: today-fan 700ms cubic-bezier(0.34, 1.5, 0.64, 1) both;
+  }
+
+  .flash-tile-b {
+    animation-delay: 120ms;
+  }
+
+  .flash-tile-c {
+    animation-delay: 240ms;
+  }
+}
+
+.flash-glow {
+  animation: today-breathe 6s ease-in-out infinite;
+}
+
+/* ---------- The Studio: tranh len troi lo lung ---------- */
+
+.promo {
+  min-block-size: 250px;
+
+  > :not(.promo-glow):not(.promo-floats) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .promo-title {
+    max-inline-size: 62%;
+  }
+}
+
+.promo-floats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.promo-float {
+  position: absolute;
+  block-size: auto;
+  border-radius: 8px;
+  box-shadow: var(--pm-shadow-lifted);
+  rotate: var(--turn);
+  animation: today-float var(--beat) ease-in-out infinite alternate;
+  transition: scale 300ms ease;
+}
+
+.promo-float-a {
+  --turn: 8deg;
+  --beat: 5s;
+  inset-block-start: 10%;
+  inset-inline-end: 5%;
+  inline-size: 28%;
+}
+
+.promo-float-b {
+  --turn: -10deg;
+  --beat: 6.4s;
+  inset-block-end: 10%;
+  inset-inline-end: 27%;
+  inline-size: 22%;
+  animation-delay: -2s;
+}
+
+.promo-float-c {
+  --turn: -3deg;
+  --beat: 4.4s;
+  inset-block-end: 6%;
+  inset-inline-end: 3%;
+  inline-size: 21%;
+  animation-delay: -1s;
+}
+
+// Re chuot vao the: tranh len noi len gan hon.
+.promo:hover .promo-float {
+  scale: 1.08;
+}
+
+// Tia lap lanh quanh tranh.
+.promo-spark {
+  position: absolute;
+  inline-size: 14px;
+  block-size: 14px;
+  background: var(--pm-amber-bright);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  animation: today-twinkle 2.4s ease-in-out infinite;
+}
+
+.promo-spark-a {
+  inset-block-start: 8%;
+  inset-inline-end: 38%;
+}
+
+.promo-spark-b {
+  inset-block-start: 48%;
+  inset-inline-end: 2%;
+  animation-delay: 0.8s;
+}
+
+.promo-spark-c {
+  inset-block-end: 4%;
+  inset-inline-end: 50%;
+  animation-delay: 1.6s;
+}
+
+.promo[data-reveal] .promo-float {
+  opacity: 0;
+}
+
+.promo[data-reveal].is-shown .promo-float {
+  animation:
+    today-pop 700ms cubic-bezier(0.34, 1.5, 0.64, 1) both,
+    today-float var(--beat) ease-in-out 700ms infinite alternate;
+}
+
+.promo[data-reveal].is-shown .promo-float-b {
+  animation-delay: 150ms, 850ms;
+}
+
+.promo[data-reveal].is-shown .promo-float-c {
+  animation-delay: 300ms, 1000ms;
+}
+
+/* ---------- Khung hinh chuyen dong ---------- */
+
+@keyframes today-pop {
+  0% {
+    opacity: 0;
+    translate: 0 40px;
+    scale: 0.85;
+  }
+  70% {
+    opacity: 1;
+    translate: 0 -6px;
+    scale: 1.03;
+  }
+  100% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@keyframes today-slide-left {
+  from {
+    opacity: 0;
+    translate: -40px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes today-slide-right {
+  from {
+    opacity: 0;
+    translate: 40px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes today-fan {
+  from {
+    opacity: 0;
+    scale: 0.6;
+    rotate: -14deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+
+@keyframes today-float {
+  from {
+    translate: 0 0;
+    rotate: var(--turn);
+  }
+  to {
+    translate: 0 -10px;
+    rotate: calc(var(--turn) + 4deg);
+  }
+}
+
+@keyframes today-beat {
+  0%,
+  100% {
+    scale: 1;
+  }
+  15% {
+    scale: 1.3;
+  }
+  30% {
+    scale: 1;
+  }
+  45% {
+    scale: 1.2;
+  }
+}
+
+@keyframes today-breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+    scale: 1;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.15;
+  }
+}
+
+@keyframes today-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    scale: 0.4;
+    rotate: 0deg;
+  }
+  50% {
+    opacity: 1;
+    scale: 1;
+    rotate: 45deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet:not(.pet-add),
+  .pet:not(.pet-add):hover {
+    transform: none;
+  }
+
+  .tag-accent pm-icon,
+  .flash-glow,
+  .promo-float,
+  .promo[data-reveal].is-shown .promo-float,
+  .promo-spark {
+    animation: none;
+  }
+
+  .promo-float {
+    opacity: 1;
+  }
+}
+
+/* ---------- Hoi tuong: anh that xoay vong, mo dan vao nhau ---------- */
+
+.flash-photo {
+  position: relative;
+  overflow: hidden;
+  background: var(--pm-art-tan);
+  box-shadow: var(--pm-shadow-lifted);
+
+  // Anh vua roi nam yen ben duoi; anh moi duoc chen vao tren cung.
+  img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  // Anh moi: mo dan hien ra de len anh cu va phong cham nhu thuoc phim tai lieu.
+  // Dung animation (khong phai transition) vi anh vua chen vao cung chay duoc.
+  img.on {
+    z-index: 1;
+    animation:
+      flash-fade-in 1100ms ease both,
+      flash-zoom 6s ease-out both;
+  }
+}
+
+@keyframes flash-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flash-zoom {
+  from {
+    scale: 1.1;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-photo img.on {
+    animation: none;
+  }
+}
+
+// Nhan ten cuon album dang phat, noi o goc khung anh.
+.flash-album {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-end: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-glass-card);
+  color: var(--pm-text);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: var(--pm-shadow);
+}

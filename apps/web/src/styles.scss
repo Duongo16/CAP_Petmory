@@ -66,6 +66,16 @@ html {
   --pm-paper-cream: #fbf1de;
   --pm-paper-kraft: #e8d3ae;
   --pm-paper-mark: rgba(120, 96, 66, 0.22);
+
+  /*
+   * Nen chung cua moi trang: giay kem, ke soc doc moi 56px nhu giay dan tuong o
+   * man dau trang gioi thieu. Che do toi doi mau nen va mau duong ke.
+   */
+  --pm-wall-base: var(--pm-paper-cream);
+  --pm-wall-line: var(--pm-paper-mark);
+  --pm-wallpaper:
+    repeating-linear-gradient(90deg, transparent 0 56px, var(--pm-wall-line) 56px 57px),
+    var(--pm-wall-base);
   --pm-paper-bloom: #fdeee4;
   --pm-paper-petal: rgba(214, 150, 105, 0.35);
   --pm-book-cover: #c4661a;
@@ -199,6 +209,8 @@ html {
 }
 
 @mixin pm-dark-tokens {
+  --pm-wall-base: #1a140e;
+  --pm-wall-line: rgba(251, 241, 222, 0.06);
   --pm-accent-glow: 0 10px 24px rgba(0, 0, 0, 0.4);
   --pm-night: #0f0b07;
   --pm-on-night: #fbf1de;
@@ -278,7 +290,8 @@ body {
   height: 100%;
   margin: 0;
   font-family: var(--pm-font);
-  background: var(--pm-bg);
+  background: var(--pm-wallpaper);
+  background-attachment: fixed;
   color: var(--pm-text);
 }
 

@@ -19,7 +19,11 @@
     "IMAGE_LINK": "Image link",
     "IMAGE_LINK_HINT": "Paste an image link from the web…",
     "IMAGE_LINK_ADD": "Add link",
-    "IMAGE_LINK_BAD": "That link is not right. It has to start with http:// or https://"
+    "IMAGE_LINK_BAD": "That link is not right. It has to start with http:// or https://",
+    "PICK_DATE": "Pick a date",
+    "MONTH": "Month",
+    "YEAR": "Year",
+    "TODAY": "Today"
   },
   "NAV": {
     "REPORT": "Reports",
@@ -985,8 +989,8 @@
     "LIST_EMPTY": "No diary has been made public yet.",
     "SEARCH": "Search",
     "SEARCH_HINT": "Search by the pet's name…",
-     "SHARED_COUNT": "{{count}} journals open",
-     "MOMENTS_COUNT": "{{count}} moments shared",
+    "SHARED_COUNT": "{{count}} journals open",
+    "MOMENTS_COUNT": "{{count}} moments shared",
     "KEPT_BY": "Kept by {{name}}",
     "READ_ONLY": "Read only",
     "BACK_TO_LIST": "Back to the list",
@@ -1271,7 +1275,8 @@
     "STUDIO_PROMO": "Turn a favourite photo into a keepsake",
     "STUDIO_OPEN": "Open Studio",
     "ORDERS": "Your orders",
-    "ORDERS_SUB": "Follow the keepsakes being made"
+    "ORDERS_SUB": "Follow the keepsakes being made",
+    "FLASH_ALBUM": "{{name}}'s album"
   },
   "PHOTO": {
     "EDIT": {
@@ -2334,6 +2339,14 @@
         "SHEPHERD": "Needle-felted German Shepherd leaning out of a name-carved wooden frame"
       },
       "CREDIT": "Sample photos: works by @thevo.sculptor, Kim Karanikolaou and other needle-felting artists."
+    },
+    "FX": {
+      "DIARY_DATE": "SUNDAY · 05.12",
+      "DIARY_TITLE": "Mochi went to the beach",
+      "MEMORY_EYEBROW": "TODAY, 1 YEAR AGO",
+      "MEMORY_TITLE": "BigBoy's first beach day",
+      "POST_WHO": "Mai's dog",
+      "POST_WHEN": "2 minutes ago"
     }
   },
   "SHELF": {
@@ -2343,7 +2356,7 @@
     "EMPTY": "No books yet. Create a pet profile to start the first one.",
     "LABEL": "DIARY",
     "PAGES": "{{count}} pages",
-     "COUNT": "{{count}} journals",
+    "COUNT": "{{count}} journals",
     "HINT": "Click a book to take it down and open it.",
     "OPENING": "Opening {{name}}’s diary",
     "BACK": "Back to the bookcase",

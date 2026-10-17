@@ -1,0 +1,244 @@
+:host {
+  display: block;
+}
+
+.date-field {
+  position: relative;
+}
+
+// Chua cho nut lich o mep phai o nhap.
+.with-calendar .date-text {
+  padding-inline-end: 46px;
+}
+
+.cal-toggle {
+  position: absolute;
+  inset-block: 4px;
+  inset-inline-end: 4px;
+  display: grid;
+  place-items: center;
+  inline-size: 38px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--pm-accent);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+
+  &:hover,
+  &.on {
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pm-accent-ring);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/* ---------- Bang lich ---------- */
+
+.cal {
+  position: fixed;
+  z-index: 1100;
+  inline-size: 300px;
+  padding: 14px;
+  border: 1px solid var(--pm-border);
+  border-radius: 18px;
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  box-shadow: var(--pm-shadow-lifted);
+  font-family: var(--pm-font);
+  transform-origin: top left;
+  animation: cal-in 160ms ease-out;
+
+  &.up {
+    transform-origin: bottom left;
+  }
+}
+
+.cal-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-end: 10px;
+}
+
+.cal-nav {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 32px;
+  block-size: 32px;
+  border: 1px solid var(--pm-border);
+  border-radius: 10px;
+  background: var(--pm-bg);
+  color: var(--pm-text);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--pm-accent);
+    color: var(--pm-accent);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.cal-nav-next pm-icon {
+  rotate: 180deg;
+}
+
+.cal-pick {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-inline-size: 0;
+}
+
+.cal-select {
+  flex: 1;
+  min-inline-size: 0;
+  block-size: 32px;
+  padding: 0 6px;
+  border: 1px solid var(--pm-border);
+  border-radius: 10px;
+  background: var(--pm-bg);
+  color: var(--pm-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: capitalize;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--pm-accent-ring);
+  }
+}
+
+.cal-week,
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-week span {
+  padding-block: 4px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pm-amber);
+  text-transform: uppercase;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--pm-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+
+  &:hover:not(:disabled):not(.chosen) {
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pm-accent);
+    outline-offset: -2px;
+  }
+
+  &.out {
+    color: var(--pm-text-muted);
+    opacity: 0.55;
+  }
+
+  // Hom nay: vien nau.
+  &.today {
+    box-shadow: inset 0 0 0 1.5px var(--pm-accent);
+  }
+
+  &.chosen {
+    background: var(--pm-accent);
+    color: var(--pm-on-accent);
+    box-shadow: var(--pm-shadow);
+  }
+
+  &:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+}
+
+.cal-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-block-start: 10px;
+  padding-block-start: 10px;
+  border-block-start: 1px dashed var(--pm-border);
+}
+
+.cal-link,
+.cal-today {
+  min-block-size: 32px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cal-link {
+  border: 0;
+  background: transparent;
+  color: var(--pm-text-muted);
+
+  &:hover {
+    color: var(--pm-danger);
+  }
+}
+
+.cal-today {
+  border: 1px solid var(--pm-accent);
+  background: var(--pm-accent-soft);
+  color: var(--pm-accent-dark);
+
+  &:hover {
+    background: var(--pm-accent);
+    color: var(--pm-on-accent);
+  }
+}
+
+@keyframes cal-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cal {
+    animation: none;
+  }
+}
