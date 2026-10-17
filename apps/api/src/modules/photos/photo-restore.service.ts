@@ -93,26 +93,17 @@ export class PhotoRestoreService {
     private readonly config: ConfigService,
   ) {}
 
-  /** Lua chon Cloudinary ro rang khong duoc tu chuyen sang Gemini. */
+  /** Cloudinary chi duoc dung khi duoc chon ro rang trong env. */
   private get useCloud(): boolean {
     const wanted = this.config.get<string>('ai.imageProvider') ?? '';
-    return (
-      wanted === 'cloudinary' ||
-      (wanted !== 'gemini' &&
-        wanted !== 'huggingface' &&
-        wanted !== 'huggingface-space' &&
-        this.cloud.ready)
-    );
+    return wanted === 'cloudinary';
   }
 
   private get useHuggingFaceSpace(): boolean {
     const wanted = this.config.get<string>('ai.imageProvider') ?? '';
     return (
       wanted === 'huggingface-space' ||
-      (wanted === '' &&
-        !this.cloud.ready &&
-        !this.huggingface.ready &&
-        this.huggingfaceSpace.ready)
+      (wanted === '' && this.huggingfaceSpace.ready)
     );
   }
 
@@ -120,10 +111,7 @@ export class PhotoRestoreService {
     const wanted = this.config.get<string>('ai.imageProvider') ?? '';
     return (
       wanted === 'huggingface' ||
-      (wanted === '' &&
-        !this.cloud.ready &&
-        !this.useHuggingFaceSpace &&
-        this.huggingface.ready)
+      (wanted === '' && !this.useHuggingFaceSpace && this.huggingface.ready)
     );
   }
 
