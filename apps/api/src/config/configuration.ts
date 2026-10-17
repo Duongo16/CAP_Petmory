@@ -35,8 +35,19 @@ export interface AppConfig {
     model: string;
     /** Mo hinh sua anh cua Gemini, dung cho phuc hoi anh. Rong thi dung mac dinh. */
     imageModel: string;
-    /** Noi sua anh khi phuc hoi: cloudinary hoac gemini. Rong thi uu tien dich vu anh neu da cau hinh. */
+    /** Noi sua anh khi phuc hoi: cloudinary, huggingface hoac gemini. */
     imageProvider: string;
+    /** Cau hinh Hugging Face Inference Providers cho phuc hoi anh. */
+    huggingface: {
+      token: string;
+      imageModel: string;
+      provider: string;
+      endpointUrl: string;
+      /** URL Space Gradio công khai dùng để upscale/khôi phục ảnh thú cưng. */
+      spaceUrl: string;
+      spaceApiName: string;
+      spaceScale: number;
+    };
     timeoutMs: number;
   };
   storage: {
@@ -89,6 +100,20 @@ export default (): AppConfig => ({
     model: (process.env.AI_MODEL ?? '').trim(),
     imageModel: (process.env.AI_IMAGE_MODEL ?? '').trim(),
     imageProvider: (process.env.AI_IMAGE_PROVIDER ?? '').trim().toLowerCase(),
+    huggingface: {
+      token: (process.env.HF_TOKEN ?? '').trim(),
+      imageModel: (
+        process.env.HF_IMAGE_MODEL ?? 'black-forest-labs/FLUX.1-Kontext-dev'
+      ).trim(),
+      provider: (process.env.HF_IMAGE_PROVIDER ?? 'auto').trim().toLowerCase(),
+      endpointUrl: (process.env.HF_IMAGE_ENDPOINT_URL ?? '').trim(),
+      spaceUrl: (
+        process.env.HF_SPACE_URL ??
+        'https://nick088-real-esrgan-pytorch.hf.space'
+      ).trim(),
+      spaceApiName: (process.env.HF_SPACE_API_NAME ?? 'predict').trim(),
+      spaceScale: Number(process.env.HF_SPACE_SCALE ?? 4),
+    },
     timeoutMs: Number(process.env.AI_TIMEOUT_MS ?? 45000),
   },
   storage: {

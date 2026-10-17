@@ -1,4 +1,4 @@
-# PETMORY
+﻿# PETMORY
 
 Website lưu giữ kỷ niệm thú cưng bằng sản phẩm thủ công tùy biến.
 
@@ -59,6 +59,10 @@ Mọi tính năng AI chỉ dành cho người đã đăng nhập và đi qua m�
 | `ANTHROPIC_API_KEY` | Khóa Claude, nếu dùng Anthropic. |
 | `AI_MODEL` | Để trống để dùng mặc định: `gemini-3.5-flash-lite` hoặc `claude-opus-5`. |
 | `AI_TIMEOUT_MS` | Thời gian chờ mỗi lần gọi, mặc định 45000. |
+
+Khoi phuc anh dung bien rieng `AI_IMAGE_PROVIDER`. Dat `AI_IMAGE_PROVIDER=huggingface-space` de goi Space Gradio cong khai; mac dinh dung `https://nick088-real-esrgan-pytorch.hf.space`, `HF_SPACE_API_NAME=predict`, `HF_SPACE_SCALE=4`.
+Space Real-ESRGAN tong quat phu hop voi anh thu cung va khong dung credit Inference Providers. Space co the tam ngu hoac qua tai; khi goi that bai, he thong giu anh local va danh dau thao tac AI bi bo qua.
+Neu muon dung Inference Providers, dat `AI_IMAGE_PROVIDER=huggingface`, `HF_TOKEN` va `HF_IMAGE_MODEL`. Token chi duoc doc o Backend, khong dua vao Frontend.
 
 Không có khóa hoặc dịch vụ lỗi thì trợ lý vẫn chạy bằng **kho tri thức** (trang *Kho tri thức trợ lý* của nhóm Quản lý) và vẫn nhớ sản phẩm vừa nói tới trong phiên. Nạp kho tri thức mẫu: `node tools/seed-assistant-knowledge.js`.
 
