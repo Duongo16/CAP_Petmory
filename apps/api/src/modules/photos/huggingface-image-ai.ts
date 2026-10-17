@@ -114,10 +114,12 @@ export class HuggingFaceImageAi {
 
 function promptFor(operations: string[]): string {
   const instructions: string[] = [
-    'Restore this pet photo while preserving the exact pet identity.',
-    'Keep the same species, breed, body shape, pose, fur colors, fur pattern, eyes, nose, markings, and expression.',
-    'Remove blur and compression noise and recover natural detail without inventing new features.',
-    'Do not turn the pet into a human, cartoon, different breed, or different animal.',
+    'Restore this old, blurry, low-quality photograph of a real pet.',
+    'Reduce age-related fading, blur, compression artifacts, scratches, dust, and image noise while recovering realistic natural detail.',
+    'Preserve the exact animal identity: same species, breed, body shape, pose, fur colors, fur pattern, eyes, nose, markings, proportions, and expression.',
+    'Keep the original composition, camera angle, lighting direction, background, and era of the photograph unless a separate operation explicitly changes them.',
+    'Do not hallucinate or add fur patterns, facial features, limbs, accessories, text, or objects that are not supported by the original image.',
+    'Do not turn the animal into a human, cartoon, different breed, or different animal.',
   ];
   if (operations.includes('REMOVE_BACKGROUND')) {
     instructions.push(

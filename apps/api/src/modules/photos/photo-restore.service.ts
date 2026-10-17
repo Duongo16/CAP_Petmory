@@ -36,7 +36,7 @@ const AI_INSTRUCTION: Record<string, string> = {
   REMOVE_BACKGROUND:
     'Remove the background completely and replace it with a plain pure white background. Keep the pet exactly as it is: same shape, pose, fur colours and markings.',
   FACE_DETAIL:
-    "Enhance the detail and sharpness of the pet's face, eyes, nose and fur texture. Do not change the pet's shape, markings, colours, proportions or expression.",
+    "Recover natural detail in the pet's face, eyes, nose and fur from this old or blurry photograph. Preserve the same animal, markings, colours, proportions and expression; do not invent facial features.",
 };
 
 const ALLOWED_TYPES = new Set(['jpeg', 'jpg', 'png']);
