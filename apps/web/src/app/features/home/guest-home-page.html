@@ -221,6 +221,40 @@
     </div>
   </section>
 
+  @if (featuredGoods().length > 0) {
+    <section class="lp-section lp-ready-goods" id="ready-goods">
+      <header class="lp-head">
+        <span class="lp-eyebrow">{{ 'LANDING.READY_GOODS.EYEBROW' | translate }}</span>
+        <h2 class="lp-h2"><pm-bounce-text [text]="'LANDING.READY_GOODS.TITLE' | translate" /></h2>
+        <p class="lp-sub">{{ 'LANDING.READY_GOODS.SUB' | translate }}</p>
+      </header>
+      <div class="lp-goods-grid">
+        @for (good of featuredGoods(); track good.code) {
+          <a class="lp-good-card" routerLink="/shop" [queryParams]="{ tab: 'ready', goods: good.code }">
+            <span class="lp-good-image">
+              @if (good.images[0]) {
+                <img [src]="good.images[0]" [alt]="good.name" loading="lazy" />
+              } @else {
+                <pm-icon name="gift" [size]="30" aria-hidden="true" />
+              }
+            </span>
+            <span class="lp-good-copy">
+              <strong>{{ good.name }}</strong>
+              <span class="lp-good-price">{{ 'GOODS.FROM' | translate }} {{ priceFrom(good) | amount }}</span>
+              <span class="lp-good-delivery">{{ 'GOODS.DELIVERY_DAYS' | translate: { count: good.deliveryDays } }}</span>
+            </span>
+          </a>
+        }
+      </div>
+      <div class="lp-cta-row lp-center lp-ready-cta">
+        <a class="lp-btn lp-btn-lg" routerLink="/shop" [queryParams]="{ tab: 'ready' }">
+          {{ 'LANDING.READY_GOODS.CTA' | translate }}
+          <pm-icon name="arrow" [size]="18" />
+        </a>
+      </div>
+    </section>
+  }
+
   <section class="lp-section lp-book-row">
     <div class="lp-book-text">
       <span class="lp-eyebrow">{{ 'LANDING.BOOK_EYEBROW' | translate }}</span>

@@ -2356,6 +2356,12 @@
       "MEMORY_TITLE": "Lần đầu ra biển",
       "POST_WHO": "Cậu zàng",
       "POST_WHEN": "2 phút trước"
+    },
+    "READY_GOODS": {
+      "EYEBROW": "Hàng có sẵn",
+      "TITLE": "Mua ngay những món đã hoàn thiện",
+      "SUB": "Một vài sản phẩm đang có sẵn trong cửa hàng, xem mẫu và đặt hàng nhanh.",
+      "CTA": "Xem toàn bộ hàng có sẵn"
     }
   },
   "SHELF": {

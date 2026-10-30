@@ -2356,6 +2356,12 @@
       "MEMORY_TITLE": "BigBoy's first beach day",
       "POST_WHO": "Mai's dog",
       "POST_WHEN": "2 minutes ago"
+    },
+    "READY_GOODS": {
+      "EYEBROW": "Ready-made goods",
+      "TITLE": "Pieces ready to send",
+      "SUB": "A few products are already in the shop, ready to browse and order.",
+      "CTA": "See all ready-made goods"
     }
   },
   "SHELF": {
