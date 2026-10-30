@@ -21,6 +21,7 @@ import { DiaryMusicPlayer } from '../memories/diary-music/diary-music';
 import { PageFace } from '../memories/book/page-face';
 import { PaperKind } from '../../shared/diary-art';
 import { Icon } from '../../shared/icon/icon';
+import { GuestHeader } from '../../shared/guest-header/guest-header';
 
 type ScreenState = 'LOADING' | 'MISSING' | 'ERROR' | 'DONE';
 
@@ -36,7 +37,7 @@ const PLAIN_SETTING: SlideSetting = { trackCode: '', effect: 'FADE', seconds: 5 
 @Component({
   selector: 'pm-diary-book-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon],
+  imports: [DatePipe, RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon, GuestHeader],
   templateUrl: './diary-book-page.html',
   styleUrl: './diary-book-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

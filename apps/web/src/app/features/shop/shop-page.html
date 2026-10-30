@@ -46,21 +46,7 @@
     </div>
   </header>
   } @else {
-  <header class="lp-bar shop-guest-bar">
-    <div class="lp-bar-inner">
-      <a class="lp-brand" routerLink="/landing"><pm-brand size="md" /></a>
-      <nav class="lp-nav" [attr.aria-label]="'NAV.MAIN' | translate">
-        <a routerLink="/shop">{{ 'NAV.SHOP' | translate }}</a>
-        <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
-      </nav>
-      <div class="lp-bar-actions">
-        <pm-language-toggle />
-        <pm-theme-toggle />
-        <a class="lp-link-btn" routerLink="/login" [queryParams]="{ continue: '/shop' }">{{ 'AUTH.SIGN_IN' | translate }}</a>
-        <a class="lp-btn lp-btn-sm" routerLink="/register" [queryParams]="{ continue: '/shop' }">{{ 'LANDING.START_FREE' | translate }}</a>
-      </div>
-    </div>
-  </header>
+  <pm-guest-header />
   }
   <header class="shop-head tw-page pb-0">
     <div class="flex flex-col gap-1">

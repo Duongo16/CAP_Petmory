@@ -14,6 +14,7 @@ import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 import { UserFace } from '../../shared/user-face/user-face';
 import { CartService } from '../../core/services/cart.service';
+import { GuestHeader } from '../../shared/guest-header/guest-header';
 
 type Shelf = 'custom' | 'ready';
 
@@ -28,7 +29,7 @@ const LEFT = 'LEFT';
 @Component({
   selector: 'pm-shop-page',
   standalone: true,
-  imports: [TranslatePipe, Icon, ProductsPage, GoodsListPage, RouterLink, RouterLinkActive, Brand, LanguageToggle, ThemeToggle, UserFace],
+  imports: [TranslatePipe, Icon, ProductsPage, GoodsListPage, RouterLink, RouterLinkActive, Brand, LanguageToggle, ThemeToggle, UserFace, GuestHeader],
   templateUrl: './shop-page.html',
   styleUrl: './shop-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
