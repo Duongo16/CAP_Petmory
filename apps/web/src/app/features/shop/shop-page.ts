@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,6 +13,7 @@ import { Brand } from '../../shared/brand/brand';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 import { UserFace } from '../../shared/user-face/user-face';
+import { CartService } from '../../core/services/cart.service';
 
 type Shelf = 'custom' | 'ready';
 
@@ -38,9 +39,12 @@ export class ShopPage implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly auth = inject(AuthService);
+  private readonly cart = inject(CartService);
 
   readonly signedIn = this.auth.isSignedIn;
   readonly user = this.auth.user;
+  readonly cartItemCount = this.cart.countItem;
+  readonly menuOpen = signal(false);
 
   readonly customerMenu = [
     { path: '/home', key: 'NAV.HOME' },
@@ -48,6 +52,13 @@ export class ShopPage implements OnInit {
     { path: '/shop', key: 'NAV.SHOP' },
     { path: '/studio', key: 'NAV.STUDIO' },
     { path: '/community', key: 'NAV.COMMUNITY' },
+  ];
+  readonly accountMenu = [
+    { path: '/orders', key: 'NAV.ORDER' },
+    { path: '/designs', key: 'NAV.DESIGNS' },
+    { path: '/pets', key: 'NAV.PET' },
+    { path: '/restore', key: 'NAV.RESTORE' },
+    { path: '/colors', key: 'NAV.PALETTE' },
   ];
 
   readonly shelf = signal<Shelf>('custom');
@@ -82,6 +93,24 @@ export class ShopPage implements OnInit {
 
   pickShelf(shelf: Shelf): void {
     void this.router.navigate([], { relativeTo: this.route, queryParams: { tab: shelf } });
+  }
+
+  toggleMenu(): void { this.menuOpen.update((open) => !open); }
+  closeMenu(): void { this.menuOpen.set(false); }
+
+  @HostListener('document:keydown.escape')
+  closeMenuOnEscape(): void { this.closeMenu(); }
+
+  @HostListener('document:click', ['$event'])
+  closeMenuOnOutsideClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (this.menuOpen() && !target?.closest('.account-menu, .account-button')) this.closeMenu();
+  }
+
+  logout(): void {
+    this.closeMenu();
+    this.cart.reset();
+    this.auth.logout();
   }
 
   private show(wanted: ShopDetailRequest | null): void {

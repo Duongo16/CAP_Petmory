@@ -1,11 +1,10 @@
 <div class="shop">
-  <header class="pm-shop-header sticky top-0 z-10 border-b border-edge bg-card/85 backdrop-blur-md">
-    <div class="shop-header-inner flex items-center gap-4 max-w-[1180px] mx-auto px-6 py-3 box-border">
-      <a class="inline-flex items-center flex-shrink-0 no-underline" [routerLink]="signedIn() ? '/home' : '/landing'">
+  @if (signedIn()) {
+  <header class="pm-shell-header sticky top-0 z-10 border-b border-edge bg-card/85 backdrop-blur-md transition-shadow">
+    <div class="flex items-center gap-4 max-w-[1180px] mx-auto px-6 py-3 box-border">
+      <a class="inline-flex items-center flex-shrink-0 no-underline" routerLink="/home">
         <pm-brand size="md" [referenceWord]="true" />
       </a>
-
-      @if (signedIn()) {
         <nav class="hidden nav:flex items-center gap-0.5 flex-[0_0_auto]" [attr.aria-label]="'NAV.MAIN' | translate">
           @for (item of customerMenu; track item.path) {
             <a
@@ -14,34 +13,55 @@
             >{{ item.key | translate }}</a>
           }
         </nav>
-      } @else {
-        <nav class="hidden nav:flex items-center gap-0.5 flex-[0_0_auto]" [attr.aria-label]="'NAV.MAIN' | translate">
-          <a class="px-3 py-2 rounded-full text-ink-muted no-underline text-sm font-medium whitespace-nowrap transition-colors duration-150 hover:text-ink hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold" routerLink="/shop" routerLinkActive="selected">{{ 'NAV.SHOP' | translate }}</a>
-          <a class="px-3 py-2 rounded-full text-ink-muted no-underline text-sm font-medium whitespace-nowrap transition-colors duration-150 hover:text-ink hover:bg-muted" routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
-        </nav>
-      }
-
       <div class="flex items-center gap-2 flex-shrink-0 ml-auto">
         <pm-language-toggle />
         <pm-theme-toggle />
-        @if (signedIn()) {
-          @if (user(); as u) {
-          <a class="relative inline-grid place-items-center w-10 h-10 rounded-full text-ink no-underline transition-colors duration-150 hover:bg-accent-soft hover:text-accent-dark" routerLink="/cart" [attr.aria-label]="'NAV.CART' | translate">
-            <pm-icon name="cart" />
-          </a>
-          <a class="shop-account flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-edge-strong bg-card text-ink no-underline transition-colors duration-150 hover:border-accent" [routerLink]="['/community/users', u.id]">
+        <a class="relative inline-grid place-items-center w-10 h-10 rounded-full text-ink no-underline transition-colors duration-150 hover:bg-accent-soft hover:text-accent-dark [&.selected]:bg-accent-soft" routerLink="/cart" routerLinkActive="selected" [attr.aria-label]="'NAV.CART' | translate">
+          <pm-icon name="cart" />
+          @if (cartItemCount() > 0) { <span class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-on-accent text-[0.65rem] font-bold leading-[18px] text-center" role="status">{{ cartItemCount() }}</span> }
+        </a>
+        @if (user(); as u) {
+        <div class="relative">
+          <button type="button" class="account-button flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-edge-strong bg-card text-ink font-[inherit] cursor-pointer transition-colors duration-150 hover:border-accent" [attr.aria-expanded]="menuOpen()" aria-haspopup="true" aria-controls="shop-account-menu" (click)="toggleMenu()">
             <pm-user-face [name]="u.fullName" [url]="u.avatarUrl" [size]="32" aria-hidden="true" />
             <span class="hidden nav:block text-sm font-semibold whitespace-nowrap max-w-28 truncate">{{ u.fullName }}</span>
             <pm-icon name="chevron" [size]="14" />
-          </a>
+          </button>
+          @if (menuOpen()) {
+            <div class="account-menu absolute top-[calc(100%+8px)] right-0 z-20 flex flex-col min-w-[200px] p-2 rounded-lg bg-card border border-edge shadow-elevated" role="menu" id="shop-account-menu">
+              @for (item of customerMenu; track item.path) {
+                <a class="hidden max-nav:block px-3 py-2 rounded-md no-underline text-ink text-sm transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold" role="menuitem" [routerLink]="item.path" routerLinkActive="selected" (click)="closeMenu()">{{ item.key | translate }}</a>
+              }
+              @for (item of accountMenu; track item.path) {
+                <a class="px-3 py-2 rounded-md no-underline text-ink text-sm transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold" role="menuitem" [routerLink]="item.path" routerLinkActive="selected" (click)="closeMenu()">{{ item.key | translate }}</a>
+              }
+              <span class="my-1 border-t border-edge" aria-hidden="true"></span>
+              <a class="px-3 py-2 rounded-md no-underline text-ink text-sm transition-colors hover:bg-muted" role="menuitem" [routerLink]="['/community/users', u.id]" (click)="closeMenu()">{{ 'NAV.MY_PROFILE' | translate }}</a>
+              <button type="button" class="mt-1 px-3 py-2 text-left rounded-b-md border-0 border-t border-edge bg-transparent text-danger font-semibold text-sm font-[inherit] cursor-pointer transition-colors hover:bg-danger-soft" role="menuitem" (click)="logout()">{{ 'NAV.LOGOUT' | translate }}</button>
+            </div>
           }
-        } @else {
-          <a class="tw-btn-secondary tw-btn-sm" routerLink="/login" [queryParams]="{ continue: '/shop' }">{{ 'AUTH.SIGN_IN' | translate }}</a>
-          <a class="tw-btn-primary tw-btn-sm" routerLink="/register" [queryParams]="{ continue: '/shop' }">{{ 'AUTH.SIGN_UP' | translate }}</a>
+        </div>
         }
       </div>
     </div>
   </header>
+  } @else {
+  <header class="lp-bar shop-guest-bar">
+    <div class="lp-bar-inner">
+      <a class="lp-brand" routerLink="/landing"><pm-brand size="md" /></a>
+      <nav class="lp-nav" [attr.aria-label]="'NAV.MAIN' | translate">
+        <a routerLink="/shop">{{ 'NAV.SHOP' | translate }}</a>
+        <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
+      </nav>
+      <div class="lp-bar-actions">
+        <pm-language-toggle />
+        <pm-theme-toggle />
+        <a class="lp-link-btn" routerLink="/login" [queryParams]="{ continue: '/shop' }">{{ 'AUTH.SIGN_IN' | translate }}</a>
+        <a class="lp-btn lp-btn-sm" routerLink="/register" [queryParams]="{ continue: '/shop' }">{{ 'LANDING.START_FREE' | translate }}</a>
+      </div>
+    </div>
+  </header>
+  }
   <header class="shop-head tw-page pb-0">
     <div class="flex flex-col gap-1">
       <span class="tw-eyebrow">{{ 'SHOP.EYEBROW' | translate }}</span>
