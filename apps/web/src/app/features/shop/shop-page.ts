@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
@@ -13,6 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { Brand } from '../../shared/brand/brand';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
+import { UserFace } from '../../shared/user-face/user-face';
 
 type Shelf = 'custom' | 'ready';
 
@@ -27,7 +27,7 @@ const LEFT = 'LEFT';
 @Component({
   selector: 'pm-shop-page',
   standalone: true,
-  imports: [TranslatePipe, Icon, ProductsPage, GoodsListPage, RouterLink, Brand, LanguageToggle, ThemeToggle],
+  imports: [TranslatePipe, Icon, ProductsPage, GoodsListPage, RouterLink, RouterLinkActive, Brand, LanguageToggle, ThemeToggle, UserFace],
   templateUrl: './shop-page.html',
   styleUrl: './shop-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,7 +40,15 @@ export class ShopPage implements OnInit {
   private readonly auth = inject(AuthService);
 
   readonly signedIn = this.auth.isSignedIn;
-  readonly isInternal = this.auth.isInternal;
+  readonly user = this.auth.user;
+
+  readonly customerMenu = [
+    { path: '/home', key: 'NAV.HOME' },
+    { path: '/journals', key: 'NAV.JOURNALS' },
+    { path: '/shop', key: 'NAV.SHOP' },
+    { path: '/studio', key: 'NAV.STUDIO' },
+    { path: '/community', key: 'NAV.COMMUNITY' },
+  ];
 
   readonly shelf = signal<Shelf>('custom');
 

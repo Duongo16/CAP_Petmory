@@ -4,8 +4,8 @@ html {
   color-scheme: light dark;
   @include mat.theme((
     color: (
-      primary: mat.$yellow-palette,
-      tertiary: mat.$yellow-palette,
+      primary: mat.$orange-palette,
+      tertiary: mat.$orange-palette,
     ),
     typography: 'Be Vietnam Pro',
     density: 0,
@@ -27,24 +27,24 @@ html {
   --pm-bg-3d: #fdf2e2;
 
   /*
-   * Yellow from the PETMORY wordmark drives actions; a darker shade keeps small text readable.
+   * PETMORY wordmark orange drives actions; a darker shade from the same hue keeps small text readable.
    */
-  --pm-accent: #886000;
-  --pm-accent-dark: #674700;
-  --pm-accent-soft: #fff1c2;
-  --pm-accent-ring: #b87d0040;
+  --pm-accent: #a95608;
+  --pm-accent-dark: #7f3f03;
+  --pm-accent-soft: #fff0df;
+  --pm-accent-ring: #fe923040;
   --pm-on-accent: #ffffff;
-  --pm-action: #f7b52b;
-  --pm-action-hover: #e6a31c;
+  --pm-action: #fe9230;
+  --pm-action-hover: #ec7d1d;
   --pm-on-action: #382400;
   --pm-memorial: #5b6640;
   --pm-memorial-soft: #e6ead8;
 
-  /* Mau vang am, lay tu bo long cho tren logo */
-  --pm-amber: #8a5406;
-  --pm-amber-bright: #f7b52b;
-  --pm-amber-soft: #fde2bb;
-  --pm-on-amber: #2e1a00;
+  /* Tông cam vàng lấy trực tiếp từ chữ PETMORY */
+  --pm-amber: #a95608;
+  --pm-amber-bright: #fe9230;
+  --pm-amber-soft: #ffe3cc;
+  --pm-on-amber: #6d3500;
 
   --pm-danger: #b3261e;
   --pm-danger-soft: #ffdad5;
@@ -54,7 +54,7 @@ html {
   --pm-on-success-soft: #0c2d18;
   --pm-info: #4a3726;
   --pm-info-soft: #f7e7d3;
-  --pm-star: #e0870c;
+  --pm-star: #fe9230;
 
   /* Lop phu mo phan anh bi cat bo trong hop sua anh */
   --pm-shade-crop: rgba(44, 29, 16, 0.52);
@@ -224,21 +224,21 @@ html {
   --pm-bg-sunken: #382c20;
   --pm-bg-3d: #2a2018;
 
-  --pm-accent: #ffd261;
-  --pm-accent-dark: #ffe294;
-  --pm-accent-soft: #4a3a14;
-  --pm-accent-ring: #ffd26140;
+  --pm-accent: #ffb469;
+  --pm-accent-dark: #ffd09f;
+  --pm-accent-soft: #4a2b16;
+  --pm-accent-ring: #fe923066;
   --pm-on-accent: #4a2100;
-  --pm-action: #ffd261;
-  --pm-action-hover: #ffe294;
+  --pm-action: #fe9230;
+  --pm-action-hover: #ffb469;
   --pm-on-action: #382400;
   --pm-memorial: #c3ceaa;
   --pm-memorial-soft: #333c24;
 
-  --pm-amber: #f7bf78;
-  --pm-amber-bright: #ffd261;
-  --pm-amber-soft: #4d3306;
-  --pm-on-amber: #ffe2ba;
+  --pm-amber: #ffb469;
+  --pm-amber-bright: #fe9230;
+  --pm-amber-soft: #4d2b16;
+  --pm-on-amber: #ffe2c8;
 
   --pm-danger: #ffb4ab;
   --pm-danger-soft: #59150f;

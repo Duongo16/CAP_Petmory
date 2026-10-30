@@ -8,32 +8,29 @@
   padding: 0 16px;
   font-size: var(--pm-text-md);
 }
-.shop-public-nav {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 10px max(20px, calc((100vw - 1180px) / 2));
-  background: var(--pm-bg-card);
-  border-bottom: 1px solid var(--pm-border);
-}
-
-.shop-public-nav nav {
-  display: flex;
-  gap: 16px;
-  margin-inline: auto;
-}
-
-.shop-public-nav nav a {
-  color: var(--pm-text);
-  text-decoration: none;
-  font-weight: 700;
-}
-
 @media (max-width: 700px) {
-  .shop-public-nav nav {
-    order: 2;
-    width: 100%;
-    justify-content: center;
+  .shop-header-inner {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  .shop-header-inner pm-brand {
+    inline-size: max-content;
+    overflow: visible;
+    --pm-brand-scale: 0.8;
+  }
+
+  .shop-header-inner pm-theme-toggle {
+    display: none;
+  }
+
+  .shop-account {
+    padding-inline-end: 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .shop-header-inner pm-brand {
+    --pm-brand-scale: 0.7;
   }
 }
