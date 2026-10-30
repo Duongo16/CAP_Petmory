@@ -197,7 +197,7 @@
 
       </form>
 
-      <a class="ap-switch" routerLink="/login">
+      <a class="ap-switch" routerLink="/login" [queryParams]="continueUrl ? { continue: continueUrl } : {}">
         {{ 'AUTH.HAVE_ACCOUNT' | translate }}
         <strong>{{ 'AUTH.LOGIN_LINK' | translate }}</strong>
         <pm-icon name="chevron" [size]="13" />

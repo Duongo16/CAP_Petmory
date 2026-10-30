@@ -17,6 +17,7 @@ import { TOPIC_ORDER, topicKey } from '../../shared/memory-topics';
 import { Icon } from '../../shared/icon/icon';
 import { PetFace } from '../../shared/pet-face/pet-face';
 import { UserFace } from '../../shared/user-face/user-face';
+import { GuestHeader } from '../../shared/guest-header/guest-header';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -53,7 +54,7 @@ interface Flight {
 @Component({
   selector: 'pm-diary-list-page',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, Icon, PetFace, UserFace, RouterLink],
+  imports: [ReactiveFormsModule, TranslatePipe, Icon, PetFace, UserFace, RouterLink, GuestHeader],
   templateUrl: './diary-list-page.html',
   styleUrl: './diary-list-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

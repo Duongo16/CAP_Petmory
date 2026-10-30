@@ -6,13 +6,14 @@ import {
   computed,
   inject,
   signal, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { take } from 'rxjs';
 import { GoodsService } from '../../core/services/goods.service';
 import { CartService } from '../../core/services/cart.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Goods, GoodsVariant } from '../../core/models/api.model';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { Icon } from '../../shared/icon/icon';
@@ -45,6 +46,8 @@ export class GoodsDetailPage implements OnInit {
 
   private readonly service = inject(GoodsService);
   private readonly cart = inject(CartService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly words = inject(TranslateService);
   private readonly notice = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
@@ -129,6 +132,10 @@ export class GoodsDetailPage implements OnInit {
    * nen o day chi can bao loi neu may chu tu choi vi hang da het.
    */
   addToCart(): void {
+    if (!this.auth.isSignedIn()) {
+      void this.router.navigate(['/login'], { queryParams: { continue: this.router.url } });
+      return;
+    }
     const one = this.chosen();
     if (!one || this.sending() || this.soldOut()) {
       return;

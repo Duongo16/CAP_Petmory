@@ -28,6 +28,7 @@ export class DiaryMusicPlayer {
   private readonly destroyRef = inject(DestroyRef);
   private readonly player = viewChild<ElementRef<HTMLAudioElement>>('player');
   private readonly youtubeFrame = viewChild<ElementRef<HTMLIFrameElement>>('youtubeFrame');
+  private youtubePlayTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly petId = input.required<string>();
   readonly music = input.required<DiaryMusic>();
@@ -58,6 +59,21 @@ export class DiaryMusicPlayer {
   readonly youtubePage = computed(() => `https://www.youtube.com/watch?v=${this.music().youtubeId}`);
 
   constructor() {
+    const onYoutubeMessage = (event: MessageEvent) => {
+      if (event.origin !== 'https://www.youtube.com' || event.source !== this.youtubeFrame()?.nativeElement.contentWindow) return;
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data?.event === 'onStateChange' && data.info === 1) {
+          if (this.youtubePlayTimer) clearTimeout(this.youtubePlayTimer);
+          this.blocked.set(false);
+        }
+      } catch { /* Ignore messages unrelated to this player. */ }
+    };
+    window.addEventListener('message', onYoutubeMessage);
+    this.destroyRef.onDestroy(() => {
+      window.removeEventListener('message', onYoutubeMessage);
+      if (this.youtubePlayTimer) clearTimeout(this.youtubePlayTimer);
+    });
     effect((onCleanup) => {
       const current = this.music();
       const petId = this.petId();
@@ -100,7 +116,13 @@ export class DiaryMusicPlayer {
   }
 
   onYoutubeLoad(): void {
+    const frame = this.youtubeFrame()?.nativeElement;
+    frame?.contentWindow?.postMessage(JSON.stringify({ event: 'listening', id: 'diary-music' }), 'https://www.youtube.com');
+    frame?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] }), 'https://www.youtube.com');
     this.playYoutube();
+    this.blocked.set(false);
+    if (this.youtubePlayTimer) clearTimeout(this.youtubePlayTimer);
+    this.youtubePlayTimer = setTimeout(() => this.blocked.set(true), 2000);
   }
 
   playYoutube(): void {

@@ -81,16 +81,21 @@ export class PhotosService {
    * sees what it looks like cleaned up, and only then decides whether it joins
    * a pet profile or is simply downloaded and forgotten.
    */
-  loadLoose(owner: string, file: Express.Multer.File): Promise<PetPhotoDocument> {
-    return this.store(null, owner, PhotoAngle.GENERAL, file);
+  loadLoose(owner: string, file: Express.Multer.File, purpose: 'RESTORE' | 'DESIGN' = 'RESTORE'): Promise<PetPhotoDocument> {
+    return this.store(null, owner, PhotoAngle.GENERAL, file, purpose);
   }
 
   /** Every restored picture of this customer that no pet has claimed yet. */
   listLoose(owner: string) {
     return this.model
-      .find({ owner: new Types.ObjectId(owner), pet: null, isHidden: false })
+      .find({ owner: new Types.ObjectId(owner), pet: null, isHidden: false, purpose: { $ne: 'DESIGN' } })
       .sort({ createdAt: -1 })
       .exec();
+  }
+
+  listDesign(owner: string) {
+    return this.model.find({ owner: new Types.ObjectId(owner), pet: null, isHidden: false, purpose: 'DESIGN' })
+      .sort({ createdAt: -1 }).exec();
   }
 
   /** Moves a loose picture, and the original it came from, onto a pet. */
@@ -113,6 +118,7 @@ export class PhotosService {
     owner: string,
     angle: PhotoAngle,
     file: Express.Multer.File,
+    purpose: 'RESTORE' | 'DESIGN' = 'RESTORE',
   ): Promise<PetPhotoDocument> {
     const cf = await this.businessConfig.get();
 
@@ -151,6 +157,7 @@ export class PhotosService {
     await this.writeFile(fileName, file.buffer);
 
     return this.model.create({
+      purpose,
       pet: petId ? new Types.ObjectId(petId) : null,
       owner: new Types.ObjectId(owner),
       angle,

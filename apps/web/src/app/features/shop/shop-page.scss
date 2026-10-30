@@ -8,3 +8,29 @@
   padding: 0 16px;
   font-size: var(--pm-text-md);
 }
+@media (max-width: 480px) {
+  .pm-shell-header > div {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  .pm-shell-header pm-brand {
+    inline-size: max-content;
+    overflow: visible;
+    --pm-brand-scale: 0.8;
+  }
+
+  .pm-shell-header pm-theme-toggle {
+    display: none;
+  }
+
+  .pm-shell-header .ml-auto {
+    gap: 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .pm-shell-header pm-brand {
+    --pm-brand-scale: 0.7;
+  }
+}

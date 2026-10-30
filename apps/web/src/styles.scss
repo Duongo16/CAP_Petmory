@@ -5,7 +5,7 @@ html {
   @include mat.theme((
     color: (
       primary: mat.$orange-palette,
-      tertiary: mat.$yellow-palette,
+      tertiary: mat.$orange-palette,
     ),
     typography: 'Be Vietnam Pro',
     density: 0,
@@ -27,26 +27,24 @@ html {
   --pm-bg-3d: #fdf2e2;
 
   /*
-   * Mau thuong hieu, lay tu chu PETMORY tren logo.
-   *
-   * Mau cam tren logo rat tuoi nen dung lam chu thi doc khong ra. Mau nhan o
-   * day la chinh sac cam do nhung dam hon, vua du de vua lam chu tren nen
-   * sang vua lam nen cho chu trang. Sac cam nguyen ban cua logo van duoc giu,
-   * dat o muc mau ho phach tuoi va chi dung cho mang trang tri.
+   * PETMORY wordmark orange drives actions; a darker shade from the same hue keeps small text readable.
    */
-  --pm-accent: #a8500c;
-  --pm-accent-dark: #843e08;
-  --pm-accent-soft: #fce7ce;
-  --pm-accent-ring: #a8500c40;
+  --pm-accent: #a95608;
+  --pm-accent-dark: #7f3f03;
+  --pm-accent-soft: #fff0df;
+  --pm-accent-ring: #fe923040;
   --pm-on-accent: #ffffff;
+  --pm-action: #fe9230;
+  --pm-action-hover: #ec7d1d;
+  --pm-on-action: #382400;
   --pm-memorial: #5b6640;
   --pm-memorial-soft: #e6ead8;
 
-  /* Mau vang am, lay tu bo long cho tren logo */
-  --pm-amber: #8a5406;
-  --pm-amber-bright: #fb8b1f;
-  --pm-amber-soft: #fde2bb;
-  --pm-on-amber: #2e1a00;
+  /* Tông cam vàng lấy trực tiếp từ chữ PETMORY */
+  --pm-amber: #a95608;
+  --pm-amber-bright: #fe9230;
+  --pm-amber-soft: #ffe3cc;
+  --pm-on-amber: #6d3500;
 
   --pm-danger: #b3261e;
   --pm-danger-soft: #ffdad5;
@@ -56,7 +54,7 @@ html {
   --pm-on-success-soft: #0c2d18;
   --pm-info: #4a3726;
   --pm-info-soft: #f7e7d3;
-  --pm-star: #e0870c;
+  --pm-star: #fe9230;
 
   /* Lop phu mo phan anh bi cat bo trong hop sua anh */
   --pm-shade-crop: rgba(44, 29, 16, 0.52);
@@ -180,7 +178,7 @@ html {
   --pm-font-rounded: 'Nunito', 'Be Vietnam Pro', 'Segoe UI', sans-serif;
   --pm-shadow: 0 1px 2px rgba(74, 48, 24, 0.06), 0 10px 28px rgba(74, 48, 24, 0.08);
   --pm-shadow-lifted: 0 2px 4px rgba(74, 48, 24, 0.07), 0 18px 40px rgba(74, 48, 24, 0.14);
-  --pm-accent-glow: 0 10px 24px rgba(168, 80, 12, 0.28);
+  --pm-accent-glow: 0 10px 24px rgba(197, 143, 20, 0.28);
 
   /* Mang toi: thanh ben noi bo, the hoi tuong, chan trang */
   --pm-night: #2c1d10;
@@ -226,18 +224,21 @@ html {
   --pm-bg-sunken: #382c20;
   --pm-bg-3d: #2a2018;
 
-  --pm-accent: #ffb877;
-  --pm-accent-dark: #ffd2a8;
-  --pm-accent-soft: #4a2d11;
-  --pm-accent-ring: #ffb87740;
+  --pm-accent: #ffb469;
+  --pm-accent-dark: #ffd09f;
+  --pm-accent-soft: #4a2b16;
+  --pm-accent-ring: #fe923066;
   --pm-on-accent: #4a2100;
+  --pm-action: #fe9230;
+  --pm-action-hover: #ffb469;
+  --pm-on-action: #382400;
   --pm-memorial: #c3ceaa;
   --pm-memorial-soft: #333c24;
 
-  --pm-amber: #f7bf78;
-  --pm-amber-bright: #fb8b1f;
-  --pm-amber-soft: #4d3306;
-  --pm-on-amber: #ffe2ba;
+  --pm-amber: #ffb469;
+  --pm-amber-bright: #fe9230;
+  --pm-amber-soft: #4d2b16;
+  --pm-on-amber: #ffe2c8;
 
   --pm-danger: #ffb4ab;
   --pm-danger-soft: #59150f;
@@ -381,7 +382,7 @@ h1.pm-page-title,
   margin: 0 0 var(--pm-gap);
 }
 
-/** Primary page button, solid amber. */
+/** Primary page button in the wordmark yellow. */
 .pm-button-primary {
   display: inline-flex;
   align-items: center;
@@ -391,8 +392,8 @@ h1.pm-page-title,
   padding: 0 20px;
   border: none;
   border-radius: var(--pm-radius);
-  background: var(--pm-accent);
-  color: var(--pm-on-accent);
+  background: var(--pm-action);
+  color: var(--pm-on-action);
   font: inherit;
   font-size: var(--pm-text-md);
   font-weight: 700;
@@ -408,7 +409,7 @@ h1.pm-page-title,
 
   &:hover:not(:disabled),
   &:focus-visible:not(:disabled) {
-    background: var(--pm-accent-dark);
+    background: var(--pm-action-hover);
     transform: translate3d(0, -1px, 0);
   }
 

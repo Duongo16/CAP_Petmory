@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { samePassword } from './password-match';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { switchMap } from 'rxjs';
@@ -68,6 +68,8 @@ export class RegisterPage {
   private readonly auth = inject(AuthService);
   private readonly drafts = inject(PetDraftService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  readonly continueUrl = this.route.snapshot.queryParamMap.get('continue');
   private readonly destroyRef = inject(DestroyRef);
 
   /** The pet profile started on the welcome page, waiting for this account. */
@@ -144,7 +146,8 @@ export class RegisterPage {
       .subscribe({
         next: () => {
           this.pendingSend.set(false);
-          void this.router.navigate(['/home']);
+          const target = this.continueUrl;
+          void this.router.navigateByUrl(target?.startsWith('/') && !target.startsWith('//') && !target.startsWith('/admin') ? target : '/home');
         },
         error: (trouble: HttpErrorResponse) => {
           this.pendingSend.set(false);

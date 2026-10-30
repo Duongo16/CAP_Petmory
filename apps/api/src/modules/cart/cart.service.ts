@@ -73,6 +73,9 @@ export class CartService {
   async add(owner: string, dto: AddToCartDto): Promise<CartView> {
     // Gia va thoi gian lam deu lay tu may chu, khong tin so lieu do trinh duyet gui len.
     const kind = await this.catalog.detailProductType(dto.productTypeCode);
+    if (kind.code !== 'PT-03') {
+      throw new BadRequestException('Hien chi nhan dat khung tranh thu cung');
+    }
     const size = kind.sizes.find((s) => s.code === dto.sizeCode.toUpperCase() && s.enabled);
     if (!size) {
       throw new NotFoundException(MSG.NOT_FOUND);
@@ -82,10 +85,13 @@ export class CartService {
     const design = dto.designId
       ? await this.designs.findOwned(dto.designId, owner)
       : null;
-    await this.checkReadyToMake(design, size.minPhotos);
+    if (design && (design.productTypeCode !== kind.code || design.sizeCode !== size.code)) {
+      throw new BadRequestException('Ban thiet ke khong khop san pham va kich co');
+    }
+    await this.checkReadyToMake(design, size.minPhotos, owner);
 
     // The stand is looked up on the server too, so its price cannot be forged.
-    const base = await this.catalog.findDisplayBase(dto.displayBaseCode);
+    const base = kind.code === 'PT-03' ? null : await this.catalog.findDisplayBase(dto.displayBaseCode);
     // Phu kien lay tu ban thiet ke va gia doc lai tu danh muc, roi chot vao dong.
     const accessories = await this.catalog.findAccessories(design?.accessories);
     if (accessories.length > size.maxAccessories) {
@@ -156,21 +162,26 @@ export class CartService {
     return this.format(cart);
   }
 
-  /**
-   * Hang tuy bien lam theo anh cua be (muc 7, 12): phai co ban thiet ke, ban
-   * thiet ke phai gan voi mot be, va be phai du so anh toi thieu cua kich co.
-   * Thieu thi tu choi kem ma loi rieng de man hinh noi dung cho can bo sung.
-   */
-  private async checkReadyToMake(design: Awaited<ReturnType<DesignsService['findOwned']>> | null, minPhotos: number): Promise<void> {
+  /** A saved portrait and enough owned reference photos are required. */
+  private async checkReadyToMake(design: Awaited<ReturnType<DesignsService['findOwned']>> | null, minPhotos: number, owner: string): Promise<void> {
     if (!design) {
       throw new BadRequestException({ code: 'NEED_DESIGN', message: 'Can co ban thiet ke truoc khi them vao gio' });
     }
-    if (!design.pet) {
-      throw new BadRequestException({ code: 'NEED_PET', message: 'Ban thiet ke can gan voi mot be' });
+    const direct = await this.photoModel.countDocuments({
+      _id: { $in: design.referencePhotoIds ?? [] },
+      owner: new Types.ObjectId(owner),
+      pet: null,
+      purpose: 'DESIGN',
+      isHidden: false,
+      isRestored: false,
+    }).exec();
+    if (direct !== (design.referencePhotoIds ?? []).length) {
+      throw new BadRequestException({ code: 'NEED_PHOTOS', message: 'Mot so anh tham chieu khong con hop le' });
     }
-    const have = await this.photoModel
-      .countDocuments({ pet: design.pet, isHidden: false, isRestored: false })
-      .exec();
+    const fromPet = design.pet ? await this.photoModel.countDocuments({
+      pet: design.pet, owner: new Types.ObjectId(owner), isHidden: false, isRestored: false,
+    }).exec() : 0;
+    const have = direct + fromPet;
     if (have < minPhotos) {
       throw new BadRequestException({
         code: 'NEED_PHOTOS',

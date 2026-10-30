@@ -197,6 +197,15 @@ export class Design {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Pet', default: null })
   pet!: Types.ObjectId | null;
 
+  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'PetPhoto', default: [] })
+  referencePhotoIds!: Types.ObjectId[];
+
+  @Prop({ type: String, enum: ['ROUND', 'SQUARE', 'LANDSCAPE', 'PORTRAIT'], default: 'ROUND' })
+  frameShape!: string;
+
+  @Prop({ type: String, enum: ['WALNUT', 'OAK', 'WHITE', 'BLACK', 'ROSE'], default: 'WALNUT' })
+  frameFinish!: string;
+
   @Prop({ default: false, index: true })
   isHidden!: boolean;
 }

@@ -42,6 +42,18 @@ export class PhotosService {
     });
   }
 
+  listDesign(): Observable<PetPhoto[]> {
+    return this.http.get<PetPhoto[]>(`${this.base}/pet-photos/design`);
+  }
+
+  loadDesign(file: File): Observable<PetPhoto> {
+    return from(fitForUpload(file)).pipe(switchMap((ready) => {
+      const form = new FormData();
+      form.append('file', ready, ready.name);
+      return this.http.post<PetPhoto>(`${this.base}/pet-photos/design`, form);
+    }));
+  }
+
   checkAngle(petId: string): Observable<AngleCheckResult> {
     return this.http.get<AngleCheckResult>(`${this.base}/pet-photos/check-angles`, {
       params: { pet: petId },

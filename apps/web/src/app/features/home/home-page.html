@@ -19,7 +19,7 @@
           <p class="description">{{ 'HOME.DESCRIPTION' | translate }}</p>
 
           <div class="buttons">
-            <a class="button-amber" routerLink="/studio">
+            <a class="button-amber" routerLink="/shop">
               {{ 'HOME.CREATE_PET' | translate }}
               <pm-icon name="chevron" [size]="14" />
             </a>
@@ -91,7 +91,7 @@
 
       <div class="grid">
         @for (card of featured(); track card.raw.code) {
-          <a class="product-card" [routerLink]="studioProductCodes.has(card.raw.code) ? '/studio' : ['/products', card.raw.code]" [queryParams]="studioProductCodes.has(card.raw.code) ? { product: card.raw.code } : null">
+          <a class="product-card" routerLink="/shop" [queryParams]="{ tab: 'custom', product: card.raw.code }">
             <div class="photo">
               @if (card.raw.imageUrl) {
                 <img [src]="card.raw.imageUrl" [alt]="card.raw.name" />

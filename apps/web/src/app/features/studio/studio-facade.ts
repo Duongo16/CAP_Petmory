@@ -17,6 +17,7 @@ import {
   Design,
   MeshPaint,
   Pet,
+  PetPhoto,
   DisplayBase,
   Accessory,
   PackagingKind,
@@ -143,6 +144,11 @@ export class StudioFacade {
 
   /** So anh goc cua be dang chon; rong khi chua biet. */
   readonly photoCount = signal<number | null>(null);
+  readonly referencePhotos = signal<PetPhoto[]>([]);
+  readonly referencesLoading = signal(false);
+  readonly uploadingReference = signal(false);
+  readonly referenceError = signal(false);
+  readonly totalPhotoCount = computed(() => (this.photoCount() ?? 0) + this.referencePhotos().length);
 
   /** So anh toi thieu cua kich co dang chon (muc 7, 12). */
   readonly minPhotos = computed(() => {
@@ -155,9 +161,39 @@ export class StudioFacade {
 
   /** Da gan be va be du anh cho kich co nay chua. */
   readonly photosReady = computed(() => {
-    const have = this.photoCount();
-    return Boolean(this.petChosen()) && have !== null && have >= this.minPhotos();
+    return this.totalPhotoCount() >= this.minPhotos();
   });
+
+  uploadReference(file: File): void {
+    if (this.uploadingReference() || this.referencePhotos().length >= 20) return;
+    this.uploadingReference.set(true);
+    this.referenceError.set(false);
+    this.photosService.loadDesign(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (photo) => {
+        this.referencePhotos.update((now) => [...now, photo]);
+        this.uploadingReference.set(false);
+        this.markChanged();
+      },
+      error: () => { this.uploadingReference.set(false); this.referenceError.set(true); },
+    });
+  }
+
+  removeReference(id: string): void {
+    this.referencePhotos.update((now) => now.filter((photo) => photo._id !== id));
+    this.markChanged();
+  }
+
+  private restoreReferencePhotos(ids: string[]): void {
+    if (ids.length === 0) { this.referencePhotos.set([]); return; }
+    this.referencesLoading.set(true);
+    this.photosService.listDesign().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (photos) => {
+        this.referencePhotos.set(ids.flatMap((id) => photos.find((photo) => photo._id === id) ?? []));
+        this.referencesLoading.set(false);
+      },
+      error: () => { this.referencePhotos.set([]); this.referencesLoading.set(false); },
+    });
+  }
 
   /** Dem lai anh cua be dang chon, goi sau khi doi be hoac vua tai them anh. */
   refreshPhotos(): void {
@@ -255,17 +291,15 @@ export class StudioFacade {
     } else if (!this.sizeCodeSelected()) {
       out.push({ key: 'STUDIO.CART_BLOCK.NO_SIZE', step: 'FINISH' });
     }
-    if (!this.petChosen()) {
-      out.push({ key: 'STUDIO.CART_BLOCK.NO_PET', step: 'PHOTOS' });
-    } else if (this.chosenProduct() && !this.photosReady()) {
+    if (this.chosenProduct() && !this.photosReady()) {
       out.push({
         key: 'STUDIO.CART_BLOCK.NEED_PHOTOS',
         step: 'PHOTOS',
-        params: { have: this.photoCount() ?? 0, need: this.minPhotos() },
+        params: { have: this.totalPhotoCount(), need: this.minPhotos() },
       });
     }
     if (!this.nameValid()) {
-      out.push({ key: 'STUDIO.CART_BLOCK.NO_NAME', step: 'STAND' });
+      out.push({ key: 'STUDIO.CART_BLOCK.NO_NAME', step: 'PHOTOS' });
     }
     return out;
   });
@@ -285,6 +319,12 @@ export class StudioFacade {
       .list()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({ next: (list) => this.pets.set(list), error: () => this.pets.set([]) });
+  }
+
+  watchDetails(): void {
+    this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      if (this.designId()) this.standDirty.set(true);
+    });
   }
 
   loadCatalog(): void {
@@ -321,6 +361,7 @@ export class StudioFacade {
     });
     // Doi hop hay khung la mot mon khac trong gio, nen cho them vao gio lai.
     this.addedToCart.set(false);
+    if (this.designId()) this.standDirty.set(true);
     this.fetchQuote();
   }
 
@@ -388,8 +429,13 @@ export class StudioFacade {
     this.fetchQuote();
   }
 
+  markDesignChanged(): void {
+    this.markChanged();
+  }
+
   selectKind(code: string): void {
     this.codeKindSelected.set(code);
+    if (code === 'PT-03') this.stand.set({ baseCode: BASE_NONE, tone: 'OAK', decorations: [] });
     this.sizeCodeSelected.set('');
     this.quote.set(null);
     this.addedToCart.set(false);
@@ -436,6 +482,7 @@ export class StudioFacade {
     colorCodesUsed: string[],
     zonePaint: { zone: string; colorCode: string }[],
     sixAnglePhotos: { angle: PreviewAngle; photo: string }[],
+    frame: { shape: string; finish: string },
     onSaved?: () => void,
   ): void {
     if (this.form.invalid) {
@@ -457,6 +504,9 @@ export class StudioFacade {
       // Tying the design to a pet is what carries the customer's photos through
       // to the production file the workshop reads.
       pet: v.petId || undefined,
+      referencePhotoIds: this.referencePhotos().map((photo) => photo._id),
+      frameShape: frame.shape,
+      frameFinish: frame.finish,
       engraving: {
         name: v.engravedName.trim(),
         memorialDate: v.memorialDate || undefined,
@@ -514,7 +564,7 @@ export class StudioFacade {
         quantity: 1,
         designId: code,
         petName: petName || undefined,
-        displayBaseCode: this.stand().baseCode || undefined,
+        displayBaseCode: this.codeKindSelected() === 'PT-03' ? undefined : this.stand().baseCode || undefined,
         packagingCodes: this.packagingCodes(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -543,22 +593,23 @@ export class StudioFacade {
           this.codeKindSelected.set(tk.productTypeCode);
           this.sizeCodeSelected.set(tk.sizeCode);
           this.stand.set({
-            baseCode: tk.stand?.baseCode || BASE_NONE,
+            baseCode: tk.productTypeCode === 'PT-03' ? BASE_NONE : tk.stand?.baseCode || BASE_NONE,
             tone: (tk.stand?.tone as StandTone) || 'OAK',
             decorations: [...((tk.stand?.decorations ?? []) as StandDecoration[])],
           });
           this.accessoryPicked.set([...(tk.accessories ?? [])]);
-          this.standDirty.set(false);
           this.form.patchValue({
             name: tk.name,
             engravedName: tk.engraving?.name ?? '',
             memorialDate: tk.engraving?.memorialDate ? tk.engraving.memorialDate.slice(0, 10) : '',
             message: tk.engraving?.message ?? '',
             featureNote: tk.featureNote ?? '',
-          });
+          }, { emitEvent: false });
           // Dat be ma khong phat su kien doi be, de ban vua mo khong bi coi la chua luu.
           this.form.controls.petId.setValue(tk.pet ?? '', { emitEvent: false });
           this.petChosen.set(tk.pet ?? '');
+          this.standDirty.set(tk.productTypeCode === 'PT-03' && Boolean(tk.stand?.baseCode) && tk.stand?.baseCode !== BASE_NONE);
+          this.restoreReferencePhotos(tk.referencePhotoIds ?? []);
           this.refreshPhotos();
           if (tk.productTypeCode && tk.sizeCode) {
             this.fetchQuote();
@@ -580,7 +631,7 @@ const CART_ERROR: Record<string, string> = {
 /** Mot dieu con thieu truoc khi them vao gio, kem buoc can quay lai de sua. */
 export interface CartBlocker {
   key: string;
-  step?: 'PHOTOS' | 'STAND' | 'FINISH';
+  step?: 'PHOTOS' | 'FINISH';
   params?: Record<string, number>;
 }
 

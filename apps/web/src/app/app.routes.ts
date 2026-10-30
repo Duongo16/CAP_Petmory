@@ -70,6 +70,15 @@ export const routes: Routes = [
       import('./features/public-diary/diary-book-page').then((m) => m.DiaryBookPage),
   },
   {
+    path: 'shop',
+    canActivate: [customerOnlyGuard],
+    loadComponent: () => import('./features/shop/shop-page').then((m) => m.ShopPage),
+  },
+  { path: 'products', pathMatch: 'full', redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom' } }) },
+  { path: 'goods', pathMatch: 'full', redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready' } }) },
+  { path: 'products/:code', redirectTo: ({ params }) => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom', product: params['code'] } }) },
+  { path: 'goods/:code', redirectTo: ({ params }) => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready', goods: params['code'] } }) },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./layout/shell').then((m) => m.Shell),
@@ -97,32 +106,6 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () =>
           import('./features/community/profile-page').then((m) => m.CommunityProfilePage),
-      },
-      {
-        path: 'shop',
-        canActivate: [customerOnlyGuard],
-        loadComponent: () => import('./features/shop/shop-page').then((m) => m.ShopPage),
-      },
-      // Products and ready-made goods now share the shop, and details open as a popup there.
-      {
-        path: 'products',
-        pathMatch: 'full',
-        redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom' } }),
-      },
-      {
-        path: 'goods',
-        pathMatch: 'full',
-        redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready' } }),
-      },
-      {
-        path: 'products/:code',
-        redirectTo: ({ params }) =>
-          inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom', product: params['code'] } }),
-      },
-      {
-        path: 'goods/:code',
-        redirectTo: ({ params }) =>
-          inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready', goods: params['code'] } }),
       },
       {
         path: 'cart',

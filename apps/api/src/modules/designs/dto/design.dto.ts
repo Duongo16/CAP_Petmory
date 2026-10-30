@@ -147,6 +147,21 @@ export class SaveDesignDto {
   @IsMongoId()
   pet?: string;
 
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @ArrayUnique()
+  @IsMongoId({ each: true })
+  referencePhotoIds?: string[];
+
+  @IsOptional()
+  @IsIn(['ROUND', 'SQUARE', 'LANDSCAPE', 'PORTRAIT'])
+  frameShape?: string;
+
+  @IsOptional()
+  @IsIn(['WALNUT', 'OAK', 'WHITE', 'BLACK', 'ROSE'])
+  frameFinish?: string;
+
   /** Ma phu kien gan len mau, moi diem neo mot mon. May chu doc gia va kiem lai. */
   @IsOptional()
   @IsArray()

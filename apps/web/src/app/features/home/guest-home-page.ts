@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Icon } from '../../shared/icon/icon';
-import { PetStarter } from './pet-starter/pet-starter';
+import { MoneyPipe } from '../../shared/money.pipe';
+import { GoodsService } from '../../core/services/goods.service';
+import { Goods } from '../../core/models/api.model';
 
 /** A card in the features grid, with its keys written out in full. */
 interface Feature {
@@ -58,7 +61,7 @@ import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 @Component({
   selector: 'pm-guest-home-page',
   standalone: true,
-  imports: [Brand, BounceText, RevealDirective, TiltDirective, RouterLink, TranslatePipe, Icon, PetStarter, LanguageToggle, ThemeToggle],
+  imports: [Brand, BounceText, RevealDirective, TiltDirective, RouterLink, TranslatePipe, Icon, LanguageToggle, ThemeToggle, MoneyPipe],
   templateUrl: './guest-home-page.html',
   styleUrl: './guest-home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,11 +69,22 @@ import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 export class GuestHomePage {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly goodsService = inject(GoodsService);
 
-  readonly starterOpen = signal(false);
   readonly authPromptOpen = signal(false);
+  readonly readyGoods = signal<Goods[]>([]);
+  readonly featuredGoods = computed(() => this.readyGoods().slice(0, 4));
+
+  priceFrom(good: Goods): string {
+    const prices = good.variant.filter((one) => one.enabled).map((one) => Number(one.price.$numberDecimal));
+    return prices.length > 0 ? String(Math.min(...prices)) : '0';
+  }
 
   constructor() {
+    this.goodsService.list({ page: 1 }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (page) => this.readyGoods.set(page.rows.filter((one) => one.enabled)),
+      error: () => this.readyGoods.set([]),
+    });
     // Anh nen nam duoi thanh dinh: do chieu cao that cua thanh (dien thoai co hai hang)
     // de anh vua khit man hinh va chu khong bi thanh dinh che.
     afterNextRender(() => {
@@ -142,14 +156,6 @@ export class GuestHomePage {
     const bar = document.querySelector('.lp-bar')?.getBoundingClientRect().height ?? 0;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: front.getBoundingClientRect().top + window.scrollY - bar, behavior: reduce ? 'auto' : 'smooth' });
-  }
-
-  openOnboarding(): void {
-    this.starterOpen.set(true);
-  }
-
-  closeOnboarding(): void {
-    this.starterOpen.set(false);
   }
 
   openAuthPrompt(): void { this.authPromptOpen.set(true); }

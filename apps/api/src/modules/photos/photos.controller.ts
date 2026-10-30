@@ -56,6 +56,18 @@ export class PhotosController {
     return this.service.listLoose(user.userId);
   }
 
+  /** Upload an order reference photo without creating a pet profile. */
+  @Post('design')
+  @UseInterceptors(FileInterceptor('file'))
+  loadDesign(@UploadedFile() file: Express.Multer.File, @CurrentUser() user: AuthUser) {
+    return this.service.loadLoose(user.userId, file, 'DESIGN');
+  }
+
+  @Get('design')
+  listDesign(@CurrentUser() user: AuthUser) {
+    return this.service.listDesign(user.userId);
+  }
+
   /**
    * Takes one photograph, cleans it up, and hands back both versions.
    *
