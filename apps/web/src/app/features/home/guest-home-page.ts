@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRe
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Icon } from '../../shared/icon/icon';
-import { PetStarter } from './pet-starter/pet-starter';
 
 /** A card in the features grid, with its keys written out in full. */
 interface Feature {
@@ -58,7 +57,7 @@ import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 @Component({
   selector: 'pm-guest-home-page',
   standalone: true,
-  imports: [Brand, BounceText, RevealDirective, TiltDirective, RouterLink, TranslatePipe, Icon, PetStarter, LanguageToggle, ThemeToggle],
+  imports: [Brand, BounceText, RevealDirective, TiltDirective, RouterLink, TranslatePipe, Icon, LanguageToggle, ThemeToggle],
   templateUrl: './guest-home-page.html',
   styleUrl: './guest-home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -67,7 +66,6 @@ export class GuestHomePage {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly starterOpen = signal(false);
   readonly authPromptOpen = signal(false);
 
   constructor() {
@@ -142,14 +140,6 @@ export class GuestHomePage {
     const bar = document.querySelector('.lp-bar')?.getBoundingClientRect().height ?? 0;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: front.getBoundingClientRect().top + window.scrollY - bar, behavior: reduce ? 'auto' : 'smooth' });
-  }
-
-  openOnboarding(): void {
-    this.starterOpen.set(true);
-  }
-
-  closeOnboarding(): void {
-    this.starterOpen.set(false);
   }
 
   openAuthPrompt(): void { this.authPromptOpen.set(true); }

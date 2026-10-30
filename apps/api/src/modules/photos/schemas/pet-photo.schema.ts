@@ -69,6 +69,9 @@ export const QualityScoreSchema = SchemaFactory.createForClass(QualityScore);
 
 @Schema({ timestamps: true, collection: 'pet_photos' })
 export class PetPhoto {
+  /** Loose photos for a custom order stay out of the restoration gallery. */
+  @Prop({ type: String, enum: ['RESTORE', 'DESIGN'], default: 'RESTORE' })
+  purpose!: 'RESTORE' | 'DESIGN';
   /*
    * Mot anh co the chua thuoc ve be nao.
    * Nguoi dung co the phuc hoi mot tam anh roi moi quyet dinh gan no vao ho so

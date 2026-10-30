@@ -5,6 +5,7 @@
         <pm-brand size="md" />
       </a>
       <nav class="lp-nav" [attr.aria-label]="'NAV.MAIN' | translate">
+        <a routerLink="/shop">{{ 'NAV.SHOP' | translate }}</a>
         <button type="button" (click)="openAuthPrompt()">{{ 'LANDING.NAV_DIARY' | translate }}</button>
         <button type="button" (click)="openAuthPrompt()">{{ 'LANDING.NAV_MEMORY' | translate }}</button>
         <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
@@ -13,7 +14,7 @@
         <pm-language-toggle />
         <pm-theme-toggle />
         <a class="lp-link-btn" routerLink="/login">{{ 'AUTH.SIGN_IN' | translate }}</a>
-        <button type="button" class="lp-btn lp-btn-sm" (click)="openOnboarding()">{{ 'LANDING.START_FREE' | translate }}</button>
+        <a class="lp-btn lp-btn-sm" routerLink="/register">{{ 'LANDING.START_FREE' | translate }}</a>
       </div>
     </div>
   </header>
@@ -30,10 +31,10 @@
         <h1 class="lp-cover-title"><pm-bounce-text [text]="'LANDING.FELT.TITLE' | translate" /></h1>
         <p class="lp-cover-sub">{{ 'LANDING.FELT.SUB' | translate }}</p>
         <div class="lp-cover-actions">
-          <button type="button" class="lp-btn lp-btn-lg" (click)="openOnboarding()">
+          <a class="lp-btn lp-btn-lg" routerLink="/shop">
             {{ 'LANDING.FELT.CTA' | translate }}
             <pm-icon name="arrow" [size]="18" />
-          </button>
+          </a>
           <a class="lp-cover-go" href="#start" (click)="scrollToStart($event)">
             {{ 'LANDING.FELT.CTA_WALL' | translate }}
             <pm-icon name="chevron" [size]="14" />
@@ -131,10 +132,10 @@
       }
     </div>
     <div class="lp-cta-row lp-center lp-styles-cta">
-      <button type="button" class="lp-btn lp-btn-lg" (click)="openOnboarding()">
+      <a class="lp-btn lp-btn-lg" routerLink="/shop">
         {{ 'LANDING.FELT.CTA' | translate }}
         <pm-icon name="arrow" [size]="18" />
-      </button>
+      </a>
     </div>
   </section>
 
@@ -253,7 +254,7 @@
       <h2>{{ 'LANDING.CTA_TITLE' | translate }}</h2>
       <p>{{ 'LANDING.CTA_SUB' | translate }}</p>
       <div class="lp-cta-row lp-center">
-        <button type="button" class="lp-btn-light lp-btn-lg" (click)="openOnboarding()">{{ 'LANDING.CTA_CREATE' | translate }}</button>
+        <a class="lp-btn-light lp-btn-lg" routerLink="/shop">{{ 'NAV.SHOP' | translate }}</a>
         <a class="lp-btn-outline lp-btn-lg" routerLink="/login">{{ 'LANDING.CTA_LOGIN' | translate }}</a>
       </div>
     </div>
@@ -267,6 +268,7 @@
           <span>{{ 'LANDING.FOOTER_SLOGAN' | translate }}</span>
         </div>
         <nav class="lp-footer-nav" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
+          <a routerLink="/shop">{{ 'NAV.SHOP' | translate }}</a>
           <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
           <a routerLink="/login">{{ 'AUTH.SIGN_IN' | translate }}</a>
           <a routerLink="/register">{{ 'AUTH.SIGN_UP' | translate }}</a>
@@ -294,8 +296,4 @@
       </div>
     </div>
   </div>
-}
-
-@if (starterOpen()) {
-  <pm-pet-starter (closed)="closeOnboarding()" />
 }

@@ -1494,3 +1494,9 @@ ul {
 .match-notes {
   font-style: italic;
 }
+.reference-list { list-style:none; padding:0; margin:8px 0; display:grid; gap:6px; }
+.reference-list li { display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:0; padding:8px 10px; border:1px solid var(--pm-border); border-radius:8px; }
+.reference-list li span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.studio-optional-details { margin-block:12px; border-top:1px solid var(--pm-border); padding-top:10px; }
+.studio-optional-details summary { cursor:pointer; color:var(--pm-accent-dark); font-weight:700; }
+.studio-optional-details .form { margin-top:10px; }

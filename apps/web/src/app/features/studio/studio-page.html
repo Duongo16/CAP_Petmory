@@ -154,6 +154,7 @@
           @switch (step()) {
             @case ('MODEL') {
               <h2 class="panel-title">{{ 'STUDIO.PANEL.MODEL' | translate }}</h2>
+              @if (kindTabs().length > 1) {
               <div class="chips" role="group" [attr.aria-label]="'STUDIO.KIND_LABEL' | translate">
                 @for (one of kindTabs(); track one.kind) {
                   <button type="button" class="chip" [class.on]="kindSelected() === one.kind"
@@ -162,6 +163,8 @@
                   </button>
                 }
               </div>
+              }
+              @if (poseTabs().length > 1) {
               <div class="chips pose-chips" role="group" [attr.aria-label]="'STUDIO.POSE_LABEL' | translate">
                 @for (one of poseTabs(); track one.pose) {
                   <button type="button" class="chip" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-pose]="one.pose"
@@ -170,6 +173,7 @@
                   </button>
                 }
               </div>
+              }
               <ul class="models">
                 @for (card of modelCards(); track card.raw.code) {
                   <li>
@@ -182,6 +186,7 @@
                   </li>
                 }
               </ul>
+              @if (facade.pets().length > 0) {
               <div class="match-box" id="studio-match-box">
                 <h3 class="group-title first">{{ 'STUDIO.MATCH.TITLE' | translate }}</h3>
                 <p class="hint">{{ 'STUDIO.MATCH.SUB' | translate }}</p>
@@ -206,8 +211,6 @@
                     {{ 'STUDIO.MATCH.NEED_PHOTO' | translate }}
                     <button type="button" class="cart-block-fix" (click)="go('PHOTOS')">{{ 'STUDIO.MATCH.TO_PHOTOS' | translate }}</button>
                   </p>
-                } @else if (facade.pets().length === 0) {
-                  <p class="match-hint"><a class="suggest-link" routerLink="/pets">{{ 'STUDIO.PET_CREATE' | translate }}</a></p>
                 }
                 @if (facade.matchError(); as codeError) {
                   <p class="note danger" role="alert">{{ codeError | translate }}</p>
@@ -244,6 +247,7 @@
                   </div>
                 }
               </div>
+              }
 
               @if (credit(); as one) {
                 <p class="credit">
@@ -298,9 +302,38 @@
               </ul>
             }
 
-            @case ('STAND') {
-              <h2 class="panel-title">{{ 'STUDIO.PANEL.STAND' | translate }}</h2>
+            @case ('PHOTOS') {
+              <h2 class="panel-title">{{ 'STUDIO.PANEL.PHOTOS' | translate }}</h2>
+              <p class="hint">{{ 'STUDIO.PHOTOS_SUB' | translate }}</p>
+              <label class="field">
+                <span>{{ 'STUDIO.REFERENCE_UPLOAD' | translate }}</span>
+                <input type="file" accept="image/jpeg,image/png,image/webp" [disabled]="facade.uploadingReference()" (change)="uploadReference($event)" />
+              </label>
+              @if (facade.uploadingReference()) { <p class="hint">{{ 'COMMON.LOADING' | translate }}</p> }
+              @if (facade.referenceError()) { <p class="note danger" role="alert">{{ 'STUDIO.REFERENCE_ERROR' | translate }}</p> }
+              @if (facade.referencePhotos().length > 0) {
+                <ul class="reference-list">
+                  @for (photo of facade.referencePhotos(); track photo._id) {
+                    <li><span>{{ photo.originalName }}</span><button type="button" class="text-button" (click)="facade.removeReference(photo._id)">{{ 'COMMON.REMOVE' | translate }}</button></li>
+                  }
+                </ul>
+              }
+              <p class="photo-need" [class.ok]="facade.photosReady()">
+                {{ 'STUDIO.PHOTOS_NEED' | translate: { have: facade.totalPhotoCount(), need: facade.minPhotos() } }}
+              </p>
 
+              <details class="studio-optional-details">
+                <summary>{{ 'STUDIO.OPTIONAL_DETAILS' | translate }}</summary>
+                <div class="form" [formGroup]="facade.form">
+                  <label class="field"><span>{{ 'STUDIO.ENGRAVED_NAME' | translate }}</span><input type="text" formControlName="engravedName" maxlength="60" class="tw-input" /></label>
+                  <label class="field"><span>{{ 'STUDIO.MEMORIAL_DATE' | translate }}</span><pm-date-input formControlName="memorialDate" /></label>
+                  <label class="field"><span>{{ 'STUDIO.MESSAGE' | translate }}</span><textarea formControlName="message" rows="2" maxlength="300" class="tw-textarea"></textarea></label>
+                  <label class="field"><span>{{ 'STUDIO.FEATURE_NOTE' | translate }}</span><textarea formControlName="featureNote" rows="2" maxlength="500" class="tw-textarea feature-note" [placeholder]="'STUDIO.FEATURE_NOTE_HINT' | translate"></textarea></label>
+                </div>
+              </details>
+
+              <details class="studio-optional-details">
+              <summary>{{ 'STUDIO.OPTIONAL_ACCESSORIES' | translate }}</summary>
               <h3 class="group-title first">
                 {{ 'STUDIO.ACC.TITLE' | translate }}
                 <span class="count">{{ facade.accessoryPicked().length }}/{{ facade.accessoryMax() }}</span>
@@ -332,94 +365,10 @@
                   <p class="hint acc-note" role="status">{{ note | translate: { max: facade.accessoryMax() } }}</p>
                 }
               }
+              </details>
 
-              <h3 class="group-title">{{ 'STUDIO.STAND.SHAPE' | translate }}</h3>
-              <ul class="bases">
-                @for (card of baseCards(); track card.raw.code) {
-                  <li>
-                    <button type="button" class="base" [class.on]="card.on" [attr.aria-pressed]="card.on"
-                      [attr.data-base]="card.raw.code" (click)="facade.selectBase(card.raw.code)">
-                      <span class="base-art" [attr.data-shape]="card.shape ?? 'NONE'" aria-hidden="true"></span>
-                      <span class="base-name">{{ card.raw.displayName }}</span>
-                      <span class="base-price">
-                        @if (card.free) {
-                          {{ 'STUDIO.STAND.FREE' | translate }}
-                        } @else {
-                          +{{ card.raw.priceDelta | amount: card.raw.currency }}
-                        }
-                      </span>
-                    </button>
-                  </li>
-                }
-              </ul>
-
-              @if (hasStand()) {
-                <h3 class="group-title">{{ 'STUDIO.STAND.TONE_LABEL' | translate }}</h3>
-                <ul class="tones">
-                  @for (tone of toneCards(); track tone.code) {
-                    <li>
-                      <button type="button" class="tone" [class.on]="tone.on" [attr.aria-pressed]="tone.on"
-                        [style.--wood]="tone.hex" [attr.aria-label]="tone.key | translate" [attr.title]="tone.key | translate"
-                        (click)="facade.selectTone(tone.code)"></button>
-                    </li>
-                  }
-                </ul>
-
-                <h3 class="group-title">
-                  {{ 'STUDIO.STAND.DECOR_LABEL' | translate }}
-                  <span class="count">{{ decorCount() }}/{{ decorationMax }}</span>
-                </h3>
-                <div class="chips">
-                  @for (one of decorCards(); track one.code) {
-                    <button type="button" class="chip decor" [class.on]="one.on" [attr.aria-pressed]="one.on"
-                      [disabled]="one.disabled" [attr.data-decor]="one.code" (click)="facade.toggleDecoration(one.code)">
-                      {{ one.key | translate }}
-                    </button>
-                  }
-                </div>
-              }
-
-              <h3 class="group-title">{{ (hasStand() ? 'STUDIO.STAND.ENGRAVE_ON_STAND' : 'STUDIO.STAND.ENGRAVE_ON_TAG') | translate }}</h3>
-              @if (!hasStand()) {
-              <div class="tag-preview" aria-hidden="true">
-                <span class="tag-hole"></span>
-                <span class="tag-name">{{ engraving().engravedName || ('STUDIO.TAG_PLACEHOLDER' | translate) }}</span>
-                @if (engraving().memorialDate) {
-                  <span class="tag-date">{{ engraving().memorialDate | date: 'dd.MM.yyyy' }}</span>
-                }
-                @if (engraving().message) {
-                  <span class="tag-message">{{ engraving().message }}</span>
-                }
-              </div>
-              }
-              <div class="form" [formGroup]="facade.form">
-                <label class="field">
-                  <span>{{ 'STUDIO.ENGRAVED_NAME' | translate }}</span>
-                  <input type="text" formControlName="engravedName" maxlength="60" class="tw-input" />
-                </label>
-                <label class="field">
-                  <span>{{ 'STUDIO.MEMORIAL_DATE' | translate }}</span>
-                  <pm-date-input formControlName="memorialDate" />
-                </label>
-                <label class="field">
-                  <span>{{ 'STUDIO.MESSAGE' | translate }}</span>
-                  <textarea formControlName="message" rows="2" maxlength="300" class="tw-textarea"></textarea>
-                </label>
-                <label class="field">
-                  <span>{{ 'STUDIO.FEATURE_NOTE' | translate }}</span>
-                  <textarea formControlName="featureNote" rows="2" maxlength="500" class="tw-textarea feature-note"
-                    [placeholder]="'STUDIO.FEATURE_NOTE_HINT' | translate"></textarea>
-                </label>
-                <label class="field">
-                  <span>{{ 'STUDIO.NAME_DRAFT' | translate }}</span>
-                  <input type="text" formControlName="name" maxlength="100" class="tw-input" />
-                </label>
-              </div>
-            }
-
-            @case ('PHOTOS') {
-              <h2 class="panel-title">{{ 'STUDIO.PANEL.PHOTOS' | translate }}</h2>
-              <p class="hint">{{ 'STUDIO.PHOTOS_SUB' | translate }}</p>
+              @if (facade.pets().length > 0) {
+              <p class="hint">{{ 'STUDIO.PET_OPTIONAL' | translate }}</p>
               <div class="form" [formGroup]="facade.form">
                 <label class="field">
                   <span>{{ 'STUDIO.PET_LABEL' | translate }}</span>
@@ -431,14 +380,9 @@
                   </select>
                 </label>
               </div>
-              @if (facade.pets().length === 0) {
-                <a class="suggest-link" routerLink="/pets">{{ 'STUDIO.PET_CREATE' | translate }}</a>
-              }
               @if (facade.petChosen(); as pet) {
-                <p class="photo-need" [class.ok]="facade.photosReady()" id="studio-photo-need">
-                  {{ 'STUDIO.PHOTOS_NEED' | translate: { have: facade.photoCount() ?? 0, need: facade.minPhotos() } }}
-                </p>
                 <pm-pet-photos [petId]="pet" (changed)="facade.refreshPhotos()" />
+              }
               }
 
             }
@@ -464,6 +408,7 @@
                 </button>
               }
 
+              @if (productCards().length > 1) {
               <h3 class="group-title">{{ 'STUDIO.SELECT_PRODUCT' | translate }}</h3>
               <ul class="products">
                 @for (card of productCards(); track card.raw.code) {
@@ -480,6 +425,7 @@
                   </li>
                 }
               </ul>
+              }
               @if (sizeCards().length > 0) {
                 <div class="chips" role="group" [attr.aria-label]="'STUDIO.SELECT_SIZE' | translate">
                   @for (size of sizeCards(); track size.raw.code) {
@@ -531,20 +477,8 @@
                   </p>
                 }
               }
-              @if (baseLine(); as base) {
-                <p class="base-line">
-                  <span>{{ 'STUDIO.STAND.BASE_LINE' | translate }} {{ base.name }}</span>
-                  <span>
-                    @if (base.free) {
-                      {{ 'STUDIO.STAND.FREE' | translate }}
-                    } @else {
-                      +{{ base.price | amount: base.currency }}
-                    }
-                  </span>
-                </p>
-              }
               @if (facade.standDirty()) {
-                <p class="note warn" role="status">{{ 'STUDIO.STAND.DIRTY' | translate }}</p>
+                <p class="note warn" role="status">{{ 'STUDIO.DESIGN_DIRTY' | translate }}</p>
               }
 
               <p class="summary">

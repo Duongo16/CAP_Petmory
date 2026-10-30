@@ -18,7 +18,6 @@ import { take } from 'rxjs';
 import { CatalogService } from '../../core/services/catalog.service';
 import { AuthService } from '../../core/services/auth.service';
 import {
-  DisplayBase,
   PendingReview,
   ProductReview,
   ProductSize,
@@ -76,8 +75,6 @@ export class ProductDetailPage implements OnInit {
   readonly tab = signal<DetailTab>('STORY');
   readonly tabs = TABS;
 
-  readonly bases = signal<DisplayBase[]>([]);
-  readonly baseSelected = signal<DisplayBase | null>(null);
 
   readonly reviews = signal<ProductReview[]>([]);
   readonly reviewable = signal<PendingReview | null>(null);
@@ -97,19 +94,9 @@ export class ProductDetailPage implements OnInit {
       return null;
     }
     const unitPrice = BigInt(size.price.$numberDecimal.split('.')[0]);
-    const delta = BigInt(this.baseSelected()?.priceDelta.$numberDecimal.split('.')[0] ?? '0');
-    return ((unitPrice + delta) * BigInt(this.quantity())).toString();
+    return (unitPrice * BigInt(this.quantity())).toString();
   });
 
-  /** Precomputes each base with its price difference, so the view calls no functions. */
-  readonly baseOptions = computed(() =>
-    this.bases().map((base) => ({
-      raw: base,
-      delta: base.priceDelta.$numberDecimal.split('.')[0],
-      free: BigInt(base.priceDelta.$numberDecimal.split('.')[0]) === 0n,
-      selected: this.baseSelected()?.code === base.code,
-    })),
-  );
 
   readonly canReview = computed(() => this.reviewable() !== null && !this.reviewSent());
   readonly studioQuery = computed(() => ({ product: this.product()?.code ?? this.code() }));
@@ -117,13 +104,6 @@ export class ProductDetailPage implements OnInit {
   ngOnInit(): void {
     this.loadProduct();
 
-    this.catalog.displayBase$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (list) => {
-        this.bases.set(list);
-        this.baseSelected.set(list[0] ?? null);
-      },
-      error: () => undefined,
-    });
 
     this.catalog
       .reviewsOf(this.code())
@@ -160,10 +140,6 @@ export class ProductDetailPage implements OnInit {
     this.sizeSelected.set(size);
   }
 
-  selectBase(base: DisplayBase): void {
-    this.baseSelected.set(base);
-  }
-
   setTab(value: DetailTab): void {
     this.tab.set(value);
   }
@@ -191,7 +167,7 @@ export class ProductDetailPage implements OnInit {
       return;
     }
     void this.router.navigate(['/studio'], {
-      queryParams: { product: product.code, size: size.code, base: this.baseSelected()?.code || null },
+      queryParams: { product: product.code, size: size.code },
     });
   }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
 import { CatalogService, RatingSummary } from './catalog.service';
 import { ColorGroup } from './schemas/color-code.schema';
@@ -95,14 +95,16 @@ export class CatalogController {
   @Public()
   @Get('products')
   async productList(@CurrentUser() user: AuthUser, @Query() query: ProductQueryDto) {
-    const list = await this.service.listProductType(!isInternal(user), query.keyword);
+    const list = (await this.service.listProductType(!isInternal(user), query.keyword))
+      .filter((kind) => isInternal(user) || kind.code === 'PT-03');
     const rating = await this.service.ratingByProduct(list.map((m) => m.code));
     return list.map((m) => this.withRating(m, rating.get(m.code)));
   }
 
   @Public()
   @Get('products/:code')
-  async productDetail(@Param('code') code: string) {
+  async productDetail(@Param('code') code: string, @CurrentUser() user: AuthUser) {
+    if (!isInternal(user) && code.toUpperCase() !== 'PT-03') throw new NotFoundException();
     const kind = await this.service.detailProductType(code);
     const rating = await this.service.ratingByProduct([kind.code]);
     return this.withRating(kind, rating.get(kind.code));

@@ -151,7 +151,7 @@
       },
       "VOUCHER": {
         "NAME": "10% off your first order",
-        "OVERLAY": "A 10% voucher for a wool figure or a framed keepsake, and a place in a corner of shared feeling."
+        "OVERLAY": "A 10% voucher for your first framed pet portrait, and a place to share memories."
       }
     },
     "FOOTER": "© 2024 Petmory. Every moment as precious as a family keepsake.",
@@ -390,7 +390,7 @@
     "REVIEW_COUNT": "{{count}} reviews",
     "FREE_SHIPPING": "Nationwide delivery, shipping paid on delivery",
     "SHIPPING_NOTE": "A gift box and a handwritten card are included",
-    "STEP_SIZE": "1. Choose the size",
+    "STEP_SIZE": "Choose portrait size",
     "STEP_BASE": "2. Stand and display case",
     "BASE_FREE_NAME": "Engraving of the name is included",
     "BASE_NO_EXTRA": "No extra charge",
@@ -401,13 +401,13 @@
     "TAB_CARE": "Caring for wool",
     "TAB_REVIEWS": "What owners say",
     "STORY_TITLE": "Every strand is a seed of memory",
-    "STORY_TEXT": "Needle felting rebuilds the likeness of a pet through many thousands of needle passes, worked entirely by hand. Unlike a factory soft toy, each Petmory piece follows the character, the eyes and the particular markings that only someone who lives with them would know.",
+    "STORY_TEXT": "Needle felting recreates your pet's face by hand, layer by layer, inside a frame. Each Petmory portrait follows your reference photos to preserve their eyes and distinctive markings.",
     "NOTE_EYES": "Glass eyes set by hand",
     "NOTE_EYES_TEXT": "The eyes are glazed to carry depth, so the mischief or the gentle warmth of your friend comes through.",
     "NOTE_COAT": "Coat colours blended by eye",
     "NOTE_COAT_TEXT": "A maker blends four to eight shades of natural wool to reach a true gradient from the back to the chest.",
     "PROCESS_TITLE": "Four steps from photograph to keepsake",
-    "PROCESS_TEXT": "You pick a model and paint it in 3D. The workshop receives a production file with the colour of each zone, six-angle photos and the engraving, then builds the frame and felts the shape. Handwork takes 7 to 14 days depending on size.",
+    "PROCESS_TEXT": "Choose a portrait model, set its colours and upload reference photos. The workshop uses your design and photos to felt the portrait and finish the frame. Production time depends on size.",
     "CARE_TITLE": "Keeping a wool keepsake well",
     "CARE_TEXT": "Keep it somewhere dry and out of long direct sunlight, since ultraviolet light fades wool. Brush dust away with a soft brush, or blow it off with a hairdryer on cool. Never wash or wring it. If a strand fluffs up, trim it close with small scissors rather than pulling it.",
     "START_DESIGN": "Start designing"
@@ -441,7 +441,7 @@
     "PAINT_HINT": "Tap the model to paint. Tap the colour you are holding again to go back to rotating."
   },
   "STUDIO": {
-    "TITLE": "Make your plush buddy",
+    "TITLE": "Design a framed felt portrait",
     "SELECT_ZONE": "Choose a zone to recolour",
     "SELECT_COLOR_CODE": "Choose a wool colour code",
     "PALETTE": "(draft)",
@@ -542,7 +542,7 @@
     "LOAD_ERROR": "The workbench could not load. Please refresh the page.",
     "STAGE": "3D plush viewer",
     "STAGE_TOOLS": "Viewer tools",
-    "STEPS": "Plush making steps",
+    "STEPS": "Portrait design steps",
     "ANGLES": "Viewing angle",
     "HOLDING": "Holding yarn",
     "BUBBLE_DRAG": "Drag to spin, scroll to zoom",
@@ -551,14 +551,16 @@
       "MODEL": "Model",
       "COLOR": "Yarn",
       "FINISH": "Wrap up",
-      "STAND": "Stand & name",
+      "STAND": "Details",
+      "DETAILS": "Details",
       "PHOTOS": "Pet photos"
     },
     "PANEL": {
       "MODEL": "Who are we making today?",
       "COLOR": "Pick a yarn, then tap the plush",
       "FINISH": "Time to wrap it up!",
-      "STAND": "Pick a stand, engrave a name",
+      "STAND": "Portrait details",
+      "DETAILS": "Portrait details",
       "PHOTOS": "Pet photos"
     },
     "SUGGEST_LINK": "Not sure? Send a photo for a suggestion",
@@ -612,13 +614,19 @@
     },
     "FEATURE_NOTE": "Distinctive features",
     "FEATURE_NOTE_HINT": "For example: white spot on the left paw, right ear folds a little, two-coloured eyes...",
-    "PHOTOS_SUB": "Choose the pet this piece follows and upload photos. A front photo is enough; more angles make the figure look more like your pet.",
+    "PHOTOS_SUB": "Upload a reference photo for your portrait. One clear face photo is enough.",
+    "REFERENCE_UPLOAD": "Upload an order photo",
+    "OPTIONAL_DETAILS": "Add a name, date and message (optional)",
+    "OPTIONAL_ACCESSORIES": "Add accessories (optional)",
+    "DESIGN_DIRTY": "Your design has changed. It will be saved before adding to the cart.",
+    "REFERENCE_ERROR": "The photo could not be uploaded. Choose a JPG, PNG or WEBP image and try again.",
+    "PET_OPTIONAL": "Already have a pet album? You can select it below to use its photos too. This is optional.",
     "PET_CREATE": "Create a pet profile first",
-    "PHOTOS_NEED": "This pet has {{have}} photos; this size needs at least {{need}}.",
-    "CART_NEED_PHOTOS_HINT": "Link a pet with at least {{need}} photos in the Pet photos step before adding to the cart.",
+    "PHOTOS_NEED": "{{have}} photos added; at least {{need}} are needed for this portrait.",
+    "CART_NEED_PHOTOS_HINT": "Upload at least {{need}} photos in the Photos step before adding to the cart.",
     "CART_NEED_DESIGN": "Save the design before adding it to the cart.",
     "CART_NEED_PET": "The design needs a pet. Pick one in the Pet photos step and save again.",
-    "CART_NEED_PHOTOS": "The pet does not have enough photos for this size yet. Add more in the Pet photos step.",
+    "CART_NEED_PHOTOS": "There are not enough reference photos yet. Add more in the Photos step.",
     "PACK": {
       "BOX": "Gift box",
       "FRAME": "Display frame",
@@ -648,7 +656,7 @@
       "NO_PRODUCT": "No product chosen.",
       "NO_SIZE": "No size chosen.",
       "NO_PET": "No pet chosen for this design.",
-      "NEED_PHOTOS": "The pet has {{have}} photos; this size needs at least {{need}}.",
+      "NEED_PHOTOS": "{{have}} photos added; at least {{need}} are needed for this portrait.",
       "NO_NAME": "The design has no name.",
       "FIX": "Fix it"
     }
@@ -658,7 +666,7 @@
     "TITLE_LEAD": "Keep their likeness, in something",
     "TITLE_ACCENT": "you can hold",
     "DESCRIPTION": "From the photographs you love, our makers work feeling into every strand of natural wool, keeping the bright eyes and the memory whole.",
-    "CREATE_PET": "Make my pet",
+    "CREATE_PET": "Shop felt portraits",
     "EXPLORE": "Browse the collection",
     "STAT_MADE": "Over 4,200 pets portrayed",
     "STAT_RATING": "4.98/5 from our families",
@@ -700,7 +708,7 @@
     "STUDIO": {
       "EYEBROW": "INTERACTIVE SIMULATION",
       "TITLE": "Try the 3D customiser for real",
-      "OVERLAY": "Pick a model, recolour each patch of fur, choose a wooden stand and engraving, and view the model in 360 degrees before the workshop starts.",
+      "OVERLAY": "Choose a portrait model, yarn colours and frame, then preview the 3D design before ordering.",
       "START": "Start designing in 3D",
       "SPIN": "Turn 360 degrees",
       "SPIN_SUB": "True to life"
@@ -711,7 +719,7 @@
     "STEP": {
       "1": {
         "NAME": "Send us their photos",
-        "OVERLAY": "Three to five clear shots of face, back and ears, with a note on habits or a special patch."
+        "OVERLAY": "Send at least one clear face photo, with notes about markings if you wish. No pet profile is required."
       },
       "2": {
         "NAME": "Wool matching and sketch",
@@ -797,7 +805,7 @@
       "NOTE_3": "Eyes and nose shaped as in the design",
       "STEP_4": "STEP 4",
       "NAME_4": "Pack the keepsake box",
-      "NOTE_4": "Engrave the oak stand and hand it over"
+      "NOTE_4": "Frame the portrait and hand it over"
     },
     "ADD_ACCESSORY": "Add a keepsake accessory",
     "PRIVACY_NOTE": "Your pet's information and photos stay completely private",
@@ -827,7 +835,7 @@
     "ADVICE_GO": "Ask the community",
     "ALSO_EYEBROW": "COMPLETE THE SPACE",
     "ALSO_TITLE": "Often chosen together",
-    "ALSO_SUB": "The best companions for a needle-felted portrait figure",
+    "ALSO_SUB": "Thoughtful companions for a framed needle-felted portrait",
     "ALSO_ADD": "See item",
     "SUGGEST": {
       "BADGE_PROTECT": "100% protected",
@@ -1252,7 +1260,7 @@
     "GREET_AFTERNOON": "Good afternoon, {{name}}!",
     "GREET_EVENING": "Good evening, {{name}}!",
     "GREET_SUB": "Turn a page of the diary together.",
-    "NO_PET": "You have not set up a pet yet.",
+    "NO_PET": "You can shop for portraits and ready-made goods now. Create a pet profile whenever you want to keep a diary.",
     "ADD_PET": "Set one up",
     "DAYS_TOGETHER": "{{count}} days together",
     "WRITE": "Write a new entry",
@@ -1272,7 +1280,7 @@
     "MANAGE": "Manage",
     "DIARY_PUBLIC": "Public diary",
     "DIARY_PRIVATE": "Private diary",
-    "STUDIO_PROMO": "Turn a favourite photo into a keepsake",
+    "STUDIO_PROMO": "Turn your pet's photo into a framed felt portrait",
     "STUDIO_OPEN": "Open Studio",
     "ORDERS": "Your orders",
     "ORDERS_SUB": "Follow the keepsakes being made",
@@ -1313,7 +1321,7 @@
     "VIEW": "View larger",
     "FRAME": {
       "TITLE": "Photos by angle",
-      "SUB": "A front photo is all that is required. Side, back or close-up photos make the figure look more like your pet. Drag photos onto each box or click to choose.",
+      "SUB": "A front photo is all that is required. Side or close-up photos help the portrait resemble your pet. Drag photos onto each box or click to choose.",
       "REQUIRED_COUNT": "{{done}}/{{total}} required photo",
       "OPTIONAL": "Optional",
       "DROP": "Drop or click to choose a photo",
@@ -1713,6 +1721,7 @@
       "TAB_MUSIC": "Music"
     },
     "PROFILE": {
+      "FRAME": "Portrait frame",
       "ZONE_COLOUR": "Colour codes by zone",
       "ZONE_NONE": "This design was made on a model without separated zones; use the wool list below.",
       "ZONE_OTHER": "Other zone",
@@ -2169,7 +2178,7 @@
     "AUTH_PROMPT_REGISTER": "Create account",
     "AUTH_PROMPT_LOGIN": "Sign in",
     "NAV_PUBLIC": "Public diaries",
-    "START_FREE": "Start for free",
+    "START_FREE": "Create account",
     "COVER_LABEL": "A handmade needle-felted piece by Petmory",
     "COVER_EYEBROW": "Petmory · Handmade needle felting",
     "COVER_TITLE": "Your pet, made again in wool",
@@ -2202,7 +2211,7 @@
       },
       "STUDIO": {
         "NAME": "Keepsake studio",
-        "TEXT": "Pick the best photo and order a figure, keyring or frame in their likeness."
+        "TEXT": "Pick your favourite photo and order a needle-felted framed portrait of your pet."
       },
       "COMMUNITY": {
         "NAME": "Pet lovers",
@@ -2232,8 +2241,8 @@
     "BOOK_DATE": "SUNDAY · 05.12",
     "BOOK_PAGE_TITLE": "Mochi's first day in the new home.",
     "BOOK_PAGE_BODY": "A shy lap around the living room, then she settled by the grey blanket...",
-    "CTA_TITLE": "Start your pet’s book today",
-    "CTA_SUB": "Free for your first pet. No credit card needed.",
+    "CTA_TITLE": "Find a felt portrait for your pet",
+    "CTA_SUB": "Browse designs and prices, then order from a photo. Create an account only when you order.",
     "CTA_CREATE": "Create account",
     "CTA_LOGIN": "I already have an account",
     "FOOTER_SLOGAN": "Keep the memories, keep the love.",
@@ -2277,7 +2286,7 @@
       "COVER_EYEBROW": "Framed needle-felted portraits",
       "TITLE": "Your pet, the star of your wall",
       "SUB": "From a single photo, an artisan needles wool fibre by fibre into a raised portrait of your pet, framed and ready to hang or stand.",
-      "CTA": "Order a wool portrait",
+      "CTA": "Shop felt portraits",
       "CTA_WALL": "See the gallery wall",
       "MARQUEE": {
         "1": "Hand-needled fibre by fibre",
@@ -2365,8 +2374,8 @@
   "SHOP": {
     "EYEBROW": "Petmory shop",
     "TITLE": "Shop",
-    "SUB": "Keepsakes made from your pet’s photos, and ready-made pieces to take home now.",
-    "CUSTOM": "Made from your photos",
+    "SUB": "Shop framed felt portraits from your pet's photo or ready-made goods. You only need a Petmory account to order; a pet profile is optional.",
+    "CUSTOM": "Portraits from photos",
     "READY": "Ready-made"
   },
   "KNOWLEDGE": {

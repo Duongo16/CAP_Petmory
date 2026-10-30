@@ -46,6 +46,7 @@ export class LoginPage implements OnInit {
 
   /** The pet profile started on the welcome page, waiting for this account. */
   readonly draft = this.drafts.draft;
+  readonly continueUrl = this.route.snapshot.queryParamMap.get('continue');
   readonly draftArt = computed<PetArtKind>(() => (this.draft()?.kind === 'CAT' ? 'cat' : 'dog'));
   private readonly destroyRef = inject(DestroyRef);
 
@@ -106,7 +107,7 @@ export class LoginPage implements OnInit {
         next: () => {
           this.pendingSend.set(false);
           const continueUrl = this.route.snapshot.queryParamMap.get('continue');
-          if (continueUrl) {
+          if (continueUrl?.startsWith('/') && !continueUrl.startsWith('//')) {
             if (this.auth.isInternal() && continueUrl.startsWith('/admin')) {
               void this.router.navigateByUrl(continueUrl);
               return;

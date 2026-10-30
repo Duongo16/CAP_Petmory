@@ -115,32 +115,6 @@
               </div>
             </fieldset>
 
-            <!-- Step 2: base -->
-            @if (baseOptions().length > 0) {
-              <fieldset class="step m-0 pt-4 px-0 pb-0 border-0 border-t border-edge">
-                <legend class="float-left w-full p-0 text-base font-bold text-ink">{{ 'PRODUCT.STEP_BASE' | translate }}</legend>
-                <p class="clear-both tw-hint pt-1">{{ 'PRODUCT.BASE_FREE_NAME' | translate }}</p>
-                <div class="flex flex-row flex-wrap gap-2 pt-3">
-                  @for (one of baseOptions(); track one.raw.code) {
-                    <button
-                      type="button"
-                      class="option flex flex-col gap-1 flex-1 min-h-11 px-4 py-3 rounded-lg border-[1.5px] border-edge bg-card font-[inherit] text-start cursor-pointer transition-colors duration-150 hover:border-edge-strong"
-                      [class.picked]="one.selected"
-                      (click)="selectBase(one.raw)"
-                    >
-                      <strong class="text-base font-bold text-ink">{{ one.raw.displayName }}</strong>
-                      <span class="text-xs font-bold" [class.text-ink-muted]="one.free" [class.text-amber]="!one.free">
-                        @if (one.free) {
-                          {{ 'PRODUCT.BASE_NO_EXTRA' | translate }}
-                        } @else {
-                          + {{ one.delta | amount }}
-                        }
-                      </span>
-                    </button>
-                  }
-                </div>
-              </fieldset>
-            }
 
             <!-- Specs -->
             <dl class="tw-panel flex flex-wrap gap-x-8 gap-y-3 m-0 px-5 py-4">

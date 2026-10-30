@@ -1,4 +1,20 @@
 <div class="shop">
+  <div class="shop-public-nav">
+    <a routerLink="/landing" aria-label="Petmory"><pm-brand size="md" /></a>
+    <nav [attr.aria-label]="'NAV.MAIN' | translate">
+      <a routerLink="/shop">{{ 'NAV.SHOP' | translate }}</a>
+      <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>
+    </nav>
+    <pm-language-toggle />
+    <pm-theme-toggle />
+    @if (signedIn() && !isInternal()) {
+      <a class="tw-btn-secondary tw-btn-sm" routerLink="/cart">{{ 'NAV.CART' | translate }}</a>
+      <a class="tw-btn-primary tw-btn-sm" routerLink="/home">{{ 'NAV.HOME' | translate }}</a>
+    } @else if (!signedIn()) {
+      <a class="tw-btn-secondary tw-btn-sm" routerLink="/login" [queryParams]="{ continue: '/shop' }">{{ 'AUTH.SIGN_IN' | translate }}</a>
+      <a class="tw-btn-primary tw-btn-sm" routerLink="/register" [queryParams]="{ continue: '/shop' }">{{ 'AUTH.SIGN_UP' | translate }}</a>
+    }
+  </div>
   <header class="shop-head tw-page pb-0">
     <div class="flex flex-col gap-1">
       <span class="tw-eyebrow">{{ 'SHOP.EYEBROW' | translate }}</span>

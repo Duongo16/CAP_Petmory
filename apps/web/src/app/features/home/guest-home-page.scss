@@ -138,11 +138,11 @@
 
 .lp-btn {
   border: 0;
-  background: var(--pm-accent);
-  color: var(--pm-on-accent);
+  background: var(--pm-action);
+  color: var(--pm-on-action);
   box-shadow: var(--pm-accent-glow);
 
-  &:hover { background: var(--pm-accent-dark); }
+  &:hover { background: var(--pm-action-hover); }
 }
 
 .lp-btn-ghost {

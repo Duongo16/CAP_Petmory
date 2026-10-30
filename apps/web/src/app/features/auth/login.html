@@ -113,7 +113,7 @@
         </div>
       }
 
-      <a class="ap-switch" routerLink="/register">
+      <a class="ap-switch" routerLink="/register" [queryParams]="continueUrl ? { continue: continueUrl } : {}">
         {{ 'AUTH.NO_ACCOUNT' | translate }}
         <strong>{{ 'AUTH.REGISTER_LINK' | translate }}</strong>
       </a>

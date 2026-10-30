@@ -37,6 +37,7 @@ export interface ProductionItem {
   engraving: { name: string; memorialDate: Date | null; message: string } | null;
   /** De trung bay: ten de theo don, mau go va do trang tri. Rong khi khong co de. */
   stand: { baseName: string; tone: string; decorations: string[] } | null;
+  frame?: { shape: string; finish: string } | null;
   /** Phu kien gan len mau. */
   accessories: { code: string; displayName: string }[];
   /** Hop va khung khach chon, xuong dong goi kem. */
@@ -270,6 +271,10 @@ export class ProductionFileService {
       designId: line.designId?.toString() ?? null,
       nameDesign: older?.name ?? null,
       modelCode,
+      frame: line.productTypeCode === 'PT-03' ? {
+        shape: taken?.frameShape ?? older?.frameShape ?? 'ROUND',
+        finish: taken?.frameFinish ?? older?.frameFinish ?? 'WALNUT',
+      } : null,
       woolRolls: colours.map(
         (code) => palette.get(code) ?? { code, displayName: code, swatch: '' },
       ),

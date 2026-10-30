@@ -101,6 +101,10 @@
                   }
                 </dd>
               }
+              @if (item.frame; as frame) {
+                <dt>{{ 'ADMIN.PROFILE.FRAME' | translate }}</dt>
+                <dd>{{ ('STUDIO.HOOP.SHAPE.' + frame.shape) | translate }} · {{ ('STUDIO.HOOP.FINISH.' + frame.finish) | translate }}</dd>
+              }
             </dl>
 
             <h3>{{ 'ADMIN.PROFILE.SIZE_SPEC' | translate }}</h3>

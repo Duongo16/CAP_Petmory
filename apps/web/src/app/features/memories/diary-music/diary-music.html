@@ -19,14 +19,14 @@
           allow="autoplay; encrypted-media" aria-hidden="true" tabindex="-1"
           referrerpolicy="strict-origin-when-cross-origin" [title]="'BOOK.MUSIC_YOUTUBE_PLAYER' | translate"
           (load)="onYoutubeLoad()"></iframe>
-        <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="playYoutube()">
-          {{ 'BOOK.MUSIC_PLAY' | translate }}
-        </button>
+        @if (blocked()) {
+          <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="playYoutube()">{{ 'BOOK.MUSIC_PLAY' | translate }}</button>
+        }
         <a class="youtube-link" [href]="youtubePage()" target="_blank" rel="noopener noreferrer">
           {{ 'BOOK.MUSIC_OPEN_YOUTUBE' | translate }}
         </a>
       } @else if (active() && audioUrl()) {
-        <audio #player [src]="audioUrl()" controls loop preload="auto" [attr.aria-label]="'BOOK.MUSIC_PLAYER' | translate"></audio>
+        <audio #player [src]="audioUrl()" controls autoplay loop preload="auto" [attr.aria-label]="'BOOK.MUSIC_PLAYER' | translate"></audio>
         @if (blocked()) {
           <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="play()">{{ 'BOOK.MUSIC_PLAY' | translate }}</button>
         }

@@ -15,7 +15,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Icon } from '../../shared/icon/icon';
 import { Viewer3d } from '../../shared/viewer-3d/viewer-3d';
@@ -56,19 +55,18 @@ function isZero(value: string): boolean {
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
 /** Bon ngan do nghe cua ban len, theo thu tu nguoi dung di qua. */
-export type Step = 'MODEL' | 'COLOR' | 'STAND' | 'PHOTOS' | 'FINISH';
+export type Step = 'MODEL' | 'COLOR' | 'PHOTOS' | 'FINISH';
 
 /**
  * Thu tu cac buoc. Dung mau tu anh la tuy chon, nam gon trong buoc chon mau:
  * khach nop anh de he thong tu chon mau, hoac tu chon lay.
  */
-export const STEPS: Step[] = ['MODEL', 'COLOR', 'STAND', 'PHOTOS', 'FINISH'];
+export const STEPS: Step[] = ['MODEL', 'COLOR', 'PHOTOS', 'FINISH'];
 
 /** Nhan va bieu tuong cua tung ngan, viet ra tung key de tim duoc. */
 const STEP_VIEW: Record<Step, { key: string; icon: string }> = {
   MODEL: { key: 'STUDIO.TAB.MODEL', icon: 'paw' },
   COLOR: { key: 'STUDIO.TAB.COLOR', icon: 'sparkle' },
-  STAND: { key: 'STUDIO.TAB.STAND', icon: 'pencil' },
   PHOTOS: { key: 'STUDIO.TAB.PHOTOS', icon: 'camera' },
   FINISH: { key: 'STUDIO.TAB.FINISH', icon: 'gift' },
 };
@@ -140,7 +138,7 @@ import { CUSTOM_KEEPSAKE_CODES, FIGURE_PRODUCT_CODE, PORTRAIT_PRODUCT_CODE, pack
 @Component({
   selector: 'pm-studio-page',
   standalone: true,
-  imports: [Icon, Viewer3d, HoopPreview, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe, PetPhotos, DateInput],
+  imports: [Icon, Viewer3d, HoopPreview, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, PetPhotos, DateInput],
   providers: [StudioFacade],
   templateUrl: './studio-page.html',
   styleUrl: './studio-page.scss',
@@ -217,13 +215,7 @@ export class StudioPage implements OnInit {
 
   readonly availableModels = computed(() => {
     const product = this.productPinned() ? this.facade.codeKindSelected() : '';
-    return this.baseModel().filter((model) =>
-      product === PORTRAIT_PRODUCT_CODE
-        ? model.pose === 'HEAD'
-        : product === FIGURE_PRODUCT_CODE
-          ? model.pose !== 'HEAD'
-          : true,
-    );
+    return this.baseModel().filter((model) => model.pose === 'HEAD' && (!product || product === PORTRAIT_PRODUCT_CODE));
   });
 
   private declaredZones: DeclaredZone[] = [];
@@ -515,8 +507,12 @@ export class StudioPage implements OnInit {
   ngOnInit(): void {
     this.facade.loadCatalog();
     this.facade.loadPets();
+    this.facade.watchDetails();
+    this.facade.selectKind(PORTRAIT_PRODUCT_CODE);
+    this.productPinned.set(true);
     const query = this.route.snapshot.queryParamMap;
     const codeDraft = query.get('draft');
+    if (codeDraft) this.productPinned.set(false);
     // Tu trang san pham sang: chon san san pham, kich co va de khach vua chon.
     const product = query.get('product');
     if (!codeDraft && product) {
@@ -525,10 +521,6 @@ export class StudioPage implements OnInit {
       const size = query.get('size');
       if (size) {
         this.facade.selectSize(size);
-      }
-      const base = query.get('base');
-      if (base) {
-        this.facade.selectBase(base);
       }
     }
     this.http
@@ -539,16 +531,14 @@ export class StudioPage implements OnInit {
           this.library = library;
           this.declaredZones = library.zoneMaterial;
           this.zoneByFile = library.zoneByFile ?? {};
-          const ready = library.baseModel.filter((m) => m.ready);
+          const ready = library.baseModel.filter((m) => m.ready && m.pose === 'HEAD');
           this.baseModel.set(ready);
           this.status.set(ready.length > 0 ? 'READY' : 'ERROR');
           if (codeDraft) {
             this.openDesign(codeDraft);
             return;
           }
-          const first = this.portraitSelected()
-            ? this.availableModels()[0] ?? null
-            : ready.find((m) => m.pose === 'SITTING') ?? ready[0] ?? null;
+          const first = this.availableModels()[0] ?? null;
           this.baseModelSelected.set(first);
           this.nameDraftFor(first);
         },
@@ -569,13 +559,12 @@ export class StudioPage implements OnInit {
     }
     const ready = this.baseModel();
     this.facade.openDraft(code, (tk) => {
+      if (FRAME_SHAPES.includes(tk.frameShape as FrameShape)) this.frameShape.set(tk.frameShape as FrameShape);
+      if (FRAME_FINISHES.includes(tk.frameFinish as FrameFinish)) this.frameFinish.set(tk.frameFinish as FrameFinish);
       if (selection?.product && !tk.productTypeCode) {
         this.facade.selectKind(selection.product);
         if (selection.size) {
           this.facade.selectSize(selection.size);
-        }
-        if (selection.base && selection.base !== this.facade.stand().baseCode) {
-          this.facade.selectBase(selection.base);
         }
       }
       const modelCode = currentModelCode(tk.modelCode, library);
@@ -596,6 +585,13 @@ export class StudioPage implements OnInit {
       (designId) => this.openDesign(designId, selection),
       selection.product === PORTRAIT_PRODUCT_CODE ? 'HEAD' : undefined,
     );
+  }
+
+  uploadReference(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) this.facade.uploadReference(file);
   }
 
   go(step: Step): void {
@@ -722,11 +718,13 @@ export class StudioPage implements OnInit {
 
   pickFrameShape(shape: FrameShape): void {
     this.frameShape.set(shape);
+    this.facade.markDesignChanged();
     writePreference('frame-shape', shape);
   }
 
   pickFrameFinish(finish: FrameFinish): void {
     this.frameFinish.set(finish);
+    this.facade.markDesignChanged();
     writePreference('frame-finish', finish);
   }
 
@@ -790,6 +788,7 @@ export class StudioPage implements OnInit {
       this.colorCodesUsed(),
       this.zonePaintOf(model),
       this.preview().map((m) => ({ angle: m.angle as PreviewAngle, photo: m.photo })),
+      { shape: this.frameShape(), finish: this.frameFinish() },
       onSaved,
     );
   }
@@ -822,7 +821,7 @@ export class StudioPage implements OnInit {
   readonly cartProblems = computed(() => (this.cartTried() ? this.facade.cartBlockers() : []));
 
   /** Nut them vao gio chi khoa trong luc dang luu hoac dang gui. */
-  readonly cartBusy = computed(() => this.facade.statusSave() === 'SAVING' || this.facade.addingToCart());
+  readonly cartBusy = computed(() => this.facade.statusSave() === 'SAVING' || this.facade.addingToCart() || this.facade.uploadingReference() || this.facade.referencesLoading());
 
   /** Dat san ten ban thiet ke theo mau vua chon, neu nguoi dung chua tu dat. */
   private nameDraftFor(model: BaseModel | null): void {

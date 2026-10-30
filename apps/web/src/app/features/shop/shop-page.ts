@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
@@ -8,6 +9,10 @@ import { Icon } from '../../shared/icon/icon';
 import { ProductsPage } from '../catalog/products-page';
 import { GoodsListPage } from '../goods/goods-list-page';
 import { ShopDetailDialog, ShopDetailRequest } from './shop-detail-dialog';
+import { AuthService } from '../../core/services/auth.service';
+import { Brand } from '../../shared/brand/brand';
+import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
+import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 
 type Shelf = 'custom' | 'ready';
 
@@ -22,7 +27,7 @@ const LEFT = 'LEFT';
 @Component({
   selector: 'pm-shop-page',
   standalone: true,
-  imports: [TranslatePipe, Icon, ProductsPage, GoodsListPage],
+  imports: [TranslatePipe, Icon, ProductsPage, GoodsListPage, RouterLink, Brand, LanguageToggle, ThemeToggle],
   templateUrl: './shop-page.html',
   styleUrl: './shop-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +37,10 @@ export class ShopPage implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
+
+  readonly signedIn = this.auth.isSignedIn;
+  readonly isInternal = this.auth.isInternal;
 
   readonly shelf = signal<Shelf>('custom');
 
