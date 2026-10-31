@@ -13,6 +13,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import { MemoriesService } from '../../core/services/memories.service';
 import { AuthService } from '../../core/services/auth.service';
+import { FooterLink, SiteFooter } from '../../shared/site-footer/site-footer';
 import { DiaryBook, MusicTrack } from '../../core/models/api.model';
 import { groupByMonth } from '../memories/memories-facade';
 import { JourneyMap } from '../memories/journey-map/journey-map';
@@ -38,7 +39,7 @@ const PLAIN_SETTING: SlideSetting = { trackCode: '', effect: 'FADE', seconds: 5 
 @Component({
   selector: 'pm-diary-book-page',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon, GuestHeader, JourneyMap],
+  imports: [RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon, GuestHeader, JourneyMap, SiteFooter],
   templateUrl: './diary-book-page.html',
   styleUrl: './diary-book-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,6 +49,13 @@ export class DiaryBookPage implements OnInit {
   private readonly service = inject(MemoriesService);
   /** Da dang nhap thi trang nam trong khung chung, nen khong ve dau trang cua khach. */
   readonly signedIn = inject(AuthService).isSignedIn;
+  /** Chan trang cho khach chua dang nhap: chi cac duong mo cho khach. */
+  readonly guestFooterMenu: FooterLink[] = [
+    { path: '/shop', key: 'NAV.SHOP' },
+    { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' },
+    { path: '/login', key: 'AUTH.SIGN_IN' },
+    { path: '/register', key: 'LANDING.START_FREE' },
+  ];
   private readonly destroyRef = inject(DestroyRef);
 
   readonly status = signal<ScreenState>('LOADING');

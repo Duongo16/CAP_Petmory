@@ -6,7 +6,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../core/services/auth.service';
 import { CartService } from '../core/services/cart.service';
 import { ChatWidget } from '../shared/chat-widget/chat-widget';
-import { SocialLinks } from '../shared/social-links/social-links';
+import { SiteFooter } from '../shared/site-footer/site-footer';
 import { Icon } from '../shared/icon/icon';
 import { ThemeToggle } from '../shared/theme-toggle/theme-toggle';
 import { LanguageToggle } from '../shared/language-toggle/language-toggle';
@@ -53,7 +53,7 @@ function isQuietChat(root: ActivatedRouteSnapshot): boolean {
     RouterLinkActive,
     TranslatePipe,
     ChatWidget,
-    SocialLinks,
+    SiteFooter,
     Icon,
     ThemeToggle,
     LanguageToggle,

@@ -98,3 +98,7 @@
     }
   }
 </div>
+
+@if (!signedIn()) {
+  <pm-site-footer [menu]="guestFooterMenu" />
+}
