@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, computed, effect, inject, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
@@ -45,6 +46,7 @@ function isQuietChat(root: ActivatedRouteSnapshot): boolean {
 
 @Component({
   selector: 'pm-shell',
+  host: { '[class.immersive]': 'immersive()' },
   standalone: true,
   imports: [UserFace, 
     Brand,
@@ -76,6 +78,18 @@ export class Shell {
     ),
     { initialValue: isImmersive(this.router.routerState.snapshot.root) },
   );
+
+  /**
+   * Trang tran khung tu lo phan cuon ben trong, nen khoa cuon cua ca cua so: neu
+   * khong, trinh duyet van tinh noi dung cuon trong ngan keo vao chieu cao trang
+   * va de lai mot khoang trong cuon xuong duoc. Roi trang thi tra lai nhu cu.
+   */
+  private readonly lockPageScroll = (() => {
+    const root = inject(DOCUMENT).documentElement;
+    effect(() => root.classList.toggle('pm-immersive', this.immersive()));
+    inject(DestroyRef).onDestroy(() => root.classList.remove('pm-immersive'));
+    return true;
+  })();
 
   /** Man co nut chinh o day man hinh: an nut tro ly tren dien thoai. */
   readonly quietChat = toSignal(

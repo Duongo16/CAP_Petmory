@@ -83,4 +83,6 @@
   } @else {
     <pm-goods-list-page />
   }
+
+  <pm-site-footer [menu]="signedIn() ? footerMenu : guestFooterMenu" />
 </div>

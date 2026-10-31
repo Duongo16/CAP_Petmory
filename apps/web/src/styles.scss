@@ -761,3 +761,21 @@ td {
     padding: 1rem;
   }
 }
+
+/* Trang tran khung (xuong 3D): cua so khong cuon, trang tu cuon ben trong. */
+html.pm-immersive,
+html.pm-immersive body {
+  overflow: hidden;
+}
+
+/*
+ * Bo cuc hai cot cua xuong 3D: ban lam viec rong toi da 1440px, can giua, le
+ * --pm-space-4. Nut Hoi nhanh dat vao cho trong duoi ngan keo ben phai: mep phai
+ * trung mep ngan keo, day trung day san khau.
+ */
+@media (min-width: 961px) {
+  html.pm-immersive {
+    --pm-chat-right: calc(var(--pm-space-4) + max(0px, (100vw - 1440px - 2 * var(--pm-space-4)) / 2));
+    --pm-chat-bottom: var(--pm-space-4);
+  }
+}

@@ -15,6 +15,7 @@ import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
 import { UserFace } from '../../shared/user-face/user-face';
 import { CartService } from '../../core/services/cart.service';
 import { GuestHeader } from '../../shared/guest-header/guest-header';
+import { FooterLink, SiteFooter } from '../../shared/site-footer/site-footer';
 
 type Shelf = 'custom' | 'ready';
 
@@ -29,7 +30,7 @@ const LEFT = 'LEFT';
 @Component({
   selector: 'pm-shop-page',
   standalone: true,
-  imports: [TranslatePipe, Icon, ProductsPage, GoodsListPage, RouterLink, RouterLinkActive, Brand, LanguageToggle, ThemeToggle, UserFace, GuestHeader],
+  imports: [TranslatePipe, Icon, ProductsPage, GoodsListPage, RouterLink, RouterLinkActive, Brand, LanguageToggle, ThemeToggle, UserFace, GuestHeader, SiteFooter],
   templateUrl: './shop-page.html',
   styleUrl: './shop-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,6 +61,21 @@ export class ShopPage implements OnInit {
     { path: '/designs', key: 'NAV.DESIGNS' },
     { path: '/pets', key: 'NAV.PET' },
     { path: '/restore', key: 'NAV.RESTORE' },
+  ];
+
+  /** Chan trang giong khung chinh: menu chinh, nhat ky cong khai, roi cac trang ca nhan. */
+  readonly footerMenu: FooterLink[] = [
+    ...this.customerMenu,
+    { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' },
+    ...this.accountMenu.filter((item) => !this.customerMenu.some((top) => top.path === item.path)),
+  ];
+
+  /** Khach chua dang nhap chi thay cac duong mo cho khach. */
+  readonly guestFooterMenu: FooterLink[] = [
+    { path: '/shop', key: 'NAV.SHOP' },
+    { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' },
+    { path: '/login', key: 'AUTH.SIGN_IN' },
+    { path: '/register', key: 'LANDING.START_FREE' },
   ];
 
   readonly shelf = signal<Shelf>('custom');

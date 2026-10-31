@@ -122,9 +122,15 @@ export class Painter {
         }
       }
     } else {
+      // Co co tinh theo khung canh (mau da duoc chuan hoa, canh dai nhat bang 1),
+      // con tam mat tinh theo don vi rieng cua tep. Doi co co ve don vi rieng,
+      // neu khong voi tep ve theo cm thi co nho hon ca mot mat va khong to duoc gi.
+      const scale = new THREE.Vector3().setFromMatrixScale(item.mesh.matrixWorld);
+      const localRadius = radius / (Math.max(scale.x, scale.y, scale.z) || 1);
       const localPoint = item.mesh.worldToLocal(score.point.clone());
+      this.writeColorFace(item, faceScore, color);
       for (let face = 0; face < countFace; face += 1) {
-        if (item.faceCenters[face].distanceTo(localPoint) <= radius) {
+        if (item.faceCenters[face].distanceTo(localPoint) <= localRadius) {
           this.writeColorFace(item, face, color);
         }
       }

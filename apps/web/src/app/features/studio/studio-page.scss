@@ -1,7 +1,23 @@
 :host {
   display: block;
   padding: var(--pm-space-4);
-  --bench-height: max(560px, calc(100dvh - 68px - 2 * var(--pm-space-4)));
+  box-sizing: border-box;
+  // Khung chinh cho trang nay lap day phan duoi dau trang; ban lam viec chiem
+  // het chieu cao do (tru le), toi thieu 560px. Ngan keo tu cuon ben trong.
+  --bench-height: auto;
+}
+
+@media (min-width: 961px) {
+  :host {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .workbench {
+    flex: 1 1 0;
+    min-block-size: 560px;
+    inline-size: 100%;
+  }
 }
 
 // Ban lam viec: san khau ben trai, ngan keo ben phai, vua mot man hinh.
@@ -421,8 +437,9 @@
   display: flex;
   flex-direction: column;
   min-block-size: 0;
-  // Chua cho nut Hoi nhanh nam ngay duoi ngan keo, khoi de len nut Tiep.
-  margin-block-end: 64px;
+  // Chua dung cho nut Hoi nhanh (cao 56px) nam ngay duoi ngan keo, cach mot khoang
+  // bang khe giua hai cot: ngan keo + nut cao bang san khau, mep phai va day thang hang.
+  margin-block-end: calc(56px + var(--pm-space-4));
   border-radius: 28px;
   background: var(--pm-bg-card);
   box-shadow: var(--pm-shadow);

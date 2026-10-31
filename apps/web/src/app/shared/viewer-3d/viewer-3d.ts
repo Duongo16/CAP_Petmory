@@ -74,7 +74,7 @@ export class Viewer3d {
   /** Paint mode: brush over small patches, or flood one patch of a single colour. */
   readonly paintMode = input<PaintMode>('BRUSH');
 
-  /** Brush size, in the model's local units. */
+  /** Co co, tinh theo phan cua be (be da chuan hoa, canh dai nhat bang 1). */
   readonly brushSize = input(0.06);
 
   /** Reports the material zones read from the model file itself. */
@@ -115,6 +115,10 @@ export class Viewer3d {
   readonly angles = ANGLES_PREPARE;
   readonly canPaint = signal(false);
   private draggingBrush = false;
+  /** Vong tron xem truoc co co: vi tri trong khung (px), ban kinh (px), dang hien hay khong. */
+  readonly ring = signal<{ x: number; y: number; r: number; on: boolean }>({ x: 0, y: 0, r: 0, on: false });
+  private ringTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastPointer: { x: number; y: number } | null = null;
   private measureStart: { x: number; y: number } | null = null;
 
   constructor() {
@@ -124,6 +128,39 @@ export class Viewer3d {
       const path = this.pathModel();
       const box = this.wrap().nativeElement;
       untracked(() => this.initAndLoad(box, path));
+    });
+
+    // Quet co thi khoa xoay; do ca mang van keo xoay duoc vi chi can mot cu bam.
+    effect(() => {
+      const locked = this.colorPendingPaint() !== null && this.canPaint() && this.paintMode() === 'BRUSH';
+      if (this.status() === READY) {
+        this.engine?.setPaintLock(locked);
+        // Be dang tu xoay thi net co bi keo lech; cam co len la dung xoay (bam nut xoay de bat lai).
+        if (locked && untracked(() => this.autoRotate())) {
+          this.autoRotate.set(false);
+          this.engine?.setAutoRotate(false);
+        }
+      }
+      if (!locked) {
+        untracked(() => this.ring.update((one) => ({ ...one, on: false })));
+      }
+    });
+
+    // Doi co co thi hien vong tron mot chut o cho chuot vua dung (hoac giua be) de thay co moi.
+    effect(() => {
+      this.brushSize();
+      untracked(() => {
+        if (this.status() !== READY || this.paintMode() !== 'BRUSH' || !this.engine) {
+          return;
+        }
+        const box = this.wrap().nativeElement.getBoundingClientRect();
+        const at = this.lastPointer ?? { x: box.width / 2, y: box.height / 2 };
+        this.showRing(at.x, at.y, box);
+        if (this.ringTimer) clearTimeout(this.ringTimer);
+        this.ringTimer = setTimeout(() => {
+          if (!this.lastPointer) this.ring.update((one) => ({ ...one, on: false }));
+        }, 1200);
+      });
     });
 
     effect(() => {
@@ -188,7 +225,28 @@ export class Viewer3d {
     this.paintAtEvent(su);
   }
 
+  /** Di chuot tren be khi dang cam co: ve vong tron dung co co. */
+  hoverBrush(su: PointerEvent): void {
+    if (!this.pendingPaint || this.paintMode() !== 'BRUSH') {
+      return;
+    }
+    const box = (su.currentTarget as HTMLElement).getBoundingClientRect();
+    this.lastPointer = { x: su.clientX - box.left, y: su.clientY - box.top };
+    this.showRing(this.lastPointer.x, this.lastPointer.y, box);
+  }
+
+  leaveBrush(): void {
+    this.lastPointer = null;
+    this.ring.update((one) => ({ ...one, on: false }));
+  }
+
+  private showRing(x: number, y: number, box: DOMRect): void {
+    const r = this.engine?.brushRadiusPx(x / box.width, y / box.height, this.brushSize()) ?? 0;
+    this.ring.set({ x, y, r: Math.max(4, r), on: true });
+  }
+
   dragPaint(su: PointerEvent): void {
+    this.hoverBrush(su);
     if (!this.draggingBrush || this.paintMode() === 'FILL') {
       return;
     }

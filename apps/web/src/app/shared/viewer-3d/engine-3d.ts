@@ -451,6 +451,26 @@ export class Engine3d {
     return this.painter.paint(this.raycaster, color, mode, radius);
   }
 
+  /** Khi dang quet co thi khoa xoay de net co khong bi keo theo mau; cuon chuot van phong to. */
+  setPaintLock(locked: boolean): void {
+    this.controls.enableRotate = !locked;
+  }
+
+  /**
+   * Ban kinh co tren man hinh (px) tai diem chuot dang chi, de ve vong tron dung co.
+   * Khong trung be thi lay o tam be.
+   */
+  brushRadiusPx(ratioX: number, ratioY: number, radius: number): number {
+    const canvas = this.renderer.domElement;
+    this.raycaster.setFromCamera(new THREE.Vector2(ratioX * 2 - 1, -(ratioY * 2 - 1)), this.camera);
+    const hit = this.angle ? this.raycaster.intersectObject(this.angle, true)[0] : undefined;
+    const point = hit ? hit.point.clone() : this.modelCenter.clone();
+    const side = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0).normalize();
+    const a = point.clone().project(this.camera);
+    const b = point.clone().addScaledVector(side, radius).project(this.camera);
+    return Math.hypot(((b.x - a.x) * canvas.clientWidth) / 2, ((b.y - a.y) * canvas.clientHeight) / 2);
+  }
+
   undoPaint(): boolean {
     return this.painter?.undo() ?? false;
   }
