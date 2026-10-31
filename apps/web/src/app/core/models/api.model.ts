@@ -719,9 +719,8 @@ export interface PhotoMatchInfo {
   notes?: string;
 }
 
-/** Ket qua dung san mau tu anh: ban thiet ke vua tao va nhung gi nhan ra. */
+/** Ket qua dung san mau tu anh. Chua luu thanh ban thiet ke nao cho toi khi khach bam Luu. */
 export interface PhotoMatch {
-  design: Design;
   match: PhotoMatchInfo;
 }
 
@@ -928,6 +927,8 @@ export interface ZonePaint {
 export interface SaveDesign {
   name: string;
   modelCode: string;
+  /** Dac diem AI doc tu anh khi dung mau tu anh; bo trong thi giu ghi chu cu. */
+  aiNote?: string;
   accessories?: string[];
   featureNote?: string;
   paint?: MeshPaint[];

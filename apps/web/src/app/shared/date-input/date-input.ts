@@ -41,7 +41,8 @@ const isoOf = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}
  * Bat [calendar] thi o van go tay duoc, kem nut mo bang lich tu dung theo mau
  * cua giao dien (chon thang, nam, ngay; phim mui ten di chuyen, Enter chon, Esc
  * dong). [max]/[min] (yyyy-mm-dd) chan ngay ngoai khoang ca khi go lan khi chon.
- * Gia tri luon la yyyy-mm-dd.
+ * Gia tri la yyyy-mm-dd, hoac yyyy-mm-ddTHH:mm theo gio may khi bat [dateTime]
+ * (khong doi sang gio UTC, de o nhap hien lai dung ngay gio nguoi dung da go).
  */
 @Component({
   selector: 'pm-date-input',
@@ -144,7 +145,7 @@ export class DateInput implements ControlValueAccessor, Validator {
   /* ---------- Form ---------- */
 
   writeValue(value: unknown): void {
-    this.value = typeof value === 'string' ? value : '';
+    this.value = this.normalize(typeof value === 'string' ? value : '');
     this.display = this.format(this.value);
     this.chosenIso.set(this.value.slice(0, 10));
     this.invalid = false;
@@ -228,7 +229,7 @@ export class DateInput implements ControlValueAccessor, Validator {
       return;
     }
     this.invalid = false;
-    this.commit(cell.iso, true);
+    this.commit(this.dateTime() ? `${cell.iso}T${this.timeOf(this.value)}` : cell.iso, true);
     this.onTouched();
     this.onValidatorChange();
     this.close();
@@ -302,7 +303,7 @@ export class DateInput implements ControlValueAccessor, Validator {
 
   private commit(iso: string, reformat: boolean): void {
     this.value = iso;
-    this.chosenIso.set(iso);
+    this.chosenIso.set(iso.slice(0, 10));
     if (reformat) {
       this.display = this.format(iso);
     }
@@ -342,6 +343,21 @@ export class DateInput implements ControlValueAccessor, Validator {
     return iso;
   }
 
+  /** Gio phut (HH:mm) cua gia tri dang co, mac dinh 00:00 khi chua co gio. */
+  private timeOf(value: string): string {
+    return /T(\d{2}:\d{2})/.exec(value)?.[1] ?? '00:00';
+  }
+
+  /** Doi moc gio co mui gio (vi du ...Z tu may chu) ve yyyy-mm-ddTHH:mm theo gio may. */
+  private normalize(value: string): string {
+    if (!this.dateTime() || !/T\d{2}:\d{2}.*(Z|[+-]\d{2}:?\d{2})$/.test(value)) {
+      return value;
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return `${isoOf(date.getFullYear(), date.getMonth(), date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
   private format(value: string): string {
     if (!value) return '';
     const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/.exec(value);
@@ -353,7 +369,7 @@ export class DateInput implements ControlValueAccessor, Validator {
   private parse(raw: string): string | null {
     const text = raw.trim();
     const pattern = this.dateTime()
-      ? /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/
+      ? /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2})[:h](\d{2}))?$/
       : /^(\d{2})\/(\d{2})\/(\d{4})$/;
     const match = pattern.exec(text);
     if (!match) return null;
@@ -362,13 +378,12 @@ export class DateInput implements ControlValueAccessor, Validator {
     const year = Number(match[3]);
     const date = new Date(year, month - 1, day);
     if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
-    if (!this.dateTime()) {
-      const iso = `${year.toString().padStart(4, '0')}-${match[2]}-${match[1]}`;
-      return this.outOfRange(iso) ? null : iso;
-    }
-    const hour = Number(match[4]);
-    const minute = Number(match[5]);
+    const iso = isoOf(year, month - 1, day);
+    if (this.outOfRange(iso)) return null;
+    if (!this.dateTime()) return iso;
+    // Go thieu gio thi giu gio dang co, de doi ngay khong bat go lai gio.
+    const [hour, minute] = match[4] ? [Number(match[4]), Number(match[5])] : this.timeOf(this.value).split(':').map(Number);
     if (hour > 23 || minute > 59) return null;
-    return new Date(year, month - 1, day, hour, minute).toISOString();
+    return `${iso}T${pad(hour)}:${pad(minute)}`;
   }
 }

@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -28,6 +27,7 @@ import { DiaryMusic, Memory, MemoryTopic, PetStory } from '../../core/models/api
 import { DiaryMusicPlayer } from './diary-music/diary-music';
 import { Icon } from '../../shared/icon/icon';
 import { PetPhotos } from './pet-photos/pet-photos';
+import { JourneyMap } from './journey-map/journey-map';
 
 /** Ba cach xem nhat ky cua mot be. */
 type DiaryView = 'BOOK' | 'MAP' | 'PHOTOS';
@@ -50,7 +50,7 @@ function viewFrom(raw: string | null): DiaryView {
 @Component({
   selector: 'pm-memories-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, TranslatePipe, DiaryBookView, DiaryMusicPlayer, Icon, PetPhotos],
+  imports: [RouterLink, TranslatePipe, DiaryBookView, DiaryMusicPlayer, Icon, PetPhotos, JourneyMap],
   providers: [MemoriesFacade],
   templateUrl: './memories-page.html',
   styleUrl: './memories-page.scss',

@@ -15,7 +15,13 @@
 .music-edit > summary { cursor: pointer; color: var(--pm-text-muted); font-size: .75rem; list-style-position: inside; }
 .music-edit-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px; padding-top: 10px; }
 .music-edit .tw-field { min-width: 0; }
-.music-edit input[type='file'] { width: 100%; font-size: .875rem; }
+.music-file-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.music-file-button { position: relative; flex: none; cursor: pointer; }
+.music-file-button:focus-within { outline: 2px solid var(--pm-accent); outline-offset: 2px; }
+.music-file-button.is-disabled { opacity: .55; cursor: not-allowed; }
+.music-file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; opacity: 0; }
+.music-file-name { overflow: hidden; min-width: 0; color: var(--pm-text); font-size: .875rem; text-overflow: ellipsis; white-space: nowrap; }
+.music-file-name.empty { color: var(--pm-text-muted); }
 .music-edit small { color: var(--pm-text-muted); }
 .music-link-row { display: flex; gap: 8px; }
 .music-link-row input { min-width: 0; flex: 1; }

@@ -7,14 +7,14 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import { MemoriesService } from '../../core/services/memories.service';
 import { DiaryBook, MusicTrack } from '../../core/models/api.model';
-import { topicKey, topicTone } from '../../shared/memory-topics';
+import { groupByMonth } from '../memories/memories-facade';
+import { JourneyMap } from '../memories/journey-map/journey-map';
 import { SlideSetting, Slideshow, SlideEffect } from '../memories/slideshow/slideshow';
 import { DiaryBookView } from '../memories/book/diary-book';
 import { DiaryMusicPlayer } from '../memories/diary-music/diary-music';
@@ -37,7 +37,7 @@ const PLAIN_SETTING: SlideSetting = { trackCode: '', effect: 'FADE', seconds: 5 
 @Component({
   selector: 'pm-diary-book-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon, GuestHeader],
+  imports: [RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon, GuestHeader, JourneyMap],
   templateUrl: './diary-book-page.html',
   styleUrl: './diary-book-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -86,15 +86,8 @@ export class DiaryBookPage implements OnInit {
     };
   });
 
-  /** Mot the khoanh khac, kem ten chu de va mau cua no. */
-  readonly cards = computed(() =>
-    this.moments().map((one) => ({
-      raw: one,
-      topicKey: topicKey(one.topic),
-      topicTone: topicTone(one.topic),
-      shots: one.photo.filter((id) => this.sourceOf()[id]),
-    })),
-  );
+  /** Cac khoanh khac gom theo thang, ve thanh ban do hanh trinh nhu nhat ky cua chu. */
+  readonly months = computed(() => groupByMonth(this.moments(), this.sourceOf()));
 
   ngOnInit(): void {
     this.load();

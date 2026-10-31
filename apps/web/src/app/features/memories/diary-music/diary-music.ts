@@ -45,6 +45,11 @@ export class DiaryMusicPlayer {
   readonly saving = signal(false);
   readonly problem = signal('');
   readonly link = signal('');
+  /** Ten tep vua chon; chua chon thi hien ten bai da tai len truoc do. */
+  readonly pickedName = signal('');
+  readonly fileName = computed(() =>
+    this.pickedName() || (this.music().source === 'UPLOAD' ? this.music().title : ''),
+  );
 
   readonly sampleUrl = computed(() => SAMPLES.find((one) => one.code === this.music().sampleCode)?.url ?? '');
   readonly sampleTitleKey = computed(() => SAMPLES.find((one) => one.code === this.music().sampleCode)?.key ?? '');
@@ -141,6 +146,7 @@ export class DiaryMusicPlayer {
     const file = input.files?.[0];
     input.value = '';
     if (!file || this.saving()) return;
+    this.pickedName.set(file.name);
     if (file.size > 4 * 1024 * 1024 || !/\.(mp3|m4a|ogg|wav)$/i.test(file.name)) {
       this.problem.set('BOOK.MUSIC_BAD_FILE');
       return;
@@ -166,6 +172,7 @@ export class DiaryMusicPlayer {
       next: (pet) => {
         this.saving.set(false);
         this.link.set('');
+        this.pickedName.set('');
         this.changed.emit(pet);
       },
       error: () => {

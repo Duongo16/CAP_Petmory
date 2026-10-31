@@ -175,6 +175,12 @@ export class SaveDesignDto {
   @IsString()
   @MaxLength(500)
   featureNote?: string;
+
+  /** Dac diem AI doc tu anh khi dung mau tu anh, gui kem khi khach bam Luu. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  aiNote?: string;
 }
 
 /** Doi ten mot ban thiet ke. */

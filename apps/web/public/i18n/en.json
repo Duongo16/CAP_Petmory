@@ -63,7 +63,8 @@
     "CATALOG": "Catalogue",
     "AUDIT": "Activity log",
     "MY_ACCOUNT": "My account",
-    "PUBLIC_DIARIES": "Public journals"
+    "PUBLIC_DIARIES": "Public journals",
+    "MY_JOURNALS": "My journals"
   },
   "AUTH": {
     "QUICK": {
@@ -890,6 +891,7 @@
     "STATIC_QR": "TRANSFER QR CODE",
     "DUE_LABEL": "AMOUNT DUE",
     "QR_CODE": "Transfer QR code",
+    "QR_ZOOM": "Enlarge QR code",
     "WAITING_STAFF": "After transferring, confirm here so the shop can check your payment.",
     "MANUAL_TRANSFER": "Manual transfer details",
     "INTERNET_BANKING": "Internet Banking",
@@ -953,8 +955,7 @@
     "PROMISE_MATCH_VALUE": "3D model, colours, engraving",
     "HELP_TITLE": "Direct order support",
     "HELP_TEXT": "Want to add your pet's real fur to the core of the keepsake, or change the delivery address?",
-    "HELP_COMMUNITY": "Ask artisans in the community",
-    "HELP_RESTORE": "Restore your pet's reference photo",
+    "HELP_CONTACT": "Contact customer care",
     "GROUP": {
       "ALL": "All",
       "AWAITING": "Awaiting transfer confirmation",
@@ -1022,6 +1023,8 @@
     "MUSIC_SAMPLE_GENTLE": "Gentle music box",
     "MUSIC_SAMPLE_MORNING": "Morning music box",
     "MUSIC_UPLOAD": "Upload your music",
+    "MUSIC_PICK_FILE": "Choose music",
+    "MUSIC_NO_FILE": "No song chosen",
     "MUSIC_FILE_HINT": "MP3, M4A, OGG or WAV; up to 4 MB.",
     "MUSIC_YOUTUBE": "YouTube link",
     "MUSIC_YOUTUBE_HINT": "https://www.youtube.com/watch?v=...",
@@ -2494,6 +2497,9 @@
     "FIELD_CONTENT": "Content",
     "EDIT_INVALID": "Title and content cannot be empty.",
     "SAVED": "Changes saved.",
+    "SAVING": "Saving...",
+    "ALREADY_SAVED": "Version saved",
+    "AUTO_SAVED": "Every version the assistant writes is saved right away to the list on the left.",
     "REMOVE": "Remove this version",
     "REMOVE_CONFIRM": "Yes, remove",
     "REWRITE_TITLE": "Rewrite from this version",

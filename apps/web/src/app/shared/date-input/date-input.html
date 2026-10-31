@@ -1,4 +1,4 @@
-<div class="date-field" [class.with-calendar]="calendar() && !dateTime()">
+<div class="date-field" [class.with-calendar]="calendar()">
   <input
     class="tw-input w-full date-text"
     [id]="id"
@@ -12,7 +12,7 @@
     (input)="onInput($event)"
     (blur)="onBlur()"
   />
-  @if (calendar() && !dateTime()) {
+  @if (calendar()) {
     <button
       type="button"
       class="cal-toggle"

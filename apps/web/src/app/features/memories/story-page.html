@@ -17,7 +17,9 @@
     }
     @case ('DONE') {
       @if (problem(); as message) {
-        <p class="story-alert" role="alert">{{ message | translate }}</p>
+        @if (!failedInEditor()) {
+          <p class="story-alert" role="alert">{{ message | translate }}</p>
+        }
       }
 
       <div class="story-layout">
@@ -103,8 +105,8 @@
                 <p class="tw-error">{{ 'STORY.EDIT_INVALID' | translate }}</p>
               }
               <div class="editor-actions">
-                <button id="story-save" type="submit" class="tw-btn-primary" [disabled]="busy() !== null || editor.pristine">
-                  {{ 'COMMON.SAVE' | translate }}
+                <button id="story-save" type="submit" class="tw-btn-primary" [disabled]="busy() !== null">
+                  {{ (busy() === 'SAVE' ? 'STORY.SAVING' : 'COMMON.SAVE') | translate }}
                 </button>
                 @if (confirmRemove()) {
                   <button id="story-remove" type="button" class="tw-btn-danger" [disabled]="busy() !== null" (click)="remove()">
@@ -118,8 +120,14 @@
                 }
               </div>
               @if (notice(); as message) {
-                <p class="story-notice" role="status">{{ message | translate }}</p>
+                <p class="story-notice" role="status"><pm-icon name="check" [size]="15" /> {{ message | translate }}</p>
               }
+              @if (problem(); as message) {
+                @if (failedInEditor()) {
+                  <p class="story-alert" role="alert">{{ message | translate }}</p>
+                }
+              }
+              <p class="tw-hint">{{ 'STORY.AUTO_SAVED' | translate }}</p>
             </form>
 
             <div class="story-tools">

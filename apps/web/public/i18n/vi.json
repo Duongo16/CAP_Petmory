@@ -63,7 +63,8 @@
     "CATALOG": "Danh mục",
     "AUDIT": "Nhật ký thao tác",
     "MY_ACCOUNT": "Tài khoản của tôi",
-    "PUBLIC_DIARIES": "Nhật ký công khai"
+    "PUBLIC_DIARIES": "Nhật ký công khai",
+    "MY_JOURNALS": "Nhật ký cá nhân"
   },
   "AUTH": {
     "QUICK": {
@@ -890,6 +891,7 @@
     "STATIC_QR": "QR CHUYỂN KHOẢN",
     "DUE_LABEL": "SỐ TIỀN CẦN THANH TOÁN",
     "QR_CODE": "Mã QR chuyển khoản",
+    "QR_ZOOM": "Phóng to mã QR",
     "WAITING_STAFF": "Sau khi chuyển khoản, hãy bấm xác nhận để shop kiểm tra giao dịch.",
     "MANUAL_TRANSFER": "Thông tin chuyển khoản thủ công",
     "INTERNET_BANKING": "Internet Banking",
@@ -953,8 +955,7 @@
     "PROMISE_MATCH_VALUE": "Mẫu 3D, mã màu, chữ khắc",
     "HELP_TITLE": "Hỗ trợ đơn hàng trực tiếp",
     "HELP_TEXT": "Bạn cần bổ sung lông thật của bé vào lõi kỷ vật, hoặc đổi địa chỉ giao hàng?",
-    "HELP_COMMUNITY": "Hỏi nghệ nhân trong cộng đồng",
-    "HELP_RESTORE": "Phục hồi ảnh mẫu của bé",
+    "HELP_CONTACT": "Liên hệ chăm sóc khách hàng",
     "GROUP": {
       "ALL": "Tất cả",
       "AWAITING": "Chờ xác nhận chuyển khoản",
@@ -1022,6 +1023,8 @@
     "MUSIC_SAMPLE_GENTLE": "Hộp nhạc dịu dàng",
     "MUSIC_SAMPLE_MORNING": "Hộp nhạc nắng sớm",
     "MUSIC_UPLOAD": "Tải nhạc của bạn lên",
+    "MUSIC_PICK_FILE": "Chọn nhạc",
+    "MUSIC_NO_FILE": "Chưa chọn bài nào",
     "MUSIC_FILE_HINT": "MP3, M4A, OGG hoặc WAV; tối đa 4 MB.",
     "MUSIC_YOUTUBE": "Link YouTube",
     "MUSIC_YOUTUBE_HINT": "https://www.youtube.com/watch?v=...",
@@ -2494,6 +2497,9 @@
     "FIELD_CONTENT": "Nội dung",
     "EDIT_INVALID": "Tiêu đề và nội dung không được để trống.",
     "SAVED": "Đã lưu bản sửa.",
+    "SAVING": "Đang lưu...",
+    "ALREADY_SAVED": "Bản đã được lưu",
+    "AUTO_SAVED": "Mỗi bản trợ lý viết đều được lưu ngay vào danh sách bên trái.",
     "REMOVE": "Bỏ bản này",
     "REMOVE_CONFIRM": "Chắc chắn bỏ",
     "REWRITE_TITLE": "Viết lại từ bản này",

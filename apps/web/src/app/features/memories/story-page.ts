@@ -56,6 +56,8 @@ export class StoryPage implements OnInit {
   readonly problem = signal<string | null>(null);
   readonly notice = signal<string | null>(null);
   readonly confirmRemove = signal(false);
+  /** Loi cua cac thao tac tren ban dang mo hien ngay duoi khung soan, khong o dau trang. */
+  readonly failedInEditor = signal(false);
 
   readonly notes = new FormControl('', { nonNullable: true, validators: [Validators.maxLength(2000)] });
   readonly rewriteNotes = new FormControl('', { nonNullable: true, validators: [Validators.maxLength(2000)] });
@@ -143,6 +145,11 @@ export class StoryPage implements OnInit {
     if (!one || this.editor.invalid) {
       return;
     }
+    if (this.editor.pristine) {
+      this.problem.set(null);
+      this.notice.set('STORY.ALREADY_SAVED');
+      return;
+    }
     const value = this.editor.getRawValue();
     this.run('SAVE', this.service.edit(one._id, value.title.trim(), value.content.trim()), (fresh) => {
       this.replace(fresh);
@@ -197,6 +204,7 @@ export class StoryPage implements OnInit {
       },
       error: (trouble: HttpErrorResponse) => {
         this.busy.set(null);
+        this.failedInEditor.set(kind !== 'WRITE');
         this.problem.set(problemKey(trouble.status, kind));
         if (trouble.status === 429) {
           this.readQuota();

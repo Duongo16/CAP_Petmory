@@ -25,7 +25,7 @@ import { ANCHOR_NODE, AccessoryMount, StandardAngle, MaterialZone } from '../../
 import { PaintMode } from '../../shared/viewer-3d/painter';
 import { DateInput } from '../../shared/date-input/date-input';
 import { CatalogService } from '../../core/services/catalog.service';
-import { AccessoryAnchor, PackagingKind, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
+import { AccessoryAnchor, PackagingKind, PhotoMatchInfo, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
 import { BaseModel, ModelLibrary, DeclaredZone, ZoneName, currentModelCode } from './model-manifest';
 import {
   STAND_DECORATIONS,
@@ -552,7 +552,7 @@ export class StudioPage implements OnInit {
   }
 
   /** Mo mot ban thiet ke len san khau: chon dung mau nen va nap mau tung vung. */
-  private openDesign(code: string, selection?: { product: string; size: string; base: string }): void {
+  private openDesign(code: string): void {
     const library = this.library;
     if (!library) {
       return;
@@ -561,12 +561,6 @@ export class StudioPage implements OnInit {
     this.facade.openDraft(code, (tk) => {
       if (FRAME_SHAPES.includes(tk.frameShape as FrameShape)) this.frameShape.set(tk.frameShape as FrameShape);
       if (FRAME_FINISHES.includes(tk.frameFinish as FrameFinish)) this.frameFinish.set(tk.frameFinish as FrameFinish);
-      if (selection?.product && !tk.productTypeCode) {
-        this.facade.selectKind(selection.product);
-        if (selection.size) {
-          this.facade.selectSize(selection.size);
-        }
-      }
       const modelCode = currentModelCode(tk.modelCode, library);
       this.baseModelSelected.set(ready.find((m) => m.code === modelCode) ?? ready[0] ?? null);
       this.colorCodesUsed.set([...tk.colorCodesUsed]);
@@ -574,16 +568,14 @@ export class StudioPage implements OnInit {
     });
   }
 
-  /** Dung san mau tu anh cua be va mo mau do len ngay trong buoc chon mau. */
+  /**
+   * Dung san mau tu anh cua be va ap ngay len ban dang lam: doi mau nen va to mau
+   * tung vung. Chua luu gi; khach bam Luu thi moi thanh mot ban thiet ke.
+   */
   matchFromPhoto(): void {
-    const selection = {
-      product: this.facade.codeKindSelected(),
-      size: this.facade.sizeCodeSelected(),
-      base: this.facade.stand().baseCode,
-    };
     this.facade.matchFromPhoto(
-      (designId) => this.openDesign(designId, selection),
-      selection.product === PORTRAIT_PRODUCT_CODE ? 'HEAD' : undefined,
+      (match) => this.applyMatch(match),
+      this.facade.codeKindSelected() === PORTRAIT_PRODUCT_CODE ? 'HEAD' : undefined,
     );
   }
 
@@ -592,6 +584,26 @@ export class StudioPage implements OnInit {
     const file = input.files?.[0];
     input.value = '';
     if (file) this.facade.uploadReference(file);
+  }
+
+  private applyMatch(match: PhotoMatchInfo): void {
+    const library = this.library;
+    const code = library ? currentModelCode(match.modelCode, library) : match.modelCode;
+    const model = this.baseModel().find((one) => one.code === code);
+    if (!model) {
+      return;
+    }
+    this.baseModelSelected.set(model);
+    this.zoneDisplay.set([]);
+    this.colorPendingPaint.set(null);
+    this.preview.set([]);
+    this.facade.paintSaved.set([]);
+    if ((model.anchors ?? []).length === 0) {
+      this.facade.clearAccessories();
+    }
+    this.colorCodesUsed.set([...new Set(match.zonePaint.map((one) => one.colorCode))]);
+    this.zonePaintOpened.set([...match.zonePaint]);
+    this.nameDraftFor(model);
   }
 
   go(step: Step): void {

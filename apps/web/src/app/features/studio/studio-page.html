@@ -83,7 +83,7 @@
             [attr.aria-pressed]="rotating()"
             [attr.aria-label]="(rotating() ? 'VIEWER.STOP_ROTATE' : 'VIEWER.AUTO_ROTATE') | translate"
             [attr.title]="(rotating() ? 'VIEWER.STOP_ROTATE' : 'VIEWER.AUTO_ROTATE') | translate">
-            <pm-icon name="sparkle" [size]="18" />
+            <pm-icon name="rotate" [size]="18" />
           </button>
           @if (hoopAvailable()) {
             <button type="button" class="round-button" [class.on]="hoopShown()" (click)="toggleHoop()"
@@ -99,10 +99,6 @@
               <pm-icon name="back" [size]="18" />
             </button>
           }
-          <button type="button" class="round-button camera" [disabled]="capturing()" (click)="capture()"
-            [attr.aria-label]="'VIEWER.CAPTURE_AFTER_ANGLE' | translate" [attr.title]="'VIEWER.CAPTURE_AFTER_ANGLE' | translate">
-            <pm-icon name="camera" [size]="18" />
-          </button>
         </div>
 
         @if (colorPendingPaint(); as held) {

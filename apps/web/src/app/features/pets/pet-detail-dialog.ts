@@ -27,24 +27,32 @@ type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 const MONTHS_IN_YEAR = 12;
 const DAY_MS = 86_400_000;
 
-/** Whole months between a date and today, never below zero. */
-function monthsSince(from: string | null): number | null {
+/** Whole months between two dates (or between a date and today), never below zero. */
+function monthsBetween(from: string | null, to?: string | null): number | null {
   if (!from) {
     return null;
   }
   const at = new Date(from);
-  const now = new Date();
+  const end = to ? new Date(to) : new Date();
+  if (end.getTime() < at.getTime()) {
+    return 0;
+  }
   const months =
-    (now.getFullYear() - at.getFullYear()) * MONTHS_IN_YEAR + (now.getMonth() - at.getMonth());
-  return Math.max(0, now.getDate() < at.getDate() ? months - 1 : months);
+    (end.getFullYear() - at.getFullYear()) * MONTHS_IN_YEAR + (end.getMonth() - at.getMonth());
+  return Math.max(0, end.getDate() < at.getDate() ? months - 1 : months);
 }
 
-/** Whole days between a date and today, never below zero. */
-function daysSince(from: string | null): number | null {
+/** Whole days between two dates (or between a date and today), never below zero. */
+function daysBetween(from: string | null, to?: string | null): number | null {
   if (!from) {
     return null;
   }
-  return Math.max(0, Math.floor((Date.now() - new Date(from).getTime()) / DAY_MS));
+  const fromTime = new Date(from).getTime();
+  const toTime = to ? new Date(to).getTime() : Date.now();
+  if (toTime < fromTime) {
+    return 0;
+  }
+  return Math.max(0, Math.floor((toTime - fromTime) / DAY_MS));
 }
 
 /** The popup closes with this when it sent the reader to another screen. */
@@ -101,12 +109,19 @@ export class PetDetailDialog implements OnInit {
   });
 
   /** How old the pet is, in whole months, or nothing when no birthday is known. */
-  readonly ageMonths = computed(() => monthsSince(this.pet()?.birthDate ?? null));
+  readonly ageMonths = computed(() => {
+    const pet = this.pet();
+    return monthsBetween(pet?.birthDate ?? null, pet?.passedAwayDate ?? null);
+  });
 
   /** How long the pet has been home, counted from the day it arrived. */
-  readonly daysTogether = computed(() =>
-    daysSince(this.pet()?.adoptionDate ?? this.pet()?.birthDate ?? null),
-  );
+  readonly daysTogether = computed(() => {
+    const pet = this.pet();
+    return daysBetween(
+      pet?.adoptionDate ?? pet?.birthDate ?? null,
+      pet?.passedAwayDate ?? null,
+    );
+  });
 
   ngOnInit(): void {
     this.destroyRef.onDestroy(() => this.releaseSnaps());

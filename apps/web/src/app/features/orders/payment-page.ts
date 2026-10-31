@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, OnInit, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -34,6 +34,13 @@ export class PaymentPage implements OnInit, OnDestroy {
   readonly confirming = this.facade.confirming;
   readonly confirmationError = this.facade.confirmationError;
   readonly copied = this.facade.copied;
+  /** Dang xem anh QR phong to o giua man hinh. */
+  readonly zoomed = signal(false);
+
+  @HostListener('document:keydown.escape')
+  closeZoom(): void {
+    this.zoomed.set(false);
+  }
 
   ngOnInit(): void {
     this.facade.start(this.orderCode());

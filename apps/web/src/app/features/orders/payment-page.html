@@ -99,25 +99,50 @@
           </header>
 
           <div class="grid grid-cols-1 nav:grid-cols-2 gap-8 items-start">
-            <!-- Cot trai: ma QR -->
-            <section class="qr-card tw-card flex flex-col items-center gap-2 p-8 max-[600px]:p-5">
-              <div class="qr-tags flex items-center justify-between gap-3 flex-wrap w-full pb-4 border-b border-edge">
-                <span class="tag-green tw-badge tw-badge-success">{{ 'PAYMENT.STATIC_QR' | translate }}</span>
+            <!-- Cot trai: ma QR va nut xac nhan, de hai cot cao xap xi nhau -->
+            <div class="pay-left flex flex-col gap-4">
+              <section class="qr-card tw-card flex flex-col items-center gap-2 p-8 max-[600px]:p-5">
+                <div class="qr-tags flex items-center justify-between gap-3 flex-wrap w-full pb-4 border-b border-edge">
+                  <span class="tag-green tw-badge tw-badge-success">{{ 'PAYMENT.STATIC_QR' | translate }}</span>
+                </div>
+
+                <p class="due-name mt-4 mb-0 text-xs font-semibold tracking-[0.04em] text-ink-muted">{{ 'PAYMENT.DUE_LABEL' | translate }}</p>
+                <p class="due-money m-0 font-serif text-[2.25rem] max-[600px]:text-[1.875rem] font-bold leading-[1.15] text-accent">{{ qr.amount | amount: qr.currency }}</p>
+
+                <div class="qr-frame grid place-items-center mt-4 p-4 rounded-lg bg-card border border-edge">
+                  <img [src]="qr.qrImageUrl" [alt]="'PAYMENT.QR_CODE' | translate" />
+                  <button type="button" class="qr-zoom" (click)="zoomed.set(true)"
+                    [attr.aria-label]="'PAYMENT.QR_ZOOM' | translate" [attr.title]="'PAYMENT.QR_ZOOM' | translate">
+                    <pm-icon name="search" [size]="18" />
+                  </button>
+                </div>
+                @if (zoomed()) {
+                  <div class="qr-lightbox" role="dialog" aria-modal="true" [attr.aria-label]="'PAYMENT.QR_CODE' | translate" (click)="closeZoom()">
+                    <img [src]="qr.qrImageUrl" [alt]="'PAYMENT.QR_CODE' | translate" (click)="$event.stopPropagation()" />
+                    <button type="button" class="qr-lightbox-close" (click)="closeZoom()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+                      <pm-icon name="close" [size]="20" />
+                    </button>
+                  </div>
+                }
+                <p class="qr-bank mt-2 mb-0 text-xs font-medium text-ink-muted">{{ qr.bankName }}</p>
+
+                <p class="waiting flex items-center gap-3 w-full mt-5 mb-0 px-4 py-3 rounded-md bg-accent-soft text-sm font-medium text-body" role="status">
+                  <span class="waiting-dot" aria-hidden="true"></span>
+                  {{ 'PAYMENT.WAITING_STAFF' | translate }}
+                </p>
+              </section>
+
+              <div class="manual-deeds tw-card flex flex-col gap-3 p-5">
+                @if (confirmationError(); as errorKey) {
+                  <p class="error m-0" role="alert">{{ errorKey | translate }}</p>
+                }
+                <p class="m-0 text-sm leading-[1.6] text-body">{{ 'PAYMENT.STAFF_CONFIRMATION' | translate }}</p>
+                <button type="button" class="tw-btn-primary tw-btn-block" [disabled]="confirming()" (click)="confirmTransfer()">
+                  {{ (confirming() ? 'PAYMENT.CONFIRMING_TRANSFER' : 'PAYMENT.CONFIRM_TRANSFER') | translate }}
+                </button>
+                <a class="deeds-back tw-btn-ghost tw-btn-block" routerLink="/orders">{{ 'PAYMENT.SEE_MY_ORDERS' | translate }}</a>
               </div>
-
-              <p class="due-name mt-4 mb-0 text-xs font-semibold tracking-[0.04em] text-ink-muted">{{ 'PAYMENT.DUE_LABEL' | translate }}</p>
-              <p class="due-money m-0 font-serif text-[2.25rem] max-[600px]:text-[1.875rem] font-bold leading-[1.15] text-accent">{{ qr.amount | amount: qr.currency }}</p>
-
-              <div class="qr-frame grid place-items-center mt-4 p-4 rounded-lg bg-card border border-edge">
-                <img [src]="qr.qrImageUrl" [alt]="'PAYMENT.QR_CODE' | translate" />
-              </div>
-              <p class="qr-bank mt-2 mb-0 text-xs font-medium text-ink-muted">{{ qr.bankName }}</p>
-
-              <p class="waiting flex items-center gap-3 w-full mt-5 mb-0 px-4 py-3 rounded-md bg-accent-soft text-sm font-medium text-body" role="status">
-                <span class="waiting-dot" aria-hidden="true"></span>
-                {{ 'PAYMENT.WAITING_STAFF' | translate }}
-              </p>
-            </section>
+          </div>
 
             <!-- Cot phai: chuyen khoan thu cong -->
             <section class="manual flex flex-col gap-4">
@@ -177,16 +202,6 @@
                 </aside>
               </div>
 
-              <div class="manual-deeds tw-card flex flex-col gap-3 p-5">
-                @if (confirmationError(); as errorKey) {
-                  <p class="error m-0" role="alert">{{ errorKey | translate }}</p>
-                }
-                <p class="m-0 text-sm leading-[1.6] text-body">{{ 'PAYMENT.STAFF_CONFIRMATION' | translate }}</p>
-                <button type="button" class="tw-btn-primary tw-btn-block" [disabled]="confirming()" (click)="confirmTransfer()">
-                  {{ (confirming() ? 'PAYMENT.CONFIRMING_TRANSFER' : 'PAYMENT.CONFIRM_TRANSFER') | translate }}
-                </button>
-                <a class="deeds-back tw-btn-ghost tw-btn-block" routerLink="/orders">{{ 'PAYMENT.SEE_MY_ORDERS' | translate }}</a>
-              </div>
             </section>
           </div>
         }

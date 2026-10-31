@@ -60,11 +60,20 @@
             }
           </select>
         </label>
-        <label class="tw-field">
-          <span class="tw-label">{{ 'BOOK.MUSIC_UPLOAD' | translate }}</span>
-          <input type="file" accept=".mp3,.m4a,.ogg,.wav,audio/*" [disabled]="saving()" (change)="upload($event)" />
+        <div class="tw-field">
+          <span class="tw-label" id="diary-music-upload-label">{{ 'BOOK.MUSIC_UPLOAD' | translate }}</span>
+          <div class="music-file-row">
+            <label class="tw-btn-secondary tw-btn-sm music-file-button" [class.is-disabled]="saving()">
+              <input class="music-file-input" type="file" accept=".mp3,.m4a,.ogg,.wav,audio/*"
+                aria-labelledby="diary-music-upload-label" [disabled]="saving()" (change)="upload($event)" />
+              ♫ {{ 'BOOK.MUSIC_PICK_FILE' | translate }}
+            </label>
+            <span class="music-file-name" [class.empty]="!fileName()" [attr.title]="fileName() || null">
+              {{ fileName() || ('BOOK.MUSIC_NO_FILE' | translate) }}
+            </span>
+          </div>
           <small>{{ 'BOOK.MUSIC_FILE_HINT' | translate }}</small>
-        </label>
+        </div>
         <div class="tw-field">
           <label class="tw-label" for="diary-youtube-link">{{ 'BOOK.MUSIC_YOUTUBE' | translate }}</label>
           <div class="music-link-row">

@@ -97,6 +97,8 @@ export class StudioFacade {
 
   /** Nhung gi he thong nhan ra tu anh lan gan nhat; rong khi chua dung mau. */
   readonly match = signal<PhotoMatchInfo | null>(null);
+  /** Dac diem AI doc tu anh o lan dung mau gan nhat, gui kem khi bam Luu cho xuong. */
+  readonly aiNote = signal('');
 
   /** Key loi cua buoc dung mau, rong khi khong co loi. */
   readonly matchError = signal('');
@@ -107,10 +109,10 @@ export class StudioFacade {
   /**
    * Gui anh cua be cho may chu dung san mot mau gan giong nhat.
    *
-   * May chu tao san mot ban thiet ke voi mau nen va mau tung vung; man hinh mo
-   * ban do len nhu mo mot ban nhap de khach tuy bien tiep.
+   * May chu chi tra mau nen va mau tung vung, khong luu gi; man hinh ap len ban
+   * dang lam. Ban do chi vao "Thiet ke cua toi" khi khach bam Luu.
    */
-  matchFromPhoto(onDesign: (designId: string) => void, pose?: 'HEAD'): void {
+  matchFromPhoto(onMatch: (match: PhotoMatchInfo) => void, pose?: 'HEAD'): void {
     const pet = this.petChosen();
     if (!this.canMatch()) {
       return;
@@ -124,7 +126,8 @@ export class StudioFacade {
         next: (got) => {
           this.matching.set(false);
           this.match.set(got.match);
-          onDesign(got.design._id);
+          this.aiNote.set(got.match.notes ?? '');
+          onMatch(got.match);
         },
         error: (trouble: { status?: number }) => {
           this.matching.set(false);
@@ -515,6 +518,7 @@ export class StudioFacade {
       stand: { ...this.stand(), decorations: [...this.stand().decorations] },
       accessories: [...this.accessoryPicked()],
       featureNote: v.featureNote.trim(),
+      aiNote: this.aiNote() || undefined,
     };
 
     const existing = this.designId();
@@ -589,6 +593,8 @@ export class StudioFacade {
         next: (tk) => {
           this.designId.set(tk._id);
           this.nameDraft.set(tk.name);
+          // Ban da luu da giu ghi chu AI cua no; khong gui de khoi ghi de.
+          this.aiNote.set('');
           this.paintSaved.set(tk.paint);
           this.codeKindSelected.set(tk.productTypeCode);
           this.sizeCodeSelected.set(tk.sizeCode);

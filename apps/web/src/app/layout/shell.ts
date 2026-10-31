@@ -109,15 +109,22 @@ export class Shell {
 
   /** Personal destinations, kept behind the account button so the bar stays on one line. */
   readonly accountMenu: MenuItem[] = [
+    { path: '/journals', key: 'NAV.MY_JOURNALS' },
     { path: '/orders', key: 'NAV.ORDER' },
     { path: '/designs', key: 'NAV.DESIGNS' },
     { path: '/pets', key: 'NAV.PET' },
     { path: '/restore', key: 'NAV.RESTORE' },
-    { path: '/colors', key: 'NAV.PALETTE' },
   ];
 
   /** The footer lists everything, since it has the room. */
-  readonly footerMenu: MenuItem[] = [...this.menu, { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' }, ...this.accountMenu];
+  /** Menu chinh hien trong dropdown tren dien thoai, bo muc da co san trong nhom ca nhan. */
+  readonly phoneMenu: MenuItem[] = this.menu.filter((top) => !this.accountMenu.some((item) => item.path === top.path));
+
+  readonly footerMenu: MenuItem[] = [
+    ...this.menu,
+    { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' },
+    ...this.accountMenu.filter((item) => !this.menu.some((top) => top.path === item.path)),
+  ];
 
   /** Shown to internal staff only. The server re-checks permission on every request. */
   /** Cac man hinh van hanh, chi mo cho nhom Quan ly. */

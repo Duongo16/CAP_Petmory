@@ -101,7 +101,7 @@
             >
               <!-- Nav items shown only on mobile (narrow) for customer -->
               @if (!isInternal()) {
-                @for (item of menu; track item.path) {
+                @for (item of phoneMenu; track item.path) {
                   <a
                     class="hidden max-nav:block px-3 py-2 rounded-md no-underline text-ink text-sm
                            transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
@@ -201,7 +201,7 @@
       </nav>
 
       <!-- Social links -->
-      <div class="footer-contact flex flex-col items-start gap-3">
+      <div id="footer-contact" tabindex="-1" class="footer-contact flex flex-col items-start gap-3">
         <h2 class="m-0 mb-1 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
           {{ 'FOOTER.FOLLOW' | translate }}
         </h2>

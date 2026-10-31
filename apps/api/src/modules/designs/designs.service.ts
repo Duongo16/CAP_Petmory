@@ -294,6 +294,8 @@ export class DesignsService {
       frameFinish: dto.frameFinish ?? 'WALNUT',
       accessories: dto.accessories ?? [],
       featureNote: dto.featureNote?.trim() ?? '',
+      // Chi ghi khi co gui, de sua ban cu khong xoa mat ghi chu AI da co.
+      ...(dto.aiNote !== undefined ? { aiNote: dto.aiNote.trim() } : {}),
     };
   }
 }

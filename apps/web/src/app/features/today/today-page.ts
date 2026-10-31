@@ -45,12 +45,17 @@ const GREETING_KEY = {
   EVENING: 'TODAY.GREET_EVENING',
 };
 
-/** Whole days between a date and today, never below zero. */
-function daysSince(from: string | null): number {
+/** Whole days between two dates (or between a date and today), never below zero. */
+function daysBetween(from: string | null, to?: string | null): number {
   if (!from) {
     return 0;
   }
-  return Math.max(0, Math.floor((Date.now() - new Date(from).getTime()) / DAY_MS));
+  const fromTime = new Date(from).getTime();
+  const toTime = to ? new Date(to).getTime() : Date.now();
+  if (toTime < fromTime) {
+    return 0;
+  }
+  return Math.max(0, Math.floor((toTime - fromTime) / DAY_MS));
 }
 
 /** How many whole years ago a date was, at least one. */
@@ -146,9 +151,13 @@ export class TodayPage implements OnInit {
   /** The pet the page puts forward, which is simply the first one kept. */
   readonly spotlight = computed(() => this.petRows()[0] ?? null);
 
-  readonly daysTogether = computed(() =>
-    daysSince(this.spotlight()?.adoptionDate ?? this.spotlight()?.birthDate ?? null),
-  );
+  readonly daysTogether = computed(() => {
+    const pet = this.spotlight();
+    return daysBetween(
+      pet?.adoptionDate ?? pet?.birthDate ?? null,
+      pet?.passedAwayDate ?? null,
+    );
+  });
 
   /** Every pet, with the label its card shows when no breed was written down. */
   readonly petCards = computed(() =>

@@ -324,11 +324,6 @@ export const routes: Routes = [
           },
         ],
       },
-      {
-        path: 'colors',
-        canActivate: [customerOnlyGuard],
-        loadComponent: () => import('./features/catalog/colors-page').then((m) => m.ColorsPage),
-      },
     ],
   },
   {
