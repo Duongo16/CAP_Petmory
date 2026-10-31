@@ -1,4 +1,6 @@
-<pm-guest-header />
+@if (!signedIn()) {
+  <pm-guest-header />
+}
 <div class="wall tw-page flex flex-col gap-5">
   <header class="wall-head">
     <a class="tw-back self-start" routerLink="/landing"><pm-icon name="back" [size]="14" /> {{ 'AUTH.BACK_HOME' | translate }}</a>

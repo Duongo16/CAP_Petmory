@@ -12,6 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MemoriesService } from '../../core/services/memories.service';
+import { AuthService } from '../../core/services/auth.service';
 import { DiaryCard, DiaryList, MemoryTopic } from '../../core/models/api.model';
 import { TOPIC_ORDER, topicKey } from '../../shared/memory-topics';
 import { Icon } from '../../shared/icon/icon';
@@ -61,6 +62,8 @@ interface Flight {
 })
 export class DiaryListPage implements OnInit {
   private readonly service = inject(MemoriesService);
+  /** Da dang nhap thi trang nam trong khung chung, nen khong ve dau trang cua khach. */
+  readonly signedIn = inject(AuthService).isSignedIn;
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);

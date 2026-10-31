@@ -90,7 +90,7 @@ export class RegisterPage {
     {
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [optionalVietnamesePhone]],
+      phone: ['', [Validators.required, optionalVietnamesePhone]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirm: ['', [Validators.required]],
       terms: [false, [Validators.requiredTrue]],

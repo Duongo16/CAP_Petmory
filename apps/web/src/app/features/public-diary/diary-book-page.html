@@ -1,4 +1,6 @@
-<pm-guest-header />
+@if (!signedIn()) {
+  <pm-guest-header />
+}
 <div class="read tw-page flex flex-col gap-6">
   @switch (status()) {
     @case ('LOADING') {

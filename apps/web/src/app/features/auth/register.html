@@ -38,7 +38,7 @@
         </div>
       </div>
 
-      <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" /></a>
+      <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" [wordOnly]="true" /></a>
 
       <div class="ap-head">
         <h1 class="ap-title">{{ 'AUTH.REGISTER_TITLE' | translate }}</h1>
@@ -88,8 +88,7 @@
 
         <div class="ap-field">
           <label class="ap-label" for="up-phone">
-            {{ 'AUTH.PHONE' | translate }}
-            <span class="font-normal text-ink-muted">({{ 'AUTH.PHONE_NOTE' | translate }})</span>
+            {{ 'AUTH.PHONE' | translate }} *
           </label>
           <div class="ap-input-wrap">
             <input

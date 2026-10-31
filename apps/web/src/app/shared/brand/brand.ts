@@ -17,11 +17,17 @@ export class Brand {
   readonly size = input<BrandSize>('md');
   /** Leave the lettering out where only the picture fits. */
   readonly markOnly = input(false);
+  /** Chi giu chu Petmory, bo hinh cho meo. */
+  readonly wordOnly = input(false);
+  /**
+   * Giu de cac cho dang truyen khong loi. Moi noi deu dung chung anh chu day du,
+   * vi anh chu cu (logo-word-clear.png) bi cat mat mot phan chu P o mep trai.
+   */
   readonly referenceWord = input(false);
 
   readonly markPx = computed(() => MARK_PX[this.size()]);
   readonly wordPx = computed(() => WORD_PX[this.size()]);
   readonly wordWidth = computed(() =>
-    Math.round(this.wordPx() * (this.referenceWord() ? 1000 / 268 : 838 / 245)),
+    Math.round(this.wordPx() * (1000 / 268)),
   );
 }

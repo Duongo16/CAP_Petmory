@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import { MemoriesService } from '../../core/services/memories.service';
+import { AuthService } from '../../core/services/auth.service';
 import { DiaryBook, MusicTrack } from '../../core/models/api.model';
 import { groupByMonth } from '../memories/memories-facade';
 import { JourneyMap } from '../memories/journey-map/journey-map';
@@ -45,6 +46,8 @@ const PLAIN_SETTING: SlideSetting = { trackCode: '', effect: 'FADE', seconds: 5 
 export class DiaryBookPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(MemoriesService);
+  /** Da dang nhap thi trang nam trong khung chung, nen khong ve dau trang cua khach. */
+  readonly signedIn = inject(AuthService).isSignedIn;
   private readonly destroyRef = inject(DestroyRef);
 
   readonly status = signal<ScreenState>('LOADING');

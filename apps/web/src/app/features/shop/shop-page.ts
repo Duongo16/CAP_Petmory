@@ -55,11 +55,11 @@ export class ShopPage implements OnInit {
     { path: '/community', key: 'NAV.COMMUNITY' },
   ];
   readonly accountMenu = [
+    { path: '/journals', key: 'NAV.MY_JOURNALS' },
     { path: '/orders', key: 'NAV.ORDER' },
     { path: '/designs', key: 'NAV.DESIGNS' },
     { path: '/pets', key: 'NAV.PET' },
     { path: '/restore', key: 'NAV.RESTORE' },
-    { path: '/colors', key: 'NAV.PALETTE' },
   ];
 
   readonly shelf = signal<Shelf>('custom');

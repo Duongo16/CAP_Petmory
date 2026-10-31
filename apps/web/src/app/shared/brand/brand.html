@@ -1,15 +1,17 @@
 <span class="brand" [style.--mark.px]="markPx()" [style.--word-w.px]="wordWidth()" [style.--word-h.px]="wordPx()">
-  <img
-    class="brand-mark"
-    src="img/logo-mark.png"
-    alt=""
-    [attr.width]="markPx()"
-    [attr.height]="markPx()"
-  />
+  @if (!wordOnly()) {
+    <img
+      class="brand-mark"
+      src="img/logo-mark.png"
+      alt=""
+      [attr.width]="markPx()"
+      [attr.height]="markPx()"
+    />
+  }
   @if (!markOnly()) {
     <img
       class="brand-word"
-      [src]="referenceWord() ? 'img/logo-word-reference.png' : 'img/logo-word-clear.png'"
+      src="img/logo-word-reference.png"
       alt="Petmory"
       [attr.width]="wordWidth()"
       [attr.height]="wordPx()"

@@ -50,6 +50,33 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/reset-password').then((m) => m.ResetPasswordPage),
   },
   /*
+   * Nguoi da dang nhap doc nhat ky cong khai ngay trong khung chung cua trang
+   * (dau trang co tai khoan, chan trang, tro ly), khong roi ve dau trang cua
+   * khach. Khach chua dang nhap khong khop nhom nay va roi xuong ba duong ben duoi.
+   */
+  {
+    path: '',
+    canMatch: [() => inject(AuthService).isSignedIn()],
+    loadComponent: () => import('./layout/shell').then((m) => m.Shell),
+    children: [
+      {
+        path: 'diaries',
+        loadComponent: () =>
+          import('./features/public-diary/diary-list-page').then((m) => m.DiaryListPage),
+      },
+      {
+        path: 'diaries/:petId',
+        loadComponent: () =>
+          import('./features/public-diary/diary-book-page').then((m) => m.DiaryBookPage),
+      },
+      {
+        path: 'd/:code',
+        loadComponent: () =>
+          import('./features/public-diary/diary-book-page').then((m) => m.DiaryBookPage),
+      },
+    ],
+  },
+  /*
    * Ba duong duoi day nam ngoai lop kiem dang nhap, vi mot quyen nhat ky da
    * de cong khai thi phai doc duoc that su, ke ca khi nguoi doc chua tung co
    * tai khoan o day.
