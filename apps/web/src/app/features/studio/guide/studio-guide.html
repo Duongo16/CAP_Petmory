@@ -1,0 +1,41 @@
+<div class="guide">
+  <!-- Lop chan thao tac: nen toi, vung dang chi duoc khoet sang -->
+  <div class="backdrop" (click)="$event.stopPropagation()"></div>
+
+  @if (spot(); as s) {
+    <div class="spot" aria-hidden="true" [style.top.px]="s.top" [style.left.px]="s.left" [style.width.px]="s.width" [style.height.px]="s.height"></div>
+  }
+
+  @if (current(); as step) {
+    <div #popover class="pop" role="dialog" aria-modal="true" aria-labelledby="guide-title" aria-describedby="guide-body" [style]="popStyle()">
+      <div class="pop-head">
+        <span class="count">{{ 'STUDIO.GUIDE.PROGRESS' | translate: { n: index() + 1, total: shown().length } }}</span>
+        <button type="button" class="close" [attr.aria-label]="'STUDIO.GUIDE.CLOSE' | translate" (click)="close()">
+          <pm-icon name="close" [size]="16" />
+        </button>
+      </div>
+
+      <h3 id="guide-title" class="pop-title">{{ step.titleKey | translate }}</h3>
+      <p id="guide-body" class="pop-body">{{ step.bodyKey | translate }}</p>
+
+      <div class="dots" aria-hidden="true">
+        @for (i of dots(); track i) {
+          <span class="dot" [class.on]="i === index()"></span>
+        }
+      </div>
+
+      <div class="actions">
+        @if (!last()) {
+          <button type="button" class="link" (click)="close()">{{ 'STUDIO.GUIDE.SKIP' | translate }}</button>
+        }
+        <span class="spacer"></span>
+        @if (index() > 0) {
+          <button type="button" class="ghost" (click)="prev()">{{ 'STUDIO.GUIDE.PREV' | translate }}</button>
+        }
+        <button type="button" class="go" (click)="next()">
+          {{ (last() ? 'STUDIO.GUIDE.DONE' : 'STUDIO.GUIDE.NEXT') | translate }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

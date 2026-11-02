@@ -176,13 +176,11 @@
 @if (!isInternal()) {
   @if (!immersive()) {
   <footer class="mt-16 bg-night text-on-night max-nav:pb-[calc(140px+env(safe-area-inset-bottom))]">
-    <div class="grid gap-10 max-w-[1180px] mx-auto px-6 pt-12 pb-8 box-border [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
+    <div class="grid gap-10 max-w-[1180px] mx-auto px-6 py-14 box-border items-start [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))] nav:[grid-template-columns:1.3fr_1.6fr_1fr]">
 
       <!-- Brand column -->
       <div class="flex flex-col items-start gap-3">
-        <pm-brand size="md" />
-        <p class="m-0 font-serif italic text-base leading-relaxed">{{ 'FOOTER.TAGLINE' | translate }}</p>
-        <p class="m-0 text-sm text-on-night/70">{{ 'FOOTER.SLOGAN' | translate }}</p>
+        <pm-brand size="lg" />
       </div>
 
       <!-- Explore nav -->
@@ -207,9 +205,6 @@
         </h2>
         <pm-social-links variant="full" />
       </div>
-    </div>
-    <div class="max-w-[1180px] mx-auto px-6 pb-8 box-border">
-      <p class="m-0 pt-5 border-t border-on-night/15 text-xs text-on-night/60">{{ 'FOOTER.RIGHTS' | translate }}</p>
     </div>
   </footer>
   }

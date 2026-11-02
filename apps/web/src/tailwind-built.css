@@ -924,12 +924,6 @@
   .border-edge-strong {
     border-color: var(--color-edge-strong);
   }
-  .border-on-night\/15 {
-    border-color: var(--color-on-night);
-    @supports (color: color-mix(in lab, red, red)) {
-      border-color: color-mix(in oklab, var(--color-on-night) 15%, transparent);
-    }
-  }
   .border-on-night\/30 {
     border-color: var(--color-on-night);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1068,6 +1062,9 @@
   .py-12 {
     padding-block: calc(var(--spacing) * 12);
   }
+  .py-14 {
+    padding-block: calc(var(--spacing) * 14);
+  }
   .py-16 {
     padding-block: calc(var(--spacing) * 16);
   }
@@ -1083,14 +1080,8 @@
   .pt-4 {
     padding-top: calc(var(--spacing) * 4);
   }
-  .pt-5 {
-    padding-top: calc(var(--spacing) * 5);
-  }
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
-  }
-  .pt-12 {
-    padding-top: calc(var(--spacing) * 12);
   }
   .pr-3 {
     padding-right: calc(var(--spacing) * 3);
@@ -1106,9 +1097,6 @@
   }
   .pb-6 {
     padding-bottom: calc(var(--spacing) * 6);
-  }
-  .pb-8 {
-    padding-bottom: calc(var(--spacing) * 8);
   }
   .pl-1 {
     padding-left: var(--spacing);
@@ -1313,12 +1301,6 @@
   .text-on-night {
     color: var(--color-on-night);
   }
-  .text-on-night\/60 {
-    color: var(--color-on-night);
-    @supports (color: color-mix(in lab, red, red)) {
-      color: color-mix(in oklab, var(--color-on-night) 60%, transparent);
-    }
-  }
   .text-on-night\/70 {
     color: var(--color-on-night);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1410,6 +1392,11 @@
     --tw-backdrop-blur: blur(var(--blur-md));
     -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
     backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+  }
+  .transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
   .transition-\[border-color\,box-shadow\] {
     transition-property: border-color,box-shadow;
@@ -1632,6 +1619,9 @@
     }
     .nav\:max-h-\[62vh\] {
       max-height: 62vh;
+    }
+    .nav\:\[grid-template-columns\:1\.3fr_1\.6fr_1fr\] {
+      grid-template-columns: 1.3fr 1.6fr 1fr;
     }
     .nav\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));

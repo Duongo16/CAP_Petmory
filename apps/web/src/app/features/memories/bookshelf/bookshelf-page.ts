@@ -166,7 +166,7 @@ export class BookshelfPage implements OnInit {
           tone: TONES[at % TONES.length],
           kind: pet.kind,
           avatarUrl: pet.avatarUrl,
-          coverColor: pet.diaryCoverColor || '#c4661a',
+          coverColor: pet.diaryCoverColor || '#fb8b1f',
         }),
       ),
     );

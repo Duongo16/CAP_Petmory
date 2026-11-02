@@ -165,7 +165,7 @@ export class MemoriesFacade {
   readonly chosen = this.topic.asReadonly();
   readonly pending = this.saving.asReadonly();
   readonly coverSaving = this.coverSavingRow.asReadonly();
-  readonly coverColor = computed(() => this.petRow()?.diaryCoverColor || '#c4661a');
+  readonly coverColor = computed(() => this.petRow()?.diaryCoverColor || '#fb8b1f');
 
   /** Cap nhat cau hinh nhac vua duoc luu trong quyen dang mo. */
   applyPet(pet: Pet): void {

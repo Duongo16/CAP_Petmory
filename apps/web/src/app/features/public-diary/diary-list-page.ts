@@ -80,7 +80,7 @@ export class DiaryListPage implements OnInit {
     this.answer().rows.map((card, at) => ({
       card,
       tone: TONES[at % TONES.length],
-      coverColor: card.coverColor || '#c4661a',
+      coverColor: card.coverColor || '#fb8b1f',
       tilt: [-2.5, 1.5, -1, 2][at % 4],
     })),
   );

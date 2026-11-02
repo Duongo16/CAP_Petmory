@@ -1,0 +1,84 @@
+<div
+  class="stage"
+  [class.born]="isRevealing()"
+  (pointermove)="onPointerMove($event)"
+  (pointerleave)="onPointerLeave()"
+>
+  <!-- Den chieu tu phia truoc, goc ben phai -->
+  <div class="wall-light" aria-hidden="true"></div>
+
+  <header class="born-head">
+    <h2 class="born-title">{{ 'STUDIO.SHOWCASE.BORN_TITLE' | translate }}</h2>
+    <p class="born-note" role="note">{{ 'STUDIO.SHOWCASE.DISCLAIMER' | translate }}</p>
+  </header>
+
+  <div class="hang">
+    <div class="anchor" [style.--shx.px]="-tiltY() * 0.8" [style.--shy.px]="tiltX() * 0.7">
+      <!-- Vet sang loe ra tu mot diem, vong anh sang lan toa luc khung khop lai -->
+      <div class="pool" aria-hidden="true"></div>
+      <div class="ring" aria-hidden="true"></div>
+
+      <div class="piece">
+        <!-- Bong khung do len tuong phia sau, lech sang trai vi den o ben phai -->
+        <div class="cast" aria-hidden="true"></div>
+
+        <div
+          class="tilt"
+          [style.--rx]="tiltX() + 'deg'"
+          [style.--ry]="tiltY() + 'deg'"
+          [style.--sx]="sheenX() + '%'"
+          [style.--sy]="sheenY() + '%'"
+        >
+          <!-- Khung go soi: bon thanh vat goc 45 do bat vao tu bon phia -->
+          <div class="frame" [class.wobble]="wobbling()" (click)="wobble()" (animationend)="wobbling.set(false)">
+            <i class="rail rail-top"></i>
+            <i class="rail rail-right"></i>
+            <i class="rail rail-bottom"></i>
+            <i class="rail rail-left"></i>
+
+            <div class="mat">
+              <div class="art-window">
+                <img class="art" [src]="imageSrc()" [alt]="'STUDIO.SHOWCASE.ART_ALT' | translate" draggable="false" />
+                <div class="foil" aria-hidden="true"></div>
+                <div class="glass" aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bon tia lap lanh o goc khung -->
+          <div class="sparks" aria-hidden="true">
+            <i class="spark s1"></i>
+            <i class="spark s2"></i>
+            <i class="spark s3"></i>
+            <i class="spark s4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    @if (petName() || memorialDate()) {
+      <div class="plaque">
+        @if (petName()) {
+          <span class="plaque-name">{{ petName() }}</span>
+        }
+        @if (memorialDate(); as date) {
+          <span class="plaque-date">{{ date | date: 'dd.MM.yyyy' }}</span>
+        }
+      </div>
+    }
+  </div>
+
+  <button
+    type="button"
+    class="replay"
+    [attr.aria-label]="'STUDIO.SHOWCASE.REPLAY' | translate"
+    [title]="'STUDIO.SHOWCASE.REPLAY' | translate"
+    (click)="replay()"
+  >
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v5h5" />
+    </svg>
+    <span class="replay-text">{{ 'STUDIO.SHOWCASE.REPLAY' | translate }}</span>
+  </button>
+</div>

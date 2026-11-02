@@ -43,11 +43,8 @@ function dateForStand(value: string): string {
 }
 
 /** Gia them bang khong thi hien chu da gom thay vi so khong dong. */
-/** Hai nhom dong goi khach chon them, khai key ban dich tung nhom. */
-const PACK_GROUPS: { kind: PackagingKind; key: string }[] = [
-  { kind: 'BOX', key: 'STUDIO.PACK.BOX' },
-  { kind: 'FRAME', key: 'STUDIO.PACK.FRAME' },
-];
+/** Nhom dong goi chon o buoc cuoi. Loai khung da chuyen len buoc Khung & ten nen o day chi con hop. */
+const PACK_GROUPS: { kind: PackagingKind; key: string }[] = [{ kind: 'BOX', key: 'STUDIO.PACK.BOX' }];
 
 function isZero(value: string): boolean {
   return /^0+(\.0+)?$/.test(value.trim());
@@ -55,21 +52,24 @@ function isZero(value: string): boolean {
 
 type ScreenState = 'LOADING' | 'ERROR' | 'READY';
 
+/** Thoi gian ngan treo khung theu truot ra/vao (ms); khop voi transition .hoop-wall trong scss. */
+const HOOP_SLIDE_MS = 650;
+
 /** Bon ngan do nghe cua ban len, theo thu tu nguoi dung di qua. */
-export type Step = 'MODEL' | 'COLOR' | 'STAND' | 'PHOTOS' | 'FINISH';
+export type Step = 'MODEL' | 'STAND' | 'PHOTOS' | 'SHOWCASE' | 'FINISH';
 
 /**
  * Thu tu cac buoc. Dung mau tu anh la tuy chon, nam gon trong buoc chon mau:
  * khach nop anh de he thong tu chon mau, hoac tu chon lay.
  */
-export const STEPS: Step[] = ['MODEL', 'COLOR', 'STAND', 'PHOTOS', 'FINISH'];
+export const STEPS: Step[] = ['MODEL', 'STAND', 'PHOTOS', 'SHOWCASE', 'FINISH'];
 
 /** Nhan va bieu tuong cua tung ngan, viet ra tung key de tim duoc. */
 const STEP_VIEW: Record<Step, { key: string; icon: string }> = {
   MODEL: { key: 'STUDIO.TAB.MODEL', icon: 'paw' },
-  COLOR: { key: 'STUDIO.TAB.COLOR', icon: 'sparkle' },
   STAND: { key: 'STUDIO.TAB.STAND', icon: 'pencil' },
   PHOTOS: { key: 'STUDIO.TAB.PHOTOS', icon: 'camera' },
+  SHOWCASE: { key: 'STUDIO.TAB.SHOWCASE', icon: 'star' },
   FINISH: { key: 'STUDIO.TAB.FINISH', icon: 'gift' },
 };
 
@@ -136,11 +136,13 @@ export interface ZoneView {
 
 import { PetPhotos } from '../memories/pet-photos/pet-photos';
 import { CUSTOM_KEEPSAKE_CODES, FIGURE_PRODUCT_CODE, PORTRAIT_PRODUCT_CODE, packagingFits } from '../catalog/custom-keepsakes';
+import { FinishedShowcase } from './finished-showcase/finished-showcase';
+import { GuideStep, StudioGuide } from './guide/studio-guide';
 
 @Component({
   selector: 'pm-studio-page',
   standalone: true,
-  imports: [Icon, Viewer3d, HoopPreview, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe, PetPhotos, DateInput],
+  imports: [Icon, Viewer3d, HoopPreview, FinishedShowcase, StudioGuide, RouterLink, ReactiveFormsModule, MoneyPipe, MatProgressSpinnerModule, TranslatePipe, DatePipe, PetPhotos, DateInput],
   providers: [StudioFacade],
   templateUrl: './studio-page.html',
   styleUrl: './studio-page.scss',
@@ -159,8 +161,8 @@ export class StudioPage implements OnInit {
   readonly portrait = signal<string | null>(null);
   private portraitTimers: ReturnType<typeof setTimeout>[] = [];
 
-  /** Mau "chi dau" la san pham dinh len vai dong khung, nen moi co phan xem truoc khung. */
-  readonly hoopAvailable = computed(() => this.baseModelSelected()?.pose === 'HEAD');
+  /** Khung de uom: mau nao cung xem duoc be nam trong khung, de hinh dung truoc khi chon loai khung. */
+  readonly hoopAvailable = computed(() => this.baseModelSelected() !== null);
   /** Nguoi dung tu an hoac hien khung xem truoc; nho lai cho lan sau tren may nay. */
   readonly hoopShown = signal(readPreference('hoop-shown', ['1', '0']) !== '0');
   readonly showHoop = computed(() => this.hoopAvailable() && this.hoopShown());
@@ -175,17 +177,47 @@ export class StudioPage implements OnInit {
     swatch: `var(--pm-frame-${finish.toLowerCase()})`,
   }));
 
-  /** Doi phu kien hay mau theo vung thi chup lai; tep phu kien nap cham nen chup them mot lan sau. */
+  /**
+   * Ngan treo khung theu truot ra/vao theo hai nhip: gan vao cay DOM truoc (o ngoai man hinh),
+   * mot nhip sau moi them class .on de CSS truot vao; khi tat thi truot ra roi moi go khoi cay.
+   */
+  readonly hoopMounted = signal(false);
+  readonly hoopOn = signal(false);
+  private hoopTimer: ReturnType<typeof setTimeout> | null = null;
+
+  protected readonly hoopSlide = effect(() => {
+    const want = this.showHoop();
+    untracked(() => {
+      if (this.hoopTimer) {
+        clearTimeout(this.hoopTimer);
+      }
+      if (want) {
+        this.hoopMounted.set(true);
+        this.hoopTimer = setTimeout(() => this.hoopOn.set(true), 50);
+      } else {
+        this.hoopOn.set(false);
+        this.hoopTimer = setTimeout(() => this.hoopMounted.set(false), HOOP_SLIDE_MS);
+      }
+    });
+  });
+
+  /**
+   * Doi phu kien hay mau theo vung thi chup lai; tep phu kien nap cham nen chup them mot lan sau.
+   * Lan chup dau doi den khi ngan treo truot xong, vi chup anh la viec nang va se lam khung hinh.
+   */
   protected readonly hoopOnChange = effect(() => {
     this.accessoryMounts();
     this.colorByZone();
     this.showHoop();
-    untracked(() => this.schedulePortrait([400, 1500]));
+    untracked(() => this.schedulePortrait([HOOP_SLIDE_MS + 150, HOOP_SLIDE_MS + 1300]));
   });
 
   private readonly stopPortraitTimers = this.destroyRef.onDestroy(() => {
     for (const timer of this.portraitTimers) {
       clearTimeout(timer);
+    }
+    if (this.hoopTimer) {
+      clearTimeout(this.hoopTimer);
     }
   });
 
@@ -262,8 +294,41 @@ export class StudioPage implements OnInit {
   readonly tabs = computed(() => {
     const now = this.step();
     const at = STEPS.indexOf(now);
-    return STEPS.map((code, i) => ({ code, ...STEP_VIEW[code], on: code === now, done: i < at, number: i + 1 }));
+    return STEPS.map((code, i) => ({
+      code,
+      ...STEP_VIEW[code],
+      on: code === now,
+      done: i < at,
+      number: i + 1,
+      // Buoc anh la bat buoc de dat hang: nhac bang cham do cho den khi du anh.
+      todo: code === 'PHOTOS' && code !== now && !this.facade.photosReady(),
+    }));
   });
+
+  readonly stepCount = STEPS.length;
+
+  /** Lop huong dan: tu mo lan dau vao trang, sau do mo lai bang nut Huong dan. */
+  readonly guideOpen = signal(false);
+
+  /** Cac diem nhan cua huong dan; muc giai thich o ngan keo doi noi dung theo buoc dang mo. */
+  readonly guideSteps = computed<GuideStep[]>(() => [
+    { target: '.stage', titleKey: 'STUDIO.GUIDE.STAGE_TITLE', bodyKey: 'STUDIO.GUIDE.STAGE_BODY' },
+    { target: '.stage-tools', titleKey: 'STUDIO.GUIDE.TOOLS_TITLE', bodyKey: 'STUDIO.GUIDE.TOOLS_BODY' },
+    { target: '.stepper', titleKey: 'STUDIO.GUIDE.STEPS_TITLE', bodyKey: 'STUDIO.GUIDE.STEPS_BODY' },
+    { target: '.panel-head', titleKey: 'STUDIO.GUIDE.PANEL_TITLE', bodyKey: 'STUDIO.HELP.' + this.step() },
+    { target: '.drawer-foot', titleKey: 'STUDIO.GUIDE.FOOT_TITLE', bodyKey: 'STUDIO.GUIDE.FOOT_BODY' },
+    { target: '.guide-btn', titleKey: 'STUDIO.GUIDE.REOPEN_TITLE', bodyKey: 'STUDIO.GUIDE.REOPEN_BODY' },
+  ]);
+
+  openGuide(): void {
+    this.guideOpen.set(true);
+  }
+
+  /** Dong huong dan va nho da xem, lan sau vao trang khong tu mo nua. */
+  closeGuide(): void {
+    this.guideOpen.set(false);
+    writePreference('guide-seen', '1');
+  }
 
   readonly stepIndex = computed(() => STEPS.indexOf(this.step()));
   readonly isFirst = computed(() => this.stepIndex() === 0);
@@ -438,6 +503,20 @@ export class StudioPage implements OnInit {
     })).filter((group) => group.options.length > 0);
   });
 
+  /** Cac loai khung trong danh muc hop voi san pham dang chon (kem gia); chon lai la bo khung. */
+  readonly frameCards = computed(() => {
+    const picked = this.facade.packagingPicked()['FRAME'];
+    const product = this.facade.codeKindSelected();
+    return this.facade
+      .packagingCatalog()
+      .filter((one) => one.kind === 'FRAME' && packagingFits(one.code, product))
+      .map((raw) => ({ raw, on: picked === raw.code, free: isZero(raw.priceDelta.$numberDecimal) }));
+  });
+
+  selectFrame(code: string): void {
+    this.facade.selectPackaging('FRAME', code);
+  }
+
   /** Ten hop va khung dang chon, de ghi vao bang gia. */
   readonly packagingNames = computed(() => {
     const picked = new Set(this.facade.packagingCodes());
@@ -504,6 +583,18 @@ export class StudioPage implements OnInit {
     untracked(() => this.facade.selectKind(want));
   });
 
+  /**
+   * Chon san mot co (co vua neu co) ngay khi biet san pham, de gia tam tinh hien tu buoc dau
+   * va so phu kien duoc gan co san. Da co co roi (mo ban nhap, tu trang san pham) thi khong dong den.
+   */
+  protected readonly sizeDefault = effect(() => {
+    const sizes = this.facade.sizes();
+    const kind = this.facade.codeKindSelected();
+    if (kind && sizes.length > 0 && !this.facade.sizeCodeSelected()) {
+      untracked(() => this.facade.selectSize(sizes[Math.min(1, sizes.length - 1)].code));
+    }
+  });
+
   readonly sizeCards = computed(() =>
     this.facade.sizes().map((size) => ({ raw: size, on: this.facade.sizeCodeSelected() === size.code })),
   );
@@ -542,6 +633,10 @@ export class StudioPage implements OnInit {
           const ready = library.baseModel.filter((m) => m.ready);
           this.baseModel.set(ready);
           this.status.set(ready.length > 0 ? 'READY' : 'ERROR');
+          // Lan dau vao trang: tu mo huong dan sau khi be 3D hien ra mot nhip.
+          if (ready.length > 0 && !codeDraft && readPreference('guide-seen', ['1']) !== '1') {
+            setTimeout(() => this.guideOpen.set(true), 900);
+          }
           if (codeDraft) {
             this.openDesign(codeDraft);
             return;
@@ -598,15 +693,21 @@ export class StudioPage implements OnInit {
     );
   }
 
+  /** So lan kich hoat hieu ung anh sang Out-In */
+  readonly showcaseRevealTrigger = signal<number>(0);
+
+
   go(step: Step): void {
     this.step.set(step);
+    // Chuyen vao buoc thanh pham thi phat man chao don anh sang Out-In
+    if (step === 'SHOWCASE') {
+      this.showcaseRevealTrigger.update((v) => v + 1);
+    }
     // Sang ngan hoan tat ma chua co anh thi tu chup sau goc, de khoi phai nho bam.
     if (step === 'FINISH' && this.preview().length === 0) {
       this.capture();
     }
-    if (step !== 'COLOR') {
-      this.colorPendingPaint.set(null);
-    }
+    this.colorPendingPaint.set(null);
   }
 
   next(): void {
@@ -733,7 +834,8 @@ export class StudioPage implements OnInit {
   /** Mau vua nap xong (ca mau da to cua ban nhap), chup anh cho khung theu. */
   onViewerReady(): void {
     this.portrait.set(null);
-    this.schedulePortrait([150]);
+    // Doi ngan treo truot xong roi moi chup, de khong chup giua luc dang chuyen dong.
+    this.schedulePortrait([this.hoopOn() ? 150 : HOOP_SLIDE_MS + 150]);
   }
 
   /**

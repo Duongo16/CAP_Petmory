@@ -87,7 +87,7 @@ export class DiaryBookView {
 
   readonly faces = input.required<PageFace[]>();
   readonly sourceOf = input.required<Record<string, string>>();
-  readonly coverColor = input('#c4661a');
+  readonly coverColor = input('#fb8b1f');
 
   /** Chon mau chu de giu do tuong phan voi ca mau bia sang va toi. */
   readonly coverInk = computed(() => {

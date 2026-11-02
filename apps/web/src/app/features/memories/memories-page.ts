@@ -39,7 +39,7 @@ const DIARY_TABS: { view: DiaryView; key: string }[] = [
 ];
 
 /** Mot so mau bia de chon nhanh, van co the mo bang mau tuy chinh. */
-const COVER_COLORS = ['#c4661a', '#6f7e4f', '#7d4e57', '#4d6b7a', '#8a6a42', '#7b5c8d'];
+const COVER_COLORS = ['#fb8b1f', '#6f7e4f', '#7d4e57', '#4d6b7a', '#8a6a42', '#7b5c8d'];
 
 /** Doc tab tu duong dan, chi nhan nhung tab co that. */
 function viewFrom(raw: string | null): DiaryView {

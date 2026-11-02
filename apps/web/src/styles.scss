@@ -5,7 +5,7 @@ html {
   @include mat.theme((
     color: (
       primary: mat.$orange-palette,
-      tertiary: mat.$yellow-palette,
+      tertiary: mat.$orange-palette,
     ),
     typography: 'Be Vietnam Pro',
     density: 0,
@@ -19,12 +19,28 @@ html {
  * doi o day chu khong phai do lai tung man hinh.
  */
 :root {
+  /*
+   * Mot nhom mau cam duy nhat, lay tu chu PETMORY tren logo (500 la mau logo).
+   * Toan bo giao dien chi dung cac bac cua nhom nay: bac nhat cho nen, bac vua
+   * cho net va chi tiet, bac dam cho chu, nen nhin dong nhat nhung van co chieu sau.
+   */
+  --pm-orange-50: #fff7ec;
+  --pm-orange-100: #ffeacf;
+  --pm-orange-200: #ffd4a3;
+  --pm-orange-300: #ffbc73;
+  --pm-orange-400: #fda145;
+  --pm-orange-500: #fb8b1f;
+  --pm-orange-600: #e87608;
+  --pm-orange-700: #c25d00;
+  --pm-orange-800: #8f4304;
+  --pm-orange-900: #5a2a05;
+
   /* Nen va mat phang, lay tu mau giay kem cua logo */
-  --pm-bg: #fffaf2;
+  --pm-bg: #fffaf3;
   --pm-bg-card: #ffffff;
-  --pm-bg-muted: #fdf2e2;
-  --pm-bg-sunken: #f8e8d2;
-  --pm-bg-3d: #fdf2e2;
+  --pm-bg-muted: #fff1de;
+  --pm-bg-sunken: #ffe6c8;
+  --pm-bg-3d: #fff1de;
 
   /*
    * Mau thuong hieu, lay tu chu PETMORY tren logo.
@@ -34,19 +50,20 @@ html {
    * sang vua lam nen cho chu trang. Sac cam nguyen ban cua logo van duoc giu,
    * dat o muc mau ho phach tuoi va chi dung cho mang trang tri.
    */
-  --pm-accent: #a8500c;
-  --pm-accent-dark: #843e08;
-  --pm-accent-soft: #fce7ce;
-  --pm-accent-ring: #a8500c40;
-  --pm-on-accent: #ffffff;
+  --pm-accent: var(--pm-orange-500);
+  --pm-accent-dark: var(--pm-orange-700);
+  --pm-accent-soft: var(--pm-orange-100);
+  --pm-accent-ring: #fb8b1f66;
+  /* Chu tren nen cam logo: nau dam, doc ro hon chu trang. */
+  --pm-on-accent: #3d1d00;
   --pm-memorial: #5b6640;
   --pm-memorial-soft: #e6ead8;
 
   /* Mau vang am, lay tu bo long cho tren logo */
-  --pm-amber: #8a5406;
-  --pm-amber-bright: #fb8b1f;
-  --pm-amber-soft: #fde2bb;
-  --pm-on-amber: #2e1a00;
+  --pm-amber: var(--pm-orange-700);
+  --pm-amber-bright: var(--pm-orange-500);
+  --pm-amber-soft: var(--pm-orange-200);
+  --pm-on-amber: #3d1d00;
 
   --pm-danger: #b3261e;
   --pm-danger-soft: #ffdad5;
@@ -54,18 +71,18 @@ html {
   --pm-success: #3a6248;
   --pm-success-soft: #cfe9d6;
   --pm-on-success-soft: #0c2d18;
-  --pm-info: #4a3726;
-  --pm-info-soft: #f7e7d3;
-  --pm-star: #e0870c;
+  --pm-info: var(--pm-orange-800);
+  --pm-info-soft: var(--pm-orange-100);
+  --pm-star: var(--pm-orange-500);
 
   /* Lop phu mo phan anh bi cat bo trong hop sua anh */
   --pm-shade-crop: rgba(44, 29, 16, 0.52);
 
   /* Giay cua quyen so ky niem */
-  --pm-ink: #3a2a18;
-  --pm-paper-cream: #fbf1de;
-  --pm-paper-kraft: #e8d3ae;
-  --pm-paper-mark: rgba(120, 96, 66, 0.22);
+  --pm-ink: #3d2108;
+  --pm-paper-cream: #fff0dc;
+  --pm-paper-kraft: #f6d4a8;
+  --pm-paper-mark: rgba(194, 93, 0, 0.2);
 
   /*
    * Nen chung cua moi trang: giay kem, ke soc doc moi 56px nhu giay dan tuong o
@@ -76,9 +93,9 @@ html {
   --pm-wallpaper:
     repeating-linear-gradient(90deg, transparent 0 56px, var(--pm-wall-line) 56px 57px),
     var(--pm-wall-base);
-  --pm-paper-bloom: #fdeee4;
-  --pm-paper-petal: rgba(214, 150, 105, 0.35);
-  --pm-book-cover: #c4661a;
+  --pm-paper-bloom: #ffeedb;
+  --pm-paper-petal: rgba(251, 139, 31, 0.3);
+  --pm-book-cover: var(--pm-orange-500);
   --pm-book-edge: rgba(60, 40, 25, 0.18);
 
   /* Khung theu trong anh xem truoc thanh pham. La vat that nen giu mau o ca che do toi, tru buc tuong phia sau. */
@@ -108,11 +125,11 @@ html {
   --pm-hoop-shadow: rgba(60, 40, 22, 0.32);
 
   /* Chu va vien */
-  --pm-text: #2c1d10;
-  --pm-text-body: #4a3726;
-  --pm-text-muted: #6b5541;
-  --pm-border: #e8ceab;
-  --pm-border-strong: #a8835a;
+  --pm-text: #34190a;
+  --pm-text-body: #55301a;
+  --pm-text-muted: #7d5233;
+  --pm-border: #f6d6ae;
+  --pm-border-strong: #d79552;
 
   /* Hinh khoi */
   --pm-radius-lg: 16px;
@@ -178,16 +195,16 @@ html {
   --pm-font-display: 'Noto Serif', Georgia, serif;
   /* Chu khong chan, dau net bo tron, cho tieu de trang gioi thieu. */
   --pm-font-rounded: 'Nunito', 'Be Vietnam Pro', 'Segoe UI', sans-serif;
-  --pm-shadow: 0 1px 2px rgba(74, 48, 24, 0.06), 0 10px 28px rgba(74, 48, 24, 0.08);
-  --pm-shadow-lifted: 0 2px 4px rgba(74, 48, 24, 0.07), 0 18px 40px rgba(74, 48, 24, 0.14);
-  --pm-accent-glow: 0 10px 24px rgba(168, 80, 12, 0.28);
+  --pm-shadow: 0 1px 2px rgba(120, 58, 8, 0.06), 0 10px 28px rgba(120, 58, 8, 0.09);
+  --pm-shadow-lifted: 0 2px 4px rgba(120, 58, 8, 0.07), 0 18px 40px rgba(120, 58, 8, 0.15);
+  --pm-accent-glow: 0 10px 24px rgba(251, 139, 31, 0.38);
 
   /* Mang toi: thanh ben noi bo, the hoi tuong, chan trang */
-  --pm-night: #2c1d10;
-  --pm-on-night: #fbf1de;
-  --pm-on-night-muted: #d9c4a6;
-  --pm-night-line: rgba(251, 241, 222, 0.14);
-  --pm-night-hover: rgba(251, 241, 222, 0.08);
+  --pm-night: #2e1606;
+  --pm-on-night: #fff1de;
+  --pm-on-night-muted: #f0cda0;
+  --pm-night-line: rgba(255, 241, 222, 0.16);
+  --pm-night-hover: rgba(255, 241, 222, 0.09);
 
   /* Lop kinh mo cho thanh dinh va the noi */
   --pm-glass: rgba(255, 250, 242, 0.88);
@@ -196,15 +213,15 @@ html {
   --pm-glass-on-accent-line: rgba(255, 255, 255, 0.24);
 
   /* Mau ve hinh minh hoa thu cung, giu nguyen o ca hai che do */
-  --pm-art-fur: #c4661a;
-  --pm-art-cream: #fbf1de;
-  --pm-art-tan: #e8d3ae;
-  --pm-art-dark: #843e08;
-  --pm-art-blush: #f2b48a;
-  --pm-art-eye: #2c1d10;
-  --pm-art-collar: #5b6640;
-  --pm-art-tag: #fb8b1f;
-  --pm-art-shadow: rgba(74, 48, 24, 0.12);
+  --pm-art-fur: var(--pm-orange-500);
+  --pm-art-cream: #fff1de;
+  --pm-art-tan: #f6d4a8;
+  --pm-art-dark: var(--pm-orange-800);
+  --pm-art-blush: var(--pm-orange-300);
+  --pm-art-eye: #34190a;
+  --pm-art-collar: var(--pm-orange-700);
+  --pm-art-tag: var(--pm-orange-500);
+  --pm-art-shadow: rgba(120, 58, 8, 0.12);
   --pm-tape: rgba(251, 139, 31, 0.35);
 }
 
@@ -226,18 +243,18 @@ html {
   --pm-bg-sunken: #382c20;
   --pm-bg-3d: #2a2018;
 
-  --pm-accent: #ffb877;
-  --pm-accent-dark: #ffd2a8;
-  --pm-accent-soft: #4a2d11;
-  --pm-accent-ring: #ffb87740;
-  --pm-on-accent: #4a2100;
+  --pm-accent: var(--pm-orange-500);
+  --pm-accent-dark: var(--pm-orange-300);
+  --pm-accent-soft: #4d2a0b;
+  --pm-accent-ring: #fb8b1f66;
+  --pm-on-accent: #2b1400;
   --pm-memorial: #c3ceaa;
   --pm-memorial-soft: #333c24;
 
-  --pm-amber: #f7bf78;
-  --pm-amber-bright: #fb8b1f;
-  --pm-amber-soft: #4d3306;
-  --pm-on-amber: #ffe2ba;
+  --pm-amber: var(--pm-orange-300);
+  --pm-amber-bright: var(--pm-orange-500);
+  --pm-amber-soft: #4d2c08;
+  --pm-on-amber: #ffe4c6;
 
   --pm-danger: #ffb4ab;
   --pm-danger-soft: #59150f;
@@ -245,9 +262,9 @@ html {
   --pm-success: #a8d4b6;
   --pm-success-soft: #21402c;
   --pm-on-success-soft: #cfe9d6;
-  --pm-info: #d8c6ae;
-  --pm-info-soft: #3a2c1e;
-  --pm-star: #f7bf78;
+  --pm-info: var(--pm-orange-200);
+  --pm-info-soft: #3d2410;
+  --pm-star: var(--pm-orange-400);
 
   --pm-shade-crop: rgba(0, 0, 0, 0.62);
 

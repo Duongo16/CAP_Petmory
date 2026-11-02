@@ -103,7 +103,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
     return (rev?.byKind ?? []).map((one, index) => {
       const amountNum = Number(one.amount);
       const percent = totalAmount > 0 ? Math.round((amountNum / totalAmount) * 100) : 0;
-      const colors = ['#a8500c', '#5b6640', '#fb8b1f', '#8a5406'];
+      const colors = ['#fb8b1f', '#c25d00', '#ffbc73', '#8f4304'];
       return {
         raw: one,
         key: KIND_KEY[one.name] ?? KIND_KEY_OTHER,
@@ -255,11 +255,11 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
           {
             label: this.words.instant('ADMIN.REPORT.DAILY_REVENUE'),
             data: revenueData,
-            borderColor: '#a8500c',
+            borderColor: '#fb8b1f',
             backgroundColor: 'rgba(168, 80, 12, 0.12)',
             fill: true,
             tension: 0.35,
-            pointBackgroundColor: '#a8500c',
+            pointBackgroundColor: '#fb8b1f',
             pointRadius: 4,
             pointHoverRadius: 6,
             yAxisID: 'y',
@@ -385,9 +385,9 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
           {
             label: this.words.instant('ADMIN.REPORT.REVENUE'),
             data,
-            backgroundColor: '#a8500c',
+            backgroundColor: '#fb8b1f',
             borderRadius: 6,
-            hoverBackgroundColor: '#843e08',
+            hoverBackgroundColor: '#c25d00',
           },
         ],
       },
@@ -425,9 +425,9 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
     if (!el) return;
 
     const statusMapColors: Record<string, string> = {
-      PENDING: '#e0870c',
-      PAID: '#8a5406',
-      IN_PRODUCTION: '#a8500c',
+      PENDING: '#ffbc73',
+      PAID: '#c25d00',
+      IN_PRODUCTION: '#fb8b1f',
       SHIPPING: '#fb8b1f',
       COMPLETED: '#3a6248',
       CANCELLED: '#b3261e',
@@ -493,7 +493,7 @@ export class AdminReportsPage implements OnInit, AfterViewInit {
           {
             label: this.words.instant('ADMIN.REPORT.AI_COST'),
             data: costs,
-            backgroundColor: '#a8500c',
+            backgroundColor: '#fb8b1f',
             borderRadius: 6,
             yAxisID: 'y',
           },

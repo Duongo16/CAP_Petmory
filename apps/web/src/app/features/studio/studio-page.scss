@@ -7,7 +7,8 @@
 // Ban lam viec: san khau ben trai, ngan keo ben phai, vua mot man hinh.
 .workbench {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
+  // Ngan keo rong hon (380 -> 400..460px) cho de doc, nhung khong qua 1/3 man hinh.
+  grid-template-columns: minmax(0, 1fr) clamp(400px, 31vw, 460px);
   gap: var(--pm-space-4);
   block-size: var(--bench-height);
   max-inline-size: 1440px;
@@ -27,6 +28,10 @@
     var(--pm-bg-3d);
   box-shadow: var(--pm-shadow), inset 0 0 0 2px var(--pm-paper-mark);
   color: var(--pm-text);
+
+  &.showcase-stage {
+    background: #1e1510; // trung voi mau tuong cua man thanh pham
+  }
 }
 
 .stage-viewer {
@@ -38,11 +43,35 @@
 // Mau "chi dau": san khau chia hai, ben trai nan va to be 3D, ben phai la buc
 // tuong treo thanh pham trong khung theu. Nut va thanh goc nhin don ve nua trai.
 
-.stage.split {
-  --hoop-share: 42%;
+// Chia doi bang transform (khong doi kich thuoc khung 3D) de chuyen dong muot: khung 3D va cac nut
+// tren san khau truot sang trai nua be rong cua ngan treo, ngan treo truot tu mep phai vao.
+.stage {
+  // Don vi cqw tinh theo be rong san khau, dung duoc o moi phan tu con.
+  container-type: inline-size;
+  --hoop-share: 42cqw;
+  --hoop-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
 
+.stage-viewer,
+.stage-tools,
+.angles,
+.bubble,
+.held {
+  translate: 0 0;
+  transition:
+    translate 0.6s var(--hoop-ease),
+    scale 0.6s var(--hoop-ease);
+}
+
+.stage-top {
+  transition: inset-inline-end 0.6s var(--hoop-ease);
+}
+
+.stage.split {
+  // Be 3D nam giua phan ben trai: dich nua be rong ngan treo va thu nho deu cho vua khung, canvas khong doi kich thuoc.
   .stage-viewer {
-    inset-inline-end: var(--hoop-share);
+    translate: calc(var(--hoop-share) / -2) 0;
+    scale: 0.78;
   }
 
   .stage-top {
@@ -50,13 +79,13 @@
   }
 
   .stage-tools {
-    inset-inline-end: calc(var(--hoop-share) + var(--pm-space-5));
+    translate: calc(var(--hoop-share) * -1) 0;
   }
 
   .angles,
   .bubble,
   .held {
-    inset-inline-start: calc((100% - var(--hoop-share)) / 2);
+    translate: calc(var(--hoop-share) / -2) 0;
     max-inline-size: calc(100% - var(--hoop-share) - 2 * var(--pm-space-4));
   }
 }
@@ -75,6 +104,43 @@
   overflow-y: auto;
   background: var(--pm-hoop-wall);
   border-inline-start: 2px dashed var(--pm-paper-mark);
+
+  // Truot vao tu mep phai; chi dung transform va opacity nen chay tren GPU, khong bi khung 3D dang nap lam khung.
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition:
+    transform 0.6s var(--hoop-ease),
+    opacity 0.35s ease;
+
+  &.on {
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  // Noi dung hien dan sau khi ngan treo da truot ra: khung truoc, bo chon khung sau.
+  .hoop,
+  .frame-picker {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+    transition:
+      opacity 0.45s ease,
+      transform 0.55s var(--hoop-ease);
+  }
+
+  &.on .hoop {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.22s;
+  }
+
+  &.on .frame-picker {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.36s;
+  }
 }
 
 .hoop {
@@ -430,64 +496,343 @@
   color: var(--pm-text);
 }
 
-.tabs {
+// Dau ngan keo: "Buoc n / 6" va nut Huong dan luon nam o day.
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pm-space-3);
+  padding: var(--pm-space-3) var(--pm-space-4) 0;
+  background: var(--pm-paper-cream);
+}
+
+.step-of {
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  color: var(--pm-accent-dark);
+}
+
+.guide-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 36px;
+  padding: 0 14px;
+  border: 1.5px solid var(--pm-accent);
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-card);
+  color: var(--pm-accent-dark);
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+
+  &:hover {
+    background: var(--pm-accent-soft);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pm-accent-ring);
+    outline-offset: 2px;
+  }
+}
+
+// Thanh buoc: mot hang, danh so, noi nhau bang duong ke; chi buoc dang mo hien nhan tren man hep.
+.stepper {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  padding: 10px;
+  grid-template-columns: repeat(5, 1fr);
+  padding: var(--pm-space-3) var(--pm-space-2) var(--pm-space-3);
   background: var(--pm-paper-cream);
   border-block-end: 2px dashed var(--pm-paper-mark);
 }
 
 .tab {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px 2px 6px;
+  gap: 6px;
+  min-inline-size: 0;
+  padding: 0 2px;
   border: 0;
-  border-radius: 16px;
   background: transparent;
   color: var(--pm-text-muted);
   font-size: var(--pm-text-xs);
   font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
   cursor: pointer;
-  transition: background-color 0.18s ease, color 0.18s ease;
 
-  &:hover {
-    background: var(--pm-glass-card);
+  // Duong ke noi voi buoc ke truoc
+  &:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 15px;
+    inset-inline: calc(-50% + 17px) calc(50% + 17px);
+    block-size: 2px;
+    background: var(--pm-border);
+  }
+
+  &.done:not(:first-child)::before,
+  &.on:not(:first-child)::before {
+    background: var(--pm-success);
   }
 
   &.on {
-    background: var(--pm-bg-card);
     color: var(--pm-text);
-    box-shadow: var(--pm-shadow);
   }
 
   &:focus-visible {
     outline: 2px solid var(--pm-accent-ring);
+    outline-offset: 2px;
+    border-radius: 12px;
   }
 }
 
-.tab-paw {
+.tab-num {
+  position: relative;
   display: grid;
   place-items: center;
   inline-size: 32px;
   block-size: 32px;
-  border-radius: 50% 50% 46% 46%;
-  background: var(--pm-bg-muted);
-  transition: transform 0.2s ease;
+  border: 2px solid var(--pm-border);
+  border-radius: 50%;
+  background: var(--pm-bg-card);
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+
+  .tab:hover & {
+    border-color: var(--pm-accent);
+  }
 
   .tab.on & {
+    border-color: var(--pm-accent);
     background: var(--pm-accent);
     color: var(--pm-on-accent);
-    transform: scale(1.08) rotate(-6deg);
+    transform: scale(1.12);
+    box-shadow: 0 0 0 4px var(--pm-accent-soft);
   }
 
   .tab.done & {
+    border-color: var(--pm-success);
     background: var(--pm-success-soft);
     color: var(--pm-success);
   }
+
+  // Cham cam: buoc bat buoc nhung chua lam xong
+  .tab.todo &::after {
+    content: '';
+    position: absolute;
+    inset-block-start: -3px;
+    inset-inline-end: -3px;
+    inline-size: 10px;
+    block-size: 10px;
+    border: 2px solid var(--pm-paper-cream);
+    border-radius: 50%;
+    background: var(--pm-danger);
+  }
+}
+
+.tab-label {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+
+// Moi muc gap duoc trong buoc Phu kien/De/Khac chu: tieu de bam duoc de dong mo.
+.folds {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-3);
+}
+
+.fold-frame {
+  order: 0;
+}
+
+.fold-base {
+  order: 1;
+}
+
+.fold-engrave {
+  order: 2;
+}
+
+.picker-row.left {
+  justify-content: flex-start;
+}
+
+.fold {
+  border: 1.5px solid var(--pm-border);
+  border-radius: 18px;
+  background: var(--pm-bg-card);
+
+  > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pm-space-2);
+    min-block-size: 48px;
+    padding: 0 var(--pm-space-4);
+    border-radius: 18px;
+    font-size: var(--pm-text-sm);
+    font-weight: 700;
+    color: var(--pm-text);
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    // Mui ten chi mo/dong
+    &::after {
+      content: '';
+      flex: none;
+      inline-size: 8px;
+      block-size: 8px;
+      margin-inline-start: auto;
+      border-inline-end: 2px solid var(--pm-text-muted);
+      border-block-end: 2px solid var(--pm-text-muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--pm-accent-ring);
+      outline-offset: -2px;
+    }
+  }
+
+  &[open] > summary::after {
+    transform: rotate(-135deg);
+  }
+
+  &[open] > summary {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  // Noi dung nam trong the, cach tieu de mot chut.
+  > :not(summary) {
+    margin-inline: var(--pm-space-4);
+  }
+
+  > :last-child {
+    margin-block-end: var(--pm-space-4);
+  }
+}
+
+// Nut cong cu tren san khau: bieu tuong kem nhan chu, de biet nut lam gi.
+.tool {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 44px;
+  padding: 0 14px 0 6px;
+  border: 0;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  box-shadow: var(--pm-shadow);
+  font-size: var(--pm-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  &.on {
+    background: var(--pm-accent-soft);
+    color: var(--pm-accent-dark);
+  }
+
+  &.camera {
+    background: var(--pm-accent);
+    color: var(--pm-on-accent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pm-accent-ring);
+    outline-offset: 2px;
+  }
+}
+
+.tool-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+// Tieu de va huong dan cua tung buoc, dung chung cho moi buoc.
+.panel-head {
+  margin-block-end: var(--pm-space-4);
+}
+
+.panel-help {
+  margin: 0;
+  font-size: var(--pm-text-sm);
+  line-height: 1.5;
+  color: var(--pm-text-muted);
+}
+
+.chip-sub {
+  margin-inline-start: 6px;
+  font-weight: 500;
+  color: var(--pm-text-muted);
+}
+
+.match-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+  font-size: var(--pm-text-md);
+  font-weight: 700;
+  color: var(--pm-accent-dark);
+}
+
+// Gia tam tinh hien o chan ngan keo tu buoc dau.
+.foot-price {
+  display: flex;
+  flex-basis: 100%;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 0;
+}
+
+.foot-price-label {
+  font-size: var(--pm-text-xs);
+  color: var(--pm-text-muted);
+}
+
+.foot-price-value {
+  font-size: var(--pm-text-lg);
+  color: var(--pm-accent-dark);
+}
+
+.foot-price-days {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: auto;
+  font-size: var(--pm-text-xs);
+  color: var(--pm-text-muted);
 }
 
 .panel {
@@ -928,7 +1273,7 @@ ul {
 
 .photos {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 4px;
 }
 
@@ -1109,7 +1454,16 @@ ul {
   .model,
   .yarn-ball,
   .tab-paw,
-  .tone {
+  .tone,
+  .stage-viewer,
+  .stage-tools,
+  .stage-top,
+  .angles,
+  .bubble,
+  .held,
+  .hoop-wall,
+  .hoop-wall .hoop,
+  .hoop-wall .frame-picker {
     transition: none;
   }
 }
@@ -1121,13 +1475,80 @@ ul {
   }
 
   .workbench {
-    grid-template-columns: 1fr;
-    grid-template-rows: 46vh auto;
+    // minmax(0, ...) de hang mau luot ngang khong keo gian ca cot ra ngoai man hinh.
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 34vh auto;
     block-size: auto;
+    align-items: start;
   }
 
+  // San khau dinh o dau man hinh: be 3D luon nhin thay khi chon mau/phu kien o ngan keo ben duoi.
   .stage {
+    position: sticky;
+    // Nam ngay duoi thanh dau trang cua he thong (cao khoang 66px), khong bi no de len.
+    inset-block-start: 72px;
+    z-index: 5;
+    block-size: 34vh;
+    min-block-size: 230px;
     border-radius: 22px;
+  }
+
+  // Chan ngan keo gon lai de con cho cho noi dung: gia nam cung hang voi nut.
+  .drawer-foot {
+    padding: var(--pm-space-2) var(--pm-space-3);
+  }
+
+  .foot-price {
+    flex-basis: 100%;
+    justify-content: space-between;
+  }
+
+  .foot-price-value {
+    font-size: var(--pm-text-md);
+  }
+
+  .foot-price-days {
+    margin-inline-start: 0;
+  }
+
+  // Tren dien thoai chi giu bieu tuong cho nut cong cu, nhan chu da co trong huong dan.
+  .tool {
+    padding: 0 6px;
+  }
+
+  .tool-label {
+    display: none;
+  }
+
+  // Thanh buoc: chi buoc dang mo hien nhan chu cho khoi chen chuc.
+  .tab:not(.on) .tab-label {
+    display: none;
+  }
+
+  .tab.on .tab-label {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-start: 50%;
+    translate: -50% 4px;
+    white-space: nowrap;
+    padding-block-start: 0;
+  }
+
+  .stepper {
+    padding-block-end: calc(var(--pm-space-3) + 18px);
+  }
+
+  // Nut Tiep/Quay lai luon nam san tren thanh dieu huong duoi cua trang.
+  .drawer {
+    overflow: clip;
+  }
+
+  .drawer-foot {
+    position: sticky;
+    inset-block-end: 84px;
+    z-index: 4;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.08);
   }
 
   .title {
@@ -1190,27 +1611,35 @@ ul {
   // Man hep khong du cho chia hai: be 3D chiem ca san khau, khung theu thu
   // nho thanh o anh o goc duoi ben phai, tren thanh goc nhin.
   .stage.split {
-    .stage-viewer {
-      inset-inline-end: 0;
+    .stage-viewer,
+    .stage-tools,
+    .angles,
+    .bubble,
+    .held {
+      translate: 0 0;
+      scale: 1;
     }
 
     .stage-top {
       inset-inline-end: 72px;
     }
 
-    .stage-tools {
-      inset-inline-end: var(--pm-space-3);
-    }
-
     .angles,
     .bubble,
     .held {
-      inset-inline-start: 50%;
       max-inline-size: calc(100% - 2 * var(--pm-space-4));
     }
   }
 
   .hoop-wall {
+    // Man hep: o anh nho noi len tu goc duoi thay vi truot tu mep phai.
+    transform: translateY(18px) scale(0.9);
+    transform-origin: 100% 100%;
+
+    &.on {
+      transform: none;
+    }
+
     inset-block: auto 64px;
     inset-inline-end: var(--pm-space-3);
     inline-size: 116px;
@@ -1375,14 +1804,18 @@ ul {
   flex-direction: column;
   align-items: stretch;
   gap: var(--pm-space-2);
-  // Nam duoi danh sach mau: chon mau truoc, goi y tu anh la phan khong bat buoc.
-  margin-block: var(--pm-space-4) var(--pm-space-3);
+  // Nam dau buoc chon mau nhu mot duong tat gon: co anh be thi dung, khong thi chon tay ngay ben duoi.
+  margin-block: 0 var(--pm-space-4);
   padding: var(--pm-space-3);
   border: 2px dashed var(--pm-paper-mark);
   border-radius: 14px;
+  background: var(--pm-paper-cream);
 
   .hint {
     margin: 0;
+    font-size: var(--pm-text-sm);
+    line-height: 1.45;
+    color: var(--pm-text-muted);
   }
 
   button {
@@ -1483,6 +1916,17 @@ ul {
     flex: 1 1 140px;
     min-inline-size: 0;
   }
+
+  button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+.panel .hint {
+  font-size: var(--pm-text-sm);
+  line-height: 1.5;
+  color: var(--pm-text-muted);
 }
 
 .match-hint {
@@ -1493,4 +1937,158 @@ ul {
 
 .match-notes {
   font-style: italic;
+}
+
+// ---------- San khau thanh pham thuc te ----------
+
+.stage-showcase-view {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+// The thong tin don cho tac pham len choc thuc te
+.showcase-single-card {
+  display: flex;
+  gap: var(--pm-space-3);
+  padding: var(--pm-space-3);
+  border-radius: var(--pm-radius-md, 12px);
+  background: var(--pm-bg-card);
+  border: 1px solid var(--pm-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-block: var(--pm-space-3);
+  align-items: center;
+
+  .single-card-thumb {
+    inline-size: 76px;
+    block-size: 96px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f3f4f6;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+
+    img {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  .single-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .single-card-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--pm-accent-dark);
+      letter-spacing: 0.02em;
+    }
+
+    .single-card-name {
+      margin: 0;
+      font-size: var(--pm-text-sm, 0.88rem);
+      font-weight: 700;
+      color: var(--pm-text);
+      line-height: 1.3;
+    }
+
+    .single-card-desc {
+      margin: 0;
+      font-size: var(--pm-text-xs, 0.75rem);
+      color: var(--pm-text-muted);
+      line-height: 1.4;
+    }
+  }
+}
+
+.showcase-cta {
+  margin-top: var(--pm-space-4);
+
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-block: 12px;
+    font-weight: 700;
+  }
+}
+
+// Bang thong so che tac thu cong
+.craft-specs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-space-2);
+  margin-block: var(--pm-space-2);
+}
+
+.craft-spec-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pm-space-3);
+  padding: 10px 12px;
+  border-radius: var(--pm-radius-md, 10px);
+  background: var(--pm-bg-card);
+  border: 1px solid var(--pm-border);
+
+  .spec-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .spec-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: var(--pm-text-sm, 0.82rem);
+      color: var(--pm-text);
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      font-size: var(--pm-text-xs, 0.75rem);
+      color: var(--pm-text-muted);
+      line-height: 1.4;
+    }
+  }
+}
+
+// The ky niem ca nhan hoa
+.showcase-personal-card {
+  margin-top: var(--pm-space-3);
+  padding: 12px 14px;
+  border-radius: var(--pm-radius-md, 10px);
+  background: linear-gradient(135deg, var(--pm-orange-100) 0%, var(--pm-orange-50) 100%);
+  border: 1px solid var(--pm-orange-300);
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--pm-orange-800);
+    font-weight: 700;
+    font-size: var(--pm-text-sm, 0.82rem);
+    margin-bottom: 6px;
+  }
+
+  .card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: var(--pm-text-xs, 0.78rem);
+    color: var(--pm-orange-900);
+
+    p {
+      margin: 0;
+    }
+  }
 }

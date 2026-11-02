@@ -2,7 +2,7 @@
   <header class="lp-bar">
     <div class="lp-bar-inner">
       <a class="lp-brand" routerLink="/landing">
-        <pm-brand size="md" />
+        <pm-brand size="lg" />
       </a>
       <nav class="lp-nav" [attr.aria-label]="'NAV.MAIN' | translate">
         <button type="button" (click)="openAuthPrompt()">{{ 'LANDING.NAV_DIARY' | translate }}</button>
@@ -264,7 +264,6 @@
       <div class="lp-footer-top">
         <div class="lp-footer-brand">
           <pm-brand size="md" />
-          <span>{{ 'LANDING.FOOTER_SLOGAN' | translate }}</span>
         </div>
         <nav class="lp-footer-nav" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
           <a routerLink="/diaries">{{ 'LANDING.NAV_PUBLIC' | translate }}</a>

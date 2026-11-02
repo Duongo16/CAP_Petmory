@@ -149,256 +149,64 @@
   ],
   "baseModel": [
     {
-      "code": "BASE-DOG-STAND",
-      "name": "Cún đứng",
+      "code": "HEAD-DOG-SHIBA",
+      "name": "Đầu chó Shiba",
       "kind": "DOG",
-      "pose": "STANDING",
-      "file": "base-dog-standing.glb",
-      "fileFull": "base-dog-standing-full.glb",
+      "pose": "HEAD",
+      "file": "head-dog-shiba.glb",
+      "fileFull": "head-dog-shiba-full.glb",
       "ready": true,
-      "core": true,
-      "styleGroup": "BLOCKY",
       "rotateY": 0,
       "anchors": [
         "PM_ANCHOR_HEAD",
         "PM_ANCHOR_FACE",
-        "PM_ANCHOR_NECK",
-        "PM_ANCHOR_BACK"
+        "PM_ANCHOR_NECK"
       ]
     },
     {
-      "code": "BASE-DOG-SIT",
-      "name": "Cún ngồi",
+      "code": "HEAD-DOG-CORGI",
+      "name": "Đầu chó Corgi",
       "kind": "DOG",
-      "pose": "SITTING",
-      "file": "base-dog-sitting.glb",
-      "fileFull": "base-dog-sitting-full.glb",
+      "pose": "HEAD",
+      "file": "head-dog-corgi.glb",
+      "fileFull": "head-dog-corgi-full.glb",
       "ready": true,
-      "core": true,
-      "styleGroup": "BLOCKY",
       "rotateY": 0,
       "anchors": [
         "PM_ANCHOR_HEAD",
         "PM_ANCHOR_FACE",
-        "PM_ANCHOR_NECK",
-        "PM_ANCHOR_BACK"
+        "PM_ANCHOR_NECK"
       ]
     },
     {
-      "code": "BASE-CAT-SIT",
-      "name": "Mèo ngồi",
-      "kind": "CAT",
-      "pose": "SITTING",
-      "file": "base-cat-sitting.glb",
-      "fileFull": "base-cat-sitting-full.glb",
+      "code": "HEAD-DOG-POODLE",
+      "name": "Đầu chó Poodle",
+      "kind": "DOG",
+      "pose": "HEAD",
+      "file": "head-dog-poodle.glb",
+      "fileFull": "head-dog-poodle-full.glb",
       "ready": true,
-      "core": true,
-      "styleGroup": "BLOCKY",
       "rotateY": 0,
       "anchors": [
         "PM_ANCHOR_HEAD",
         "PM_ANCHOR_FACE",
-        "PM_ANCHOR_NECK",
-        "PM_ANCHOR_BACK"
+        "PM_ANCHOR_NECK"
       ]
     },
     {
-      "code": "BASE-CAT-LIE",
-      "name": "Mèo nằm",
-      "kind": "CAT",
-      "pose": "LYING",
-      "file": "base-cat-lying.glb",
-      "fileFull": "base-cat-lying-full.glb",
+      "code": "HEAD-DOG-PUG",
+      "name": "Đầu chó Pug",
+      "kind": "DOG",
+      "pose": "HEAD",
+      "file": "head-dog-pug.glb",
+      "fileFull": "head-dog-pug-full.glb",
       "ready": true,
-      "core": true,
-      "styleGroup": "BLOCKY",
       "rotateY": 0,
       "anchors": [
         "PM_ANCHOR_HEAD",
         "PM_ANCHOR_FACE",
-        "PM_ANCHOR_NECK",
-        "PM_ANCHOR_BACK"
+        "PM_ANCHOR_NECK"
       ]
-    },
-    {
-      "code": "DOG-GOLDEN",
-      "name": "Cún lông vàng",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "dog-golden-puppy.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "Poly by Google",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/3nFLBC3aXen"
-      }
-    },
-    {
-      "code": "DOG-POODLE",
-      "name": "Poodle",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "dog-poodle.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "Poly by Google",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/eQmBaLcGbbE"
-      }
-    },
-    {
-      "code": "DOG-BEAGLE",
-      "name": "Beagle",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "dog-beagle.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "Poly by Google",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/0BnDT3T1wTE"
-      }
-    },
-    {
-      "code": "DOG-CORGI",
-      "name": "Corgi",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "dog-corgi.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "madtrollstudio",
-        "licence": "CC-BY 3.0",
-        "source": "https://poly.pizza/m/2neHxHTY3t"
-      }
-    },
-    {
-      "code": "Q-PUG",
-      "name": "Pug",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-Pug.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "Quaternius",
-        "licence": "CC0 1.0",
-        "source": "https://poly.pizza/m/1gXKv15ik8"
-      }
-    },
-    {
-      "code": "Q-SHIBA",
-      "name": "Shiba Inu",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-ShibaInu.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "Quaternius",
-        "licence": "CC0 1.0",
-        "source": "https://poly.pizza/m/y4wdQpg767"
-      }
-    },
-    {
-      "code": "Q-HUSKY",
-      "name": "Husky",
-      "kind": "DOG",
-      "pose": "STANDING",
-      "file": "q-Husky.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "Quaternius",
-        "licence": "CC0 1.0",
-        "source": "https://poly.pizza/m/wcWiuEqwzq"
-      }
-    },
-    {
-      "code": "Q-FOX",
-      "name": "Cáo nhỏ",
-      "kind": "OTHER",
-      "pose": "STANDING",
-      "file": "q-Fox.glb",
-      "ready": true,
-      "styleGroup": "REALISTIC",
-      "rotateY": 0,
-      "credit": {
-        "author": "Quaternius",
-        "licence": "CC0 1.0",
-        "source": "https://quaternius.com/packs/ultimateanimatedanimals.html"
-      }
-    },
-    {
-      "code": "TEMP-BUNNY",
-      "name": "Thỏ",
-      "kind": "OTHER",
-      "pose": "STANDING",
-      "file": "animal-bunny.glb",
-      "ready": true,
-      "styleGroup": "BLOCKY",
-      "rotateY": 0,
-      "credit": {
-        "author": "Kenney",
-        "licence": "CC0 1.0",
-        "source": "https://kenney.nl/assets/cube-pets"
-      }
-    },
-    {
-      "code": "TEMP-PANDA",
-      "name": "Gấu trúc",
-      "kind": "OTHER",
-      "pose": "STANDING",
-      "file": "animal-panda.glb",
-      "ready": true,
-      "styleGroup": "BLOCKY",
-      "rotateY": 0,
-      "credit": {
-        "author": "Kenney",
-        "licence": "CC0 1.0",
-        "source": "https://kenney.nl/assets/cube-pets"
-      }
-    },
-    {
-      "code": "TEMP-PARROT",
-      "name": "Vẹt",
-      "kind": "BIRD",
-      "pose": "STANDING",
-      "file": "animal-parrot.glb",
-      "ready": true,
-      "styleGroup": "BLOCKY",
-      "rotateY": 0,
-      "credit": {
-        "author": "Kenney",
-        "licence": "CC0 1.0",
-        "source": "https://kenney.nl/assets/cube-pets"
-      }
-    },
-    {
-      "code": "TEMP-FISH",
-      "name": "Cá",
-      "kind": "OTHER",
-      "pose": "STANDING",
-      "file": "animal-fish.glb",
-      "ready": true,
-      "styleGroup": "BLOCKY",
-      "rotateY": 0,
-      "credit": {
-        "author": "Kenney",
-        "licence": "CC0 1.0",
-        "source": "https://kenney.nl/assets/cube-pets"
-      }
     },
     {
       "code": "HEAD-CAT-EXOTIC",
@@ -431,21 +239,6 @@
       ]
     },
     {
-      "code": "HEAD-CAT-SIAMESE",
-      "name": "Đầu mèo Xiêm",
-      "kind": "CAT",
-      "pose": "HEAD",
-      "file": "head-cat-siamese.glb",
-      "fileFull": "head-cat-siamese-full.glb",
-      "ready": true,
-      "rotateY": 0,
-      "anchors": [
-        "PM_ANCHOR_HEAD",
-        "PM_ANCHOR_FACE",
-        "PM_ANCHOR_NECK"
-      ]
-    },
-    {
       "code": "HEAD-CAT-TABBY",
       "name": "Đầu mèo mướp vàng",
       "kind": "CAT",
@@ -461,12 +254,12 @@
       ]
     },
     {
-      "code": "HEAD-DOG-SHIBA",
-      "name": "Đầu chó Shiba",
-      "kind": "DOG",
+      "code": "HEAD-CAT-SIAMESE",
+      "name": "Đầu mèo Xiêm",
+      "kind": "CAT",
       "pose": "HEAD",
-      "file": "head-dog-shiba.glb",
-      "fileFull": "head-dog-shiba-full.glb",
+      "file": "head-cat-siamese.glb",
+      "fileFull": "head-cat-siamese-full.glb",
       "ready": true,
       "rotateY": 0,
       "anchors": [
@@ -476,49 +269,268 @@
       ]
     },
     {
-      "code": "HEAD-DOG-CORGI",
-      "name": "Đầu chó Corgi",
-      "kind": "DOG",
-      "pose": "HEAD",
-      "file": "head-dog-corgi.glb",
-      "fileFull": "head-dog-corgi-full.glb",
+      "code": "TEMP-BUNNY",
+      "name": "Thỏ",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "animal-bunny.glb",
       "ready": true,
+      "styleGroup": "BLOCKY",
       "rotateY": 0,
-      "anchors": [
-        "PM_ANCHOR_HEAD",
-        "PM_ANCHOR_FACE",
-        "PM_ANCHOR_NECK"
-      ]
+      "credit": {
+        "author": "Kenney",
+        "licence": "CC0 1.0",
+        "source": "https://kenney.nl/assets/cube-pets"
+      }
     },
     {
-      "code": "HEAD-DOG-PUG",
-      "name": "Đầu chó Pug",
-      "kind": "DOG",
-      "pose": "HEAD",
-      "file": "head-dog-pug.glb",
-      "fileFull": "head-dog-pug-full.glb",
+      "code": "TEMP-PANDA",
+      "name": "Gấu trúc",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "animal-panda.glb",
       "ready": true,
+      "styleGroup": "BLOCKY",
       "rotateY": 0,
-      "anchors": [
-        "PM_ANCHOR_HEAD",
-        "PM_ANCHOR_FACE",
-        "PM_ANCHOR_NECK"
-      ]
+      "credit": {
+        "author": "Kenney",
+        "licence": "CC0 1.0",
+        "source": "https://kenney.nl/assets/cube-pets"
+      }
     },
     {
-      "code": "HEAD-DOG-POODLE",
-      "name": "Đầu chó Poodle",
-      "kind": "DOG",
-      "pose": "HEAD",
-      "file": "head-dog-poodle.glb",
-      "fileFull": "head-dog-poodle-full.glb",
+      "code": "TEMP-FISH",
+      "name": "Cá",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "animal-fish.glb",
       "ready": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "credit": {
+        "author": "Kenney",
+        "licence": "CC0 1.0",
+        "source": "https://kenney.nl/assets/cube-pets"
+      }
+    },
+    {
+      "code": "TEMP-PARROT",
+      "name": "Vẹt",
+      "kind": "BIRD",
+      "pose": "STANDING",
+      "file": "animal-parrot.glb",
+      "ready": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "credit": {
+        "author": "Kenney",
+        "licence": "CC0 1.0",
+        "source": "https://kenney.nl/assets/cube-pets"
+      }
+    },
+    {
+      "code": "BASE-DOG-STAND",
+      "name": "Cún đứng",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "base-dog-standing.glb",
+      "fileFull": "base-dog-standing-full.glb",
+      "ready": false,
+      "core": true,
+      "styleGroup": "BLOCKY",
       "rotateY": 0,
       "anchors": [
         "PM_ANCHOR_HEAD",
         "PM_ANCHOR_FACE",
-        "PM_ANCHOR_NECK"
-      ]
+        "PM_ANCHOR_NECK",
+        "PM_ANCHOR_BACK"
+      ],
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "BASE-DOG-SIT",
+      "name": "Cún ngồi",
+      "kind": "DOG",
+      "pose": "SITTING",
+      "file": "base-dog-sitting.glb",
+      "fileFull": "base-dog-sitting-full.glb",
+      "ready": false,
+      "core": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK",
+        "PM_ANCHOR_BACK"
+      ],
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "BASE-CAT-SIT",
+      "name": "Mèo ngồi",
+      "kind": "CAT",
+      "pose": "SITTING",
+      "file": "base-cat-sitting.glb",
+      "fileFull": "base-cat-sitting-full.glb",
+      "ready": false,
+      "core": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK",
+        "PM_ANCHOR_BACK"
+      ],
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "BASE-CAT-LIE",
+      "name": "Mèo nằm",
+      "kind": "CAT",
+      "pose": "LYING",
+      "file": "base-cat-lying.glb",
+      "fileFull": "base-cat-lying-full.glb",
+      "ready": false,
+      "core": true,
+      "styleGroup": "BLOCKY",
+      "rotateY": 0,
+      "anchors": [
+        "PM_ANCHOR_HEAD",
+        "PM_ANCHOR_FACE",
+        "PM_ANCHOR_NECK",
+        "PM_ANCHOR_BACK"
+      ],
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "DOG-GOLDEN",
+      "name": "Cún lông vàng",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-golden-puppy.glb",
+      "ready": false,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Poly by Google",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/3nFLBC3aXen"
+      },
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "DOG-POODLE",
+      "name": "Poodle",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-poodle.glb",
+      "ready": false,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Poly by Google",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/eQmBaLcGbbE"
+      },
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "DOG-BEAGLE",
+      "name": "Beagle",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-beagle.glb",
+      "ready": false,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Poly by Google",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/0BnDT3T1wTE"
+      },
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "DOG-CORGI",
+      "name": "Corgi",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "dog-corgi.glb",
+      "ready": false,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "madtrollstudio",
+        "licence": "CC-BY 3.0",
+        "source": "https://poly.pizza/m/2neHxHTY3t"
+      },
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "Q-PUG",
+      "name": "Pug",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-Pug.glb",
+      "ready": false,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Quaternius",
+        "licence": "CC0 1.0",
+        "source": "https://poly.pizza/m/1gXKv15ik8"
+      },
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "Q-SHIBA",
+      "name": "Shiba Inu",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-ShibaInu.glb",
+      "ready": false,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Quaternius",
+        "licence": "CC0 1.0",
+        "source": "https://poly.pizza/m/y4wdQpg767"
+      },
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "Q-HUSKY",
+      "name": "Husky",
+      "kind": "DOG",
+      "pose": "STANDING",
+      "file": "q-Husky.glb",
+      "ready": false,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Quaternius",
+        "licence": "CC0 1.0",
+        "source": "https://poly.pizza/m/wcWiuEqwzq"
+      },
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
+    },
+    {
+      "code": "Q-FOX",
+      "name": "Cáo nhỏ",
+      "kind": "OTHER",
+      "pose": "STANDING",
+      "file": "q-Fox.glb",
+      "ready": false,
+      "styleGroup": "REALISTIC",
+      "rotateY": 0,
+      "credit": {
+        "author": "Quaternius",
+        "licence": "CC0 1.0",
+        "source": "https://quaternius.com/packs/ultimateanimatedanimals.html"
+      },
+      "hiddenReason": "Dang khoi hoac goc canh, khong gan gui: an khoi danh sach chon (van mo duoc ban nhap cu)."
     }
   ],
   "source": {
