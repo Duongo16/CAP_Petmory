@@ -7,20 +7,23 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import { MemoriesService } from '../../core/services/memories.service';
+import { AuthService } from '../../core/services/auth.service';
+import { FooterLink, SiteFooter } from '../../shared/site-footer/site-footer';
 import { DiaryBook, MusicTrack } from '../../core/models/api.model';
-import { topicKey, topicTone } from '../../shared/memory-topics';
+import { groupByMonth } from '../memories/memories-facade';
+import { JourneyMap } from '../memories/journey-map/journey-map';
 import { SlideSetting, Slideshow, SlideEffect } from '../memories/slideshow/slideshow';
 import { DiaryBookView } from '../memories/book/diary-book';
 import { DiaryMusicPlayer } from '../memories/diary-music/diary-music';
 import { PageFace } from '../memories/book/page-face';
 import { PaperKind } from '../../shared/diary-art';
 import { Icon } from '../../shared/icon/icon';
+import { GuestHeader } from '../../shared/guest-header/guest-header';
 
 type ScreenState = 'LOADING' | 'MISSING' | 'ERROR' | 'DONE';
 
@@ -36,7 +39,7 @@ const PLAIN_SETTING: SlideSetting = { trackCode: '', effect: 'FADE', seconds: 5 
 @Component({
   selector: 'pm-diary-book-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon],
+  imports: [RouterLink, TranslatePipe, Slideshow, DiaryBookView, DiaryMusicPlayer, Icon, GuestHeader, JourneyMap, SiteFooter],
   templateUrl: './diary-book-page.html',
   styleUrl: './diary-book-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +47,15 @@ const PLAIN_SETTING: SlideSetting = { trackCode: '', effect: 'FADE', seconds: 5 
 export class DiaryBookPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(MemoriesService);
+  /** Da dang nhap thi trang nam trong khung chung, nen khong ve dau trang cua khach. */
+  readonly signedIn = inject(AuthService).isSignedIn;
+  /** Chan trang cho khach chua dang nhap: chi cac duong mo cho khach. */
+  readonly guestFooterMenu: FooterLink[] = [
+    { path: '/shop', key: 'NAV.SHOP' },
+    { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' },
+    { path: '/login', key: 'AUTH.SIGN_IN' },
+    { path: '/register', key: 'LANDING.START_FREE' },
+  ];
   private readonly destroyRef = inject(DestroyRef);
 
   readonly status = signal<ScreenState>('LOADING');
@@ -85,15 +97,8 @@ export class DiaryBookPage implements OnInit {
     };
   });
 
-  /** Mot the khoanh khac, kem ten chu de va mau cua no. */
-  readonly cards = computed(() =>
-    this.moments().map((one) => ({
-      raw: one,
-      topicKey: topicKey(one.topic),
-      topicTone: topicTone(one.topic),
-      shots: one.photo.filter((id) => this.sourceOf()[id]),
-    })),
-  );
+  /** Cac khoanh khac gom theo thang, ve thanh ban do hanh trinh nhu nhat ky cua chu. */
+  readonly months = computed(() => groupByMonth(this.moments(), this.sourceOf()));
 
   ngOnInit(): void {
     this.load();

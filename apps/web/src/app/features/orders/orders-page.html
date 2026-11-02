@@ -184,14 +184,10 @@
           <section class="tw-card flex flex-col gap-2 p-6">
             <h2 class="m-0 font-serif text-lg font-medium text-ink">{{ 'ORDER.HELP_TITLE' | translate }}</h2>
             <p class="m-0 mb-1 text-xs leading-[1.6] text-ink-muted">{{ 'ORDER.HELP_TEXT' | translate }}</p>
-            <a class="flex items-center gap-3 min-h-11 px-4 rounded-md bg-muted text-body text-sm font-medium no-underline hover:bg-accent-soft transition-colors duration-150" routerLink="/community">
+            <button type="button" class="flex items-center gap-3 min-h-11 px-4 border-0 rounded-md bg-muted text-body text-sm font-medium font-[inherit] text-left cursor-pointer hover:bg-accent-soft transition-colors duration-150" (click)="goToContact()">
               <span class="text-accent"><pm-icon name="comment" [size]="15" /></span>
-              {{ 'ORDER.HELP_COMMUNITY' | translate }}
-            </a>
-            <a class="flex items-center gap-3 min-h-11 px-4 rounded-md bg-muted text-body text-sm font-medium no-underline hover:bg-accent-soft transition-colors duration-150" routerLink="/restore">
-              <span class="text-accent"><pm-icon name="image" [size]="15" /></span>
-              {{ 'ORDER.HELP_RESTORE' | translate }}
-            </a>
+              {{ 'ORDER.HELP_CONTACT' | translate }}
+            </button>
           </section>
         </aside>
       </div>

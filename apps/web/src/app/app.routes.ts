@@ -50,6 +50,33 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/reset-password').then((m) => m.ResetPasswordPage),
   },
   /*
+   * Nguoi da dang nhap doc nhat ky cong khai ngay trong khung chung cua trang
+   * (dau trang co tai khoan, chan trang, tro ly), khong roi ve dau trang cua
+   * khach. Khach chua dang nhap khong khop nhom nay va roi xuong ba duong ben duoi.
+   */
+  {
+    path: '',
+    canMatch: [() => inject(AuthService).isSignedIn()],
+    loadComponent: () => import('./layout/shell').then((m) => m.Shell),
+    children: [
+      {
+        path: 'diaries',
+        loadComponent: () =>
+          import('./features/public-diary/diary-list-page').then((m) => m.DiaryListPage),
+      },
+      {
+        path: 'diaries/:petId',
+        loadComponent: () =>
+          import('./features/public-diary/diary-book-page').then((m) => m.DiaryBookPage),
+      },
+      {
+        path: 'd/:code',
+        loadComponent: () =>
+          import('./features/public-diary/diary-book-page').then((m) => m.DiaryBookPage),
+      },
+    ],
+  },
+  /*
    * Ba duong duoi day nam ngoai lop kiem dang nhap, vi mot quyen nhat ky da
    * de cong khai thi phai doc duoc that su, ke ca khi nguoi doc chua tung co
    * tai khoan o day.
@@ -68,6 +95,24 @@ export const routes: Routes = [
     path: 'd/:code',
     loadComponent: () =>
       import('./features/public-diary/diary-book-page').then((m) => m.DiaryBookPage),
+  },
+  {
+    path: 'shop',
+    canActivate: [customerOnlyGuard],
+    loadComponent: () => import('./features/shop/shop-page').then((m) => m.ShopPage),
+  },
+  { path: 'products', pathMatch: 'full', redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom' } }) },
+  { path: 'goods', pathMatch: 'full', redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready' } }) },
+  { path: 'products/:code', redirectTo: ({ params }) => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom', product: params['code'] } }) },
+  { path: 'goods/:code', redirectTo: ({ params }) => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready', goods: params['code'] } }) },
+  {
+    path: 'ar',
+    loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
+  },
+  {
+    path: 'ar-pet',
+    pathMatch: 'full',
+    redirectTo: 'ar',
   },
   {
     path: '',
@@ -97,32 +142,6 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () =>
           import('./features/community/profile-page').then((m) => m.CommunityProfilePage),
-      },
-      {
-        path: 'shop',
-        canActivate: [customerOnlyGuard],
-        loadComponent: () => import('./features/shop/shop-page').then((m) => m.ShopPage),
-      },
-      // Products and ready-made goods now share the shop, and details open as a popup there.
-      {
-        path: 'products',
-        pathMatch: 'full',
-        redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom' } }),
-      },
-      {
-        path: 'goods',
-        pathMatch: 'full',
-        redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready' } }),
-      },
-      {
-        path: 'products/:code',
-        redirectTo: ({ params }) =>
-          inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom', product: params['code'] } }),
-      },
-      {
-        path: 'goods/:code',
-        redirectTo: ({ params }) =>
-          inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready', goods: params['code'] } }),
       },
       {
         path: 'cart',
@@ -319,6 +338,12 @@ export const routes: Routes = [
               import('./features/admin/admin-chats-page').then((m) => m.AdminChatsPage),
           },
           {
+            path: 'payment-log',
+            canActivate: [deskGuard],
+            loadComponent: () =>
+              import('./features/admin/admin-payments-page').then((m) => m.AdminPaymentsPage),
+          },
+          {
             path: 'audit',
             canActivate: [moderatorGuard],
             loadComponent: () => import('./features/admin/admin-audit-page').then((m) => m.AdminAuditPage),
@@ -341,18 +366,13 @@ export const routes: Routes = [
           },
         ],
       },
-      {
-        path: 'colors',
-        canActivate: [customerOnlyGuard],
-        loadComponent: () => import('./features/catalog/colors-page').then((m) => m.ColorsPage),
-      },
     ],
   },
   {
     path: '**',
     redirectTo: () => {
       const auth = inject(AuthService);
-      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'landing';
+      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'home';
     },
   },
 ];

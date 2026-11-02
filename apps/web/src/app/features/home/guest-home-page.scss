@@ -138,11 +138,11 @@
 
 .lp-btn {
   border: 0;
-  background: var(--pm-accent);
-  color: var(--pm-on-accent);
+  background: var(--pm-action);
+  color: var(--pm-on-action);
   box-shadow: var(--pm-accent-glow);
 
-  &:hover { background: var(--pm-accent-dark); }
+  &:hover { background: var(--pm-action-hover); }
 }
 
 .lp-btn-ghost {
@@ -856,6 +856,91 @@
 
 .lp-styles-cta {
   margin-block-start: 40px;
+}
+
+.lp-ready-goods {
+  padding-block-start: 24px;
+}
+
+.lp-goods-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.lp-good-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--pm-border);
+  border-radius: 18px;
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  text-decoration: none;
+  box-shadow: var(--pm-shadow);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.lp-good-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--pm-accent);
+  box-shadow: var(--pm-shadow-lifted);
+}
+
+.lp-good-image {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--pm-bg-muted);
+  color: var(--pm-accent);
+}
+
+.lp-good-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lp-good-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.lp-good-copy strong {
+  line-height: 1.35;
+}
+
+.lp-good-price {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: var(--pm-amber-soft);
+  color: var(--pm-on-amber);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.lp-good-delivery {
+  color: var(--pm-text-muted);
+  font-size: 12px;
+}
+
+.lp-ready-cta {
+  margin-top: 26px;
+}
+
+@media (max-width: 900px) {
+  .lp-goods-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .lp-goods-grid { gap: 10px; }
+  .lp-good-card { padding: 9px; border-radius: 14px; }
 }
 
 .lp-footer-credit {

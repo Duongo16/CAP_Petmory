@@ -719,9 +719,8 @@ export interface PhotoMatchInfo {
   notes?: string;
 }
 
-/** Ket qua dung san mau tu anh: ban thiet ke vua tao va nhung gi nhan ra. */
+/** Ket qua dung san mau tu anh. Chua luu thanh ban thiet ke nao cho toi khi khach bam Luu. */
 export interface PhotoMatch {
-  design: Design;
   match: PhotoMatchInfo;
 }
 
@@ -906,6 +905,9 @@ export interface Design {
   stand?: DesignStand;
   preview: DesignPreview[];
   pet: string | null;
+  referencePhotoIds?: string[];
+  frameShape?: string;
+  frameFinish?: string;
   updatedAt: string;
 }
 
@@ -925,6 +927,8 @@ export interface ZonePaint {
 export interface SaveDesign {
   name: string;
   modelCode: string;
+  /** Dac diem AI doc tu anh khi dung mau tu anh; bo trong thi giu ghi chu cu. */
+  aiNote?: string;
   accessories?: string[];
   featureNote?: string;
   paint?: MeshPaint[];
@@ -936,6 +940,9 @@ export interface SaveDesign {
   engraving?: { name?: string; memorialDate?: string; message?: string };
   stand?: DesignStand;
   pet?: string;
+  referencePhotoIds?: string[];
+  frameShape?: string;
+  frameFinish?: string;
 }
 
 export interface Quote {
@@ -1010,6 +1017,7 @@ export interface ProductionItem {
   engraving: Engraving | null;
   /** De trung bay cua mon nay, rong khi khong co de. */
   stand: { baseName: string; tone: string; decorations: string[] } | null;
+  frame?: { shape: string; finish: string } | null;
   anglesPreview: PreviewAngle[];
   productionDays: number;
   /** Phu kien gan len mau, chot luc dat. */

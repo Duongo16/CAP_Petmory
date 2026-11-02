@@ -16,6 +16,8 @@ import { ModelLibraryService } from './model-library.service';
 import { Cart, CartDocument } from '../cart/schemas/cart.schema';
 import { MSG } from '../../common/constants/messages';
 import { StorageFolder, StorageService } from '../../common/storage/storage.service';
+import { PhotosService } from '../photos/photos.service';
+import { PetsService } from '../pets/pets.service';
 
 /** Preview images are drawn by the browser, always in a lossless raster format. */
 const TYPE_PREVIEW = 'png';
@@ -31,6 +33,8 @@ export class DesignsService {
     private readonly catalog: CatalogService,
     private readonly storage: StorageService,
     private readonly library: ModelLibraryService,
+    private readonly photos: PhotosService,
+    private readonly pets: PetsService,
   ) {}
 
   listMine(owner: string) {
@@ -62,7 +66,7 @@ export class DesignsService {
     if (currentCount >= COUNT_DESIGN_MAX) {
       throw new BadRequestException(`Moi tai khoan chi luu toi da ${COUNT_DESIGN_MAX} ban thiet ke`);
     }
-    await this.checkProduct(dto);
+    await this.checkProduct(dto, owner);
     return this.model.create({
       ...this.prepare(dto),
       owner: new Types.ObjectId(owner),
@@ -71,7 +75,7 @@ export class DesignsService {
 
   async update(id: string, owner: string, dto: SaveDesignDto): Promise<DesignDocument> {
     const tk = await this.findOwned(id, owner);
-    await this.checkProduct(dto);
+    await this.checkProduct(dto, owner);
     tk.set(this.prepare(dto));
     return tk.save();
   }
@@ -106,7 +110,7 @@ export class DesignsService {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
     // Tong la gia kich co cong de, phu kien, hop va khung, deu doc tu danh muc tren may chu.
-    const base = await this.catalog.findDisplayBase(baseCode);
+    const base = productTypeCode === 'PT-03' ? null : await this.catalog.findDisplayBase(baseCode);
     const accessories = await this.catalog.findAccessories(accessoryCodes);
     const packaging = await this.catalog.findPackaging(packagingCodes);
     const whole = (value: unknown) => BigInt(String(value ?? '0').split('.')[0]);
@@ -230,13 +234,23 @@ export class DesignsService {
   }
 
   /** If a product type and size are given, they must exist and be on sale. */
-  private async checkProduct(dto: SaveDesignDto): Promise<void> {
+  private async checkProduct(dto: SaveDesignDto, owner: string): Promise<void> {
+    if (dto.pet) await this.pets.findOwned(dto.pet, owner);
+    for (const id of dto.referencePhotoIds ?? []) {
+      const photo = await this.photos.findOwned(id, owner);
+      if (photo.pet || photo.isRestored || photo.purpose !== 'DESIGN') {
+        throw new BadRequestException('Anh tham chieu khong hop le');
+      }
+    }
     // Chi nhan mau nen co trong thu vien (muc 5, 6, 21); ma da bo duoc doi sang mau thay the.
     const model = this.library.byCode(dto.modelCode);
     if (!model) {
       throw new BadRequestException('Mau nen nay khong co trong thu vien');
     }
     dto.modelCode = model.code;
+    if (dto.productTypeCode === 'PT-03' && model.pose !== 'HEAD') {
+      throw new BadRequestException('Tranh khung chi nhan mau chan dung');
+    }
     // Phu kien chi gan duoc len mau co diem neo, va phai dang ban.
     const accessories = await this.catalog.findAccessories(dto.accessories);
     if (accessories.length > 0 && (model.anchors ?? []).length === 0) {
@@ -244,7 +258,7 @@ export class DesignsService {
     }
     dto.accessories = accessories.map((one) => one.code);
     // Ma de phai co trong danh muc va dang ban; ma rong nghia la chua chon de.
-    await this.catalog.findDisplayBase(dto.stand?.baseCode);
+    if (dto.productTypeCode !== 'PT-03') await this.catalog.findDisplayBase(dto.stand?.baseCode);
     if (!dto.productTypeCode || !dto.sizeCode) {
       return;
     }
@@ -270,13 +284,18 @@ export class DesignsService {
         message: dto.engraving?.message ?? '',
       },
       stand: {
-        baseCode: dto.stand?.baseCode?.toUpperCase() ?? '',
+        baseCode: dto.productTypeCode === 'PT-03' ? '' : dto.stand?.baseCode?.toUpperCase() ?? '',
         tone: dto.stand?.tone ?? StandTone.OAK,
-        decorations: [...(dto.stand?.decorations ?? [])],
+        decorations: dto.productTypeCode === 'PT-03' ? [] : [...(dto.stand?.decorations ?? [])],
       },
       pet: dto.pet ? new Types.ObjectId(dto.pet) : null,
+      referencePhotoIds: (dto.referencePhotoIds ?? []).map((id) => new Types.ObjectId(id)),
+      frameShape: dto.frameShape ?? 'ROUND',
+      frameFinish: dto.frameFinish ?? 'WALNUT',
       accessories: dto.accessories ?? [],
       featureNote: dto.featureNote?.trim() ?? '',
+      // Chi ghi khi co gui, de sua ban cu khong xoa mat ghi chu AI da co.
+      ...(dto.aiNote !== undefined ? { aiNote: dto.aiNote.trim() } : {}),
     };
   }
 }

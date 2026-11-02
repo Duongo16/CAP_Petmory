@@ -23,8 +23,11 @@ import { MSG } from '../../common/constants/messages';
 import { cleanReading, PhotoReading, pickModel, readColoursLocally, zonePaintOf } from './photo-match';
 
 /** Ket qua dung mau tu anh: ban thiet ke vua tao kem nhung gi he thong nhan ra. */
+/**
+ * Ket qua dung mau tu anh. Khong kem ban thiet ke nao: may chu chi tra mau nen va
+ * mau tung vung, khach bam Luu trong xuong 3D thi moi thanh mot ban thiet ke.
+ */
 export interface PhotoMatch {
-  design: DesignDocument;
   match: {
     mode: AiMode;
     kind: string;
@@ -169,8 +172,9 @@ export class DesignSuggestService {
    * Dich vu AI xem anh de nhan ra loai, tu the, giong va mau tung vung. Khong
    * goi duoc dich vu thi may chu tu lay mau chu dao trong anh, con loai lay theo
    * ho so cua be. Mau nen chon theo loai va tu the trong thu vien dang co; chua
-   * co mau cho loai do thi dung mau mac dinh. Ket qua la mot ban thiet ke moi
-   * de khach mo len tuy bien tiep. Luot nay tinh vao han muc goi y thiet ke.
+   * co mau cho loai do thi dung mau mac dinh. Ket qua chi la goi y de man hinh
+   * ap len ban dang lam, khong luu thanh ban thiet ke, de "Thiet ke cua toi" chi
+   * co nhung ban khach tu bam Luu. Luot nay tinh vao han muc goi y thiet ke.
    */
   async fromPhoto(owner: string, petId: string, pose?: 'HEAD'): Promise<PhotoMatch> {
     const pet = await this.pets.findOwned(petId, owner);
@@ -217,19 +221,8 @@ export class DesignSuggestService {
         face.map((one) => ({ code: one.code, swatch: one.swatch })),
       );
 
-      const design = await this.design.create({
-        owner: new Types.ObjectId(owner),
-        name: `Bé ${pet.name}`.slice(0, 80),
-        modelCode: picked.model.code,
-        paint: [],
-        zonePaint,
-        colorCodesUsed: [...new Set(zonePaint.map((each) => each.colorCode))],
-        pet: pet._id,
-        aiNote: reading.notes ?? '',
-      });
-      await this.usage.record(AiKind.DESIGN_SUGGESTION, owner, mode, design._id.toString(), problem);
+      await this.usage.record(AiKind.DESIGN_SUGGESTION, owner, mode, pet._id.toString(), problem);
       return {
-        design,
         match: {
           mode,
           kind: reading.kind,

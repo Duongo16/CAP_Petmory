@@ -147,6 +147,21 @@ export class SaveDesignDto {
   @IsMongoId()
   pet?: string;
 
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @ArrayUnique()
+  @IsMongoId({ each: true })
+  referencePhotoIds?: string[];
+
+  @IsOptional()
+  @IsIn(['ROUND', 'SQUARE', 'LANDSCAPE', 'PORTRAIT'])
+  frameShape?: string;
+
+  @IsOptional()
+  @IsIn(['WALNUT', 'OAK', 'WHITE', 'BLACK', 'ROSE'])
+  frameFinish?: string;
+
   /** Ma phu kien gan len mau, moi diem neo mot mon. May chu doc gia va kiem lai. */
   @IsOptional()
   @IsArray()
@@ -160,6 +175,12 @@ export class SaveDesignDto {
   @IsString()
   @MaxLength(500)
   featureNote?: string;
+
+  /** Dac diem AI doc tu anh khi dung mau tu anh, gui kem khi khach bam Luu. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  aiNote?: string;
 }
 
 /** Doi ten mot ban thiet ke. */

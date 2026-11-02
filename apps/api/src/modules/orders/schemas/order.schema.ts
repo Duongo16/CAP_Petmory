@@ -73,6 +73,12 @@ export class DesignSnapshot {
   @Prop({ type: [Types.ObjectId], ref: 'PetPhoto', default: [] })
   petPhoto!: Types.ObjectId[];
 
+  @Prop({ type: String, default: 'ROUND' })
+  frameShape!: string;
+
+  @Prop({ type: String, default: 'WALNUT' })
+  frameFinish!: string;
+
   /** Dac diem rieng cua be khach ghi trong ban thiet ke. */
   @Prop({ trim: true, default: '' })
   featureNote!: string;

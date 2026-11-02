@@ -45,6 +45,7 @@ const PATHS: Record<string, string> = {
   bell: 'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Zm4 4a2 2 0 0 0 4 0',
   home: 'M4 11l8-7 8 7v9h-5v-6H9v6H4v-9Z',
   external: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3',
+  rotate: 'M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5',
 };
 
 @Component({

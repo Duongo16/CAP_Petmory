@@ -5,8 +5,9 @@
 
 :host {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
+  // Trang co bo cuc rieng (xuong 3D) dat hai bien nay de nut nam khop voi bo cuc.
+  right: var(--pm-chat-right, 20px);
+  bottom: var(--pm-chat-bottom, 20px);
   z-index: 60;
   display: flex;
   flex-direction: column;

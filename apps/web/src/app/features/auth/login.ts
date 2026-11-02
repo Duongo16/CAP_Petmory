@@ -3,22 +3,18 @@ import {
   Component,
   DestroyRef,
   OnInit,
-  computed,
   inject,
   signal,
 } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
-import { PetDraftService } from '../../core/services/pet-draft.service';
 import { DemoAccount } from '../../core/models/api.model';
 import { Icon } from '../../shared/icon/icon';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
-import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
 import { AuthPhotos } from './auth-photos/auth-photos';
 import { Brand } from '../../shared/brand/brand';
 import { isVietnamesePhone } from '../../core/utils/vietnamese-phone';
@@ -32,7 +28,7 @@ const loginIdentifier = (control: AbstractControl): ValidationErrors | null => {
 @Component({
   selector: 'pm-login',
   standalone: true,
-  imports: [LanguageToggle, ThemeToggle, Brand, AuthPhotos, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [LanguageToggle, ThemeToggle, Brand, AuthPhotos, ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
   templateUrl: './login.html',
   styleUrls: ['./auth-shared.scss', './login.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,11 +38,7 @@ export class LoginPage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly drafts = inject(PetDraftService);
-
-  /** The pet profile started on the welcome page, waiting for this account. */
-  readonly draft = this.drafts.draft;
-  readonly draftArt = computed<PetArtKind>(() => (this.draft()?.kind === 'CAT' ? 'cat' : 'dog'));
+  readonly continueUrl = this.route.snapshot.queryParamMap.get('continue');
   private readonly destroyRef = inject(DestroyRef);
 
   /** Tai khoan mau de bam mot phat la vao, chi co khi chay o may ca nhan. */
@@ -97,16 +89,12 @@ export class LoginPage implements OnInit {
 
     this.auth
       .login(value.email, value.password, value.remember)
-      .pipe(
-        // A pet started on the welcome page joins the account it signs in to.
-        switchMap(() => this.drafts.claim()),
-        takeUntilDestroyed(this.destroyRef),
-      )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.pendingSend.set(false);
           const continueUrl = this.route.snapshot.queryParamMap.get('continue');
-          if (continueUrl) {
+          if (continueUrl?.startsWith('/') && !continueUrl.startsWith('//')) {
             if (this.auth.isInternal() && continueUrl.startsWith('/admin')) {
               void this.router.navigateByUrl(continueUrl);
               return;

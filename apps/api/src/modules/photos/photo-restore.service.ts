@@ -36,7 +36,7 @@ const AI_INSTRUCTION: Record<string, string> = {
   REMOVE_BACKGROUND:
     'Remove the background completely and replace it with a plain pure white background. Keep the pet exactly as it is: same shape, pose, fur colours and markings.',
   FACE_DETAIL:
-    "Enhance the detail and sharpness of the pet's face, eyes, nose and fur texture. Do not change the pet's shape, markings, colours, proportions or expression.",
+    "Recover natural detail in the pet's face, eyes, nose and fur from this old or blurry photograph. Preserve the same animal, markings, colours, proportions and expression; do not invent facial features.",
 };
 
 const ALLOWED_TYPES = new Set(['jpeg', 'jpg', 'png']);
@@ -93,26 +93,18 @@ export class PhotoRestoreService {
     private readonly config: ConfigService,
   ) {}
 
-  /** Lua chon Cloudinary ro rang khong duoc tu chuyen sang Gemini. */
+  /** Cloudinary legacy khong con duoc phep chay trong luong /restore. */
   private get useCloud(): boolean {
-    const wanted = this.config.get<string>('ai.imageProvider') ?? '';
-    return (
-      wanted === 'cloudinary' ||
-      (wanted !== 'gemini' &&
-        wanted !== 'huggingface' &&
-        wanted !== 'huggingface-space' &&
-        this.cloud.ready)
-    );
+    return false;
   }
 
   private get useHuggingFaceSpace(): boolean {
     const wanted = this.config.get<string>('ai.imageProvider') ?? '';
     return (
-      wanted === 'huggingface-space' ||
-      (wanted === '' &&
-        !this.cloud.ready &&
-        !this.huggingface.ready &&
-        this.huggingfaceSpace.ready)
+      wanted !== 'gemini' &&
+      wanted !== 'huggingface' &&
+      wanted !== 'cloudinary-legacy' &&
+      this.huggingfaceSpace.ready
     );
   }
 
@@ -120,10 +112,7 @@ export class PhotoRestoreService {
     const wanted = this.config.get<string>('ai.imageProvider') ?? '';
     return (
       wanted === 'huggingface' ||
-      (wanted === '' &&
-        !this.cloud.ready &&
-        !this.useHuggingFaceSpace &&
-        this.huggingface.ready)
+      (wanted === '' && !this.useHuggingFaceSpace && this.huggingface.ready)
     );
   }
 

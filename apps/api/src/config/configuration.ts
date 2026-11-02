@@ -99,7 +99,10 @@ export default (): AppConfig => ({
     geminiKey: process.env.GEMINI_API_KEY ?? '',
     model: (process.env.AI_MODEL ?? '').trim(),
     imageModel: (process.env.AI_IMAGE_MODEL ?? '').trim(),
-    imageProvider: (process.env.AI_IMAGE_PROVIDER ?? '').trim().toLowerCase(),
+    // Hugging Face Space la lua chon mac dinh; Cloudinary chi chay khi env ghi ro.
+    imageProvider: (process.env.AI_IMAGE_PROVIDER ?? 'huggingface-space')
+      .trim()
+      .toLowerCase(),
     huggingface: {
       token: (process.env.HF_TOKEN ?? '').trim(),
       imageModel: (

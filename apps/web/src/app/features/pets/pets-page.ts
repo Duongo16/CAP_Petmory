@@ -53,6 +53,17 @@ export class PetsPage implements OnInit {
     this.reload();
     // The address carries which pet is open, so a link or the back button reopens it.
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      // ?new=1 (vi du ngay sau khi dang ky) mo san form them be, roi bo khoi dia chi.
+      if (params.get('new') === '1') {
+        void this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { new: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
+        this.add();
+        return;
+      }
       const open = params.get('open');
       if (open && !this.detailRef) {
         this.openDetail(open);

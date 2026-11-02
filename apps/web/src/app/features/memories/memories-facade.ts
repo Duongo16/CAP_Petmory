@@ -107,6 +107,38 @@ function monthOf(when: string): string {
 }
 
 /**
+ * Gom cac khoanh khac theo thang de ve ban do hanh trinh. Dung chung cho nhat
+ * ky ca nhan va nhat ky cong khai.
+ */
+export function groupByMonth(
+  rows: Memory[],
+  seen: Record<string, string>,
+  told: Map<string, PetStory> = new Map(),
+): MonthGroup[] {
+  const groups = new Map<string, MomentCard[]>();
+  rows.forEach((raw, at) => {
+    const key = monthOf(raw.happenedAt);
+    const first = raw.photo[0] ?? raw.decor.find((one) => one.kind === 'PHOTO')?.photo ?? '';
+    const card: MomentCard = {
+      raw,
+      topicKey: topicKey(raw.topic),
+      topicTone: topicTone(raw.topic),
+      cover: first ? (seen[first] ?? '') : '',
+      photoCount: raw.photo.length,
+      side: at % 2 === 0 ? 'left' : 'right',
+      story: told.get(raw._id) ?? null,
+    };
+    const already = groups.get(key);
+    if (already) {
+      already.push(card);
+    } else {
+      groups.set(key, [card]);
+    }
+  });
+  return [...groups].map(([startedAt, cards]) => ({ startedAt, cards }));
+}
+
+/**
  * Holds one pet's diary: the moments, the filter above them and the writing
  * of new ones. The screen only reads signals and issues commands.
  */
@@ -191,33 +223,9 @@ export class MemoriesFacade {
   });
 
   /** The page's moments gathered by the month they happened in. */
-  readonly months = computed<MonthGroup[]>(() => {
-    const groups = new Map<string, MomentCard[]>();
-    const seen = this.shotSource();
-    const told = this.storyByMoment();
-    let at = 0;
-    for (const raw of this.answer().rows) {
-      const key = monthOf(raw.happenedAt);
-      const first = raw.photo[0] ?? raw.decor.find((one) => one.kind === 'PHOTO')?.photo ?? '';
-      const card: MomentCard = {
-        raw,
-        topicKey: topicKey(raw.topic),
-        topicTone: topicTone(raw.topic),
-        cover: first ? (seen[first] ?? '') : '',
-        photoCount: raw.photo.length,
-        side: at % 2 === 0 ? 'left' : 'right',
-        story: told.get(raw._id) ?? null,
-      };
-      at += 1;
-      const already = groups.get(key);
-      if (already) {
-        already.push(card);
-      } else {
-        groups.set(key, [card]);
-      }
-    }
-    return [...groups].map(([startedAt, cards]) => ({ startedAt, cards }));
-  });
+  readonly months = computed<MonthGroup[]>(() =>
+    groupByMonth(this.answer().rows, this.shotSource(), this.storyByMoment()),
+  );
 
   start(petId: string): void {
     this.petId = petId;

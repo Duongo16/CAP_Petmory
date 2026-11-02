@@ -2,16 +2,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { samePassword } from './password-match';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { PetDraftService } from '../../core/services/pet-draft.service';
 import { Icon } from '../../shared/icon/icon';
 import { LanguageToggle } from '../../shared/language-toggle/language-toggle';
 import { ThemeToggle } from '../../shared/theme-toggle/theme-toggle';
-import { PetArt, PetArtKind } from '../../shared/pet-art/pet-art';
 import { normalizeVietnamesePhone, optionalVietnamesePhone } from '../../core/utils/vietnamese-phone';
 
 /** A benefit shown in the left panel. Both keys are written out in full. */
@@ -58,7 +55,7 @@ import { Brand } from '../../shared/brand/brand';
 @Component({
   selector: 'pm-register',
   standalone: true,
-  imports: [LanguageToggle, ThemeToggle, Brand, AuthPhotos, ReactiveFormsModule, RouterLink, TranslatePipe, Icon, PetArt],
+  imports: [LanguageToggle, ThemeToggle, Brand, AuthPhotos, ReactiveFormsModule, RouterLink, TranslatePipe, Icon],
   templateUrl: './register.html',
   styleUrls: ['./auth-shared.scss', './register.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,13 +63,10 @@ import { Brand } from '../../shared/brand/brand';
 export class RegisterPage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
-  private readonly drafts = inject(PetDraftService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  readonly continueUrl = this.route.snapshot.queryParamMap.get('continue');
   private readonly destroyRef = inject(DestroyRef);
-
-  /** The pet profile started on the welcome page, waiting for this account. */
-  readonly draft = this.drafts.draft;
-  readonly draftArt = computed<PetArtKind>(() => (this.draft()?.kind === 'CAT' ? 'cat' : 'dog'));
 
   readonly pendingSend = signal(false);
   readonly error = signal<string | null>(null);
@@ -96,7 +90,7 @@ export class RegisterPage {
     {
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [optionalVietnamesePhone]],
+      phone: ['', [Validators.required, optionalVietnamesePhone]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirm: ['', [Validators.required]],
       terms: [false, [Validators.requiredTrue]],
@@ -136,15 +130,17 @@ export class RegisterPage {
 
     this.auth
       .register(value.email, value.password, value.fullName, value.phone || undefined)
-      .pipe(
-        // The first pet is a nicety, so a failure there must not undo the account.
-        switchMap(() => this.drafts.claim()),
-        takeUntilDestroyed(this.destroyRef),
-      )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.pendingSend.set(false);
-          void this.router.navigate(['/home']);
+          const target = this.continueUrl;
+          if (target?.startsWith('/') && !target.startsWith('//') && !target.startsWith('/admin')) {
+            void this.router.navigateByUrl(target);
+            return;
+          }
+          // Tai khoan moi chua co be nao: mo ngay form them be day du.
+          void this.router.navigate(['/pets'], { queryParams: { new: 1 } });
         },
         error: (trouble: HttpErrorResponse) => {
           this.pendingSend.set(false);

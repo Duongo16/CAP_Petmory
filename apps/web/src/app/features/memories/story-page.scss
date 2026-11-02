@@ -149,11 +149,24 @@
   gap: 8px;
 }
 
-.story-notice,
 .attached-now {
   margin: 0;
   font-size: 0.875rem;
   color: var(--pm-text);
+}
+
+.story-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--pm-success-soft);
+  color: var(--pm-success);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .story-tools {

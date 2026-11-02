@@ -52,7 +52,6 @@ export class HomePage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly products = signal<ProductType[]>([]);
-  readonly studioProductCodes = CUSTOM_KEEPSAKE_CODES;
 
   /** The first few products, shown as a taster under the selling points. */
   readonly featured = computed(() =>

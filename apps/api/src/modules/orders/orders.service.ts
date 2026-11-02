@@ -182,7 +182,16 @@ export class OrdersService {
     const rows: OrderRow[] = [];
     const problems: string[] = [];
     for (const m of items) {
+      if ((m.kind ?? LineKind.MADE_TO_ORDER) === LineKind.MADE_TO_ORDER && m.productTypeCode !== 'PT-03') {
+        problems.push(`${m.displayName}: hien chi nhan dat khung tranh thu cung`);
+        continue;
+      }
       const designId = m.designId ? new Types.ObjectId(m.designId.toString()) : null;
+      const designSnapshot = await this.copyDesign(designId, customer);
+      if ((m.kind ?? LineKind.MADE_TO_ORDER) === LineKind.MADE_TO_ORDER && !designSnapshot) {
+        problems.push(`${m.displayName}: ban thiet ke khong con hop le`);
+        continue;
+      }
       const row: OrderRow = {
         kind: m.kind ?? LineKind.MADE_TO_ORDER,
         goodsCode: m.goodsCode ?? '',
@@ -205,7 +214,7 @@ export class OrdersService {
           priceDelta: Types.Decimal128.fromString(one.priceDelta.toString()),
         })),
         designId,
-        design: await this.copyDesign(designId, customer),
+        design: designSnapshot,
         quantity: m.quantity,
         unitPrice: Types.Decimal128.fromString(m.unitPrice.toString()),
         productionDays: m.productionDays,
@@ -267,6 +276,13 @@ export class OrdersService {
       const photos = design.pet
         ? await this.photos.listByPet(design.pet.toString(), customer)
         : [];
+      const referencePhotoIds = (design.referencePhotoIds ?? []).map((id) => id.toString());
+      for (const id of referencePhotoIds) {
+        const photo = await this.photos.findOwned(id, customer).catch(() => null);
+        if (!photo || photo.pet || photo.purpose !== 'DESIGN' || photo.isHidden || photo.isRestored) {
+          throw new BadRequestException('Anh tham chieu khong hop le');
+        }
+      }
       return {
         modelCode: design.modelCode,
         paint: design.paint.map((one) => ({ mesh: one.mesh, color: one.color })),
@@ -287,12 +303,18 @@ export class OrdersService {
         },
         preview: design.preview.map((one) => ({ angle: one.angle, fileName: one.fileName })),
         pet: design.pet,
-        petPhoto: photos.filter((one) => !one.isHidden).map((one) => one._id),
+        petPhoto: [
+          ...photos.filter((one) => !one.isHidden && !one.isRestored).map((one) => one._id),
+          ...referencePhotoIds.map((id) => new Types.ObjectId(id)),
+        ],
+        frameShape: design.frameShape ?? 'ROUND',
+        frameFinish: design.frameFinish ?? 'WALNUT',
         featureNote: design.featureNote ?? '',
         aiNote: design.aiNote ?? '',
         takenAt: new Date(),
       };
-    } catch {
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
       return null;
     }
   }

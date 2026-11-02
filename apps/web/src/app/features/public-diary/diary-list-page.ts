@@ -12,11 +12,14 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MemoriesService } from '../../core/services/memories.service';
+import { AuthService } from '../../core/services/auth.service';
+import { FooterLink, SiteFooter } from '../../shared/site-footer/site-footer';
 import { DiaryCard, DiaryList, MemoryTopic } from '../../core/models/api.model';
 import { TOPIC_ORDER, topicKey } from '../../shared/memory-topics';
 import { Icon } from '../../shared/icon/icon';
 import { PetFace } from '../../shared/pet-face/pet-face';
 import { UserFace } from '../../shared/user-face/user-face';
+import { GuestHeader } from '../../shared/guest-header/guest-header';
 
 type ScreenState = 'LOADING' | 'ERROR' | 'DONE';
 
@@ -53,13 +56,22 @@ interface Flight {
 @Component({
   selector: 'pm-diary-list-page',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe, Icon, PetFace, UserFace, RouterLink],
+  imports: [ReactiveFormsModule, TranslatePipe, Icon, PetFace, UserFace, RouterLink, GuestHeader, SiteFooter],
   templateUrl: './diary-list-page.html',
   styleUrl: './diary-list-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiaryListPage implements OnInit {
   private readonly service = inject(MemoriesService);
+  /** Da dang nhap thi trang nam trong khung chung, nen khong ve dau trang cua khach. */
+  readonly signedIn = inject(AuthService).isSignedIn;
+  /** Chan trang cho khach chua dang nhap: chi cac duong mo cho khach. */
+  readonly guestFooterMenu: FooterLink[] = [
+    { path: '/shop', key: 'NAV.SHOP' },
+    { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' },
+    { path: '/login', key: 'AUTH.SIGN_IN' },
+    { path: '/register', key: 'LANDING.START_FREE' },
+  ];
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);

@@ -38,22 +38,13 @@
         </div>
       </div>
 
-      <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" /></a>
+      <a class="ap-logo" routerLink="/landing"><pm-brand size="lg" [wordOnly]="true" /></a>
 
       <div class="ap-head">
         <h1 class="ap-title">{{ 'AUTH.REGISTER_TITLE' | translate }}</h1>
         <p class="ap-sub">{{ 'AUTH.REGISTER_SUB' | translate }}</p>
       </div>
 
-      @if (draft(); as pet) {
-        <div class="ap-draft" role="status">
-          <span class="ap-draft-photo" aria-hidden="true"><pm-pet-art [kind]="draftArt()" [face]="true" [width]="40" /></span>
-          <span class="ap-draft-text">
-            <strong>{{ 'AUTH.DRAFT_TITLE' | translate: { name: pet.name } }}</strong>
-            <span>{{ 'AUTH.DRAFT_REGISTER' | translate }}</span>
-          </span>
-        </div>
-      }
 
       <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="send()">
 
@@ -97,8 +88,7 @@
 
         <div class="ap-field">
           <label class="ap-label" for="up-phone">
-            {{ 'AUTH.PHONE' | translate }}
-            <span class="font-normal text-ink-muted">({{ 'AUTH.PHONE_NOTE' | translate }})</span>
+            {{ 'AUTH.PHONE' | translate }} *
           </label>
           <div class="ap-input-wrap">
             <input
@@ -197,7 +187,7 @@
 
       </form>
 
-      <a class="ap-switch" routerLink="/login">
+      <a class="ap-switch" routerLink="/login" [queryParams]="continueUrl ? { continue: continueUrl } : {}">
         {{ 'AUTH.HAVE_ACCOUNT' | translate }}
         <strong>{{ 'AUTH.LOGIN_LINK' | translate }}</strong>
         <pm-icon name="chevron" [size]="13" />

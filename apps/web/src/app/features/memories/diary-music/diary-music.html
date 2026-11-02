@@ -19,14 +19,14 @@
           allow="autoplay; encrypted-media" aria-hidden="true" tabindex="-1"
           referrerpolicy="strict-origin-when-cross-origin" [title]="'BOOK.MUSIC_YOUTUBE_PLAYER' | translate"
           (load)="onYoutubeLoad()"></iframe>
-        <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="playYoutube()">
-          {{ 'BOOK.MUSIC_PLAY' | translate }}
-        </button>
+        @if (blocked()) {
+          <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="playYoutube()">{{ 'BOOK.MUSIC_PLAY' | translate }}</button>
+        }
         <a class="youtube-link" [href]="youtubePage()" target="_blank" rel="noopener noreferrer">
           {{ 'BOOK.MUSIC_OPEN_YOUTUBE' | translate }}
         </a>
       } @else if (active() && audioUrl()) {
-        <audio #player [src]="audioUrl()" controls loop preload="auto" [attr.aria-label]="'BOOK.MUSIC_PLAYER' | translate"></audio>
+        <audio #player [src]="audioUrl()" controls autoplay loop preload="auto" [attr.aria-label]="'BOOK.MUSIC_PLAYER' | translate"></audio>
         @if (blocked()) {
           <button type="button" class="tw-btn-secondary tw-btn-sm" (click)="play()">{{ 'BOOK.MUSIC_PLAY' | translate }}</button>
         }
@@ -60,11 +60,20 @@
             }
           </select>
         </label>
-        <label class="tw-field">
-          <span class="tw-label">{{ 'BOOK.MUSIC_UPLOAD' | translate }}</span>
-          <input type="file" accept=".mp3,.m4a,.ogg,.wav,audio/*" [disabled]="saving()" (change)="upload($event)" />
+        <div class="tw-field">
+          <span class="tw-label" id="diary-music-upload-label">{{ 'BOOK.MUSIC_UPLOAD' | translate }}</span>
+          <div class="music-file-row">
+            <label class="tw-btn-secondary tw-btn-sm music-file-button" [class.is-disabled]="saving()">
+              <input class="music-file-input" type="file" accept=".mp3,.m4a,.ogg,.wav,audio/*"
+                aria-labelledby="diary-music-upload-label" [disabled]="saving()" (change)="upload($event)" />
+              ♫ {{ 'BOOK.MUSIC_PICK_FILE' | translate }}
+            </label>
+            <span class="music-file-name" [class.empty]="!fileName()" [attr.title]="fileName() || null">
+              {{ fileName() || ('BOOK.MUSIC_NO_FILE' | translate) }}
+            </span>
+          </div>
           <small>{{ 'BOOK.MUSIC_FILE_HINT' | translate }}</small>
-        </label>
+        </div>
         <div class="tw-field">
           <label class="tw-label" for="diary-youtube-link">{{ 'BOOK.MUSIC_YOUTUBE' | translate }}</label>
           <div class="music-link-row">

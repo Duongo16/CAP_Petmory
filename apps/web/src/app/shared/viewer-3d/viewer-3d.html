@@ -4,11 +4,24 @@
     class="canvas-3d"
     [class.hidden]="status() === 'UNSUPPORTED'"
     [class.painting]="colorPendingPaint() !== null && canPaint()"
+    [class.brush]="paintMode() === 'BRUSH'"
+    [class.fill]="paintMode() === 'FILL'"
     (pointerdown)="startPaint($event)"
     (pointermove)="dragPaint($event)"
+    (pointerleave)="leaveBrush()"
     (pointerup)="endPaint($event)"
     (pointercancel)="endPaint($event)"
   ></div>
+  @if (ring().on) {
+    <span
+      class="brush-ring"
+      aria-hidden="true"
+      [style.left.px]="ring().x"
+      [style.top.px]="ring().y"
+      [style.width.px]="ring().r * 2"
+      [style.height.px]="ring().r * 2"
+    ></span>
+  }
 
   @switch (status()) {
     @case ('LOADING') {

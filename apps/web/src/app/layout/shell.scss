@@ -4,6 +4,29 @@
   min-height: 100%;
 }
 
+/*
+ * Man hinh lam viec tran khung (xuong 3D): khung chinh khoa dung mot man hinh,
+ * trang ben trong lap day phan con lai duoi dau trang, nen khong con khoang
+ * trong de cuon xuong. Man qua thap thi chi phan noi dung tu cuon.
+ */
+:host(.immersive) {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+
+  main {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  // Trang lap dung phan con lai, khong phinh theo noi dung; noi dung dai tu cuon ben trong trang.
+  main ::ng-deep > :not(router-outlet) {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+}
+
 .pm-shell-header nav a,
 .pm-shell-header .account-button,
 .pm-shell-header .account-menu,

@@ -101,7 +101,7 @@
             >
               <!-- Nav items shown only on mobile (narrow) for customer -->
               @if (!isInternal()) {
-                @for (item of menu; track item.path) {
+                @for (item of phoneMenu; track item.path) {
                   <a
                     class="hidden max-nav:block px-3 py-2 rounded-md no-underline text-ink text-sm
                            transition-colors hover:bg-muted [&.selected]:bg-accent-soft [&.selected]:text-accent-dark [&.selected]:font-semibold"
@@ -175,38 +175,7 @@
 <!-- ───── Footer (Chi hien cho khach hang) ───── -->
 @if (!isInternal()) {
   @if (!immersive()) {
-  <footer class="mt-16 bg-night text-on-night max-nav:pb-[calc(140px+env(safe-area-inset-bottom))]">
-    <div class="grid gap-10 max-w-[1180px] mx-auto px-6 py-14 box-border items-start [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))] nav:[grid-template-columns:1.3fr_1.6fr_1fr]">
-
-      <!-- Brand column -->
-      <div class="flex flex-col items-start gap-3">
-        <pm-brand size="lg" />
-      </div>
-
-      <!-- Explore nav -->
-      <nav class="flex flex-col items-start gap-2.5" [attr.aria-label]="'FOOTER.EXPLORE' | translate">
-        <h2 class="m-0 mb-2 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
-          {{ 'FOOTER.EXPLORE' | translate }}
-        </h2>
-        <div class="grid grid-cols-2 gap-x-8 gap-y-2.5">
-          @for (item of footerMenu; track item.path) {
-            <a
-              class="text-on-night/85 no-underline text-sm transition-colors hover:text-on-night hover:underline"
-              [routerLink]="item.path"
-            >{{ item.key | translate }}</a>
-          }
-        </div>
-      </nav>
-
-      <!-- Social links -->
-      <div class="footer-contact flex flex-col items-start gap-3">
-        <h2 class="m-0 mb-1 text-xs font-bold tracking-[0.1em] uppercase text-on-night/70">
-          {{ 'FOOTER.FOLLOW' | translate }}
-        </h2>
-        <pm-social-links variant="full" />
-      </div>
-    </div>
-  </footer>
+  <pm-site-footer [menu]="footerMenu" [bottomNavRoom]="true" />
   }
 
   <pm-chat-widget [class.quiet-on-phone]="quietChat()" />

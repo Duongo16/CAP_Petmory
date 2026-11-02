@@ -125,6 +125,8 @@ function checkAll(label, tokens) {
   check('Mau nhan lam chu tren nen mo', 'pm-accent', 'pm-bg-muted', NEED_TEXT, tokens);
   check('Chu tren nut mau nhan', 'pm-on-accent', 'pm-accent', NEED_TEXT, tokens);
   check('Chu tren nut mau nhan dam', 'pm-on-accent', 'pm-accent-dark', NEED_TEXT, tokens);
+  check('Chu tren nut vang logo', 'pm-on-action', 'pm-action', NEED_TEXT, tokens);
+  check('Chu tren nut vang logo khi di chuot', 'pm-on-action', 'pm-action-hover', NEED_TEXT, tokens);
   check('Mau nhan tren nen nhan nhat', 'pm-accent', 'pm-accent-soft', NEED_TEXT, tokens);
   check('Mau nhan dam lam chu tren nen trang', 'pm-accent-dark', 'pm-bg', NEED_TEXT, tokens);
 

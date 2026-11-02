@@ -20,11 +20,17 @@
   color: var(--pm-danger);
 }
 
-/* ---------- Ma QR ---------- */
+/* ---------- Ma QR ----------
+ * Anh QR cua ngan hang thuong la the doc, khong vuong: chi dat chieu cao, chieu
+ * ngang tu theo ti le anh, de anh thu nho lai chu khong bi bop meo.
+ */
 
 .qr-frame img {
-  inline-size: 256px;
-  block-size: 256px;
+  display: block;
+  inline-size: auto;
+  block-size: 320px;
+  max-inline-size: 100%;
+  object-fit: contain;
 }
 
 .waiting-dot {
@@ -47,6 +53,92 @@
     opacity: 0.35;
     transform: scale(0.75);
   }
+}
+
+/* Nut phong to hien khi lia chuot vao anh (hoac khi dung ban phim toi nut). */
+.qr-frame {
+  position: relative;
+}
+
+.qr-zoom {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: inherit;
+  background: rgb(0 0 0 / 0.38);
+  color: #fff;
+  cursor: zoom-in;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.qr-zoom pm-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-accent);
+  color: var(--pm-on-accent);
+  box-shadow: var(--pm-shadow-lifted);
+}
+
+.qr-frame:hover .qr-zoom,
+.qr-zoom:focus-visible {
+  opacity: 1;
+}
+
+/* Tren may cam ung khong co lia chuot, nen nut luon hien o goc. */
+@media (hover: none) {
+  .qr-zoom {
+    inset: auto 8px 8px auto;
+    background: none;
+    opacity: 1;
+  }
+}
+
+.qr-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 0.72);
+  cursor: zoom-out;
+  animation: qr-fade 160ms ease-out;
+}
+
+.qr-lightbox img {
+  max-inline-size: min(92vw, 520px);
+  max-block-size: 88vh;
+  inline-size: auto;
+  block-size: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.5);
+  cursor: default;
+}
+
+.qr-lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border: 0;
+  border-radius: var(--pm-radius-pill);
+  background: var(--pm-bg-card);
+  color: var(--pm-text);
+  cursor: pointer;
+}
+
+@keyframes qr-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ---------- O sao chep ---------- */
@@ -130,7 +222,140 @@
 
 @media (max-width: 600px) {
   .qr-frame img {
-    inline-size: 200px;
-    block-size: 200px;
+    block-size: 260px;
+  }
+}
+
+/* ---------- Gon lai tren may tinh ----------
+ * Ca buoc thanh toan nam vua mot man hinh (ke ca man hinh phong to 125%), de
+ * doi chieu QR, so tai khoan, noi dung va so tien ma khong phai cuon; cuon xuong
+ * la toi chan trang. Ma QR co giãn theo chieu cao man hinh. Dien thoai giu nguyen.
+ */
+@media (min-width: 1024px) {
+  .paying {
+    gap: 12px;
+    padding-block: 12px 24px;
+  }
+
+  /* Thanh buoc nho lai, chi o trang nay. */
+  :host ::ng-deep pm-order-steps {
+    .stop-number {
+      inline-size: 30px;
+      block-size: 30px;
+      font-size: var(--pm-text-sm);
+    }
+
+    .stop-name {
+      font-size: var(--pm-text-sm);
+    }
+
+    .rail {
+      inset-block-start: 14px;
+    }
+  }
+
+  .head {
+    gap: 2px;
+  }
+
+  .head .title {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .head .sub {
+    font-size: var(--pm-text-xs);
+  }
+
+  .paying > .grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 18px;
+  }
+
+  /* ----- Cot trai ----- */
+  .pay-left {
+    gap: 10px;
+  }
+
+  .qr-card {
+    gap: 2px;
+    padding: 14px 20px;
+  }
+
+  /* Nhan "QR chuyen khoan" va dong nhac cho xac nhan da noi o tieu de va o khung nut. */
+  .qr-tags,
+  .waiting {
+    display: none;
+  }
+
+  .due-name {
+    margin-top: 0;
+  }
+
+  .due-money {
+    font-size: 1.6rem;
+  }
+
+  .qr-frame {
+    margin-top: 6px;
+    padding: 8px;
+  }
+
+  .qr-frame img {
+    block-size: clamp(180px, calc(100vh - 500px), 300px);
+  }
+
+  .qr-bank {
+    margin-top: 2px;
+  }
+
+  /* Hai nut nam canh nhau cho thap hon. */
+  .manual-deeds {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 10px;
+    padding: 12px 16px;
+
+    > p {
+      grid-column: 1 / -1;
+      font-size: var(--pm-text-xs);
+      line-height: 1.5;
+    }
+
+    > .tw-btn-block {
+      inline-size: auto;
+    }
+  }
+
+  /* ----- Cot phai ----- */
+  .manual-card {
+    gap: 8px;
+    padding: 14px 20px;
+  }
+
+  .manual-head {
+    padding-bottom: 8px;
+  }
+
+  .manual-head h2 {
+    font-size: var(--pm-text-base);
+  }
+
+  .manual-rows {
+    gap: 4px;
+  }
+
+  .copy-box {
+    gap: 2px;
+    padding: 7px 14px;
+    border-radius: 12px;
+  }
+
+  .copy-big {
+    font-size: var(--pm-text-base);
+  }
+
+  .warn {
+    padding: 8px 14px;
   }
 }

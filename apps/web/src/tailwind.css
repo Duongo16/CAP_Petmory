@@ -198,11 +198,11 @@
   }
   .tw-btn-primary {
     border: 0;
-    background-color: var(--color-accent);
-    color: var(--color-on-accent);
+    background-color: var(--pm-action);
+    color: var(--pm-on-action);
     box-shadow: var(--shadow-glow);
     &:hover:not(:disabled) {
-      background-color: var(--color-accent-dark);
+      background-color: var(--pm-action-hover);
       transform: translate3d(0, -1px, 0);
     }
   }
