@@ -146,7 +146,6 @@ export class Shell {
   readonly managerMenu: MenuItem[] = [
     { path: '/admin/orders', key: 'NAV.DISPATCH_ORDER' },
     { path: '/admin/customers', key: 'NAV.CUSTOMER' },
-    { path: '/admin/payment-log', key: 'NAV.LOG_PAYMENT' },
     { path: '/admin/settings', key: 'NAV.SETTINGS' },
     { path: '/admin/accounts', key: 'NAV.ACCOUNTS' },
   ];
