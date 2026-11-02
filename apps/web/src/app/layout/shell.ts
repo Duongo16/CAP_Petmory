@@ -118,6 +118,7 @@ export class Shell {
     { path: '/journals', key: 'NAV.JOURNALS' },
     { path: '/shop', key: 'NAV.SHOP' },
     { path: '/studio', key: 'NAV.STUDIO' },
+    { path: '/ar', key: 'NAV.AR' },
     { path: '/community', key: 'NAV.COMMUNITY' },
   ];
 
@@ -145,6 +146,7 @@ export class Shell {
   readonly managerMenu: MenuItem[] = [
     { path: '/admin/orders', key: 'NAV.DISPATCH_ORDER' },
     { path: '/admin/customers', key: 'NAV.CUSTOMER' },
+    { path: '/admin/payment-log', key: 'NAV.LOG_PAYMENT' },
     { path: '/admin/settings', key: 'NAV.SETTINGS' },
     { path: '/admin/accounts', key: 'NAV.ACCOUNTS' },
   ];
@@ -155,21 +157,6 @@ export class Shell {
 
   closeMenu(): void {
     this.menuOpen.set(false);
-  }
-
-  @HostListener('document:keydown.escape')
-  closeMenuOnEscape(): void {
-    if (this.menuOpen()) {
-      this.closeMenu();
-    }
-  }
-
-  @HostListener('document:click', ['$event'])
-  closeMenuOnOutsideClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
-    if (this.menuOpen() && !target?.closest('.account-menu, .account-button')) {
-      this.closeMenu();
-    }
   }
 
   logout(): void {

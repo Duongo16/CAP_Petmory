@@ -1,0 +1,213 @@
+<div class="ar-page min-h-screen flex flex-col bg-slate-50 text-slate-800">
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 py-3 sm:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+        (click)="goBack()"
+        aria-label="Quay lại"
+      >
+        <pm-icon name="back" [size]="18" />
+      </button>
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold flex items-center gap-2 m-0 text-slate-900">
+          <span>Trải Nghiệm WebAR Thú Cưng</span>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold uppercase tracking-wider">
+            WebAR Floor
+          </span>
+        </h1>
+        <p class="text-xs text-slate-500 m-0 hidden sm:block">
+          Quét sàn và ngắm nhìn thú cưng 3D chạy nhảy sống động ngay trong không gian thật
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md shadow-amber-500/20 transition active:scale-95"
+        (click)="launchAr()"
+      >
+        <pm-icon name="camera" [size]="18" />
+        <span>Bật Camera AR</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- 3D & AR Viewer Stage (7 cols on lg) -->
+    <div class="lg:col-span-7 flex flex-col gap-4">
+      <div class="viewer-wrapper relative w-full aspect-square sm:aspect-[4/3] lg:aspect-auto lg:h-[620px] rounded-3xl overflow-hidden bg-gradient-to-b from-slate-100 to-slate-200 border-2 border-slate-200/80 shadow-inner flex flex-col justify-center items-center">
+        <!-- Floating Hints -->
+        <div class="absolute top-4 left-4 z-10 flex flex-col gap-1.5 pointer-events-none">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-medium">
+            <pm-icon name="paw" [size]="14" />
+            <span>{{ selectedPet().name }}</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/90 backdrop-blur-md text-white text-xs font-semibold">
+            <span>Hoạt ảnh:</span>
+            <span>{{ currentAnimation() }}</span>
+          </span>
+        </div>
+
+        <div class="absolute top-4 right-4 z-10 hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-md text-slate-600 text-xs shadow-sm">
+          <span>👆 Xoay 360° / Phóng to</span>
+        </div>
+
+        <!-- Google Model Viewer -->
+        <model-viewer
+          #modelViewerRef
+          class="w-full h-full cursor-grab active:cursor-grabbing"
+          [attr.src]="selectedPet().file"
+          [attr.alt]="selectedPet().name"
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          ar-placement="floor"
+          ar-scale="auto"
+          camera-controls
+          touch-action="pan-y"
+          autoplay
+          [attr.animation-name]="currentAnimation()"
+          [attr.scale]="currentScale()"
+          shadow-intensity="1.5"
+          shadow-softness="0.8"
+          exposure="1.1"
+          camera-orbit="0deg 75deg 105%"
+          min-camera-orbit="auto auto 5%"
+          max-camera-orbit="auto auto 300%"
+        >
+          <!-- Custom Slot AR Launcher Button -->
+          <button
+            slot="ar-button"
+            id="custom-ar-button"
+            class="ar-launch-slot-btn"
+          >
+            <span class="ar-btn-pulse"></span>
+            <pm-icon name="camera" [size]="20" />
+            <span>QUÉT SÀN XEM AR NGAY</span>
+          </button>
+        </model-viewer>
+
+        <!-- Floor Grid Illusion -->
+        <div class="absolute bottom-0 inset-x-0 h-28 pointer-events-none bg-gradient-to-t from-slate-300/40 to-transparent"></div>
+      </div>
+
+      <!-- Quick Tips Bar -->
+      <div class="flex items-center justify-between text-xs text-slate-500 px-2">
+        <span>💡 Nhấn vào màn hình để xoay và ngắm bé thú trước khi mở AR</span>
+        <span class="font-medium text-slate-600">Model: {{ selectedPet().badge }}</span>
+      </div>
+    </div>
+
+    <!-- Controls & Selection Panel (5 cols on lg) -->
+    <div class="lg:col-span-5 flex flex-col gap-6">
+      <!-- 1. Chọn Thú Cưng -->
+      <section class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-bold text-slate-800 m-0 flex items-center gap-2">
+            <span>1. Chọn Bé Thú Cưng</span>
+          </h2>
+          <span class="text-xs text-slate-500">{{ petList.length }} mẫu sẵn có</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5">
+          @for (pet of petList; track pet.id) {
+            <button
+              type="button"
+              class="flex items-center gap-3 p-3 rounded-xl border text-left transition"
+              [ngClass]="
+                selectedPet().id === pet.id
+                  ? 'border-amber-500 bg-amber-50/70 text-amber-950 font-bold shadow-sm'
+                  : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-medium'
+              "
+              (click)="selectPet(pet)"
+            >
+              <span class="text-2xl flex-shrink-0">{{ pet.emoji }}</span>
+              <div class="min-w-0 flex-1">
+                <p class="m-0 text-sm truncate leading-tight">{{ pet.name }}</p>
+                <p class="m-0 text-[11px] text-slate-500 truncate mt-0.5">{{ pet.badge }}</p>
+              </div>
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- 2. Chọn Hoạt Ảnh (Animation) -->
+      <section class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-bold text-slate-800 m-0 flex items-center gap-2">
+            <span>2. Chọn Hoạt Ảnh Vận Động</span>
+          </h2>
+          <span class="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">
+            Có chuyển động
+          </span>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          @for (anim of selectedPet().animations; track anim.key) {
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition"
+              [ngClass]="
+                currentAnimation() === anim.key
+                  ? 'bg-amber-500 border-amber-500 text-white shadow-sm'
+                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+              "
+              (click)="selectAnimation(anim.key)"
+            >
+              <span>{{ anim.icon }}</span>
+              <span>{{ anim.label }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- 3. Kích thước mô hình -->
+      <section class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col gap-3">
+        <h2 class="text-base font-bold text-slate-800 m-0">3. Kích Thước Trong AR</h2>
+        <div class="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            class="py-2 px-3 rounded-xl text-xs font-semibold border transition text-center"
+            [ngClass]="currentScale() === '0.6 0.6 0.6' ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 border-slate-200 text-slate-700'"
+            (click)="setScale(0.6)"
+          >
+            Nhỏ gọn (0.6x)
+          </button>
+          <button
+            type="button"
+            class="py-2 px-3 rounded-xl text-xs font-semibold border transition text-center"
+            [ngClass]="currentScale() === '1 1 1' ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 border-slate-200 text-slate-700'"
+            (click)="setScale(1.0)"
+          >
+            Chuẩn (1.0x)
+          </button>
+          <button
+            type="button"
+            class="py-2 px-3 rounded-xl text-xs font-semibold border transition text-center"
+            [ngClass]="currentScale() === '1.5 1.5 1.5' ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 border-slate-200 text-slate-700'"
+            (click)="setScale(1.5)"
+          >
+            Phóng to (1.5x)
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. Hướng dẫn quét sàn AR -->
+      <section class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/80 p-5 rounded-2xl flex flex-col gap-3 text-amber-950">
+        <h3 class="text-sm font-bold flex items-center gap-2 m-0 text-amber-900">
+          <pm-icon name="bulb" [size]="18" />
+          <span>Cách Quét Camera Để Thấy Thú Cưng:</span>
+        </h3>
+        <ol class="text-xs space-y-2 pl-4 m-0 text-amber-900/90 leading-relaxed list-decimal">
+          <li>Bấm nút <strong>"BẬT CAMERA QUÉT SÀN (AR)"</strong> ở khung xem hoặc góc phải.</li>
+          <li>Cấp quyền truy cập Camera khi trình duyệt hỏi.</li>
+          <li>Hướng camera xuống sàn nhà hoặc mặt bàn phẳng, lắc nhẹ điện thoại sang trái/phải để máy nhận diện mặt phẳng.</li>
+          <li>Bé cún sẽ xuất hiện ngay trên sàn và chạy tung tăng theo hoạt ảnh bạn đã chọn!</li>
+        </ol>
+      </section>
+    </div>
+  </main>
+</div>

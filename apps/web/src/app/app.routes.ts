@@ -106,6 +106,15 @@ export const routes: Routes = [
   { path: 'products/:code', redirectTo: ({ params }) => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom', product: params['code'] } }) },
   { path: 'goods/:code', redirectTo: ({ params }) => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready', goods: params['code'] } }) },
   {
+    path: 'ar',
+    loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
+  },
+  {
+    path: 'ar-pet',
+    pathMatch: 'full',
+    redirectTo: 'ar',
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./layout/shell').then((m) => m.Shell),
@@ -329,6 +338,12 @@ export const routes: Routes = [
               import('./features/admin/admin-chats-page').then((m) => m.AdminChatsPage),
           },
           {
+            path: 'payment-log',
+            canActivate: [deskGuard],
+            loadComponent: () =>
+              import('./features/admin/admin-payments-page').then((m) => m.AdminPaymentsPage),
+          },
+          {
             path: 'audit',
             canActivate: [moderatorGuard],
             loadComponent: () => import('./features/admin/admin-audit-page').then((m) => m.AdminAuditPage),
@@ -357,7 +372,7 @@ export const routes: Routes = [
     path: '**',
     redirectTo: () => {
       const auth = inject(AuthService);
-      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'landing';
+      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'home';
     },
   },
 ];

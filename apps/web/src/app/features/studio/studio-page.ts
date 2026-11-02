@@ -23,7 +23,6 @@ import { MoneyPipe } from '../../shared/money.pipe';
 import { StudioFacade } from './studio-facade';
 import { ANCHOR_NODE, AccessoryMount, StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
 import { PaintMode } from '../../shared/viewer-3d/painter';
-import { DateInput } from '../../shared/date-input/date-input';
 import { CatalogService } from '../../core/services/catalog.service';
 import { AccessoryAnchor, PackagingKind, PhotoMatchInfo, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
 import { BaseModel, ModelLibrary, DeclaredZone, ZoneName, currentModelCode } from './model-manifest';
@@ -327,6 +326,16 @@ export class StudioPage implements OnInit {
   readonly photos = computed(() => this.preview().map((m) => ({ ...m, key: KEY_ANGLE[m.angle] })));
   readonly hasPhotos = computed(() => this.preview().length === 6);
   readonly countColorInUse = computed(() => this.colorCodesUsed().length);
+  readonly arLink = computed(() => {
+    const model = this.baseModelSelected();
+    if (!model) return '/ar';
+    const code = (model.code || '').toLowerCase();
+    if (code.includes('shiba')) return '/ar?model=shiba';
+    if (code.includes('husky')) return '/ar?model=husky';
+    if (code.includes('fox')) return '/ar?model=fox';
+    if (code.includes('bunny') || code.includes('cat')) return '/ar?model=bunny';
+    return '/ar?model=shiba';
+  });
 
   // --- De trung bay ---
 

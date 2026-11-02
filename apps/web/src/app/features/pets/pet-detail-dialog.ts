@@ -147,6 +147,12 @@ export class PetDetailDialog implements OnInit {
     this.go(['/pets', this.data.petId, 'journal'], { view: 'photos' });
   }
 
+  openAr(): void {
+    const currentPet = this.pet();
+    const model = currentPet?.kind === 'DOG' ? 'shiba' : 'bunny';
+    this.go(['/ar'], { model });
+  }
+
   private load(id: string): void {
     this.status.set('LOADING');
     forkJoin({
