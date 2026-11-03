@@ -74,6 +74,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/public-diary/diary-book-page').then((m) => m.DiaryBookPage),
       },
+      // WebAR la muc rieng, dat canh Tuy bien 3D chu khong thay the no.
+      {
+        path: 'ar',
+        loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
+      },
+      { path: 'ar-pet', pathMatch: 'full', redirectTo: 'ar' },
     ],
   },
   /*
@@ -97,6 +103,11 @@ export const routes: Routes = [
       import('./features/public-diary/diary-book-page').then((m) => m.DiaryBookPage),
   },
   {
+    path: 'ar',
+    loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
+  },
+  { path: 'ar-pet', pathMatch: 'full', redirectTo: 'ar' },
+  {
     path: 'shop',
     canActivate: [customerOnlyGuard],
     loadComponent: () => import('./features/shop/shop-page').then((m) => m.ShopPage),
@@ -105,15 +116,6 @@ export const routes: Routes = [
   { path: 'goods', pathMatch: 'full', redirectTo: () => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready' } }) },
   { path: 'products/:code', redirectTo: ({ params }) => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'custom', product: params['code'] } }) },
   { path: 'goods/:code', redirectTo: ({ params }) => inject(Router).createUrlTree(['/shop'], { queryParams: { tab: 'ready', goods: params['code'] } }) },
-  {
-    path: 'ar',
-    loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
-  },
-  {
-    path: 'ar-pet',
-    pathMatch: 'full',
-    redirectTo: 'ar',
-  },
   {
     path: '',
     canActivate: [authGuard],
@@ -366,7 +368,7 @@ export const routes: Routes = [
     path: '**',
     redirectTo: () => {
       const auth = inject(AuthService);
-      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'home';
+      return auth.isSignedIn() ? auth.getDefaultRoute().replace(/^\//, '') : 'landing';
     },
   },
 ];

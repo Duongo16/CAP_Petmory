@@ -2,118 +2,135 @@ import {
   ChangeDetectionStrategy,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  DestroyRef,
   ElementRef,
   inject,
   OnInit,
   signal,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+import { fromEvent } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 import { Icon } from '../../shared/icon/icon';
+import { GuestHeader } from '../../shared/guest-header/guest-header';
+import { FooterLink, SiteFooter } from '../../shared/site-footer/site-footer';
 import '@google/model-viewer';
 
 export interface PetArModel {
   id: string;
-  name: string;
+  /** Khoa dich ten mau. */
+  key: string;
   kind: string;
-  emoji: string;
-  badge: string;
+  /** Khoa dich kieu van dong noi bat cua mau. */
+  motionKey: string;
   file: string;
-  defaultScale: string;
   animations: {
     key: string;
-    label: string;
-    icon: string;
+    labelKey: string;
   }[];
 }
+
+/** Bo hoat anh chung cua cac mau tu goi AnimalArmature. */
+const ARMATURE_ANIMATIONS = [
+  { key: 'AnimalArmature|Gallop', labelKey: 'AR.ANIM.GALLOP' },
+  { key: 'AnimalArmature|Walk', labelKey: 'AR.ANIM.WALK' },
+  { key: 'AnimalArmature|Idle', labelKey: 'AR.ANIM.IDLE' },
+  { key: 'AnimalArmature|Jump_ToIdle', labelKey: 'AR.ANIM.JUMP' },
+];
 
 export const AR_PET_MODELS: PetArModel[] = [
   {
     id: 'shiba',
-    name: 'Chó Shiba Inu',
+    key: 'AR.MODEL.SHIBA',
     kind: 'DOG',
-    emoji: '🐕',
-    badge: 'Chạy nhanh (Gallop)',
+    motionKey: 'AR.MOTION.GALLOP',
     file: '/models/q-ShibaInu.glb',
-    defaultScale: '1 1 1',
-    animations: [
-      { key: 'AnimalArmature|Gallop', label: 'Chạy nước đại', icon: '⚡' },
-      { key: 'AnimalArmature|Walk', label: 'Đi dạo', icon: '🐾' },
-      { key: 'AnimalArmature|Idle', label: 'Đứng yên', icon: '💤' },
-      { key: 'AnimalArmature|Jump_ToIdle', label: 'Nhảy bật', icon: '🦘' },
-      { key: 'AnimalArmature|Eating', label: 'Ăn ngon', icon: '🍖' },
-    ],
+    animations: [...ARMATURE_ANIMATIONS, { key: 'AnimalArmature|Eating', labelKey: 'AR.ANIM.EAT' }],
   },
   {
     id: 'husky',
-    name: 'Chó Husky',
+    key: 'AR.MODEL.HUSKY',
     kind: 'DOG',
-    emoji: '🐺',
-    badge: 'Chạy nhanh (Gallop)',
+    motionKey: 'AR.MOTION.GALLOP',
     file: '/models/q-Husky.glb',
-    defaultScale: '1 1 1',
-    animations: [
-      { key: 'AnimalArmature|Gallop', label: 'Chạy nước đại', icon: '⚡' },
-      { key: 'AnimalArmature|Walk', label: 'Đi dạo', icon: '🐾' },
-      { key: 'AnimalArmature|Idle', label: 'Đứng yên', icon: '💤' },
-      { key: 'AnimalArmature|Jump_ToIdle', label: 'Nhảy bật', icon: '🦘' },
-      { key: 'AnimalArmature|Eating', label: 'Ăn ngon', icon: '🍖' },
-    ],
+    animations: [...ARMATURE_ANIMATIONS, { key: 'AnimalArmature|Eating', labelKey: 'AR.ANIM.EAT' }],
   },
   {
     id: 'fox',
-    name: 'Cáo nhỏ',
+    key: 'AR.MODEL.FOX',
     kind: 'OTHER',
-    emoji: '🦊',
-    badge: 'Chạy nhanh (Gallop)',
+    motionKey: 'AR.MOTION.GALLOP',
     file: '/models/q-Fox.glb',
-    defaultScale: '1 1 1',
-    animations: [
-      { key: 'AnimalArmature|Gallop', label: 'Chạy nước đại', icon: '⚡' },
-      { key: 'AnimalArmature|Walk', label: 'Đi dạo', icon: '🐾' },
-      { key: 'AnimalArmature|Idle', label: 'Đứng yên', icon: '💤' },
-      { key: 'AnimalArmature|Jump_ToIdle', label: 'Nhảy bật', icon: '🦘' },
-    ],
+    animations: ARMATURE_ANIMATIONS,
   },
   {
     id: 'bunny',
-    name: 'Thỏ con',
+    key: 'AR.MODEL.BUNNY',
     kind: 'OTHER',
-    emoji: '🐰',
-    badge: 'Chạy / Nhảy',
+    motionKey: 'AR.MOTION.HOP',
     file: '/models/animal-bunny.glb',
-    defaultScale: '1 1 1',
     animations: [
-      { key: 'run', label: 'Chạy', icon: '⚡' },
-      { key: 'walk', label: 'Đi dạo', icon: '🐾' },
-      { key: 'dance', label: 'Nhảy múa', icon: '🎵' },
-      { key: 'idle', label: 'Đứng yên', icon: '💤' },
-      { key: 'eat', label: 'Gặm cỏ', icon: '🥕' },
+      { key: 'run', labelKey: 'AR.ANIM.RUN' },
+      { key: 'walk', labelKey: 'AR.ANIM.WALK' },
+      { key: 'dance', labelKey: 'AR.ANIM.DANCE' },
+      { key: 'idle', labelKey: 'AR.ANIM.IDLE' },
+      { key: 'eat', labelKey: 'AR.ANIM.NIBBLE' },
     ],
   },
   {
     id: 'panda',
-    name: 'Gấu trúc',
+    key: 'AR.MODEL.PANDA',
     kind: 'OTHER',
-    emoji: '🐼',
-    badge: 'Chạy / Nhảy',
+    motionKey: 'AR.MOTION.HOP',
     file: '/models/animal-panda.glb',
-    defaultScale: '1 1 1',
     animations: [
-      { key: 'run', label: 'Chạy', icon: '⚡' },
-      { key: 'walk', label: 'Đi dạo', icon: '🐾' },
-      { key: 'dance', label: 'Nhảy múa', icon: '🎵' },
-      { key: 'idle', label: 'Đứng yên', icon: '💤' },
-      { key: 'eat', label: 'Ăn trúc', icon: '🎋' },
+      { key: 'run', labelKey: 'AR.ANIM.RUN' },
+      { key: 'walk', labelKey: 'AR.ANIM.WALK' },
+      { key: 'dance', labelKey: 'AR.ANIM.DANCE' },
+      { key: 'idle', labelKey: 'AR.ANIM.IDLE' },
+      { key: 'eat', labelKey: 'AR.ANIM.BAMBOO' },
     ],
   },
 ];
 
+/** Cac muc phong to trong AR. */
+export const AR_SCALES = [
+  { value: 0.6, labelKey: 'AR.SIZE.SMALL' },
+  { value: 1, labelKey: 'AR.SIZE.NORMAL' },
+  { value: 1.5, labelKey: 'AR.SIZE.LARGE' },
+];
+
+/** Dau model-viewer de lai tren dia chi khi khong mo duoc Scene Viewer (ung dung Google). */
+const NO_SCENE_VIEWER_HASH = '#model-viewer-no-ar-fallback';
+
+/** Trinh duyet nhung trong ung dung chat, mang xa hoi: khong goi duoc AR cua he thong. */
+const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|Instagram|Zalo|Line\/|; wv\)/i;
+const MOBILE = /Android|iPhone|iPad|iPod/i;
+
+/**
+ * Ly do may nay khong mo duoc AR. model-viewer chi ghi canh bao vao console roi
+ * im lang, nen trang phai noi ro de nguoi dung biet can doi sang dau.
+ */
+export function arBlockedReason(ua: string, secure: boolean): string {
+  if (IN_APP_BROWSER.test(ua)) {
+    return 'AR.WHY.IN_APP';
+  }
+  if (!MOBILE.test(ua)) {
+    return 'AR.WHY.NEED_PHONE';
+  }
+  if (!secure) {
+    return 'AR.WHY.NEED_HTTPS';
+  }
+  return 'AR.WHY.UNSUPPORTED';
+}
+
 @Component({
   selector: 'pm-ar-pet-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, Icon],
+  imports: [RouterLink, Icon, TranslatePipe, GuestHeader, SiteFooter],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './ar-pet-page.html',
   styleUrls: ['./ar-pet-page.scss'],
@@ -121,19 +138,27 @@ export const AR_PET_MODELS: PetArModel[] = [
 })
 export class ArPetPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('modelViewerRef') modelViewerRef?: ElementRef;
 
   readonly petList = AR_PET_MODELS;
+  readonly scales = AR_SCALES;
   readonly selectedPet = signal<PetArModel>(AR_PET_MODELS[0]);
   readonly currentAnimation = signal<string>(AR_PET_MODELS[0].animations[0].key);
-  readonly currentScale = signal<string>('1 1 1');
-  readonly isArSupported = signal<boolean>(true);
-  readonly arStatusMessage = signal<string>('');
+  readonly currentScale = signal<number>(1);
+  /** Khoa dich ly do khong mo duoc AR; rong la chua co van de gi. */
+  readonly arProblem = signal<string>('');
+  readonly signedIn = inject(AuthService).isSignedIn;
+  readonly guestFooterMenu: FooterLink[] = [
+    { path: '/shop', key: 'NAV.SHOP' },
+    { path: '/diaries', key: 'NAV.PUBLIC_DIARIES' },
+    { path: '/login', key: 'AUTH.SIGN_IN' },
+    { path: '/register', key: 'LANDING.START_FREE' },
+  ];
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const modelId = params['model'] || params['pet'];
       if (modelId) {
         const found = this.petList.find(
@@ -144,6 +169,31 @@ export class ArPetPage implements OnInit {
         }
       }
     });
+    // Scene Viewer khong mo duoc thi trinh duyet quay lai trang kem dau nay.
+    fromEvent(window, 'hashchange')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (location.hash === NO_SCENE_VIEWER_HASH) {
+          this.arProblem.set('AR.WHY.NO_SCENE_VIEWER');
+        }
+      });
+  }
+
+  /** Mo hinh tai xong: bao truoc neu may nay khong mo duoc AR. */
+  onModelLoaded(): void {
+    const viewer = this.modelViewerRef?.nativeElement;
+    if (this.arProblem() === 'AR.WHY.LOAD_FAILED') {
+      this.arProblem.set('');
+    }
+    if (viewer && !viewer.canActivateAR && !this.arProblem()) {
+      this.arProblem.set(arBlockedReason(navigator.userAgent, window.isSecureContext));
+    }
+  }
+
+  onArStatus(event: Event): void {
+    if ((event as CustomEvent<{ status: string }>).detail?.status === 'failed') {
+      this.arProblem.set('AR.WHY.FAILED');
+    }
   }
 
   selectPet(pet: PetArModel): void {
@@ -152,6 +202,13 @@ export class ArPetPage implements OnInit {
     if (pet.animations.length > 0) {
       this.currentAnimation.set(pet.animations[0].key);
     }
+  }
+
+  /** Nhan cua hoat anh dang chay, de hien tren khung xem. */
+  animationLabel(): string {
+    return (
+      this.selectedPet().animations.find((a) => a.key === this.currentAnimation())?.labelKey ?? ''
+    );
   }
 
   selectAnimation(animKey: string): void {
@@ -163,29 +220,30 @@ export class ArPetPage implements OnInit {
     }
   }
 
+  scaleAttr(): string {
+    const s = this.currentScale();
+    return `${s} ${s} ${s}`;
+  }
+
   setScale(scaleMultiplier: number): void {
-    const s = `${scaleMultiplier} ${scaleMultiplier} ${scaleMultiplier}`;
-    this.currentScale.set(s);
+    this.currentScale.set(scaleMultiplier);
     const viewer = this.modelViewerRef?.nativeElement;
     if (viewer) {
-      viewer.scale = s;
+      viewer.scale = this.scaleAttr();
     }
   }
 
+  /** Phai goi ngay trong luot bam: Scene Viewer va Quick Look can thao tac cua nguoi dung. */
   launchAr(): void {
     const viewer = this.modelViewerRef?.nativeElement;
-    if (viewer && typeof viewer.activateAR === 'function') {
-      viewer.activateAR();
-    } else {
-      this.arStatusMessage.set('Đang kích hoạt chế độ AR...');
+    if (!viewer) {
+      return;
     }
-  }
-
-  goBack(): void {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      this.router.navigate(['/']);
+    if (!viewer.canActivateAR) {
+      this.arProblem.set(arBlockedReason(navigator.userAgent, window.isSecureContext));
+      return;
     }
+    this.arProblem.set('');
+    Promise.resolve(viewer.activateAR()).catch(() => this.arProblem.set('AR.WHY.FAILED'));
   }
 }

@@ -397,15 +397,13 @@ export class StudioPage implements OnInit {
   readonly photos = computed(() => this.preview().map((m) => ({ ...m, key: KEY_ANGLE[m.angle] })));
   readonly hasPhotos = computed(() => this.preview().length === 6);
   readonly countColorInUse = computed(() => this.colorCodesUsed().length);
-  readonly arLink = computed(() => {
-    const model = this.baseModelSelected();
-    if (!model) return '/ar';
-    const code = (model.code || '').toLowerCase();
-    if (code.includes('shiba')) return '/ar?model=shiba';
-    if (code.includes('husky')) return '/ar?model=husky';
-    if (code.includes('fox')) return '/ar?model=fox';
-    if (code.includes('bunny') || code.includes('cat')) return '/ar?model=bunny';
-    return '/ar?model=shiba';
+  /** Mau WebAR gan nhat voi mo hinh dang chon, de trang AR mo san dung con. */
+  readonly arModel = computed(() => {
+    const code = (this.baseModelSelected()?.code ?? '').toLowerCase();
+    if (code.includes('husky')) return 'husky';
+    if (code.includes('fox')) return 'fox';
+    if (code.includes('bunny') || code.includes('cat')) return 'bunny';
+    return 'shiba';
   });
 
   // --- De trung bay ---
