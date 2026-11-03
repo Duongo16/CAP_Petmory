@@ -143,10 +143,21 @@
           </div>
           @switch (step()) {
             @case ('MODEL') {
-              @if (facade.pets().length > 0) {
               <div class="match-box" id="studio-match-box">
                 <h3 class="match-title"><pm-icon name="sparkle" [size]="16" />{{ 'STUDIO.MATCH.TITLE' | translate }}</h3>
                 <p class="hint">{{ 'STUDIO.MATCH.SUB' | translate }}</p>
+                <!-- Tai thang mot anh len: khong can ho so be, dung duoc ngay ca khi chua tao be nao. -->
+                <label class="tw-btn-primary match-upload" for="studio-match-file" [class.is-off]="facade.matching()">
+                  @if (facade.matching()) {
+                    <mat-spinner diameter="16" />{{ 'STUDIO.MATCH.WORKING' | translate }}
+                  } @else {
+                    <pm-icon name="image" [size]="16" />{{ 'STUDIO.MATCH.UPLOAD' | translate }}
+                  }
+                </label>
+                <input id="studio-match-file" class="sr-only" type="file" accept="image/*"
+                  [disabled]="facade.matching()" (change)="matchFromUpload($event)" />
+                @if (facade.pets().length > 0) {
+                <p class="match-or">{{ 'STUDIO.MATCH.OR_PET' | translate }}</p>
                 <div class="match-row" [formGroup]="facade.form">
                   <label class="sr-only" for="studio-match-pet">{{ 'STUDIO.PET_LABEL' | translate }}</label>
                   <select id="studio-match-pet" formControlName="petId" class="tw-select">
@@ -155,12 +166,8 @@
                       <option [value]="pet._id">{{ pet.name }}</option>
                     }
                   </select>
-                  <button type="button" class="tw-btn-primary" id="studio-match" [disabled]="!facade.canMatch()" (click)="matchFromPhoto()">
-                    @if (facade.matching()) {
-                      <mat-spinner diameter="16" />{{ 'STUDIO.MATCH.WORKING' | translate }}
-                    } @else {
-                      <pm-icon name="sparkle" [size]="16" />{{ (matchView() ? 'STUDIO.MATCH.AGAIN' : 'STUDIO.MATCH.RUN') | translate }}
-                    }
+                  <button type="button" class="tw-btn-secondary" id="studio-match" [disabled]="!facade.canMatch()" (click)="matchFromPhoto()">
+                    <pm-icon name="sparkle" [size]="16" />{{ (matchView() ? 'STUDIO.MATCH.AGAIN' : 'STUDIO.MATCH.RUN') | translate }}
                   </button>
                 </div>
                 @if (facade.petChosen() && facade.photoCount() === 0) {
@@ -168,6 +175,7 @@
                     {{ 'STUDIO.MATCH.NEED_PHOTO' | translate }}
                     <button type="button" class="cart-block-fix" (click)="go('PHOTOS')">{{ 'STUDIO.MATCH.TO_PHOTOS' | translate }}</button>
                   </p>
+                }
                 }
                 @if (facade.matchError(); as codeError) {
                   <p class="note danger" role="alert">{{ codeError | translate }}</p>
@@ -204,7 +212,6 @@
                   </div>
                 }
               </div>
-              }
 
               @if (kindTabs().length > 1) {
               <div class="chips" role="group" [attr.aria-label]="'STUDIO.KIND_LABEL' | translate">

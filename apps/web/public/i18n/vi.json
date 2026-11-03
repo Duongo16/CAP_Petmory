@@ -687,7 +687,7 @@
     },
     "MATCH": {
       "TITLE": "Gợi ý từ ảnh",
-      "SUB": "Chọn bé đã có ảnh, mình chọn mẫu và tô sẵn màu lông.",
+      "SUB": "Tải ảnh bé lên, mình chọn mẫu giống bé và tô sẵn màu lông.",
       "RUN": "Gợi ý mẫu",
       "AGAIN": "Chọn lại từ ảnh",
       "WORKING": "Đang xem ảnh của bé…",
@@ -701,7 +701,9 @@
       "QUOTA": "Bạn đã dùng hết lượt dựng mẫu bằng AI hôm nay.",
       "NEED_PHOTO": "Bé chưa có ảnh nào.",
       "TO_PHOTOS": "Tải ảnh của bé",
-      "NOTES": "Ghi chú cho xưởng:"
+      "NOTES": "Ghi chú cho xưởng:",
+      "UPLOAD": "Tải ảnh bé lên",
+      "OR_PET": "Hoặc dùng ảnh của bé đã có:"
     },
     "CART_BLOCK": {
       "TITLE": "Chưa thêm được vào giỏ, còn thiếu:",

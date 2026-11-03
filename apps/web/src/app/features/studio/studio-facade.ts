@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { TimeoutError, forkJoin, map, of, switchMap, timeout } from 'rxjs';
+import { Observable, TimeoutError, forkJoin, map, of, switchMap, timeout } from 'rxjs';
 import { DesignsService } from '../../core/services/designs.service';
 import { CatalogService } from '../../core/services/catalog.service';
 import { CartService } from '../../core/services/cart.service';
@@ -22,8 +22,10 @@ import {
   Accessory,
   PackagingKind,
   PackagingOption,
+  PhotoMatch,
   PhotoMatchInfo,
 } from '../../core/models/api.model';
+import { ImageUnreadable, fitForUpload, looksLikeImage } from '../../core/utils/upload-image';
 import {
   BASE_NONE,
   StandDecoration,
@@ -42,6 +44,11 @@ export type SaveState = 'UNSAVED' | 'SAVING' | 'SAVED' | 'ERROR';
 
 /** AI nhận diện ảnh không được giữ nút ở trạng thái chờ vô hạn. */
 const MATCH_TIMEOUT_MS = 30_000;
+
+/** Anh tai len de dung mau: may chu nhan toi 4 MB, chua mot khoang an toan. */
+const MATCH_UPLOAD_BYTES = 3.5 * 1024 * 1024;
+/** AI chi can nhin ro be, canh dai 1600 diem anh la du. */
+const MATCH_UPLOAD_EDGE = 1600;
 
 /** Converts the data URL the browser produced into a binary blob for upload. */
 function dataUrlToBlob(str: string): Blob {
@@ -117,10 +124,41 @@ export class StudioFacade {
     if (!this.canMatch()) {
       return;
     }
+    this.runMatch(this.ai.matchFromPhoto(pet, pose), onMatch);
+  }
+
+  /**
+   * Dung mau tu mot anh khach tai thang len, khong can chon be.
+   *
+   * Anh thu nho tren trinh duyet truoc cho vua muc 4 MB cua may chu. `kind` la
+   * loai dang chon o man hinh, may chu dung khi dich vu AI khong doc duoc anh.
+   */
+  async matchFromUpload(file: File, kind: string, onMatch: (match: PhotoMatchInfo) => void, pose?: 'HEAD'): Promise<void> {
+    if (this.matching()) {
+      return;
+    }
+    if (!looksLikeImage(file)) {
+      this.matchError.set('PET.PHOTO_WRONG_TYPE');
+      return;
+    }
     this.matching.set(true);
     this.matchError.set('');
-    this.ai
-      .matchFromPhoto(pet, pose)
+    let ready: File;
+    try {
+      ready = await fitForUpload(file, { maxBytes: MATCH_UPLOAD_BYTES, maxEdge: MATCH_UPLOAD_EDGE });
+    } catch (trouble) {
+      this.matching.set(false);
+      this.matchError.set(trouble instanceof ImageUnreadable ? 'PHOTO.UNREADABLE' : 'STUDIO.MATCH.FAILED');
+      return;
+    }
+    this.runMatch(this.ai.matchFromUpload(ready, kind, pose), onMatch);
+  }
+
+  /** Phan chung cua hai cach dung mau: doi ket qua, ap len man hinh, bao loi. */
+  private runMatch(request: Observable<PhotoMatch>, onMatch: (match: PhotoMatchInfo) => void): void {
+    this.matching.set(true);
+    this.matchError.set('');
+    request
       .pipe(timeout({ each: MATCH_TIMEOUT_MS }), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (got) => {

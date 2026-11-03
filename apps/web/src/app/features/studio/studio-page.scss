@@ -2226,3 +2226,25 @@ ul {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+// Nut tai anh len de goi y mau: nut chinh cua hop, o chon be nam ben duoi lam cach thu hai.
+.match-upload {
+  align-self: flex-start;
+  cursor: pointer;
+
+  &.is-off {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+
+.match-box:has(#studio-match-file:focus-visible) .match-upload {
+  outline: 3px solid var(--pm-accent-ring);
+  outline-offset: 2px;
+}
+
+.match-or {
+  margin: var(--pm-space-1) 0 0;
+  font-size: var(--pm-text-sm);
+  color: var(--pm-text-muted);
+}

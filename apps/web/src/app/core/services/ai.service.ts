@@ -51,6 +51,23 @@ export class AiService {
     return this.http.post<PhotoMatch>(`${this.base}/design-suggestions/from-photo`, { petId, pose }, quiet);
   }
 
+  /**
+   * Nhu tren, nhung tu mot anh khach tai thang len, khong can ho so be.
+   * `kind` la loai dang chon o man hinh, dung khi dich vu AI khong doc duoc anh.
+   */
+  matchFromUpload(file: File, kind: string, pose?: 'HEAD'): Observable<PhotoMatch> {
+    const quiet = { headers: new HttpHeaders({ 'X-Skip-Loading': '1' }) };
+    const form = new FormData();
+    form.append('file', file);
+    if (kind === 'DOG' || kind === 'CAT') {
+      form.append('kind', kind);
+    }
+    if (pose) {
+      form.append('pose', pose);
+    }
+    return this.http.post<PhotoMatch>(`${this.base}/design-suggestions/from-upload`, form, quiet);
+  }
+
   /** Chon mot phuong an va nhan ve ban thiet ke de mo sang buoc tuy bien. */
   chooseOption(code: string, optionKey: string): Observable<Design> {
     return this.http.post<Design>(`${this.base}/design-suggestions/${code}/choose`, { optionKey });

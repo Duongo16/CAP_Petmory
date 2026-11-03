@@ -656,6 +656,21 @@ export class StudioPage implements OnInit {
     );
   }
 
+  /** Tai thang mot anh len de goi y mau, khong can chon be trong ho so. */
+  matchFromUpload(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) {
+      void this.facade.matchFromUpload(
+        file,
+        this.kindSelected() ?? '',
+        (match) => this.applyMatch(match),
+        this.facade.codeKindSelected() === PORTRAIT_PRODUCT_CODE ? 'HEAD' : undefined,
+      );
+    }
+  }
+
   uploadReference(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];

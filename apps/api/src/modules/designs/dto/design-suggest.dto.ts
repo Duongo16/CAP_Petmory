@@ -1,10 +1,24 @@
-import { Equals, IsEnum, IsMongoId, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { Equals, IsEnum, IsIn, IsMongoId, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import { SuggestStyle } from '../schemas/design-suggestion.schema';
 
 /** Dung san mot mau tu anh cua mot be. */
 export class MatchFromPhotoDto {
   @IsMongoId()
   petId!: string;
+
+  @IsOptional()
+  @Equals('HEAD')
+  pose?: 'HEAD';
+}
+
+/**
+ * Dung san mot mau tu mot anh tai thang len (tep nam o truong "file").
+ * `kind` la loai dang chon tren man hinh, dung khi dich vu AI khong doc duoc anh.
+ */
+export class MatchFromUploadDto {
+  @IsOptional()
+  @IsIn(['DOG', 'CAT'])
+  kind?: 'DOG' | 'CAT';
 
   @IsOptional()
   @Equals('HEAD')

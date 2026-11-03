@@ -687,7 +687,7 @@
     },
     "MATCH": {
       "TITLE": "Suggest from photo",
-      "SUB": "Pick a pet with photos and we’ll choose the model and fur colours.",
+      "SUB": "Upload a photo of your pet and we'll pick the closest model and fur colours.",
       "RUN": "Suggest a model",
       "AGAIN": "Pick again from photos",
       "WORKING": "Looking at your photos…",
@@ -701,7 +701,9 @@
       "QUOTA": "You have used all AI model builds for today.",
       "NEED_PHOTO": "This pet has no photos yet.",
       "TO_PHOTOS": "Upload pet photos",
-      "NOTES": "Notes for the workshop:"
+      "NOTES": "Notes for the workshop:",
+      "UPLOAD": "Upload a photo",
+      "OR_PET": "Or use photos of a pet you added:"
     },
     "CART_BLOCK": {
       "TITLE": "Cannot add to cart yet, still missing:",

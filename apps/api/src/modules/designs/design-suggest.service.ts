@@ -47,7 +47,10 @@ export interface PhotoMatch {
 const PHOTO_MAX = 3;
 
 /** Anh lon hon muc nay thi bo qua, de mot lan goi khong keo qua lau. */
-const PHOTO_BYTES_MAX = 4 * 1024 * 1024;
+export const PHOTO_BYTES_MAX = 4 * 1024 * 1024;
+
+/** Dang anh nhan khi khach tai anh thang len de dung mau. */
+const UPLOAD_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 /** Mo ta tung phong cach, viet ra de loi dan khong phu thuoc ten khoa. */
 const STYLE_NOTE: Record<SuggestStyle, string> = {
@@ -182,6 +185,41 @@ export class DesignSuggestService {
     if (picture.length === 0) {
       throw new BadRequestException({ code: 'NEED_PHOTOS', message: 'Can it nhat mot anh cua be de dung mau' });
     }
+    return this.matchPicture(owner, picture, { kind: pet.kind, breed: pet.breed ?? '' }, pose, pet._id.toString());
+  }
+
+  /**
+   * Dung mau tu mot anh khach tai thang len, khong can ho so be.
+   *
+   * Anh chi dung cho luot nay, khong luu lai. Khong co ho so nen loai lay theo
+   * loai dang chon o man hinh, dung khi dich vu AI khong doc duoc anh.
+   */
+  async fromUpload(owner: string, file: Express.Multer.File | undefined, kind = '', pose?: 'HEAD'): Promise<PhotoMatch> {
+    if (!file) {
+      throw new BadRequestException('Chua chon tep anh nao');
+    }
+    if (!UPLOAD_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException('Chi nhan anh JPG, PNG hoac WEBP');
+    }
+    if (file.size > PHOTO_BYTES_MAX) {
+      throw new BadRequestException('Anh vuot qua 4 MB');
+    }
+    const picture = [{ data: file.buffer.toString('base64'), kind: file.mimetype }];
+    return this.matchPicture(owner, picture, { kind, breed: '' }, pose, '');
+  }
+
+  /**
+   * Phan chung cua hai cach dung mau: doc anh, chon mau nen, doi mau tung vung.
+   * `known` la loai va giong biet truoc (tu ho so hoac tu man hinh), dung khi
+   * anh khong noi ro.
+   */
+  private async matchPicture(
+    owner: string,
+    picture: { data: string; kind: string }[],
+    known: { kind: string; breed: string },
+    pose: 'HEAD' | undefined,
+    resourceId: string,
+  ): Promise<PhotoMatch> {
     const zones = this.library.zoneName();
     const held = await this.quota.hold(owner, AiKind.DESIGN_SUGGESTION);
     try {
@@ -200,11 +238,11 @@ export class DesignSuggestService {
         mode = reading ? AiMode.LIVE : AiMode.LOCAL;
       }
       if (!reading) {
-        reading = { kind: pet.kind, pose: '', breed: pet.breed ?? '', colours: await readColoursLocally(Buffer.from(picture[0].data, 'base64')) };
+        reading = { kind: known.kind, pose: '', breed: known.breed, colours: await readColoursLocally(Buffer.from(picture[0].data, 'base64')) };
       }
-      // Anh khong ro loai ma ho so ghi ro la cho hay meo thi tin ho so.
-      if (!['DOG', 'CAT'].includes(reading.kind) && ['DOG', 'CAT'].includes(pet.kind)) {
-        reading.kind = pet.kind;
+      // Anh khong ro loai ma ho so (hay man hinh) ghi ro la cho hay meo thi tin cai do.
+      if (!['DOG', 'CAT'].includes(reading.kind) && ['DOG', 'CAT'].includes(known.kind)) {
+        reading.kind = known.kind;
       }
 
       const models = this.library.ready().filter((model) => !pose || model.pose === pose);
@@ -221,7 +259,7 @@ export class DesignSuggestService {
         face.map((one) => ({ code: one.code, swatch: one.swatch })),
       );
 
-      await this.usage.record(AiKind.DESIGN_SUGGESTION, owner, mode, pet._id.toString(), problem);
+      await this.usage.record(AiKind.DESIGN_SUGGESTION, owner, mode, resourceId, problem);
       return {
         match: {
           mode,

@@ -1,6 +1,7 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
-import { DesignSuggestService } from './design-suggest.service';
-import { AskSuggestionDto, ChooseOptionDto, MatchFromPhotoDto } from './dto/design-suggest.dto';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { DesignSuggestService, PHOTO_BYTES_MAX } from './design-suggest.service';
+import { AskSuggestionDto, ChooseOptionDto, MatchFromPhotoDto, MatchFromUploadDto } from './dto/design-suggest.dto';
 import { AiQuotaService } from '../ai/ai-quota.service';
 import { AiKind } from '../ai/schemas/ai-usage.schema';
 import { AuthUser, CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -35,6 +36,18 @@ export class DesignSuggestController {
   @Post('from-photo')
   fromPhoto(@Body() dto: MatchFromPhotoDto, @CurrentUser() user: AuthUser) {
     return this.service.fromPhoto(user.userId, dto.petId, dto.pose);
+  }
+
+  /** Nhu tren, nhung khach tai thang mot anh len, khong can chon be trong ho so. */
+  @HttpCode(HttpStatus.CREATED)
+  @Post('from-upload')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: PHOTO_BYTES_MAX } }))
+  fromUpload(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: MatchFromUploadDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.service.fromUpload(user.userId, file, dto.kind, dto.pose);
   }
 
   @Get()
