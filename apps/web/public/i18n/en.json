@@ -767,17 +767,12 @@
     "PICK_PET": "Pick a pet",
     "PET_COUNT": "{{count}} models",
     "PICK_ANIM": "Pick a motion",
-    "PICK_SIZE": "Size in AR",
     "HOW_TITLE": "How to see your pet",
     "HOW_1": "Tap \"Start AR camera\" at the top or the scan button in the viewer.",
     "HOW_2": "Allow the browser to use your camera.",
     "HOW_3": "Point the camera at the floor or a flat table and pan gently side to side so the phone finds the surface.",
-    "HOW_4": "Your pet appears on the floor and moves with the motion you picked.",
-    "SIZE": {
-      "SMALL": "Small (0.6x)",
-      "NORMAL": "Normal (1.0x)",
-      "LARGE": "Large (1.5x)"
-    },
+    "HOW_4": "Your pet appears on the floor at real size. Use the buttons at the bottom of the camera view to change its motion, and pinch to resize.",
+    "HOW_NOTE": "If your phone opens Google's AR viewer instead of AR inside Chrome, the pet plays its default motion with no motion buttons; you can still pinch to resize.",
     "MODEL": {
       "SHIBA": "Shiba Inu",
       "HUSKY": "Husky",

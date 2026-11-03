@@ -14,6 +14,64 @@
   }
 }
 
+/*
+ * Thanh doi hoat dong tren man hinh camera.
+ *
+ * Chi hien khi phien AR dang chay: model-viewer gan ar-status len chinh no.
+ * Nen toi trong suot de doc duoc tren moi khung canh, dat sat day va chua
+ * khoang cho thanh dieu huong cua dien thoai.
+ */
+.ar-live {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 12px calc(16px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgb(0 0 0 / 0.55), transparent);
+}
+
+model-viewer[ar-status='session-started'] .ar-live,
+model-viewer[ar-status='object-placed'] .ar-live {
+  display: flex;
+}
+
+/* Dang trong AR thi nut mo AR khong con y nghia, an di de khoi de len thanh. */
+model-viewer[ar-status='session-started'] .ar-launch-slot-btn,
+model-viewer[ar-status='object-placed'] .ar-launch-slot-btn {
+  display: none;
+}
+
+.ar-live-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ar-live-chip {
+  flex: none;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: 9999px;
+  background: rgb(0 0 0 / 0.45);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &.on {
+    border-color: var(--pm-action);
+    background: var(--pm-action);
+    color: var(--pm-on-action);
+  }
+}
+
 // O chon be: cung dang the cua giao dien, be dang chon vien mau nhan.
 .pet-pick {
   display: flex;

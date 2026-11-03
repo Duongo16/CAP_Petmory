@@ -56,7 +56,6 @@
           touch-action="pan-y"
           autoplay
           [attr.animation-name]="currentAnimation()"
-          [attr.scale]="scaleAttr()"
           shadow-intensity="1.5"
           shadow-softness="0.8"
           exposure="1.1"
@@ -72,6 +71,22 @@
             <pm-icon name="camera" [size]="18" />
             <span>{{ 'AR.LAUNCH_SLOT' | translate }}</span>
           </button>
+
+          <!--
+            Thanh dieu khien ngay tren man hinh camera. model-viewer giu cac phan
+            tu con nay tren lop phu khi xem AR trong trinh duyet (WebXR); chan
+            beforexrselect de cham vao nut khong bi tinh la dat lai vi tri be.
+          -->
+          <div class="ar-live" (beforexrselect)="$event.preventDefault()">
+            <div class="ar-live-row" role="group" [attr.aria-label]="'AR.PICK_ANIM' | translate">
+              @for (anim of selectedPet().animations; track anim.key) {
+                <button type="button" class="ar-live-chip" [class.on]="currentAnimation() === anim.key"
+                  [attr.aria-pressed]="currentAnimation() === anim.key" (click)="selectAnimation(anim.key)">
+                  {{ anim.labelKey | translate }}
+                </button>
+              }
+            </div>
+          </div>
         </model-viewer>
       </div>
 
@@ -123,22 +138,6 @@
         </div>
       </section>
 
-      <section class="tw-card tw-card-pad flex flex-col gap-3">
-        <h2 class="tw-card-title">{{ 'AR.PICK_SIZE' | translate }}</h2>
-        <div class="flex flex-wrap gap-2">
-          @for (size of scales; track size.value) {
-            <button
-              type="button"
-              class="tw-chip"
-              [attr.aria-pressed]="currentScale() === size.value"
-              (click)="setScale(size.value)"
-            >
-              {{ size.labelKey | translate }}
-            </button>
-          }
-        </div>
-      </section>
-
       <section class="tw-panel p-5 flex flex-col gap-3">
         <h3 class="m-0 flex items-center gap-2 text-sm font-bold text-ink">
           <pm-icon name="bulb" [size]="18" />{{ 'AR.HOW_TITLE' | translate }}
@@ -149,6 +148,7 @@
           <li>{{ 'AR.HOW_3' | translate }}</li>
           <li>{{ 'AR.HOW_4' | translate }}</li>
         </ol>
+        <p class="m-0 text-xs leading-relaxed text-ink-muted">{{ 'AR.HOW_NOTE' | translate }}</p>
       </section>
     </div>
   </div>

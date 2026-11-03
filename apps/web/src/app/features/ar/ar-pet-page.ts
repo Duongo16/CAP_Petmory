@@ -26,6 +26,10 @@ export interface PetArModel {
   kind: string;
   /** Khoa dich kieu van dong noi bat cua mau. */
   motionKey: string;
+  /**
+   * Ban AR cua mo hinh (tools/build-ar-models.js): da thu ve co that cua mot be
+   * va dat hoat anh mac dinh len dau, vi Scene Viewer doc thang tep nay.
+   */
   file: string;
   animations: {
     key: string;
@@ -47,7 +51,7 @@ export const AR_PET_MODELS: PetArModel[] = [
     key: 'AR.MODEL.SHIBA',
     kind: 'DOG',
     motionKey: 'AR.MOTION.GALLOP',
-    file: '/models/q-ShibaInu.glb',
+    file: '/models/q-ShibaInu.ar.glb',
     animations: [...ARMATURE_ANIMATIONS, { key: 'AnimalArmature|Eating', labelKey: 'AR.ANIM.EAT' }],
   },
   {
@@ -55,7 +59,7 @@ export const AR_PET_MODELS: PetArModel[] = [
     key: 'AR.MODEL.HUSKY',
     kind: 'DOG',
     motionKey: 'AR.MOTION.GALLOP',
-    file: '/models/q-Husky.glb',
+    file: '/models/q-Husky.ar.glb',
     animations: [...ARMATURE_ANIMATIONS, { key: 'AnimalArmature|Eating', labelKey: 'AR.ANIM.EAT' }],
   },
   {
@@ -63,7 +67,7 @@ export const AR_PET_MODELS: PetArModel[] = [
     key: 'AR.MODEL.FOX',
     kind: 'OTHER',
     motionKey: 'AR.MOTION.GALLOP',
-    file: '/models/q-Fox.glb',
+    file: '/models/q-Fox.ar.glb',
     animations: ARMATURE_ANIMATIONS,
   },
   {
@@ -71,7 +75,7 @@ export const AR_PET_MODELS: PetArModel[] = [
     key: 'AR.MODEL.BUNNY',
     kind: 'OTHER',
     motionKey: 'AR.MOTION.HOP',
-    file: '/models/animal-bunny.glb',
+    file: '/models/animal-bunny.ar.glb',
     animations: [
       { key: 'run', labelKey: 'AR.ANIM.RUN' },
       { key: 'walk', labelKey: 'AR.ANIM.WALK' },
@@ -85,7 +89,7 @@ export const AR_PET_MODELS: PetArModel[] = [
     key: 'AR.MODEL.PANDA',
     kind: 'OTHER',
     motionKey: 'AR.MOTION.HOP',
-    file: '/models/animal-panda.glb',
+    file: '/models/animal-panda.ar.glb',
     animations: [
       { key: 'run', labelKey: 'AR.ANIM.RUN' },
       { key: 'walk', labelKey: 'AR.ANIM.WALK' },
@@ -94,13 +98,6 @@ export const AR_PET_MODELS: PetArModel[] = [
       { key: 'eat', labelKey: 'AR.ANIM.BAMBOO' },
     ],
   },
-];
-
-/** Cac muc phong to trong AR. */
-export const AR_SCALES = [
-  { value: 0.6, labelKey: 'AR.SIZE.SMALL' },
-  { value: 1, labelKey: 'AR.SIZE.NORMAL' },
-  { value: 1.5, labelKey: 'AR.SIZE.LARGE' },
 ];
 
 /** Dau model-viewer de lai tren dia chi khi khong mo duoc Scene Viewer (ung dung Google). */
@@ -143,10 +140,8 @@ export class ArPetPage implements OnInit {
   @ViewChild('modelViewerRef') modelViewerRef?: ElementRef;
 
   readonly petList = AR_PET_MODELS;
-  readonly scales = AR_SCALES;
   readonly selectedPet = signal<PetArModel>(AR_PET_MODELS[0]);
   readonly currentAnimation = signal<string>(AR_PET_MODELS[0].animations[0].key);
-  readonly currentScale = signal<number>(1);
   /** Khoa dich ly do khong mo duoc AR; rong la chua co van de gi. */
   readonly arProblem = signal<string>('');
   readonly signedIn = inject(AuthService).isSignedIn;
@@ -224,19 +219,6 @@ export class ArPetPage implements OnInit {
     if (viewer) {
       viewer.animationName = animKey;
       viewer.play();
-    }
-  }
-
-  scaleAttr(): string {
-    const s = this.currentScale();
-    return `${s} ${s} ${s}`;
-  }
-
-  setScale(scaleMultiplier: number): void {
-    this.currentScale.set(scaleMultiplier);
-    const viewer = this.modelViewerRef?.nativeElement;
-    if (viewer) {
-      viewer.scale = this.scaleAttr();
     }
   }
 
