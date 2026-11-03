@@ -124,6 +124,15 @@ export function arBlockedReason(ua: string, secure: boolean): string {
   return 'AR.WHY.UNSUPPORTED';
 }
 
+/**
+ * iPhone va iPad. iPad doi moi bao minh la Mac nen phai xet them man cam ung.
+ * Tren may Apple, AR di qua Quick Look: tep USDZ tu dung khong mang hoat anh
+ * xuong nen be dung yen, va Quick Look khong cho chen nut rieng.
+ */
+function isApplePhone(): boolean {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
 @Component({
   selector: 'pm-ar-pet-page',
   standalone: true,
@@ -138,6 +147,14 @@ export class ArPetPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('modelViewerRef') modelViewerRef?: ElementRef;
+  @ViewChild('cameraVideo') cameraVideo?: ElementRef<HTMLVideoElement>;
+  @ViewChild('cameraViewer') cameraViewer?: ElementRef;
+
+  /** May Apple: nut xem qua camera dua len lam nut chinh, vi AR cua Apple de be dung yen. */
+  readonly applePhone = isApplePhone();
+  /** Che do xem qua camera: anh camera sau lam nen, be 3D chay nhay de len, co nut doi hoat dong. */
+  readonly cameraOpen = signal(false);
+  private stream: MediaStream | null = null;
 
   readonly petList = AR_PET_MODELS;
   readonly selectedPet = signal<PetArModel>(AR_PET_MODELS[0]);
@@ -172,6 +189,14 @@ export class ArPetPage implements OnInit {
           this.arProblem.set('AR.WHY.NO_SCENE_VIEWER');
         }
       });
+    fromEvent<KeyboardEvent>(document, 'keydown')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event.key === 'Escape' && this.cameraOpen()) {
+          this.closeCamera();
+        }
+      });
+    this.destroyRef.onDestroy(() => this.stopStream());
   }
 
   /** Mo hinh tai xong: bao truoc neu may nay khong mo duoc AR. */
@@ -189,6 +214,8 @@ export class ArPetPage implements OnInit {
       this.arProblem.set('AR.WHY.IN_APP');
     } else if (viewer && !viewer.canActivateAR) {
       this.arProblem.set(arBlockedReason(navigator.userAgent, window.isSecureContext));
+    } else if (this.applePhone) {
+      this.arProblem.set('AR.WHY.APPLE_STILL');
     }
   }
 
@@ -215,11 +242,62 @@ export class ArPetPage implements OnInit {
 
   selectAnimation(animKey: string): void {
     this.currentAnimation.set(animKey);
-    const viewer = this.modelViewerRef?.nativeElement;
-    if (viewer) {
-      viewer.animationName = animKey;
-      viewer.play();
+    for (const viewer of [this.modelViewerRef?.nativeElement, this.cameraViewer?.nativeElement]) {
+      if (viewer) {
+        viewer.animationName = animKey;
+        viewer.play();
+      }
     }
+  }
+
+  /**
+   * Mo camera sau ngay tren trang va dat be 3D len tren.
+   *
+   * Khac AR that, be khong bam vao san, nhung chay duoc tren moi trinh duyet co
+   * camera (ke ca iPhone) va giu duoc nut doi hoat dong. Trinh duyet chi cho
+   * dung camera tren trang https.
+   */
+  async openCamera(): Promise<void> {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this.arProblem.set(window.isSecureContext ? 'AR.CAM.UNSUPPORTED' : 'AR.WHY.NEED_HTTPS');
+      return;
+    }
+    this.cameraOpen.set(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      });
+      if (!this.cameraOpen()) {
+        // Nguoi dung da dong truoc khi trinh duyet tra camera ve.
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      this.stream = stream;
+      // Lop camera vua bat; doi mot nhip ve de the video co trong trang.
+      if (!this.cameraVideo) {
+        await new Promise((ready) => requestAnimationFrame(ready));
+      }
+      const video = this.cameraVideo?.nativeElement;
+      if (video) {
+        video.srcObject = stream;
+        await video.play().catch(() => undefined);
+      }
+    } catch (trouble) {
+      this.cameraOpen.set(false);
+      const denied = trouble instanceof DOMException && trouble.name === 'NotAllowedError';
+      this.arProblem.set(denied ? 'AR.CAM.DENIED' : 'AR.CAM.FAILED');
+    }
+  }
+
+  closeCamera(): void {
+    this.stopStream();
+    this.cameraOpen.set(false);
+  }
+
+  private stopStream(): void {
+    this.stream?.getTracks().forEach((track) => track.stop());
+    this.stream = null;
   }
 
   /** Phai goi ngay trong luot bam: Scene Viewer va Quick Look can thao tac cua nguoi dung. */
@@ -232,8 +310,10 @@ export class ArPetPage implements OnInit {
       this.arProblem.set(arBlockedReason(navigator.userAgent, window.isSecureContext));
       return;
     }
-    // Van thu mo; trong trinh duyet nhung thi giu loi nhac doi trinh duyet.
-    this.arProblem.set(IN_APP_BROWSER.test(navigator.userAgent) ? 'AR.WHY.IN_APP' : '');
+    // Van thu mo; trong trinh duyet nhung hay tren may Apple thi giu loi nhac.
+    this.arProblem.set(
+      IN_APP_BROWSER.test(navigator.userAgent) ? 'AR.WHY.IN_APP' : this.applePhone ? 'AR.WHY.APPLE_STILL' : '',
+    );
     Promise.resolve(viewer.activateAR()).catch(() => this.arProblem.set('AR.WHY.FAILED'));
   }
 }

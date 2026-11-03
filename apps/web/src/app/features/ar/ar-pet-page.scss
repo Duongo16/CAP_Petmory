@@ -192,3 +192,68 @@ model-viewer[ar-status='object-placed'] .ar-launch-slot-btn {
     margin-top: 1px;
   }
 }
+
+/*
+ * Xem qua camera: phu kin man hinh, tren moi thanh dau va thanh dieu huong.
+ * Anh camera nam duoi cung, be 3D nen trong suot de len, nut nam tren cung.
+ */
+.cam {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #000000;
+  overscroll-behavior: contain;
+}
+
+.cam-feed {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.cam-pet {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  background: transparent;
+  --poster-color: transparent;
+  outline: none;
+}
+
+.cam-close {
+  position: absolute;
+  inset-block-start: calc(12px + env(safe-area-inset-top));
+  inset-inline-end: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.45);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.cam-hint {
+  position: absolute;
+  inset-block-start: calc(16px + env(safe-area-inset-top));
+  inset-inline: 16px 68px;
+  z-index: 2;
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.7);
+  pointer-events: none;
+}
+
+// Cung thanh nut voi AR trong trinh duyet, nhung o day luon hien.
+.cam .cam-live {
+  display: flex;
+  z-index: 2;
+}

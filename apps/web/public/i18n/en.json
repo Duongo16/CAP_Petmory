@@ -772,7 +772,7 @@
     "HOW_2": "Allow the browser to use your camera.",
     "HOW_3": "Point the camera at the floor or a flat table and pan gently side to side so the phone finds the surface.",
     "HOW_4": "Your pet appears on the floor at real size. Use the buttons at the bottom of the camera view to change its motion, and pinch to resize.",
-    "HOW_NOTE": "If your phone opens Google's AR viewer instead of AR inside Chrome, the pet plays its default motion with no motion buttons; you can still pinch to resize.",
+    "HOW_NOTE": "On iPhone, tap \"View through camera\" to watch your pet move and switch motions; Apple's AR only shows it standing still. On Android, the motion buttons appear when AR runs inside Chrome.",
     "MODEL": {
       "SHIBA": "Shiba Inu",
       "HUSKY": "Husky",
@@ -799,10 +799,20 @@
       "IN_APP": "The browser inside Zalo, Facebook or Messenger cannot open AR. Tap \"Open in browser\" to use Chrome (Android) or Safari (iPhone).",
       "NEED_PHONE": "Computers do not support AR. Open this page on your phone to place your pet on the floor.",
       "NEED_HTTPS": "This page is open over an insecure address (http). Browser AR needs https, so open the deployed site or run the dev server with https.",
-      "UNSUPPORTED": "This browser cannot open AR yet. Android needs Chrome with the Google app and Google Play Services for AR; iPhone needs Safari on iOS 12 or later.",
+      "UNSUPPORTED": "This browser cannot open AR yet. Android needs Chrome with the Google app and Google Play Services for AR; iPhone needs Safari on iOS 12 or later. You can still tap \"View through camera\" to watch your pet move.",
       "NO_SCENE_VIEWER": "Google's AR viewer could not open. Install or update the Google app and Google Play Services for AR, then try again.",
       "FAILED": "The AR session could not start. Allow camera access, find a well-lit spot and try again.",
-      "LOAD_FAILED": "The 3D model could not load. Check your connection and reload the page."
+      "LOAD_FAILED": "The 3D model could not load. Check your connection and reload the page.",
+      "APPLE_STILL": "On iPhone, Apple's AR shows your pet standing still with no motion buttons. To see it run and play, use \"View through camera\"."
+    },
+    "CAM": {
+      "OPEN": "View through camera",
+      "TITLE": "Pet on camera",
+      "CLOSE": "Close camera",
+      "HINT": "Your pet shows on the camera but does not stick to the floor like AR. Drag to rotate, pinch to zoom.",
+      "DENIED": "This page is not allowed to use the camera. Allow the camera in your browser settings and try again.",
+      "FAILED": "The camera could not open. Close other apps using the camera and try again.",
+      "UNSUPPORTED": "This browser does not let pages use the camera. Open it in Safari or Chrome."
     }
   },
   "HOME": {

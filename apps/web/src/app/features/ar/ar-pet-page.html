@@ -13,7 +13,12 @@
       <a class="tw-btn-secondary" routerLink="/studio">
         <pm-icon name="sparkle" [size]="16" />{{ 'AR.TO_STUDIO' | translate }}
       </a>
-      <button type="button" class="tw-btn-primary" (click)="launchAr()">
+      <!-- Tren iPhone, AR cua Apple de be dung yen nen xem qua camera la nut chinh. -->
+      <button type="button" id="ar-camera-open" [class.tw-btn-primary]="applePhone" [class.tw-btn-secondary]="!applePhone"
+        (click)="openCamera()">
+        <pm-icon name="eye" [size]="16" />{{ 'AR.CAM.OPEN' | translate }}
+      </button>
+      <button type="button" [class.tw-btn-primary]="!applePhone" [class.tw-btn-secondary]="applePhone" (click)="launchAr()">
         <pm-icon name="camera" [size]="16" />{{ 'AR.LAUNCH' | translate }}
       </button>
     </div>
@@ -153,6 +158,45 @@
     </div>
   </div>
 </div>
+
+@if (cameraOpen()) {
+  <!-- Xem qua camera: anh camera sau lam nen, be 3D nen trong suot dat len tren. -->
+  <div class="cam" role="dialog" aria-modal="true" [attr.aria-label]="'AR.CAM.TITLE' | translate">
+    <video #cameraVideo class="cam-feed" autoplay playsinline muted></video>
+    <model-viewer
+      #cameraViewer
+      class="cam-pet"
+      [attr.src]="selectedPet().file"
+      [attr.alt]="selectedPet().key | translate"
+      camera-controls
+      touch-action="none"
+      interaction-prompt="none"
+      autoplay
+      [attr.animation-name]="currentAnimation()"
+      shadow-intensity="1.2"
+      shadow-softness="1"
+      exposure="1.1"
+      camera-orbit="20deg 78deg 130%"
+    ></model-viewer>
+
+    <button type="button" class="cam-close" (click)="closeCamera()"
+      [attr.aria-label]="'AR.CAM.CLOSE' | translate" [attr.title]="'AR.CAM.CLOSE' | translate">
+      <pm-icon name="close" [size]="20" />
+    </button>
+    <p class="cam-hint">{{ 'AR.CAM.HINT' | translate }}</p>
+
+    <div class="ar-live cam-live">
+      <div class="ar-live-row" role="group" [attr.aria-label]="'AR.PICK_ANIM' | translate">
+        @for (anim of selectedPet().animations; track anim.key) {
+          <button type="button" class="ar-live-chip" [class.on]="currentAnimation() === anim.key"
+            [attr.aria-pressed]="currentAnimation() === anim.key" (click)="selectAnimation(anim.key)">
+            {{ anim.labelKey | translate }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}
 
 @if (!signedIn()) {
   <pm-site-footer [menu]="guestFooterMenu" />

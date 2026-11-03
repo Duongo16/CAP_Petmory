@@ -772,7 +772,7 @@
     "HOW_2": "Cho phép trình duyệt dùng camera.",
     "HOW_3": "Hướng camera xuống sàn nhà hoặc mặt bàn phẳng, lia nhẹ sang hai bên để máy nhận ra mặt phẳng.",
     "HOW_4": "Bé xuất hiện trên sàn với kích thước như thật. Bấm các nút ở cuối màn hình camera để đổi hoạt động, chụm hoặc mở hai ngón để thu nhỏ, phóng to.",
-    "HOW_NOTE": "Nếu máy mở trình xem AR của Google thay vì xem ngay trong Chrome, bé chạy hoạt động mặc định và không có nút đổi hoạt động; vẫn chụm hai ngón để đổi cỡ.",
+    "HOW_NOTE": "Trên iPhone, bấm \"Xem qua camera\" để thấy bé chạy nhảy và đổi hoạt động; AR của Apple chỉ hiện bé đứng yên. Trên Android, nút đổi hoạt động có khi AR chạy ngay trong Chrome.",
     "MODEL": {
       "SHIBA": "Chó Shiba Inu",
       "HUSKY": "Chó Husky",
@@ -799,10 +799,20 @@
       "IN_APP": "Trình duyệt bên trong Zalo, Facebook hay Messenger không mở được AR. Hãy bấm \"Mở bằng trình duyệt\" để mở trang bằng Chrome (Android) hoặc Safari (iPhone).",
       "NEED_PHONE": "Máy tính không hỗ trợ AR. Hãy mở trang này trên điện thoại để đặt bé xuống sàn nhà.",
       "NEED_HTTPS": "Trang đang mở qua địa chỉ không bảo mật (http). AR của trình duyệt cần https, hãy mở bản đã triển khai hoặc chạy máy chủ thử với https.",
-      "UNSUPPORTED": "Trình duyệt này chưa mở được AR. Android cần Chrome cùng ứng dụng Google và Dịch vụ Google Play cho AR; iPhone cần Safari trên iOS 12 trở lên.",
+      "UNSUPPORTED": "Trình duyệt này chưa mở được AR. Android cần Chrome cùng ứng dụng Google và Dịch vụ Google Play cho AR; iPhone cần Safari trên iOS 12 trở lên. Bạn vẫn có thể bấm \"Xem qua camera\" để thấy bé chạy nhảy.",
       "NO_SCENE_VIEWER": "Máy chưa mở được trình xem AR của Google. Hãy cài hoặc cập nhật ứng dụng Google và Dịch vụ Google Play cho AR rồi thử lại.",
       "FAILED": "Không bắt đầu được phiên AR. Hãy cho phép dùng camera, đứng nơi đủ sáng rồi thử lại.",
-      "LOAD_FAILED": "Không tải được mô hình 3D. Kiểm tra kết nối mạng rồi tải lại trang."
+      "LOAD_FAILED": "Không tải được mô hình 3D. Kiểm tra kết nối mạng rồi tải lại trang.",
+      "APPLE_STILL": "Trên iPhone, AR của Apple chỉ hiện bé đứng yên và không có nút đổi hoạt động. Muốn thấy bé chạy nhảy, hãy dùng \"Xem qua camera\"."
+    },
+    "CAM": {
+      "OPEN": "Xem qua camera",
+      "TITLE": "Bé trên camera",
+      "CLOSE": "Đóng camera",
+      "HINT": "Bé hiện trên camera nhưng chưa bám sàn như AR. Kéo để xoay, chụm hai ngón để phóng to.",
+      "DENIED": "Trang chưa được phép dùng camera. Hãy cho phép camera trong cài đặt trình duyệt rồi thử lại.",
+      "FAILED": "Không mở được camera. Hãy đóng ứng dụng khác đang dùng camera rồi thử lại.",
+      "UNSUPPORTED": "Trình duyệt này không cho trang dùng camera. Hãy mở bằng Safari hoặc Chrome."
     }
   },
   "HOME": {
