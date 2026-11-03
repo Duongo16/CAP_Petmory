@@ -100,6 +100,14 @@
             </dl>
           </section>
 
+          <!-- QR mo camera cua be: xuong in ra, dinh kem khung khi giao. -->
+          @if (order.arCode && order.status !== 'CANCELLED') {
+            <section class="card" id="order-ar-qr">
+              <h2>{{ 'AR.QR.STAFF_TITLE' | translate }}</h2>
+              <pm-ar-qr [code]="order.arCode" [orderCode]="order.orderCode" />
+            </section>
+          }
+
           <section class="card">
             <h2>{{ 'ADMIN.ORDER.DELIVERY_INFO' | translate }}</h2>
             <dl class="info-pair">

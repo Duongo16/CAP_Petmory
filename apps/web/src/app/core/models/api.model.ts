@@ -589,6 +589,8 @@ export interface Order {
   needsAttention?: boolean;
   attentionNote?: string;
   reasonDestroy?: string;
+  /** Ma mo trang camera cua be, in thanh QR; rong voi don chi co hang co san. */
+  arCode?: string;
 }
 
 export interface PaymentQr {

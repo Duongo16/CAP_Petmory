@@ -23,6 +23,7 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "allowedCommonJsDependencies": ["qrcode", "dijkstrajs"],
             "assets": [
               {
                 "glob": "**/*",

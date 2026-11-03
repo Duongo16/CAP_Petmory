@@ -7,6 +7,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AdminOrderDetailFacade, DESK_STAGE_KEYS } from './admin-order-detail-facade';
 import { AuthService } from '../../core/services/auth.service';
 import { MoneyPipe } from '../../shared/money.pipe';
+import { ArQr } from '../../shared/ar-qr/ar-qr';
 
 @Component({
   selector: 'pm-admin-order-detail-page',
@@ -18,6 +19,7 @@ import { MoneyPipe } from '../../shared/money.pipe';
     MatProgressSpinnerModule,
     TranslatePipe,
     MoneyPipe,
+    ArQr,
   ],
   providers: [AdminOrderDetailFacade],
   templateUrl: './admin-order-detail-page.html',

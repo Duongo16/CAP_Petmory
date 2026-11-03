@@ -13,8 +13,8 @@ export class OrdersController {
   }
 
   @Get(':orderCode')
-  detail(@Param('orderCode') orderCode: string, @CurrentUser() user: AuthUser) {
-    return this.service.findOwned(orderCode, user.userId);
+  async detail(@Param('orderCode') orderCode: string, @CurrentUser() user: AuthUser) {
+    return this.service.ensureArCode(await this.service.findOwned(orderCode, user.userId));
   }
 
   /** Khach tu huy mot don con dang cho thanh toan. */

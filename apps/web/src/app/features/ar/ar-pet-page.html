@@ -6,33 +6,36 @@
   <header class="tw-page-head mb-0">
     <div>
       <p class="tw-eyebrow m-0">{{ 'AR.EYEBROW' | translate }}</p>
-      <h1 class="tw-page-title mt-1">{{ 'AR.TITLE' | translate }}</h1>
+      <h1 class="tw-page-title mt-1">
+        @if (petName(); as name) {
+          {{ 'AR.TITLE_PET' | translate: { name: name } }}
+        } @else {
+          {{ 'AR.TITLE' | translate }}
+        }
+      </h1>
       <p class="tw-page-sub">{{ 'AR.SUB' | translate }}</p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      <a class="tw-btn-secondary" routerLink="/studio">
-        <pm-icon name="sparkle" [size]="16" />{{ 'AR.TO_STUDIO' | translate }}
-      </a>
-      <!-- Tren iPhone, AR cua Apple de be dung yen nen xem qua camera la nut chinh. -->
-      <button type="button" id="ar-camera-open" [class.tw-btn-primary]="applePhone" [class.tw-btn-secondary]="!applePhone"
-        (click)="openCamera()">
-        <pm-icon name="eye" [size]="16" />{{ 'AR.CAM.OPEN' | translate }}
-      </button>
-      <button type="button" [class.tw-btn-primary]="!applePhone" [class.tw-btn-secondary]="applePhone" (click)="launchAr()">
-        <pm-icon name="camera" [size]="16" />{{ 'AR.LAUNCH' | translate }}
+      @if (!fromOrder()) {
+        <a class="tw-btn-secondary" routerLink="/studio">
+          <pm-icon name="sparkle" [size]="16" />{{ 'AR.TO_STUDIO' | translate }}
+        </a>
+      }
+      <button type="button" class="tw-btn-primary" id="ar-camera-open" (click)="openCamera()">
+        <pm-icon name="camera" [size]="16" />{{ 'AR.CAM.OPEN' | translate }}
       </button>
     </div>
   </header>
 
-  @if (arProblem(); as problem) {
+  @if (problem(); as key) {
     <p class="ar-note m-0" role="status">
       <pm-icon name="bulb" [size]="18" />
-      <span>{{ problem | translate }}</span>
+      <span>{{ key | translate }}</span>
     </p>
   }
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- Khung xem 3D va nut mo AR -->
+    <!-- Khung xem 3D: xoay ngam be truoc khi mo camera -->
     <section class="lg:col-span-7 flex flex-col gap-3">
       <div class="viewer-wrapper tw-card relative w-full aspect-square sm:aspect-[4/3] lg:aspect-auto lg:h-[620px] overflow-hidden">
         <div class="absolute top-4 left-4 z-10 flex flex-col items-start gap-1.5 pointer-events-none">
@@ -53,10 +56,6 @@
           class="w-full h-full cursor-grab active:cursor-grabbing"
           [attr.src]="selectedPet().file"
           [attr.alt]="selectedPet().key | translate"
-          ar
-          ar-modes="webxr scene-viewer quick-look"
-          ar-placement="floor"
-          ar-scale="auto"
           camera-controls
           touch-action="pan-y"
           autoplay
@@ -68,31 +67,8 @@
           min-camera-orbit="auto auto 5%"
           max-camera-orbit="auto auto 300%"
           (load)="onModelLoaded()"
-          (error)="arProblem.set('AR.WHY.LOAD_FAILED')"
-          (ar-status)="onArStatus($event)"
-        >
-          <button slot="ar-button" type="button" class="ar-launch-slot-btn">
-            <span class="ar-btn-pulse" aria-hidden="true"></span>
-            <pm-icon name="camera" [size]="18" />
-            <span>{{ 'AR.LAUNCH_SLOT' | translate }}</span>
-          </button>
-
-          <!--
-            Thanh dieu khien ngay tren man hinh camera. model-viewer giu cac phan
-            tu con nay tren lop phu khi xem AR trong trinh duyet (WebXR); chan
-            beforexrselect de cham vao nut khong bi tinh la dat lai vi tri be.
-          -->
-          <div class="ar-live" (beforexrselect)="$event.preventDefault()">
-            <div class="ar-live-row" role="group" [attr.aria-label]="'AR.PICK_ANIM' | translate">
-              @for (anim of selectedPet().animations; track anim.key) {
-                <button type="button" class="ar-live-chip" [class.on]="currentAnimation() === anim.key"
-                  [attr.aria-pressed]="currentAnimation() === anim.key" (click)="selectAnimation(anim.key)">
-                  {{ anim.labelKey | translate }}
-                </button>
-              }
-            </div>
-          </div>
-        </model-viewer>
+          (error)="problem.set('AR.WHY.LOAD_FAILED')"
+        ></model-viewer>
       </div>
 
       <p class="m-0 px-1 flex flex-wrap items-center justify-between gap-2 text-xs text-ink-muted">
@@ -103,29 +79,31 @@
 
     <!-- Bang chon -->
     <div class="lg:col-span-5 flex flex-col gap-4">
-      <section class="tw-card tw-card-pad flex flex-col gap-3">
-        <div class="flex items-center justify-between gap-2">
-          <h2 class="tw-card-title">{{ 'AR.PICK_PET' | translate }}</h2>
-          <span class="text-xs text-ink-muted">{{ 'AR.PET_COUNT' | translate: { count: petList.length } }}</span>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5">
-          @for (pet of petList; track pet.id) {
-            <button
-              type="button"
-              class="pet-pick"
-              [class.on]="selectedPet().id === pet.id"
-              [attr.aria-pressed]="selectedPet().id === pet.id"
-              (click)="selectPet(pet)"
-            >
-              <span class="tw-icon-tile pet-pick-icon" aria-hidden="true"><pm-icon name="paw" [size]="18" /></span>
-              <span class="min-w-0 flex-1">
-                <span class="block text-sm font-semibold truncate">{{ pet.key | translate }}</span>
-                <span class="block text-xs text-ink-muted truncate mt-0.5">{{ pet.motionKey | translate }}</span>
-              </span>
-            </button>
-          }
-        </div>
-      </section>
+      @if (!fromOrder()) {
+        <section class="tw-card tw-card-pad flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="tw-card-title">{{ 'AR.PICK_PET' | translate }}</h2>
+            <span class="text-xs text-ink-muted">{{ 'AR.PET_COUNT' | translate: { count: petList.length } }}</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5">
+            @for (pet of petList; track pet.id) {
+              <button
+                type="button"
+                class="pet-pick"
+                [class.on]="selectedPet().id === pet.id"
+                [attr.aria-pressed]="selectedPet().id === pet.id"
+                (click)="selectPet(pet)"
+              >
+                <span class="tw-icon-tile pet-pick-icon" aria-hidden="true"><pm-icon name="paw" [size]="18" /></span>
+                <span class="min-w-0 flex-1">
+                  <span class="block text-sm font-semibold truncate">{{ pet.key | translate }}</span>
+                  <span class="block text-xs text-ink-muted truncate mt-0.5">{{ pet.motionKey | translate }}</span>
+                </span>
+              </button>
+            }
+          </div>
+        </section>
+      }
 
       <section class="tw-card tw-card-pad flex flex-col gap-3">
         <h2 class="tw-card-title">{{ 'AR.PICK_ANIM' | translate }}</h2>
@@ -151,16 +129,14 @@
           <li>{{ 'AR.HOW_1' | translate }}</li>
           <li>{{ 'AR.HOW_2' | translate }}</li>
           <li>{{ 'AR.HOW_3' | translate }}</li>
-          <li>{{ 'AR.HOW_4' | translate }}</li>
         </ol>
-        <p class="m-0 text-xs leading-relaxed text-ink-muted">{{ 'AR.HOW_NOTE' | translate }}</p>
       </section>
     </div>
   </div>
 </div>
 
 @if (cameraOpen()) {
-  <!-- Xem qua camera: anh camera sau lam nen, be 3D nen trong suot dat len tren. -->
+  <!-- Che do camera: anh camera sau lam nen, be 3D nen trong suot dat len tren. -->
   <div class="cam" role="dialog" aria-modal="true" [attr.aria-label]="'AR.CAM.TITLE' | translate">
     <video #cameraVideo class="cam-feed" autoplay playsinline muted></video>
     <model-viewer
@@ -185,10 +161,10 @@
     </button>
     <p class="cam-hint">{{ 'AR.CAM.HINT' | translate }}</p>
 
-    <div class="ar-live cam-live">
-      <div class="ar-live-row" role="group" [attr.aria-label]="'AR.PICK_ANIM' | translate">
+    <div class="cam-live">
+      <div class="cam-live-row" role="group" [attr.aria-label]="'AR.PICK_ANIM' | translate">
         @for (anim of selectedPet().animations; track anim.key) {
-          <button type="button" class="ar-live-chip" [class.on]="currentAnimation() === anim.key"
+          <button type="button" class="cam-chip" [class.on]="currentAnimation() === anim.key"
             [attr.aria-pressed]="currentAnimation() === anim.key" (click)="selectAnimation(anim.key)">
             {{ anim.labelKey | translate }}
           </button>

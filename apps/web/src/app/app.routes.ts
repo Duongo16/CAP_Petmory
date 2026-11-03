@@ -80,6 +80,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
       },
       { path: 'ar-pet', pathMatch: 'full', redirectTo: 'ar' },
+      // QR in kem don khung thu cung: mo camera cua dung be trong don.
+      {
+        path: 'ar/o/:code',
+        loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
+      },
     ],
   },
   /*
@@ -107,6 +112,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
   },
   { path: 'ar-pet', pathMatch: 'full', redirectTo: 'ar' },
+  {
+    path: 'ar/o/:code',
+    loadComponent: () => import('./features/ar/ar-pet-page').then((m) => m.ArPetPage),
+  },
   {
     path: 'shop',
     canActivate: [customerOnlyGuard],

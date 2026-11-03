@@ -104,6 +104,8 @@ export class AdminService {
     if (!order) {
       throw new NotFoundException(MSG.NOT_FOUND);
     }
+    // Don khung dat truoc khi co QR thi cap ma ngay, de xuong in QR kem khung.
+    await this.orders.ensureArCode(order);
     const [customer, history] = await Promise.all([
       this.userModel.findById(order.customer).exec(),
       this.audit.historyOfResource(RESOURCE_TYPE_ORDER, order.orderCode),

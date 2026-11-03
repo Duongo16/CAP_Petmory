@@ -1,0 +1,25 @@
+<div class="ar-qr">
+  <div class="qr-box">
+    @if (image(); as src) {
+      <img class="qr-img" [src]="src" [alt]="'AR.QR.ALT' | translate" width="132" height="132" />
+    } @else {
+      <span class="qr-wait" aria-hidden="true"></span>
+    }
+  </div>
+  <div class="qr-text">
+    <p class="qr-title">
+      <pm-icon name="camera" [size]="16" />{{ 'AR.QR.TITLE' | translate }}
+    </p>
+    <p class="qr-sub">{{ 'AR.QR.SUB' | translate }}</p>
+    <div class="qr-actions">
+      <a class="tw-btn-primary tw-btn-sm" [href]="link()" target="_blank" rel="noopener">
+        {{ 'AR.QR.OPEN' | translate }}
+      </a>
+      @if (image(); as src) {
+        <a class="tw-btn-secondary tw-btn-sm" [href]="src" [attr.download]="fileName()">
+          <pm-icon name="download" [size]="14" />{{ 'AR.QR.DOWNLOAD' | translate }}
+        </a>
+      }
+    </div>
+  </div>
+</div>

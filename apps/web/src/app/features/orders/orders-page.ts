@@ -5,11 +5,12 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { OrderGroup, OrdersFacade } from './orders-facade';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { Icon } from '../../shared/icon/icon';
+import { ArQr } from '../../shared/ar-qr/ar-qr';
 
 @Component({
   selector: 'pm-orders-page',
   standalone: true,
-  imports: [RouterLink, DatePipe, TranslatePipe, MoneyPipe, Icon],
+  imports: [RouterLink, DatePipe, TranslatePipe, MoneyPipe, Icon, ArQr],
   templateUrl: './orders-page.html',
   styleUrl: './orders-page.scss',
   providers: [OrdersFacade],

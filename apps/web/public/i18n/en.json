@@ -216,7 +216,7 @@
     "TREASURE_MILESTONES": "Milestones",
     "OPEN_BOOK": "Open the memory book",
     "OPEN_ALBUM": "See the album",
-    "OPEN_AR": "See in your room (AR)",
+    "OPEN_AR": "See your pet on camera",
     "KEEPSAKE_EYEBROW": "MAKE A KEEPSAKE",
     "KEEPSAKE_TITLE": "Weave this story into wool",
     "KEEPSAKE_SUB": "The artisan works from the very photographs you kept.",
@@ -446,7 +446,7 @@
   },
   "STUDIO": {
     "TITLE": "Design a framed felt portrait",
-    "OPEN_AR": "View the model in WebAR",
+    "OPEN_AR": "See your pet on camera",
     "SELECT_ZONE": "Choose a zone to recolour",
     "SELECT_COLOR_CODE": "Choose a wool colour code",
     "PALETTE": "(draft)",
@@ -758,23 +758,19 @@
   },
   "AR": {
     "EYEBROW": "PET WEBAR",
-    "TITLE": "Bring your pet into your room",
-    "SUB": "Pick a pet and a motion, then turn on the camera and scan the floor to watch it play in your real space.",
-    "LAUNCH": "Start AR camera",
-    "LAUNCH_SLOT": "Scan the floor",
+    "TITLE": "Your pet on camera",
+    "SUB": "Pick a motion, then open the camera to watch your pet play right in your space.",
     "TO_STUDIO": "3D studio",
     "DRAG_HINT": "Drag to rotate 360°, scroll to zoom",
     "ANIMATION": "Motion",
-    "VIEWER_NOTE": "Rotate and look around before opening AR.",
+    "VIEWER_NOTE": "Rotate and look around before opening the camera.",
     "PICK_PET": "Pick a pet",
     "PET_COUNT": "{{count}} models",
     "PICK_ANIM": "Pick a motion",
-    "HOW_TITLE": "How to see your pet",
-    "HOW_1": "Tap \"Start AR camera\" at the top or the scan button in the viewer.",
-    "HOW_2": "Allow the browser to use your camera.",
-    "HOW_3": "Point the camera at the floor or a flat table and pan gently side to side so the phone finds the surface.",
-    "HOW_4": "Your pet appears on the floor at real size. Use the buttons at the bottom of the camera view to change its motion, and pinch to resize.",
-    "HOW_NOTE": "On iPhone, tap \"View through camera\" to watch your pet move and switch motions; Apple's AR only shows it standing still. On Android, the motion buttons appear when AR runs inside Chrome.",
+    "HOW_TITLE": "How to see your pet on camera",
+    "HOW_1": "Tap \"Open camera\" and allow the browser to use it.",
+    "HOW_2": "Point the camera where you want your pet. Drag to rotate, pinch to zoom.",
+    "HOW_3": "Tap the buttons at the bottom of the screen to change its motion.",
     "MODEL": {
       "SHIBA": "Shiba Inu",
       "HUSKY": "Husky",
@@ -798,23 +794,27 @@
       "BAMBOO": "Eat bamboo"
     },
     "WHY": {
-      "IN_APP": "The browser inside Zalo, Facebook or Messenger cannot open AR. Tap \"Open in browser\" to use Chrome (Android) or Safari (iPhone).",
-      "NEED_PHONE": "Computers do not support AR. Open this page on your phone to place your pet on the floor.",
-      "NEED_HTTPS": "This page is open over an insecure address (http). Browser AR needs https, so open the deployed site or run the dev server with https.",
-      "UNSUPPORTED": "This browser cannot open AR yet. Android needs Chrome with the Google app and Google Play Services for AR; iPhone needs Safari on iOS 12 or later. You can still tap \"View through camera\" to watch your pet move.",
-      "NO_SCENE_VIEWER": "Google's AR viewer could not open. Install or update the Google app and Google Play Services for AR, then try again.",
-      "FAILED": "The AR session could not start. Allow camera access, find a well-lit spot and try again.",
-      "LOAD_FAILED": "The 3D model could not load. Check your connection and reload the page.",
-      "APPLE_STILL": "On iPhone, Apple's AR shows your pet standing still with no motion buttons. To see it run and play, use \"View through camera\"."
+      "NEED_HTTPS": "The camera only opens over https. Open the deployed Petmory site.",
+      "LOAD_FAILED": "The 3D model could not load. Check your connection and reload the page."
     },
     "CAM": {
-      "OPEN": "View through camera",
+      "OPEN": "Open camera",
       "TITLE": "Pet on camera",
       "CLOSE": "Close camera",
-      "HINT": "Your pet shows on the camera but does not stick to the floor like AR. Drag to rotate, pinch to zoom.",
+      "HINT": "Drag to rotate, pinch to zoom.",
       "DENIED": "This page is not allowed to use the camera. Allow the camera in your browser settings and try again.",
       "FAILED": "The camera could not open. Close other apps using the camera and try again.",
       "UNSUPPORTED": "This browser does not let pages use the camera. Open it in Safari or Chrome."
+    },
+    "TITLE_PET": "{{name}} on your camera",
+    "ORDER_NOT_FOUND": "We could not find the pet for this QR code (the order was cancelled or the code is wrong). You can still pick a pet below.",
+    "QR": {
+      "TITLE": "See your pet on camera",
+      "SUB": "Scan to open the camera, watch your pet play and switch its motion on screen.",
+      "OPEN": "Open AR",
+      "DOWNLOAD": "Download QR",
+      "ALT": "QR code that opens the pet camera",
+      "STAFF_TITLE": "AR QR code (print with the frame)"
     }
   },
   "HOME": {

@@ -6,7 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { randomBytes } from 'node:crypto';
 import { Order, OrderDocument, OrderStatus } from './schemas/order.schema';
+import { Pet, PetDocument } from '../pets/schemas/pet.schema';
 import { CreateOrderDto } from './dto/order.dto';
 import { CartService } from '../cart/cart.service';
 import { CartItem, LineKind } from '../cart/schemas/cart.schema';
@@ -44,6 +46,25 @@ type OrderRow = Record<string, unknown> & {
 
 function isDuplicate(trouble: unknown): boolean {
   return (trouble as { code?: number } | null)?.code === DUPLICATE_KEY;
+}
+
+/** Ma AR dung duoc: chu, so, gach ngang va gach duoi, dung do dai ta sinh ra. */
+const AR_CODE_SHAPE = /^[A-Za-z0-9_-]{12}$/;
+
+/** Don co dong khung thu cung lam theo ban thiet ke thi moi co QR mo AR. */
+function hasPetFrame(rows: { kind?: LineKind; design?: unknown }[]): boolean {
+  return rows.some((row) => row.kind === LineKind.MADE_TO_ORDER && Boolean(row.design));
+}
+
+/** Mười hai ky tu ngau nhien (72 bit), du de khong ai do ra duong dan cua don khac. */
+function newArCode(): string {
+  return randomBytes(9).toString('base64url');
+}
+
+/** Nhung gi trang AR cong khai duoc biet ve mot don: chi mau va ten be, khong co gi rieng tu. */
+export interface ArView {
+  modelCode: string;
+  petName: string;
 }
 
 /**
@@ -84,6 +105,7 @@ function onlyReadyMade(order: { rows: { kind: LineKind }[] }): boolean {
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly model: Model<OrderDocument>,
+    @InjectModel(Pet.name) private readonly petModel: Model<PetDocument>,
     private readonly cart: CartService,
     private readonly goods: GoodsService,
     private readonly config: BusinessConfigService,
@@ -153,6 +175,7 @@ export class OrdersService {
           status: OrderStatus.AWAITING_PAYMENT,
           productionDays,
           estimatedDelivery: deliveryDate,
+          arCode: hasPetFrame(rows) ? newArCode() : '',
           // Luu lai tai khoan nhan tien de truy vet don cu; QR tinh hien theo cau hinh dang dung.
           payee: {
             bankCode: config.bankCode,
@@ -359,11 +382,63 @@ export class OrdersService {
     return order;
   }
 
-  listMine(customer: string) {
-    return this.model
+  async listMine(customer: string) {
+    const list = await this.model
       .find({ customer: new Types.ObjectId(customer) })
       .sort({ createdAt: -1 })
       .exec();
+    await Promise.all(list.map((order) => this.ensureArCode(order)));
+    return list;
+  }
+
+  /**
+   * Cap ma AR cho don khung thu cung dat truoc khi co tinh nang nay.
+   *
+   * Chi ghi khi don chua co ma, nen hai lan mo cung luc khong cap hai ma khac
+   * nhau: lan sau doc lai ma lan truoc da ghi.
+   */
+  async ensureArCode(order: OrderDocument): Promise<OrderDocument> {
+    if (order.arCode || !hasPetFrame(order.rows)) {
+      return order;
+    }
+    const code = newArCode();
+    const wrote = await this.model
+      .updateOne({ _id: order._id, arCode: { $in: ['', null] } }, { $set: { arCode: code } })
+      .exec();
+    if (wrote.modifiedCount === 1) {
+      order.arCode = code;
+    } else {
+      const fresh = await this.model.findById(order._id).select('arCode').exec();
+      order.arCode = fresh?.arCode ?? '';
+    }
+    return order;
+  }
+
+  /**
+   * Trang AR cong khai cua mot don, mo bang QR.
+   *
+   * Khong can dang nhap vi QR co the dua cho nguoi nhan qua. Chi tra mau va
+   * ten be. Don da huy thi QR thoi dung.
+   */
+  async arView(code: string): Promise<ArView> {
+    if (!AR_CODE_SHAPE.test(code)) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    const order = await this.model
+      .findOne({ arCode: code, status: { $ne: OrderStatus.CANCELLED } })
+      .select('rows')
+      .exec();
+    const row = order?.rows.find((one) => one.kind === LineKind.MADE_TO_ORDER && one.design);
+    if (!row?.design) {
+      throw new NotFoundException(MSG.NOT_FOUND);
+    }
+    // Ten be: ten ghi tren dong, ten khac tren khung, roi moi den ten trong ho so be.
+    let petName = row.petName || row.design.engraving?.name || '';
+    if (!petName && row.design.pet) {
+      const pet = await this.petModel.findById(row.design.pet).select('name').exec();
+      petName = pet?.name ?? '';
+    }
+    return { modelCode: row.design.modelCode, petName };
   }
 
   /** Checks ownership on the order itself, not just the caller's role. */

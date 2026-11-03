@@ -129,6 +129,7 @@ export interface ZoneView {
 
 import { PetPhotos } from '../memories/pet-photos/pet-photos';
 import { CUSTOM_KEEPSAKE_CODES, FIGURE_PRODUCT_CODE, PORTRAIT_PRODUCT_CODE, packagingFits } from '../catalog/custom-keepsakes';
+import { arModelFor } from '../ar/ar-models';
 import { FinishedShowcase } from './finished-showcase/finished-showcase';
 import { GuideStep, StudioGuide } from './guide/studio-guide';
 
@@ -392,13 +393,7 @@ export class StudioPage implements OnInit {
   readonly hasPhotos = computed(() => this.preview().length === 6);
   readonly countColorInUse = computed(() => this.colorCodesUsed().length);
   /** Mau WebAR gan nhat voi mo hinh dang chon, de trang AR mo san dung con. */
-  readonly arModel = computed(() => {
-    const code = (this.baseModelSelected()?.code ?? '').toLowerCase();
-    if (code.includes('husky')) return 'husky';
-    if (code.includes('fox')) return 'fox';
-    if (code.includes('bunny') || code.includes('cat')) return 'bunny';
-    return 'shiba';
-  });
+  readonly arModel = computed(() => arModelFor(this.baseModelSelected()?.code ?? ''));
 
   // --- De trung bay ---
 

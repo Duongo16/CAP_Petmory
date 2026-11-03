@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './schemas/order.schema';
+import { Pet, PetSchema } from '../pets/schemas/pet.schema';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
+import { OrderArController } from './order-ar.controller';
 import { CartModule } from '../cart/cart.module';
 import { GoodsModule } from '../goods/goods.module';
 import { BusinessConfigModule } from '../business-config/business-config.module';
@@ -11,14 +13,17 @@ import { PhotosModule } from '../photos/photos.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
+    MongooseModule.forFeature([
+      { name: Order.name, schema: OrderSchema },
+      { name: Pet.name, schema: PetSchema },
+    ]),
     CartModule,
     GoodsModule,
     BusinessConfigModule,
     DesignsModule,
     PhotosModule,
   ],
-  controllers: [OrdersController],
+  controllers: [OrdersController, OrderArController],
   providers: [OrdersService],
   exports: [OrdersService],
 })

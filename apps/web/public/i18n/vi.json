@@ -216,7 +216,7 @@
     "TREASURE_MILESTONES": "Cột mốc",
     "OPEN_BOOK": "Mở quyển kỷ niệm",
     "OPEN_ALBUM": "Xem album ảnh",
-    "OPEN_AR": "Xem AR trong phòng",
+    "OPEN_AR": "Xem bé qua camera",
     "KEEPSAKE_EYEBROW": "LÀM KỶ VẬT",
     "KEEPSAKE_TITLE": "Dệt câu chuyện này thành kỷ vật len",
     "KEEPSAKE_SUB": "Nghệ nhân sẽ tái hiện bé từ chính những tấm ảnh bạn đã giữ.",
@@ -446,7 +446,7 @@
   },
   "STUDIO": {
     "TITLE": "Thiết kế tranh len cho bé",
-    "OPEN_AR": "Xem mô hình bằng WebAR",
+    "OPEN_AR": "Xem bé qua camera",
     "SELECT_ZONE": "Chọn vùng cần đổi màu",
     "SELECT_COLOR_CODE": "Chọn mã màu len",
     "PALETTE": "(bản tạm)",
@@ -758,23 +758,19 @@
   },
   "AR": {
     "EYEBROW": "WEBAR THÚ CƯNG",
-    "TITLE": "Đưa bé vào căn phòng của bạn",
-    "SUB": "Chọn một bé, chọn dáng vận động rồi bật camera quét sàn để thấy bé chạy nhảy ngay trong không gian thật.",
-    "LAUNCH": "Bật camera AR",
-    "LAUNCH_SLOT": "Quét sàn xem AR",
+    "TITLE": "Bé cưng chạy nhảy trên camera",
+    "SUB": "Chọn hoạt động rồi mở camera để thấy bé chạy nhảy ngay trong không gian của bạn.",
     "TO_STUDIO": "Tùy biến 3D",
     "DRAG_HINT": "Kéo để xoay 360°, cuộn để phóng to",
     "ANIMATION": "Hoạt ảnh",
-    "VIEWER_NOTE": "Xoay và ngắm bé trước khi mở AR.",
+    "VIEWER_NOTE": "Xoay và ngắm bé trước khi mở camera.",
     "PICK_PET": "Chọn bé thú cưng",
     "PET_COUNT": "{{count}} mẫu",
     "PICK_ANIM": "Chọn hoạt ảnh vận động",
-    "HOW_TITLE": "Cách quét để thấy bé",
-    "HOW_1": "Bấm \"Bật camera AR\" ở đầu trang hoặc nút quét sàn trong khung xem.",
-    "HOW_2": "Cho phép trình duyệt dùng camera.",
-    "HOW_3": "Hướng camera xuống sàn nhà hoặc mặt bàn phẳng, lia nhẹ sang hai bên để máy nhận ra mặt phẳng.",
-    "HOW_4": "Bé xuất hiện trên sàn với kích thước như thật. Bấm các nút ở cuối màn hình camera để đổi hoạt động, chụm hoặc mở hai ngón để thu nhỏ, phóng to.",
-    "HOW_NOTE": "Trên iPhone, bấm \"Xem qua camera\" để thấy bé chạy nhảy và đổi hoạt động; AR của Apple chỉ hiện bé đứng yên. Trên Android, nút đổi hoạt động có khi AR chạy ngay trong Chrome.",
+    "HOW_TITLE": "Cách xem bé qua camera",
+    "HOW_1": "Bấm \"Mở camera\" và cho phép trình duyệt dùng camera.",
+    "HOW_2": "Hướng camera vào nơi muốn đặt bé. Kéo để xoay, chụm hai ngón để phóng to.",
+    "HOW_3": "Chạm các nút ở cuối màn hình để đổi hoạt động của bé.",
     "MODEL": {
       "SHIBA": "Chó Shiba Inu",
       "HUSKY": "Chó Husky",
@@ -798,23 +794,27 @@
       "BAMBOO": "Ăn trúc"
     },
     "WHY": {
-      "IN_APP": "Trình duyệt bên trong Zalo, Facebook hay Messenger không mở được AR. Hãy bấm \"Mở bằng trình duyệt\" để mở trang bằng Chrome (Android) hoặc Safari (iPhone).",
-      "NEED_PHONE": "Máy tính không hỗ trợ AR. Hãy mở trang này trên điện thoại để đặt bé xuống sàn nhà.",
-      "NEED_HTTPS": "Trang đang mở qua địa chỉ không bảo mật (http). AR của trình duyệt cần https, hãy mở bản đã triển khai hoặc chạy máy chủ thử với https.",
-      "UNSUPPORTED": "Trình duyệt này chưa mở được AR. Android cần Chrome cùng ứng dụng Google và Dịch vụ Google Play cho AR; iPhone cần Safari trên iOS 12 trở lên. Bạn vẫn có thể bấm \"Xem qua camera\" để thấy bé chạy nhảy.",
-      "NO_SCENE_VIEWER": "Máy chưa mở được trình xem AR của Google. Hãy cài hoặc cập nhật ứng dụng Google và Dịch vụ Google Play cho AR rồi thử lại.",
-      "FAILED": "Không bắt đầu được phiên AR. Hãy cho phép dùng camera, đứng nơi đủ sáng rồi thử lại.",
-      "LOAD_FAILED": "Không tải được mô hình 3D. Kiểm tra kết nối mạng rồi tải lại trang.",
-      "APPLE_STILL": "Trên iPhone, AR của Apple chỉ hiện bé đứng yên và không có nút đổi hoạt động. Muốn thấy bé chạy nhảy, hãy dùng \"Xem qua camera\"."
+      "NEED_HTTPS": "Camera chỉ mở được khi trang chạy qua https. Hãy mở bản đã triển khai của Petmory.",
+      "LOAD_FAILED": "Không tải được mô hình 3D. Kiểm tra kết nối mạng rồi tải lại trang."
     },
     "CAM": {
-      "OPEN": "Xem qua camera",
+      "OPEN": "Mở camera",
       "TITLE": "Bé trên camera",
       "CLOSE": "Đóng camera",
-      "HINT": "Bé hiện trên camera nhưng chưa bám sàn như AR. Kéo để xoay, chụm hai ngón để phóng to.",
+      "HINT": "Kéo để xoay bé, chụm hai ngón để phóng to.",
       "DENIED": "Trang chưa được phép dùng camera. Hãy cho phép camera trong cài đặt trình duyệt rồi thử lại.",
       "FAILED": "Không mở được camera. Hãy đóng ứng dụng khác đang dùng camera rồi thử lại.",
       "UNSUPPORTED": "Trình duyệt này không cho trang dùng camera. Hãy mở bằng Safari hoặc Chrome."
+    },
+    "TITLE_PET": "Bé {{name}} trên camera của bạn",
+    "ORDER_NOT_FOUND": "Không tìm thấy bé của mã QR này (đơn đã huỷ hoặc mã sai). Bạn vẫn có thể chọn một bé bên dưới.",
+    "QR": {
+      "TITLE": "Xem bé qua camera",
+      "SUB": "Quét mã để mở camera, thấy bé chạy nhảy và đổi hoạt động ngay trên màn hình.",
+      "OPEN": "Mở AR",
+      "DOWNLOAD": "Tải mã QR",
+      "ALT": "Mã QR mở camera xem bé",
+      "STAFF_TITLE": "Mã QR AR (in kèm khung)"
     }
   },
   "HOME": {

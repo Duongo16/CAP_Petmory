@@ -289,6 +289,18 @@ export class Order {
 
   @Prop({ trim: true, default: '' })
   reasonDestroy!: string;
+
+  /**
+   * Ma mo trang AR cua be, in thanh QR kem don khung thu cung.
+   *
+   * Ngau nhien chu khong lay theo ma don, de nguoi cam QR cua don nay khong
+   * doan ra duong dan cua don khac. Rong voi don chi co hang co san.
+   */
+  @Prop({ trim: true, default: '' })
+  arCode!: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
+
+// Moi ma AR chi tro toi mot don; don chua co ma (rong) thi khong tinh.
+OrderSchema.index({ arCode: 1 }, { unique: true, partialFilterExpression: { arCode: { $gt: '' } } });

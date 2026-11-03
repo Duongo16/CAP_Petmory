@@ -111,6 +111,12 @@
                 </p>
               </div>
 
+              @if (card.raw.arCode && card.raw.status !== 'CANCELLED') {
+                <section class="tw-panel p-4">
+                  <pm-ar-qr [code]="card.raw.arCode" [orderCode]="card.raw.orderCode" />
+                </section>
+              }
+
               @if (card.stage > 0) {
                 <section class="tw-panel p-4">
                   <h3 class="m-0 mb-3 text-xs font-bold tracking-[0.03em] text-ink">{{ 'ORDER.TRACK_TITLE' | translate }}</h3>
