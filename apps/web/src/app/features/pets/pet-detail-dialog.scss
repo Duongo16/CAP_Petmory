@@ -11,10 +11,20 @@
   background: var(--pm-bg);
 }
 
+/*
+ * Nut dong ghim o goc tren khi cuon, khoi phai cuon nguoc len moi dong duoc.
+ *
+ * Nut nam trong khung cuon nen dung sticky. Moc cua sticky tinh tu mep trong
+ * phan dem cua khung, nen top va le tren am bang dung phan dem, de nut van o
+ * cach goc 14px nhu truoc. Khung la cot flex co khe 20px, nen le duoi am de
+ * nut khong day noi dung xuong: 14 + 40 - 10 + 20 = 64, dung cho cu.
+ */
 .detail-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
+  position: sticky;
+  top: -50px;
+  flex: none;
+  align-self: flex-end;
+  margin: -50px -10px -10px 0;
   z-index: 2;
   box-shadow: var(--pm-shadow);
 }
@@ -23,12 +33,17 @@
   .detail {
     padding: 60px 14px 14px;
   }
+
+  .detail-close {
+    top: -46px;
+    margin: -46px 0 -14px 0;
+  }
 }
 
 /* Nhan va nut mau rieng tren nen toi, Tailwind khong co san mau nay. */
 .chip-soft {
-  background: var(--pm-memorial);
-  color: var(--pm-on-accent);
+  background: var(--pm-night);
+  color: var(--pm-on-night);
 }
 
 .treasure-eyebrow {

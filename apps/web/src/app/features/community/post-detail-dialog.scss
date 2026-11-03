@@ -10,10 +10,15 @@
   background: var(--pm-bg);
 }
 
+/*
+ * Nut dong ghim o goc tren khi cuon. Moc cua sticky tinh tu mep trong phan dem
+ * (56px), nen top va le tren am dung bang do de nut van cach goc 12px.
+ */
 .post-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+  position: sticky;
+  top: -44px;
+  float: right;
+  margin: -44px 12px 0 0;
   z-index: 2;
   box-shadow: var(--pm-shadow);
 }
