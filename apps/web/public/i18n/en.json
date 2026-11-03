@@ -1713,7 +1713,21 @@
       "GROUP_HIDDEN": "Group removed.",
       "GROUP_INVALID": "Group code 2–30 characters (capitals, digits, dashes) and a name of at least 2 characters.",
       "GROUP_DUPLICATE": "This group code already exists.",
-      "GROUP_NOT_EMPTY": "This group still has items. Move them to another group before removing it."
+      "GROUP_NOT_EMPTY": "This group still has items. Move them to another group before removing it.",
+      "CODE_HINT": "Letters, digits and dashes, 2 to 40 characters. Example: RAINCOAT-01.",
+      "CODE_BAD": "Use only letters, digits and dashes, 2 to 40 characters.",
+      "NAME_BAD": "Enter a name of 2 to 200 characters.",
+      "DAYS_BAD": "Delivery days must be from 1 to 60.",
+      "OPTION_1_BAD": "Name the first option, for example Size.",
+      "VARIANT_BAD": "Check the red cells in the variant table: each needs an option value, a code (letters, digits, dashes), a price such as 120000 or 120.000, and stock of 0 or more.",
+      "FIX_FIELDS": "Some fields are not valid (red border). Fix them and save again.",
+      "IMAGE_UPLOAD": "Upload from device",
+      "IMAGE_UPLOADING": "Uploading...",
+      "IMAGE_OR": "or paste an image link below",
+      "IMAGE_HINT": "JPG, PNG or WEBP. Large photos are shrunk before sending. The first image is the cover.",
+      "IMAGE_TOO_MANY": "Each item keeps up to 8 images; the extra ones were skipped.",
+      "IMAGE_WRONG_TYPE": "Only JPG, PNG or WEBP image files are accepted.",
+      "IMAGE_FAILED": "The image could not be uploaded. Check your connection and try again."
     },
     "ORDER": {
       "TITLE": "Orders",

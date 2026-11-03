@@ -16,14 +16,22 @@
     <div class="pair">
       <div class="field">
         <label class="field-name" for="goods-code">{{ 'ADMIN.GOODS.CODE' | translate }}</label>
-        <input id="goods-code" type="text" formControlName="code" />
+        <input id="goods-code" class="upper" type="text" formControlName="code" />
         @if (editing) {
           <p class="field-note">{{ 'ADMIN.GOODS.CODE_LOCKED' | translate }}</p>
+        } @else {
+          <p class="field-note">{{ 'ADMIN.GOODS.CODE_HINT' | translate }}</p>
+        }
+        @if (tried() && form.controls.code.invalid) {
+          <p class="field-error">{{ 'ADMIN.GOODS.CODE_BAD' | translate }}</p>
         }
       </div>
       <div class="field">
         <label class="field-name" for="goods-name">{{ 'ADMIN.GOODS.NAME' | translate }}</label>
         <input id="goods-name" type="text" formControlName="name" />
+        @if (tried() && form.controls.name.invalid) {
+          <p class="field-error">{{ 'ADMIN.GOODS.NAME_BAD' | translate }}</p>
+        }
       </div>
     </div>
 
@@ -39,6 +47,9 @@
       <div class="field">
         <label class="field-name" for="goods-days">{{ 'ADMIN.GOODS.DELIVERY_DAYS' | translate }}</label>
         <input id="goods-days" type="number" min="1" max="60" formControlName="deliveryDays" />
+        @if (tried() && form.controls.deliveryDays.invalid) {
+          <p class="field-error">{{ 'ADMIN.GOODS.DAYS_BAD' | translate }}</p>
+        }
       </div>
     </div>
 
@@ -60,7 +71,20 @@
         <label class="field-name">{{ 'ADMIN.GOODS.IMAGES' | translate }}</label>
         <span class="shot-count">{{ images().length }}/{{ imageMax }}</span>
       </div>
+      <div class="shot-pick">
+        <label class="plain shot-upload" for="goods-image-file" [class.is-off]="imageFull()">
+          <pm-icon name="image" [size]="16" />
+          {{ (uploading() > 0 ? 'ADMIN.GOODS.IMAGE_UPLOADING' : 'ADMIN.GOODS.IMAGE_UPLOAD') | translate }}
+        </label>
+        <input id="goods-image-file" class="sr-only" type="file" accept="image/*" multiple
+          [disabled]="imageFull()" (change)="pickImages($event)" />
+        <span class="shot-or">{{ 'ADMIN.GOODS.IMAGE_OR' | translate }}</span>
+      </div>
       <pm-image-link boxId="goods-image" [disabled]="imageFull()" (picked)="addImage($event)" />
+      <p class="field-note">{{ 'ADMIN.GOODS.IMAGE_HINT' | translate }}</p>
+      @if (imageProblem(); as problem) {
+        <p class="field-error" role="alert">{{ problem | translate }}</p>
+      }
       @if (images().length > 0) {
         <div class="shot-grid">
           @for (one of images(); track one; let i = $index) {
@@ -90,6 +114,9 @@
         <label class="field-name" for="goods-option-1">{{ 'ADMIN.GOODS.OPTION_1' | translate }}</label>
         <input id="goods-option-1" type="text" maxlength="60" formControlName="optionName1"
           [placeholder]="'ADMIN.GOODS.OPTION_1_HINT' | translate" />
+        @if (tried() && form.controls.optionName1.invalid) {
+          <p class="field-error">{{ 'ADMIN.GOODS.OPTION_1_BAD' | translate }}</p>
+        }
       </div>
       <div class="field">
         <label class="field-name" for="goods-option-2">{{ 'ADMIN.GOODS.OPTION_2' | translate }}</label>
@@ -122,11 +149,11 @@
           </label>
           <label class="cell">
             <span class="cell-name">{{ 'ADMIN.GOODS.SKU' | translate }}</span>
-            <input class="variant-sku" type="text" formControlName="sku" />
+            <input class="variant-sku upper" type="text" formControlName="sku" />
           </label>
           <label class="cell">
             <span class="cell-name">{{ 'ADMIN.GOODS.PRICE' | translate }}</span>
-            <input type="text" inputmode="numeric" formControlName="price" />
+            <input type="text" inputmode="numeric" formControlName="price" placeholder="120000" />
           </label>
           <label class="cell">
             <span class="cell-name">{{ 'ADMIN.GOODS.STOCK' | translate }}</span>
@@ -149,6 +176,10 @@
       }
     </div>
 
+    @if (tried() && form.controls.variant.invalid) {
+      <p class="field-error" role="alert">{{ 'ADMIN.GOODS.VARIANT_BAD' | translate }}</p>
+    }
+
     @if (missingTwo()) {
       <p class="field-error" role="alert">{{ 'ADMIN.GOODS.OPTION_2_MISSING' | translate: { name: nameTwo() } }}</p>
     }
@@ -161,8 +192,11 @@
   </div>
 
   <footer class="sheet-foot">
+    @if (tried() && (form.invalid || missingTwo())) {
+      <p class="field-error foot-error" role="alert">{{ 'ADMIN.GOODS.FIX_FIELDS' | translate }}</p>
+    }
     <button type="button" class="plain" (click)="close()">{{ 'COMMON.CANCEL' | translate }}</button>
-    <button type="submit" class="strong" id="goods-save">
+    <button type="submit" class="strong" id="goods-save" [disabled]="uploading() > 0">
       {{ 'ADMIN.GOODS.SAVE' | translate }}
       <pm-icon name="check" [size]="15" />
     </button>

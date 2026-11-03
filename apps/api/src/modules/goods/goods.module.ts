@@ -7,6 +7,7 @@ import { GoodsService } from './goods.service';
 import { GoodsAdminService } from './goods-admin.service';
 import { GoodsController } from './goods.controller';
 import { GoodsAdminController } from './goods-admin.controller';
+import { GoodsImageService } from './goods-image.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { GoodsAdminController } from './goods-admin.controller';
     ]),
   ],
   controllers: [GoodsController, GoodsAdminController],
-  providers: [GoodsService, GoodsAdminService],
+  providers: [GoodsService, GoodsAdminService, GoodsImageService],
   exports: [GoodsService],
 })
 export class GoodsModule {}

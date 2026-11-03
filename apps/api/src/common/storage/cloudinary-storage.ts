@@ -16,6 +16,7 @@ const REMOTE_FOLDER: Record<StorageFolderName, string> = {
   [StorageFolder.COMMUNITY]: 'petmory/community',
   [StorageFolder.EXPORT]: 'petmory/exports',
   [StorageFolder.DIARY_MUSIC]: 'petmory/diary-music',
+  [StorageFolder.GOODS]: 'petmory/goods',
 };
 
 /**

@@ -100,6 +100,13 @@ export class GoodsService {
     return this.http.patch<Goods>(`${this.base}/admin/goods/${code}`, input);
   }
 
+  /** Tai mot anh san pham tu may len, nhan lai dia chi de gan vao mon hang. */
+  uploadImage(file: File): Observable<{ url: string }> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ url: string }>(`${this.base}/admin/goods/images`, form);
+  }
+
   hide(code: string): Observable<Goods> {
     return this.http.delete<Goods>(`${this.base}/admin/goods/${code}`);
   }

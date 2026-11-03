@@ -1,6 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { Request } from 'express';
 import { GoodsService } from './goods.service';
 import { GoodsAdminService } from './goods-admin.service';
+import { GOODS_IMAGE_MAX_BYTES, GoodsImageService } from './goods-image.service';
 import {
   CreateGoodsDto,
   GoodsCategoryDto,
@@ -30,7 +45,23 @@ export class GoodsAdminController {
     private readonly service: GoodsService,
     private readonly manage: GoodsAdminService,
     private readonly audit: AuditService,
+    private readonly images: GoodsImageService,
   ) {}
+
+  /**
+   * Tai mot anh san pham tu may len.
+   *
+   * Tra ve dia chi de dat vao danh sach anh cua mon hang; mon hang chi giu anh
+   * khi quan ly bam luu. Kho tren dia khong co dia chi rieng nen API tu tra tep
+   * qua duong cong khai cua trang khach.
+   */
+  @Roles(Role.MANAGER)
+  @Post('images')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: GOODS_IMAGE_MAX_BYTES } }))
+  async uploadImage(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
+    const fileName = await this.images.save(file);
+    return { url: this.images.addressOf(fileName) ?? `${originOf(req)}/api/goods/images/${fileName}` };
+  }
 
   @Roles(Role.MANAGER)
   @Get('categories')
@@ -189,4 +220,18 @@ function shortOf(one: { code: string; name: string; enabled: boolean; variant: {
       stock: each.stock,
     })),
   };
+}
+
+/**
+ * Goc dia chi ma trinh duyet dung de goi API.
+ *
+ * Sau lop chuyen tiep (Vercel) thi dia chi that nam o hai dau X-Forwarded,
+ * con chay tren may thi lay thang tu yeu cau.
+ */
+function originOf(req: Request): string {
+  const first = (value: string | string[] | undefined) =>
+    (Array.isArray(value) ? value[0] : value)?.split(',')[0].trim();
+  const proto = first(req.headers['x-forwarded-proto']) || req.protocol;
+  const host = first(req.headers['x-forwarded-host']) || req.get('host');
+  return `${proto}://${host}`;
 }

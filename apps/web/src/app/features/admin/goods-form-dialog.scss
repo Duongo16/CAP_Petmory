@@ -242,3 +242,52 @@
   background: var(--pm-bg-muted);
   color: var(--pm-text-muted);
 }
+
+/* Ma hang va ma to hop luon la chu in; luc luu cung doi sang chu in. */
+.upper {
+  text-transform: uppercase;
+}
+
+/* O sai vien do, de nguoi dung thay ngay o nao chan nut luu. */
+.field input.ng-invalid.ng-touched,
+.field select.ng-invalid.ng-touched,
+.field textarea.ng-invalid.ng-touched,
+.variant-row input.ng-invalid.ng-touched {
+  border-color: var(--pm-danger);
+}
+
+/* Tai anh tu may hoac dan lien ket: hai cach dat chung mot hang. */
+.shot-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pm-space-2);
+  margin-block-end: var(--pm-space-2);
+}
+
+.shot-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pm-space-2);
+  cursor: pointer;
+
+  &.is-off {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.shot-pick:has(input:focus-visible) .shot-upload {
+  outline: 3px solid var(--pm-accent-ring);
+  outline-offset: 2px;
+}
+
+.shot-or {
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-xs);
+}
+
+.foot-error {
+  align-self: center;
+  margin-inline-end: auto;
+}

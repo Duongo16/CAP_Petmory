@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormArray, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Goods, GoodsCategory } from '../../core/models/api.model';
+import { GoodsService } from '../../core/services/goods.service';
+import { ImageUnreadable, fitForUpload, looksLikeImage } from '../../core/utils/upload-image';
 import { Icon } from '../../shared/icon/icon';
 import { ImageLink } from '../../shared/image-link/image-link';
 
@@ -35,9 +37,24 @@ export interface GoodsFormResult {
   variant: GoodsFormVariant[];
 }
 
-const CODE_SHAPE = /^[A-Z0-9-]{2,40}$/;
+/* Ma go chu thuong cung duoc, luc luu se doi sang chu in nhu may chu doi hoi. */
+const CODE_SHAPE = /^[A-Za-z0-9-]{2,40}$/;
 const SKU_SHAPE = /^[A-Za-z0-9-]{2,40}$/;
 const MONEY_SHAPE = /^\d{1,12}$/;
+
+/** Dau phan cach hang nghin nguoi ta hay go: cham, phay, cach. */
+const THOUSANDS = /[.,\s]/g;
+
+/**
+ * Gia la so nguyen dong. Nhan ca cach viet 120.000 hay 120,000 vi day la cach
+ * go quen tay; luc luu bo dau phan cach di.
+ */
+function moneyShape(control: AbstractControl<string>): ValidationErrors | null {
+  return MONEY_SHAPE.test(String(control.value ?? '').replace(THOUSANDS, '')) ? null : { money: true };
+}
+
+/** Anh san pham toi da 10 MB o may chu; truoc khi gui thu nho canh dai con 2000 diem anh. */
+const IMAGE_EDGE = 2000;
 
 /** So ngay giao mac dinh khi them mon moi. */
 const DAYS_DEFAULT = 3;
@@ -64,14 +81,24 @@ export class GoodsFormDialog {
   private readonly fb = inject(FormBuilder);
   private readonly ref = inject<MatDialogRef<GoodsFormDialog, GoodsFormResult>>(MatDialogRef);
   private readonly data = inject<GoodsFormInput>(MAT_DIALOG_DATA);
+  private readonly goods = inject(GoodsService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly editing = this.data.goods !== null;
   readonly groups = this.data.groups;
 
   /** Dia chi anh cua mon hang. Anh dau tien la anh dai dien. */
   readonly images = signal<string[]>(this.data.goods?.images ?? []);
-  readonly imageFull = computed(() => this.images().length >= IMAGE_MAX);
+  /** So anh dang tai len; con anh dang tai thi chua cho luu. */
+  readonly uploading = signal(0);
+  readonly imageFull = computed(() => this.images().length + this.uploading() >= IMAGE_MAX);
   readonly imageMax = IMAGE_MAX;
+  /** Khoa dich loi tai anh gan nhat, rong la khong co loi. */
+  readonly imageProblem = signal<string | null>(null);
+
+  /** Da bam luu ma bieu mau con o sai: tu luc nay moi hien loi cua tung o. */
+  readonly tried = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     /* Ma la chia khoa cua mon hang nen chi go duoc luc tao, sua thi khoa lai. */
@@ -120,6 +147,50 @@ export class GoodsFormDialog {
     this.images.update((list) => list.filter((_, i) => i !== at));
   }
 
+  /** Chon anh tu may: thu nho tung tam roi tai len, xong tam nao gan tam do. */
+  pickImages(event: Event): void {
+    const box = event.target as HTMLInputElement;
+    const chosen = Array.from(box.files ?? []);
+    box.value = '';
+    this.imageProblem.set(null);
+    const room = IMAGE_MAX - this.images().length - this.uploading();
+    if (chosen.length > room) {
+      this.imageProblem.set('ADMIN.GOODS.IMAGE_TOO_MANY');
+    }
+    for (const file of chosen.slice(0, Math.max(room, 0))) {
+      if (!looksLikeImage(file)) {
+        this.imageProblem.set('ADMIN.GOODS.IMAGE_WRONG_TYPE');
+        continue;
+      }
+      void this.upload(file);
+    }
+  }
+
+  private async upload(file: File): Promise<void> {
+    this.uploading.update((n) => n + 1);
+    let ready: File;
+    try {
+      ready = await fitForUpload(file, { maxEdge: IMAGE_EDGE });
+    } catch (trouble) {
+      this.uploading.update((n) => n - 1);
+      this.imageProblem.set(trouble instanceof ImageUnreadable ? 'PHOTO.UNREADABLE' : 'ADMIN.GOODS.IMAGE_FAILED');
+      return;
+    }
+    this.goods
+      .uploadImage(ready)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ url }) => {
+          this.uploading.update((n) => n - 1);
+          this.addImage(url);
+        },
+        error: () => {
+          this.uploading.update((n) => n - 1);
+          this.imageProblem.set('ADMIN.GOODS.IMAGE_FAILED');
+        },
+      });
+  }
+
   addVariant(): void {
     this.variantList().push(this.makeVariant('', ['', ''], '', 0, true, false));
   }
@@ -135,7 +206,13 @@ export class GoodsFormDialog {
     const two = raw.optionName2.trim() !== '';
     this.missingTwo.set(two && raw.variant.some((each) => each.value2.trim() === ''));
     if (this.form.invalid || this.missingTwo()) {
+      // Truoc day bam luu ma co o sai thi khong co gi xay ra; nay chi ro o sai.
+      this.tried.set(true);
       this.form.markAllAsTouched();
+      this.host.nativeElement.querySelector<HTMLElement>('input.ng-invalid, select.ng-invalid, textarea.ng-invalid')?.focus();
+      return;
+    }
+    if (this.uploading() > 0) {
       return;
     }
     const names = two ? [raw.optionName1.trim(), raw.optionName2.trim()] : [raw.optionName1.trim()];
@@ -151,7 +228,7 @@ export class GoodsFormDialog {
       variant: raw.variant.map((each) => ({
         sku: each.sku.trim().toUpperCase(),
         optionValues: two ? [each.value1.trim(), each.value2.trim()] : [each.value1.trim()],
-        price: String(each.price).trim(),
+        price: String(each.price).replace(THOUSANDS, ''),
         stock: each.stock,
         enabled: each.enabled,
       })),
@@ -199,7 +276,7 @@ export class GoodsFormDialog {
       sku: [{ value: sku, disabled: saved }, [Validators.required, Validators.pattern(SKU_SHAPE)]],
       value1: [values[0] ?? '', [Validators.required, Validators.maxLength(60)]],
       value2: [values[1] ?? '', Validators.maxLength(60)],
-      price: [price, [Validators.required, Validators.pattern(MONEY_SHAPE)]],
+      price: [price, [Validators.required, moneyShape]],
       stock: [
         { value: stock, disabled: saved },
         [Validators.required, Validators.min(0), Validators.max(1000000)],

@@ -18,6 +18,7 @@ const SUBDIRECTORY: Record<StorageFolderName, string> = {
   [StorageFolder.COMMUNITY]: 'community',
   [StorageFolder.EXPORT]: 'exports',
   [StorageFolder.DIARY_MUSIC]: 'diary-music',
+  [StorageFolder.GOODS]: 'goods',
 };
 
 /** Keeps pictures on the disk of the machine running the API. */

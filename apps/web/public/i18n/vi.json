@@ -1713,7 +1713,21 @@
       "GROUP_HIDDEN": "Đã xóa nhóm hàng.",
       "GROUP_INVALID": "Mã nhóm 2–30 ký tự (chữ in hoa, số, gạch ngang) và tên ít nhất 2 ký tự.",
       "GROUP_DUPLICATE": "Mã nhóm này đã có rồi.",
-      "GROUP_NOT_EMPTY": "Nhóm này vẫn còn hàng. Hãy chuyển hàng sang nhóm khác trước khi xóa."
+      "GROUP_NOT_EMPTY": "Nhóm này vẫn còn hàng. Hãy chuyển hàng sang nhóm khác trước khi xóa.",
+      "CODE_HINT": "Chữ cái, chữ số và dấu gạch ngang, 2 đến 40 ký tự. Ví dụ: AO-MUA-01.",
+      "CODE_BAD": "Mã chỉ gồm chữ cái, chữ số và dấu gạch ngang, dài 2 đến 40 ký tự.",
+      "NAME_BAD": "Nhập tên món hàng, từ 2 đến 200 ký tự.",
+      "DAYS_BAD": "Số ngày giao từ 1 đến 60.",
+      "OPTION_1_BAD": "Đặt tên cho thuộc tính thứ nhất, ví dụ Kích thước.",
+      "VARIANT_BAD": "Kiểm tra các ô viền đỏ trong bảng tổ hợp: cần giá trị thuộc tính, mã tổ hợp (chữ, số, gạch ngang), giá là số tiền như 120000 hoặc 120.000, tồn từ 0 trở lên.",
+      "FIX_FIELDS": "Còn ô chưa hợp lệ (viền đỏ). Sửa rồi bấm lưu lại.",
+      "IMAGE_UPLOAD": "Tải ảnh từ máy",
+      "IMAGE_UPLOADING": "Đang tải ảnh...",
+      "IMAGE_OR": "hoặc dán liên kết ảnh bên dưới",
+      "IMAGE_HINT": "JPG, PNG hoặc WEBP. Ảnh lớn được thu nhỏ trước khi gửi. Ảnh đầu tiên là ảnh đại diện.",
+      "IMAGE_TOO_MANY": "Mỗi món hàng giữ tối đa 8 ảnh; những ảnh vượt quá đã bị bỏ qua.",
+      "IMAGE_WRONG_TYPE": "Chỉ nhận tệp ảnh JPG, PNG hoặc WEBP.",
+      "IMAGE_FAILED": "Không tải được ảnh lên. Kiểm tra kết nối rồi thử lại."
     },
     "ORDER": {
       "TITLE": "Đơn hàng",

@@ -19,12 +19,17 @@ export const StorageFolder = {
   EXPORT: 'exports',
   /** Nhac rieng cua tung quyen nhat ky. */
   DIARY_MUSIC: 'diary-music',
+  /** Anh hang co san do quan ly tai len, hien cho moi khach xem. */
+  GOODS: 'goods',
 } as const;
 
 export type StorageFolderName = (typeof StorageFolder)[keyof typeof StorageFolder];
 
 /** The groups anyone may read. Everything else needs the owner check first. */
-export const PUBLIC_FOLDER: ReadonlySet<string> = new Set([StorageFolder.COMMUNITY]);
+export const PUBLIC_FOLDER: ReadonlySet<string> = new Set([
+  StorageFolder.COMMUNITY,
+  StorageFolder.GOODS,
+]);
 
 export abstract class StorageService {
   /** Keeps the bytes. The name is decided by the calling module, not here. */
