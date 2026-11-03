@@ -569,12 +569,12 @@
       "HOOP": "Khung"
     },
     "HELP": {
-      "MODEL": "Chọn mẫu giống bé nhất rồi chọn kích cỡ. Khung bên cạnh cho bạn ướm thử bé trong khung. Có ảnh bé? Bấm “Gợi ý từ ảnh” để mình chọn giúp.",
+      "MODEL": "Chọn mẫu giống bé, rồi chọn cỡ và khung.",
       "STAND": "Chọn hình dạng và màu khung để ướm bé, chọn đế, rồi khắc tên và ngày kỷ niệm. Mục nào cũng có thể bỏ qua.",
-      "PHOTOS": "Chọn bé và gửi vài ảnh rõ mặt để thợ làm giống bé nhất.",
-      "SHOWCASE": "Xem mẫu thành phẩm thật để hình dung sản phẩm khi hoàn thiện.",
-      "FINISH": "Chọn hộp đựng, kiểm tra giá rồi thêm vào giỏ. Có thể lưu nháp để làm tiếp sau.",
-      "COLOR": "Chọn một cuộn len bên dưới, rồi chạm lên phần của bé muốn tô trên hình 3D."
+      "PHOTOS": "Gửi ít nhất một ảnh rõ mặt bé.",
+      "SHOWCASE": "Tranh len thật trông như thế này.",
+      "FINISH": "Chọn hộp rồi thêm vào giỏ, hoặc lưu nháp.",
+      "COLOR": "Chọn cuộn len rồi chạm lên bé để tô."
     },
     "GUIDE": {
       "OPEN": "Hướng dẫn",
@@ -607,13 +607,13 @@
       "SHOWCASE": "Thành phẩm"
     },
     "PANEL": {
-      "MODEL": "Hôm nay mình làm bé nào?",
-      "COLOR": "Chọn len rồi chạm lên bé",
-      "FINISH": "Gói bé lại thôi!",
+      "MODEL": "Chọn mẫu cho bé",
+      "COLOR": "Tô màu len",
+      "FINISH": "Gói quà",
       "STAND": "Chi tiết bức tranh",
       "DETAILS": "Chi tiết bức tranh",
       "PHOTOS": "Ảnh của bé",
-      "SHOWCASE": "Chiêm ngưỡng thành phẩm thực tế"
+      "SHOWCASE": "Thành phẩm thực tế"
     },
     "SUGGEST_LINK": "Chưa biết chọn? Gửi ảnh để mình gợi ý",
     "TAG_PLACEHOLDER": "Tên bé",
@@ -672,7 +672,7 @@
     "OPTIONAL_ACCESSORIES": "Thêm phụ kiện (tùy chọn)",
     "DESIGN_DIRTY": "Bạn đã đổi thiết kế. Hệ thống sẽ lưu lại trước khi thêm vào giỏ.",
     "REFERENCE_ERROR": "Chưa tải được ảnh. Hãy chọn ảnh JPG, PNG hoặc WEBP và thử lại.",
-    "PET_OPTIONAL": "Đã có album thú cưng? Bạn có thể chọn bên dưới để dùng thêm ảnh từ album, không bắt buộc.",
+    "PET_OPTIONAL": "Hoặc lấy thêm ảnh từ album của bé:",
     "PET_CREATE": "Tạo hồ sơ bé trước",
     "PHOTOS_NEED": "Đã có {{have}} ảnh; cần ít nhất {{need}} ảnh để đặt tranh.",
     "CART_NEED_PHOTOS_HINT": "Cần tải ít nhất {{need}} ảnh ở bước Ảnh của bé trước khi thêm vào giỏ.",
@@ -686,9 +686,9 @@
       "LINE": "Hộp & khung:"
     },
     "MATCH": {
-      "TITLE": "Chưa biết chọn mẫu nào?",
-      "SUB": "Không bắt buộc: nộp ảnh của bé để hệ thống tự chọn mẫu gần giống và tô sẵn màu lông. Hoặc tự chọn mẫu ngay bên dưới.",
-      "RUN": "Nộp ảnh để hệ thống tự chọn mẫu",
+      "TITLE": "Gợi ý từ ảnh",
+      "SUB": "Chọn bé đã có ảnh, mình chọn mẫu và tô sẵn màu lông.",
+      "RUN": "Gợi ý mẫu",
       "AGAIN": "Chọn lại từ ảnh",
       "WORKING": "Đang xem ảnh của bé…",
       "FOUND": "Nhận ra:",

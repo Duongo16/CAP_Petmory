@@ -569,12 +569,12 @@
       "HOOP": "Frame"
     },
     "HELP": {
-      "MODEL": "Pick the model that looks most like your pet, then a size. The panel beside it lets you try your pet in a frame. Have a photo? Tap “Suggest from photo” and we'll pick for you.",
+      "MODEL": "Pick the closest model, then a size and frame.",
       "STAND": "Choose a frame shape and colour to try your pet in, pick a stand, then engrave a name and date. Every part is optional.",
-      "PHOTOS": "Choose your pet and upload a few clear photos so the artisan can match them closely.",
-      "SHOWCASE": "See a real finished piece to picture how yours will turn out.",
-      "FINISH": "Choose packaging, check the price and add to cart. You can save a draft and continue later.",
-      "COLOR": "Pick a yarn below, then tap the part of your pet you want to colour on the 3D view."
+      "PHOTOS": "Send at least one clear photo of your pet’s face.",
+      "SHOWCASE": "This is what the real wool piece looks like.",
+      "FINISH": "Pick a box, then add to cart or save a draft.",
+      "COLOR": "Pick a yarn, then tap your pet to paint."
     },
     "GUIDE": {
       "OPEN": "Guide",
@@ -607,13 +607,13 @@
       "SHOWCASE": "Showcase"
     },
     "PANEL": {
-      "MODEL": "Who are we making today?",
-      "COLOR": "Pick a yarn, then tap the plush",
-      "FINISH": "Time to wrap it up!",
+      "MODEL": "Pick a model",
+      "COLOR": "Colour the wool",
+      "FINISH": "Wrap it up",
       "STAND": "Portrait details",
       "DETAILS": "Portrait details",
-      "PHOTOS": "Pet photos",
-      "SHOWCASE": "Finished Keepsake Showcase"
+      "PHOTOS": "Your pet’s photos",
+      "SHOWCASE": "The real finished piece"
     },
     "SUGGEST_LINK": "Not sure? Send a photo for a suggestion",
     "TAG_PLACEHOLDER": "Pet name",
@@ -672,7 +672,7 @@
     "OPTIONAL_ACCESSORIES": "Add accessories (optional)",
     "DESIGN_DIRTY": "Your design has changed. It will be saved before adding to the cart.",
     "REFERENCE_ERROR": "The photo could not be uploaded. Choose a JPG, PNG or WEBP image and try again.",
-    "PET_OPTIONAL": "Already have a pet album? You can select it below to use its photos too. This is optional.",
+    "PET_OPTIONAL": "Or use more photos from your pet’s album:",
     "PET_CREATE": "Create a pet profile first",
     "PHOTOS_NEED": "{{have}} photos added; at least {{need}} are needed for this portrait.",
     "CART_NEED_PHOTOS_HINT": "Upload at least {{need}} photos in the Photos step before adding to the cart.",
@@ -686,9 +686,9 @@
       "LINE": "Box & frame:"
     },
     "MATCH": {
-      "TITLE": "Not sure which model to pick?",
-      "SUB": "Optional: send your pet photos and we pick the closest model with the fur colours filled in. Or choose a model yourself below.",
-      "RUN": "Send photos to pick a model for me",
+      "TITLE": "Suggest from photo",
+      "SUB": "Pick a pet with photos and we’ll choose the model and fur colours.",
+      "RUN": "Suggest a model",
       "AGAIN": "Pick again from photos",
       "WORKING": "Looking at your photos…",
       "FOUND": "Found:",

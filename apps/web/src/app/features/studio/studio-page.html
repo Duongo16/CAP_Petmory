@@ -143,38 +143,6 @@
           </div>
           @switch (step()) {
             @case ('MODEL') {
-              @if (kindTabs().length > 1) {
-              <div class="chips" role="group" [attr.aria-label]="'STUDIO.KIND_LABEL' | translate">
-                @for (one of kindTabs(); track one.kind) {
-                  <button type="button" class="chip" [class.on]="kindSelected() === one.kind"
-                    [attr.aria-pressed]="kindSelected() === one.kind" (click)="selectKind(one.kind)">
-                    {{ one.key | translate }}
-                  </button>
-                }
-              </div>
-              }
-              @if (poseTabs().length > 1) {
-              <div class="chips pose-chips" role="group" [attr.aria-label]="'STUDIO.POSE_LABEL' | translate">
-                @for (one of poseTabs(); track one.pose) {
-                  <button type="button" class="chip" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-pose]="one.pose"
-                    (click)="selectPose(one.pose)">
-                    {{ one.key | translate }}
-                  </button>
-                }
-              </div>
-              }
-              <ul class="models">
-                @for (card of modelCards(); track card.raw.code) {
-                  <li>
-                    <button type="button" class="model" [class.on]="card.on" [attr.aria-pressed]="card.on" [attr.data-model]="card.raw.code"
-                      (click)="selectBaseModel(card.raw)">
-                      <img class="model-thumb" [src]="card.thumb" alt="" loading="lazy" width="96" height="96" />
-                      <span class="model-name">{{ card.raw.name }}</span>
-                      <span class="model-tag" [class.sitting]="card.sitting">{{ card.tagKey | translate }}</span>
-                    </button>
-                  </li>
-                }
-              </ul>
               @if (facade.pets().length > 0) {
               <div class="match-box" id="studio-match-box">
                 <h3 class="match-title"><pm-icon name="sparkle" [size]="16" />{{ 'STUDIO.MATCH.TITLE' | translate }}</h3>
@@ -238,6 +206,39 @@
               </div>
               }
 
+              @if (kindTabs().length > 1) {
+              <div class="chips" role="group" [attr.aria-label]="'STUDIO.KIND_LABEL' | translate">
+                @for (one of kindTabs(); track one.kind) {
+                  <button type="button" class="chip" [class.on]="kindSelected() === one.kind"
+                    [attr.aria-pressed]="kindSelected() === one.kind" (click)="selectKind(one.kind)">
+                    {{ one.key | translate }}
+                  </button>
+                }
+              </div>
+              }
+              @if (poseTabs().length > 1) {
+              <div class="chips pose-chips" role="group" [attr.aria-label]="'STUDIO.POSE_LABEL' | translate">
+                @for (one of poseTabs(); track one.pose) {
+                  <button type="button" class="chip" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-pose]="one.pose"
+                    (click)="selectPose(one.pose)">
+                    {{ one.key | translate }}
+                  </button>
+                }
+              </div>
+              }
+              <ul class="models">
+                @for (card of modelCards(); track card.raw.code) {
+                  <li>
+                    <button type="button" class="model" [class.on]="card.on" [attr.aria-pressed]="card.on" [attr.data-model]="card.raw.code"
+                      (click)="selectBaseModel(card.raw)">
+                      <img class="model-thumb" [src]="card.thumb" alt="" loading="lazy" width="96" height="96" />
+                      <span class="model-name">{{ card.raw.name }}</span>
+                      <span class="model-tag" [class.sitting]="card.sitting">{{ card.tagKey | translate }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+
               <h3 class="group-title">{{ 'STUDIO.SIZE_TITLE' | translate }}</h3>
               <div class="chips size-chips" role="group" [attr.aria-label]="'STUDIO.SELECT_SIZE' | translate">
                 @for (size of sizeCards(); track size.raw.code) {
@@ -247,12 +248,10 @@
                   </button>
                 }
               </div>
-              <p class="hint">{{ 'STUDIO.SIZE_HINT' | translate }}</p>
 
               <!-- Mau khung: kieu khung xem truoc ngay tren be, cung mau khung dang chon -->
               <section class="frame-choice" id="studio-frame">
                 <h3 class="group-title">{{ 'STUDIO.FRAME.TITLE' | translate }}</h3>
-                <p class="hint">{{ 'STUDIO.FRAME.HINT' | translate }}</p>
                 <div class="frame-cards" role="radiogroup" [attr.aria-label]="'STUDIO.HOOP.SHAPE_LABEL' | translate">
                   @for (one of frameShapes; track one.shape) {
                     <button type="button" role="radio" class="frame-card" [class.on]="frameShape() === one.shape"
@@ -332,7 +331,6 @@
             }
 
             @case ('PHOTOS') {
-              <p class="hint">{{ 'STUDIO.PHOTOS_SUB' | translate }}</p>
               <label class="field">
                 <span>{{ 'STUDIO.REFERENCE_UPLOAD' | translate }}</span>
                 <input type="file" accept="image/jpeg,image/png,image/webp" [disabled]="facade.uploadingReference()" (change)="uploadReference($event)" />
@@ -381,8 +379,6 @@
             }
 
             @case ('SHOWCASE') {
-              <p class="hint">{{ 'STUDIO.SHOWCASE.SUB' | translate }}</p>
-
               <!-- The thong tin tac pham thanh pham thuc te -->
               <div class="showcase-single-card">
                 <div class="single-card-thumb">
@@ -391,7 +387,6 @@
                 <div class="single-card-body">
                   <span class="single-card-tag">✨ Kỷ vật thủ công độc bản</span>
                   <h4 class="single-card-name">Tranh dạ len chọc Border Collie 3D</h4>
-                  <p class="single-card-desc">Tác phẩm được điêu khắc thủ công bằng kỹ thuật chọc kim nổi khối, tái hiện sống động ánh mắt và nếp lông của bé.</p>
                 </div>
               </div>
 
@@ -401,7 +396,6 @@
                   <span class="spec-icon" aria-hidden="true">🧶</span>
                   <div class="spec-info">
                     <strong>{{ 'STUDIO.SHOWCASE.CRAFT_WOOL_TITLE' | translate }}</strong>
-                    <p>{{ 'STUDIO.SHOWCASE.CRAFT_WOOL_DESC' | translate }}</p>
                   </div>
                 </div>
 
@@ -409,7 +403,6 @@
                   <span class="spec-icon" aria-hidden="true">🪡</span>
                   <div class="spec-info">
                     <strong>{{ 'STUDIO.SHOWCASE.CRAFT_NEEDLE_TITLE' | translate }}</strong>
-                    <p>{{ 'STUDIO.SHOWCASE.CRAFT_NEEDLE_DESC' | translate }}</p>
                   </div>
                 </div>
 
@@ -417,7 +410,6 @@
                   <span class="spec-icon" aria-hidden="true">🪵</span>
                   <div class="spec-info">
                     <strong>{{ 'STUDIO.SHOWCASE.CRAFT_FRAME_TITLE' | translate }}</strong>
-                    <p>{{ 'STUDIO.SHOWCASE.CRAFT_FRAME_DESC' | translate }}</p>
                   </div>
                 </div>
 
@@ -425,7 +417,6 @@
                   <span class="spec-icon" aria-hidden="true">🏷️</span>
                   <div class="spec-info">
                     <strong>{{ 'STUDIO.SHOWCASE.CRAFT_BACK_TITLE' | translate }}</strong>
-                    <p>{{ 'STUDIO.SHOWCASE.CRAFT_BACK_DESC' | translate }}</p>
                   </div>
                 </div>
               </div>
