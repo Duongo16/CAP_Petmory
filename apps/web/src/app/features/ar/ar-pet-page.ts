@@ -185,7 +185,14 @@ export class ArPetPage implements OnInit {
     if (this.arProblem() === 'AR.WHY.LOAD_FAILED') {
       this.arProblem.set('');
     }
-    if (viewer && !viewer.canActivateAR && !this.arProblem()) {
+    if (this.arProblem()) {
+      return;
+    }
+    // Trinh duyet trong Zalo, Facebook van bao mo duoc AR nhung lien ket mo
+    // ung dung AR thuong bi chan, nen nhac doi trinh duyet ngay tu dau.
+    if (IN_APP_BROWSER.test(navigator.userAgent)) {
+      this.arProblem.set('AR.WHY.IN_APP');
+    } else if (viewer && !viewer.canActivateAR) {
       this.arProblem.set(arBlockedReason(navigator.userAgent, window.isSecureContext));
     }
   }
@@ -243,7 +250,8 @@ export class ArPetPage implements OnInit {
       this.arProblem.set(arBlockedReason(navigator.userAgent, window.isSecureContext));
       return;
     }
-    this.arProblem.set('');
+    // Van thu mo; trong trinh duyet nhung thi giu loi nhac doi trinh duyet.
+    this.arProblem.set(IN_APP_BROWSER.test(navigator.userAgent) ? 'AR.WHY.IN_APP' : '');
     Promise.resolve(viewer.activateAR()).catch(() => this.arProblem.set('AR.WHY.FAILED'));
   }
 }
