@@ -115,10 +115,12 @@
     }
   </svg>
 
-  <figcaption class="caption">
-    <span class="caption-title">{{ 'STUDIO.HOOP.TITLE' | translate }}</span>
-    <span class="caption-note">
-      {{ (photo() ? 'STUDIO.HOOP.NOTE' : 'STUDIO.HOOP.PREPARING') | translate }}
-    </span>
-  </figcaption>
+  @if (caption()) {
+    <figcaption class="caption">
+      <span class="caption-title">{{ 'STUDIO.HOOP.TITLE' | translate }}</span>
+      <span class="caption-note">
+        {{ (photo() ? 'STUDIO.HOOP.NOTE' : 'STUDIO.HOOP.PREPARING') | translate }}
+      </span>
+    </figcaption>
+  }
 </figure>

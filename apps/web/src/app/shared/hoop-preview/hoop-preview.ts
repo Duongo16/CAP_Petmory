@@ -142,6 +142,8 @@ export class HoopPreview {
   readonly photo = input<string | null>(null);
   readonly shape = input<FrameShape>('ROUND');
   readonly finish = input<FrameFinish>('WALNUT');
+  /** Tat dong chu ben duoi khi khung chi la hinh thu nho, vi du o the chon mau khung. */
+  readonly caption = input(true);
 
   protected readonly id = `pm-hoop-${(serial += 1)}`;
   protected readonly frame = computed(() => geometryOf(this.shape()));

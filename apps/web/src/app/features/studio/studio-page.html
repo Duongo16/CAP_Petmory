@@ -67,7 +67,8 @@
           }
         </div>
 
-        <div class="stage-tools" role="toolbar" [attr.aria-label]="'STUDIO.STAGE_TOOLS' | translate">
+        <!-- Mot cot nut cung co, chi bieu tuong; ten nut nam o title va aria-label. -->
+        <div class="stage-tools" role="toolbar" aria-orientation="vertical" [attr.aria-label]="'STUDIO.STAGE_TOOLS' | translate">
           <button type="button" class="tool" [class.on]="rotating()" (click)="toggleRotate()"
             [attr.aria-pressed]="rotating()"
             [attr.aria-label]="(rotating() ? 'VIEWER.STOP_ROTATE' : 'VIEWER.AUTO_ROTATE') | translate"
@@ -79,17 +80,16 @@
               [attr.aria-pressed]="hoopShown()"
               [attr.aria-label]="(hoopShown() ? 'STUDIO.HOOP.HIDE' : 'STUDIO.HOOP.SHOW') | translate"
               [attr.title]="(hoopShown() ? 'STUDIO.HOOP.HIDE' : 'STUDIO.HOOP.SHOW') | translate">
-              <span class="tool-icon"><pm-icon name="image" [size]="18" /></span>
-              <span class="tool-label">{{ 'STUDIO.TOOL.HOOP' | translate }}</span>
+              <pm-icon name="image" [size]="18" />
             </button>
           }
           @if (step() === 'COLOR') {
-            <button type="button" class="round-button" (click)="undo()"
+            <button type="button" class="tool" (click)="undo()"
               [attr.aria-label]="'VIEWER.UNDO' | translate" [attr.title]="'VIEWER.UNDO' | translate">
               <pm-icon name="back" [size]="18" />
             </button>
           }
-          <a class="round-button ar-btn" routerLink="/ar" [queryParams]="{ model: arModel() }"
+          <a class="tool ar-btn" routerLink="/ar" [queryParams]="{ model: arModel() }"
             [attr.aria-label]="'STUDIO.OPEN_AR' | translate" [attr.title]="'STUDIO.OPEN_AR' | translate">
             <pm-icon name="camera" [size]="18" />
             <span class="ar-tag" aria-hidden="true">AR</span>
@@ -238,34 +238,6 @@
               </div>
               }
 
-              <div class="chips" role="group" [attr.aria-label]="'STUDIO.KIND_LABEL' | translate">
-                @for (one of kindTabs(); track one.kind) {
-                  <button type="button" class="chip" [class.on]="kindSelected() === one.kind"
-                    [attr.aria-pressed]="kindSelected() === one.kind" (click)="selectKind(one.kind)">
-                    {{ one.key | translate }}
-                  </button>
-                }
-              </div>
-              <div class="chips pose-chips" role="group" [attr.aria-label]="'STUDIO.POSE_LABEL' | translate">
-                @for (one of poseTabs(); track one.pose) {
-                  <button type="button" class="chip" [class.on]="one.on" [attr.aria-pressed]="one.on" [attr.data-pose]="one.pose"
-                    (click)="selectPose(one.pose)">
-                    {{ one.key | translate }}
-                  </button>
-                }
-              </div>
-              <ul class="models">
-                @for (card of modelCards(); track card.raw.code) {
-                  <li>
-                    <button type="button" class="model" [class.on]="card.on" [attr.aria-pressed]="card.on" [attr.data-model]="card.raw.code"
-                      (click)="selectBaseModel(card.raw)">
-                      <img class="model-thumb" [src]="card.thumb" alt="" loading="lazy" width="96" height="96" />
-                      <span class="model-name">{{ card.raw.name }}</span>
-                      <span class="model-tag" [class.sitting]="card.sitting">{{ card.tagKey | translate }}</span>
-                    </button>
-                  </li>
-                }
-              </ul>
               <h3 class="group-title">{{ 'STUDIO.SIZE_TITLE' | translate }}</h3>
               <div class="chips size-chips" role="group" [attr.aria-label]="'STUDIO.SELECT_SIZE' | translate">
                 @for (size of sizeCards(); track size.raw.code) {
@@ -276,6 +248,36 @@
                 }
               </div>
               <p class="hint">{{ 'STUDIO.SIZE_HINT' | translate }}</p>
+
+              <!-- Mau khung: kieu khung xem truoc ngay tren be, cung mau khung dang chon -->
+              <section class="frame-choice" id="studio-frame">
+                <h3 class="group-title">{{ 'STUDIO.FRAME.TITLE' | translate }}</h3>
+                <p class="hint">{{ 'STUDIO.FRAME.HINT' | translate }}</p>
+                <div class="frame-cards" role="radiogroup" [attr.aria-label]="'STUDIO.HOOP.SHAPE_LABEL' | translate">
+                  @for (one of frameShapes; track one.shape) {
+                    <button type="button" role="radio" class="frame-card" [class.on]="frameShape() === one.shape"
+                      [attr.aria-checked]="frameShape() === one.shape" [attr.data-shape]="one.shape"
+                      (click)="pickFrameShape(one.shape)">
+                      <pm-hoop-preview class="frame-thumb" [photo]="portrait()" [shape]="one.shape"
+                        [finish]="frameFinish()" [caption]="false" aria-hidden="true" />
+                      <span class="frame-name">{{ one.key | translate }}</span>
+                    </button>
+                  }
+                </div>
+
+                <p class="finish-label">
+                  {{ 'STUDIO.HOOP.FINISH_LABEL' | translate }}:
+                  <strong>{{ finishKey() | translate }}</strong>
+                </p>
+                <div class="finish-row" role="radiogroup" [attr.aria-label]="'STUDIO.HOOP.FINISH_LABEL' | translate">
+                  @for (one of frameFinishes; track one.finish) {
+                    <button type="button" role="radio" class="finish-swatch" [class.on]="frameFinish() === one.finish"
+                      [attr.aria-checked]="frameFinish() === one.finish" [attr.data-finish]="one.finish"
+                      [style.--swatch]="one.swatch" [attr.aria-label]="one.key | translate" [attr.title]="one.key | translate"
+                      (click)="pickFrameFinish(one.finish)"></button>
+                  }
+                </div>
+              </section>
 
               @if (credit(); as one) {
                 <p class="credit">
@@ -356,37 +358,6 @@
                   <label class="field"><span>{{ 'STUDIO.MESSAGE' | translate }}</span><textarea formControlName="message" rows="2" maxlength="300" class="tw-textarea"></textarea></label>
                   <label class="field"><span>{{ 'STUDIO.FEATURE_NOTE' | translate }}</span><textarea formControlName="featureNote" rows="2" maxlength="500" class="tw-textarea feature-note" [placeholder]="'STUDIO.FEATURE_NOTE_HINT' | translate"></textarea></label>
                 </div>
-              </details>
-
-              <details class="studio-optional-details">
-              <summary>{{ 'STUDIO.OPTIONAL_ACCESSORIES' | translate }}</summary>
-              <h3 class="group-title first">
-                {{ 'STUDIO.ACC.TITLE' | translate }}
-                <span class="count">{{ facade.accessoryPicked().length }}/{{ facade.accessoryMax() }}</span>
-              </h3>
-              @if (!canAccessorize()) {
-                <p class="hint acc-hint">{{ 'STUDIO.ACC.NO_ANCHOR' | translate }}</p>
-              } @else if (accessoryCards().length === 0) {
-                <p class="hint acc-hint">{{ 'STUDIO.ACC.NONE' | translate }}</p>
-              } @else {
-                <ul class="accessories">
-                  @for (card of accessoryCards(); track card.raw.code) {
-                    <li>
-                      <button type="button" class="accessory" [class.on]="card.on" [attr.aria-pressed]="card.on"
-                        [attr.data-frame]="card.raw.code" (click)="selectFrame(card.raw.code)">
-                        <span class="acc-name">{{ card.raw.displayName }}</span>
-                        <span class="acc-price">
-                          @if (card.free) {
-                            {{ 'STUDIO.STAND.FREE' | translate }}
-                          } @else {
-                            +{{ card.raw.priceDelta | amount: card.raw.currency }}
-                          }
-                        </span>
-                      </button>
-                    </li>
-                  }
-                </ul>
-              }
               </details>
 
               @if (facade.pets().length > 0) {

@@ -26,7 +26,7 @@ import { StudioFacade } from './studio-facade';
 import { ANCHOR_NODE, AccessoryMount, StandardAngle, MaterialZone } from '../../shared/viewer-3d/engine-3d';
 import { PaintMode } from '../../shared/viewer-3d/painter';
 import { CatalogService } from '../../core/services/catalog.service';
-import { AccessoryAnchor, PackagingKind, PhotoMatchInfo, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
+import { PackagingKind, PhotoMatchInfo, PreviewAngle, ColorCode, ZonePaint } from '../../core/models/api.model';
 import { BaseModel, ModelLibrary, DeclaredZone, ZoneName, currentModelCode } from './model-manifest';
 import {
   STAND_DECORATIONS,
@@ -109,13 +109,6 @@ function writePreference(name: string, value: string): void {
   }
 }
 
-const KEY_ANCHOR: Record<AccessoryAnchor, string> = {
-  HEAD: 'STUDIO.ACC.ANCHOR.HEAD',
-  FACE: 'STUDIO.ACC.ANCHOR.FACE',
-  NECK: 'STUDIO.ACC.ANCHOR.NECK',
-  BACK: 'STUDIO.ACC.ANCHOR.BACK',
-};
-
 const KEY_ANGLE: Record<StandardAngle, string> = {
   FRONT: 'VIEWER.ANGLE.FRONT',
   LEFT: 'VIEWER.ANGLE.LEFT',
@@ -176,6 +169,7 @@ export class StudioPage implements OnInit {
     key: `STUDIO.HOOP.FINISH.${finish}`,
     swatch: `var(--pm-frame-${finish.toLowerCase()})`,
   }));
+  readonly finishKey = computed(() => `STUDIO.HOOP.FINISH.${this.frameFinish()}`);
 
   /**
    * Ngan treo khung theu truot ra/vao theo hai nhip: gan vao cay DOM truoc (o ngoai man hinh),
@@ -438,21 +432,10 @@ export class StudioPage implements OnInit {
   readonly decorCount = computed(() => this.facade.stand().decorations.length);
 
   // --- Phu kien ---
+  // Khach khong con tu them phu kien; ban nhap cu da co phu kien van hien va tinh gia nhu cu.
 
   /** Mau dang chon co diem neo thi moi gan duoc phu kien. */
   readonly canAccessorize = computed(() => (this.baseModelSelected()?.anchors ?? []).length > 0);
-  readonly accessoryNote = signal<string | null>(null);
-
-  readonly accessoryCards = computed(() => {
-    const picked = this.facade.accessoryPicked();
-    return this.facade.accessoryCatalog().map((raw) => ({
-      raw,
-      on: picked.includes(raw.code),
-      free: isZero(raw.priceDelta.$numberDecimal),
-      anchorKey: KEY_ANCHOR[raw.anchor],
-    }));
-  });
-
   /** Phu kien dang chon, doi ra tep va nut neo de khung ba chieu gan len mau. */
   readonly accessoryMounts = computed<AccessoryMount[]>(() => {
     if (!this.canAccessorize()) {
@@ -507,20 +490,6 @@ export class StudioPage implements OnInit {
         .map((raw) => ({ raw, on: picked[group.kind] === raw.code, free: isZero(raw.priceDelta.$numberDecimal) })),
     })).filter((group) => group.options.length > 0);
   });
-
-  /** Cac loai khung trong danh muc hop voi san pham dang chon (kem gia); chon lai la bo khung. */
-  readonly frameCards = computed(() => {
-    const picked = this.facade.packagingPicked()['FRAME'];
-    const product = this.facade.codeKindSelected();
-    return this.facade
-      .packagingCatalog()
-      .filter((one) => one.kind === 'FRAME' && packagingFits(one.code, product))
-      .map((raw) => ({ raw, on: picked === raw.code, free: isZero(raw.priceDelta.$numberDecimal) }));
-  });
-
-  selectFrame(code: string): void {
-    this.facade.selectPackaging('FRAME', code);
-  }
 
   /** Ten hop va khung dang chon, de ghi vao bang gia. */
   readonly packagingNames = computed(() => {
@@ -779,13 +748,6 @@ export class StudioPage implements OnInit {
     this.nameDraftFor(model);
   }
 
-  toggleAccessory(code: string): void {
-    const done = this.facade.toggleAccessory(code);
-    this.accessoryNote.set(done ? null : 'STUDIO.ACC.FULL');
-    // Phu kien doi thi anh sau goc cu khong con dung, lan sang ngan hoan tat se chup lai.
-    this.preview.set([]);
-  }
-
   recordPainted(swatch: string): void {
     const code = this.palette().find((m) => m.swatch.toLowerCase() === swatch.toLowerCase())?.code;
     if (!code) {
@@ -839,15 +801,24 @@ export class StudioPage implements OnInit {
   }
 
   pickFrameShape(shape: FrameShape): void {
+    this.showFramePreview();
     this.frameShape.set(shape);
     this.facade.markDesignChanged();
     writePreference('frame-shape', shape);
   }
 
   pickFrameFinish(finish: FrameFinish): void {
+    this.showFramePreview();
     this.frameFinish.set(finish);
     this.facade.markDesignChanged();
     writePreference('frame-finish', finish);
+  }
+
+  /** Dang an khung xem truoc ma chon mau khung thi hien lai, khong thi chon ma khong thay gi. */
+  private showFramePreview(): void {
+    if (!this.hoopShown()) {
+      this.toggleHoop();
+    }
   }
 
   /** Mau vua nap xong (ca mau da to cua ban nhap), chup anh cho khung theu. */

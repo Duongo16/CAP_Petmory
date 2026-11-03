@@ -554,12 +554,12 @@
     "BUBBLE_PICK": "Pick a yarn ball, then tap the plush to paint",
     "STEP_OF": "Step {{n}} of {{total}}",
     "FRAME": {
-      "TITLE": "Frame preview",
-      "HINT": "Choose a frame shape and colour; your pet sits in the frame in the panel beside it.",
+      "TITLE": "Frame style",
+      "HINT": "Pick a frame shape and colour. The frame next to your pet changes right away so you can try it on.",
       "TYPE": "Frame type when ordering"
     },
     "SIZE_TITLE": "Size",
-    "SIZE_HINT": "Pick a size first to see the estimated price and how many accessories fit.",
+    "SIZE_HINT": "Pick a size first to see the estimated price.",
     "PRICE_FROM": "Estimate",
     "TOOL": {
       "ROTATE_ON": "Auto-spin",

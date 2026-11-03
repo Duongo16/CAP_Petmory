@@ -554,12 +554,12 @@
     "BUBBLE_PICK": "Chọn một cuộn len rồi chạm lên bé để tô",
     "STEP_OF": "Bước {{n}} / {{total}}",
     "FRAME": {
-      "TITLE": "Khung ướm",
-      "HINT": "Chọn hình dạng và màu khung, bé sẽ nằm trong khung ngay ở khung xem bên cạnh.",
+      "TITLE": "Mẫu khung",
+      "HINT": "Chọn kiểu khung và màu khung. Khung bên cạnh bé đổi ngay để bạn ướm thử.",
       "TYPE": "Loại khung khi đặt hàng"
     },
     "SIZE_TITLE": "Kích cỡ",
-    "SIZE_HINT": "Chọn cỡ trước để xem giá tạm tính và số phụ kiện được gắn.",
+    "SIZE_HINT": "Chọn cỡ trước để xem giá tạm tính.",
     "PRICE_FROM": "Tạm tính",
     "TOOL": {
       "ROTATE_ON": "Tự xoay",
